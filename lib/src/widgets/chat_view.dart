@@ -52,7 +52,7 @@ class ChatView extends StatefulWidget {
     this.isLastPage,
     this.appBar,
     ChatBackgroundConfiguration? chatBackgroundConfig,
-    this.typeIndicatorConfig,
+    this.typingIndicatorConfig,
     this.sendMessageBuilder,
     this.sendMessageConfig,
     this.onChatListTap,
@@ -113,7 +113,7 @@ class ChatView extends StatefulWidget {
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
 
   /// Allow user to giving customisation typing indicator.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypingIndicatorConfiguration? typingIndicatorConfig;
 
   /// Provides controller for accessing few function for running chat.
   final ChatController chatController;
@@ -199,7 +199,7 @@ class _ChatViewState extends State<ChatView> with SingleTickerProviderStateMixin
           return ConfigurationsInheritedWidget(
             chatBackgroundConfig: widget.chatBackgroundConfig,
             reactionPopupConfig: widget.reactionPopupConfig,
-            typeIndicatorConfig: widget.typeIndicatorConfig,
+            typingIndicatorConfig: widget.typingIndicatorConfig,
             chatBubbleConfig: widget.chatBubbleConfig,
             replyPopupConfig: widget.replyPopupConfig,
             messageConfig: widget.messageConfig,

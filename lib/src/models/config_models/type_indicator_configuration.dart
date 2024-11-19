@@ -21,7 +21,7 @@
  */
 import 'package:flutter/material.dart';
 
-class TypeIndicatorConfiguration {
+class TypingIndicatorConfiguration {
   /// Used for giving typing indicator size.
   final double? indicatorSize;
 
@@ -34,7 +34,7 @@ class TypeIndicatorConfiguration {
   /// Used to give color of light circle dots.
   final Color? flashingCircleBrightColor;
 
-  const TypeIndicatorConfiguration({
+  const TypingIndicatorConfiguration({
     this.indicatorSize,
     this.indicatorSpacing,
     this.flashingCircleDarkColor,

@@ -198,6 +198,7 @@ class _ChatScreenState extends State<ChatScreen> {
           textFieldBackgroundColor: theme.textFieldBackgroundColor,
           closeIconColor: theme.closeIconColor,
           textFieldConfig: TextFieldConfiguration(
+            enableEnterToSubmit: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             onMessageTyping: (status) {
               /// Do with status

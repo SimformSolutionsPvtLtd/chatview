@@ -32,7 +32,8 @@ class ChatViewAppBar extends StatelessWidget {
   const ChatViewAppBar({
     Key? key,
     required this.chatTitle,
-    this.backgroundColor = Colors.white,
+    @Deprecated('Use backgroundColor instead') this.backGroundColor = Colors.white,
+    this.backgroundColor,
     this.centerTitle = false,
     this.userStatus,
     this.profilePicture,
@@ -52,8 +53,12 @@ class ChatViewAppBar extends StatelessWidget {
     this.networkImageProgressIndicatorBuilder,
   }) : super(key: key);
 
+  /// [Deprecated] use [backgroundColor] instead, this will be removed in next versions
+  @Deprecated('Use backgroundColor instead. This will be removed in future versions.')
+  final Color backGroundColor;
+
   /// Allow user to change colour of appbar.
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   /// Allow user to center title of appbar.
   final bool centerTitle;
@@ -119,7 +124,7 @@ class ChatViewAppBar extends StatelessWidget {
               top: MediaQuery.of(context).padding.top,
               bottom: 4,
             ),
-        color: backgroundColor,
+        color: backgroundColor ?? backGroundColor,
         child: Row(
           children: [
             if (showLeading)

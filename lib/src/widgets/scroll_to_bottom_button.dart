@@ -26,8 +26,7 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
     if (!mounted) return;
 
     final double currentOffset = scrollController?.offset ?? 0;
-    final double buttonDisplayOffset =
-        chatListConfig.scrollToBottomButtonConfig?.buttonDisplayOffset ?? 300;
+    final double buttonDisplayOffset = chatListConfig.scrollToBottomButtonConfig?.buttonDisplayOffset ?? 300;
     final bool isOffsetCrossedLimit = currentOffset > buttonDisplayOffset;
     if (isOffsetCrossedLimit) {
       if (!isButtonVisible) {
@@ -46,8 +45,7 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
 
   @override
   Widget build(BuildContext context) {
-    final scrollToBottomButtonConfig =
-        chatListConfig.scrollToBottomButtonConfig;
+    final scrollToBottomButtonConfig = chatListConfig.scrollToBottomButtonConfig;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: isButtonVisible ? 1.0 : 0.0),
       duration: const Duration(milliseconds: 200),
@@ -58,23 +56,18 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
           child: InkWell(
             onTap: () {
               scrollToBottomButtonConfig?.onClick?.call();
-              final scrollController =
-                  chatViewIW?.chatController.scrollController;
+              final scrollController = chatViewIW?.chatController.scrollController;
               scrollController?.animateTo(
                 0,
-                duration: scrollToBottomButtonConfig?.scrollAnimationDuration ??
-                    const Duration(milliseconds: 200),
+                duration: scrollToBottomButtonConfig?.scrollAnimationDuration ?? const Duration(milliseconds: 200),
                 curve: Curves.linear,
               );
             },
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: scrollToBottomButtonConfig?.borderRadius ??
-                    BorderRadius.circular(50),
-                border: scrollToBottomButtonConfig?.border ??
-                    Border.all(color: Colors.grey),
-                color:
-                    scrollToBottomButtonConfig?.backgroundColor ?? Colors.white,
+                borderRadius: scrollToBottomButtonConfig?.borderRadius ?? BorderRadius.circular(50),
+                border: scrollToBottomButtonConfig?.border ?? Border.all(color: Colors.grey),
+                color: scrollToBottomButtonConfig?.backgroundColor ?? Colors.white,
               ),
               padding: const EdgeInsets.all(4),
               child: scrollToBottomButtonConfig?.icon ??
@@ -94,6 +87,7 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
   @override
   void dispose() {
     scrollController?.removeListener(_updateScrollButtonVisibility);
+    scrollController?.dispose();
     super.dispose();
   }
 }

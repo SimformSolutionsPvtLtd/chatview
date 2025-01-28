@@ -233,6 +233,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget> with Tick
   void dispose() {
     _animationController?.dispose();
     _replyId.dispose();
+    widget.scrollController.dispose();
     super.dispose();
   }
 

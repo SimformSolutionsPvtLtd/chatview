@@ -24,6 +24,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../chatview.dart';
 import 'profile_image_widget.dart';
@@ -40,6 +41,9 @@ class ChatViewAppBar extends StatelessWidget {
     this.chatTitleTextStyle,
     this.userStatusTextStyle,
     this.backArrowColor,
+    this.shimmerBaseColor = Colors.black38,
+    this.shimmerHighlightColor = Colors.black12,
+    this.shimmerChild,
     this.actions,
     this.elevation = 1.0,
     this.onBackPress,
@@ -56,6 +60,12 @@ class ChatViewAppBar extends StatelessWidget {
   /// [Deprecated] use [backgroundColor] instead, this will be removed in next versions
   @Deprecated('Use backgroundColor instead. This will be removed in future versions.')
   final Color backGroundColor;
+
+  final Color shimmerBaseColor;
+
+  final Color shimmerHighlightColor;
+
+  final Widget? shimmerChild;
 
   /// Allow user to change colour of appbar.
   final Color? backgroundColor;
@@ -156,14 +166,28 @@ class ChatViewAppBar extends StatelessWidget {
                       crossAxisAlignment: centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                       mainAxisAlignment: centerTitle ? MainAxisAlignment.center : MainAxisAlignment.start,
                       children: [
-                        Text(
-                          chatTitle,
-                          style: chatTitleTextStyle ??
-                              const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.25,
-                              ),
+                        Align(
+                          alignment: centerTitle ? Alignment.center : Alignment.centerLeft,
+                          child: chatTitle.isNotEmpty
+                              ? Text(
+                                  chatTitle,
+                                  style: chatTitleTextStyle ??
+                                      const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.25,
+                                      ),
+                                )
+                              : Shimmer.fromColors(
+                                  baseColor: shimmerBaseColor,
+                                  highlightColor: shimmerHighlightColor,
+                                  child: shimmerChild ??
+                                      Container(
+                                        width: 100,
+                                        height: 20,
+                                        color: Colors.white,
+                                      ),
+                                ),
                         ),
                         if (userStatus != null)
                           Text(

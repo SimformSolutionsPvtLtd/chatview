@@ -82,7 +82,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       : null;
 
   String get _replyTo => replyMessage.replyTo == currentUser?.id
-      ? PackageStrings.you
+      ? (widget.sendMessageConfig?.customYouText) ?? PackageStrings.you
       : repliedUser?.name ?? '';
 
   ChatUser? currentUser;
@@ -156,7 +156,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                               ValueListenableBuilder<ReplyMessage>(
                                 builder: (_, state, child) {
                                   final replyTitle =
-                                      "${PackageStrings.replyTo} $_replyTo";
+                                      "${widget.sendMessageConfig?.customReplyingText ?? PackageStrings.replyTo} $_replyTo";
                                   if (state.message.isNotEmpty) {
                                     return widget.replyMessageBuilder
                                             ?.call(context, state) ??

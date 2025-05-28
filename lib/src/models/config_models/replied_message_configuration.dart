@@ -65,6 +65,12 @@ class RepliedMessageConfiguration {
   /// Used to give opacity of replied message.
   final double? opacity;
 
+  /// Used to give user define custom text to "Replied By" text.
+  final String? customRepliedByText;
+
+  /// Used to give user define custom text to "You" text in replying message.
+  final String? customYouText;
+
   /// Provides builder for custom view of replied message.
   final ReplyMessageWithReturnWidget? repliedMessageWidgetBuilder;
 
@@ -87,6 +93,8 @@ class RepliedMessageConfiguration {
     this.verticalBarWidth,
     this.repliedImageMessageHeight,
     this.repliedImageMessageWidth,
+    this.customRepliedByText,
+    this.customYouText,
     this.repliedImageMessageBorderRadius,
     this.repliedMessageWidgetBuilder,
     this.opacity,

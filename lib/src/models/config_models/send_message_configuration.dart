@@ -71,6 +71,12 @@ class SendMessageConfiguration {
   /// Color of mic icon when replying to some voice message.
   final Color? micIconColor;
 
+  /// Used to give user define custom text to "Replying to" text.
+  final String? customReplyingText;
+
+  /// Used to give user define custom text to "You" text in sending message.
+  final String? customYouText;
+
   /// Styling configuration for recorder widget.
   final VoiceRecordingConfiguration? voiceRecordingConfiguration;
 
@@ -88,6 +94,8 @@ class SendMessageConfiguration {
     this.replyTitleColor,
     this.replyMessageColor,
     this.closeIconColor,
+    this.customReplyingText,
+    this.customYouText,
     this.allowRecordingVoice = true,
     this.enableCameraImagePicker = true,
     this.enableGalleryImagePicker = true,

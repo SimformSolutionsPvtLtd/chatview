@@ -56,7 +56,7 @@ class ReplyMessageWidget extends StatelessWidget {
     final replyMessage = message.replyMessage.message;
     final messagedUser =
         chatController?.getUserFromId(message.replyMessage.replyBy);
-    final replyBy = replyBySender ? PackageStrings.you : messagedUser?.name;
+    final replyBy = replyBySender ? (repliedMessageConfig?.customYouText ?? PackageStrings.you) : messagedUser?.name;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -73,7 +73,7 @@ class ReplyMessageWidget extends StatelessWidget {
               replyBySender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Text(
-              "${PackageStrings.repliedBy} $replyBy",
+              "${repliedMessageConfig?.customRepliedByText ?? PackageStrings.repliedBy} $replyBy",
               style: repliedMessageConfig?.replyTitleTextStyle ??
                   textTheme.bodyMedium!
                       .copyWith(fontSize: 14, letterSpacing: 0.3),

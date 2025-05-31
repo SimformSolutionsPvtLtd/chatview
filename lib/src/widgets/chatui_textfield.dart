@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io' show File, Platform;
 
 import 'package:audio_waveforms/audio_waveforms.dart';

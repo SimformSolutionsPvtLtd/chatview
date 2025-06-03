@@ -26,6 +26,7 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview/src/utils/constants/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../chatview.dart';
@@ -74,6 +75,8 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   ValueNotifier<bool> isRecording = ValueNotifier(false);
 
+  bool Function(KeyEvent)? _keyboardHandler;
+
   SendMessageConfiguration? get sendMessageConfig => widget.sendMessageConfig;
 
   VoiceRecordingConfiguration? get voiceRecordingConfig =>
@@ -110,6 +113,12 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
       controller = RecorderController();
     }
+    if (kIsWeb) {
+      if (_attachHardwareKeyboardHandler() case final handler) {
+        _keyboardHandler = handler;
+        HardwareKeyboard.instance.addHandler(handler);
+      }
+    }
   }
 
   @override
@@ -118,6 +127,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     composingStatus.dispose();
     isRecording.dispose();
     _inputText.dispose();
+    if (_keyboardHandler case final handler?) {
+      HardwareKeyboard.instance.removeHandler(handler);
+    }
     super.dispose();
   }
 
@@ -126,6 +138,47 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       widget.sendMessageConfig?.textFieldConfig?.onMessageTyping
           ?.call(composingStatus.value);
     });
+  }
+
+  // Attaches a hardware keyboard handler to handle Enter key events.
+  // This is only applicable for web platforms.
+  // It checks if the Enter key is pressed then sends the message
+  // or inserts a new line based on whether Enter + Shift is pressed.
+  bool Function(KeyEvent) _attachHardwareKeyboardHandler() {
+    return (KeyEvent event) {
+      if (event is! KeyDownEvent ||
+          event.logicalKey != LogicalKeyboardKey.enter) {
+        return false;
+      }
+
+      final pressedKeys = HardwareKeyboard.instance.logicalKeysPressed;
+      final isShiftPressed = pressedKeys.any((key) =>
+          key == LogicalKeyboardKey.shiftLeft ||
+          key == LogicalKeyboardKey.shiftRight);
+      if (!isShiftPressed) {
+        // Send message on Enter
+        if (_inputText.value.trim().isNotEmpty) {
+          widget.onPressed();
+          _inputText.value = '';
+        }
+      } else {
+        // Shift+Enter: insert new line
+        final text = widget.textEditingController.text;
+        final selection = widget.textEditingController.selection;
+
+        // Insert a newline ('\n') at the current cursor position or
+        // replace selected text with it.
+        final newText = text.replaceRange(
+          selection.start,
+          selection.end,
+          '\n',
+        );
+        widget.textEditingController
+          ..text = newText
+          ..selection = TextSelection.collapsed(offset: selection.start + 1);
+      }
+      return true;
+    };
   }
 
   @override

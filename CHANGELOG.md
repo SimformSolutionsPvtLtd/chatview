@@ -1,5 +1,7 @@
 ## [2.4.2] (unreleased)
 
+* **Fix**: [303](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/303)
+  Hit ENTER button on PC keyboard, then send out message immediately
 * **Fix**: [289](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/289)
   ScrollController is disposed when parent widget state changes
 

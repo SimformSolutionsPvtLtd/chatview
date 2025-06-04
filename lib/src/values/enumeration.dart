@@ -22,8 +22,8 @@
 
 // Different types Message of ChatView
 
-import 'package:flutter/material.dart';
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
 
 enum ShowReceiptsIn { all, lastMessage }
 

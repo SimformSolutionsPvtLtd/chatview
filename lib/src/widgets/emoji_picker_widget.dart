@@ -30,6 +30,7 @@ class EmojiPickerWidget extends StatelessWidget {
     Key? key,
     required this.onSelected,
     this.emojiPickerSheetConfig,
+    this.height,
   }) : super(key: key);
 
   /// Provides callback when user selects emoji.
@@ -37,6 +38,9 @@ class EmojiPickerWidget extends StatelessWidget {
 
   /// Configuration for emoji picker sheet
   final Config? emojiPickerSheetConfig;
+
+  /// Height of the emoji picker sheet.
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +52,7 @@ class EmojiPickerWidget extends StatelessWidget {
             Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      height: size.height * 0.6,
+      height: height ?? size.height * 0.6,
       width: size.width,
       child: Column(
         children: [

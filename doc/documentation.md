@@ -530,182 +530,48 @@ real-time messaging with supporting media uploads.
 
 # Migration Guide
 
-## Migration Guide for ChatView 2.0.0
-This guide will help you migrate your code from previous versions of ChatView to version 2.0.0.
+## Migration Guide for ChatView 3.0.0
+This guide will help you migrate your code from previous versions of ChatView to version 3.0.0.
 
 ## Key Changes
 
-### Renamed Properties
+### Add action item widgets for text field
 
-- Renamed `sendBy` field to `sentBy` in `Message` class.
-- Renamed `chatUsers` field to `otherUsers` in `ChatController` class.
+- Add `CameraActionButton` and `GalleryActionButton` widgets to the text field for camera and gallery actions.
+- Now, you can add overlay action button to show overlay action items in the text field.
+  - With multiple action items
 
-### Moved Properties
+To show camera and gallery action items in the text field, you can use `textFieldActionWidgets`.
 
-- Moved `currentUser` field from `ChatView` widget to `ChatController` class.
-
-### Updated Methods
-
-- Updated `id` value in `copyWith` method of `Message` to have correct value.
-- Removed `showTypingIndicator` field from `ChatView` and replaced it with `ChatController.showTypingIndicator`.
-
-### JSON Serialization Changes
-
-The format for `fromJson` and `toJson` methods changed for several classes:
-
-#### ChatUser
-
-**Before (`ChatUser.fromJson`):**
 ```dart
-ChatUser.fromJson(
-  { 
-    ...
-    'imageType': ImageType.asset,
-    ...
-  },
+...
+textFieldConfig: TextFieldConfiguration(
+  textFieldActionWidgets: [
+    CameraActionButton(
+      icon: const Icon(
+        Icons.camera_alt,
+      ),
+      onPressed: (path) {
+        if (path != null) {
+          _onSendTap(path, const ReplyMessage(), MessageType.image);
+        }
+      },
+    ),
+    GalleryActionButton(
+      icon: const Icon(
+        Icons.photo_library,
+      ),
+      onPressed: (path) {
+        if (path != null) {
+          _onSendTap(path, const ReplyMessage(), MessageType.image);
+        }
+      },
+    ),
+  ],
 ),
+...
 ```
 
-**After (`ChatUser.fromJson`):**
-```dart
-ChatUser.fromJson(
-  {
-    ...
-    'imageType': 'asset',
-    ...
-  },
-),
-```
-
-**Before (`ChatUser.toJson`):**
-```dart
-{
-  ...
-  imageType: ImageType.asset,
-  ...
-}
-```
-
-**After (`ChatUser.toJson`):**
-```dart
-{
-  ...
-  imageType: asset,
-  ...
-}
-```
-
-#### Message
-
-**Before (`Message.fromJson`):**
-```dart
-Message.fromJson(
-  {
-    ...
-    'createdAt': DateTime.now(),
-    'message_type': MessageType.text,
-    'voice_message_duration': Duration(seconds: 5),
-    ...
-  }
-)
-```
-
-**After (`Message.fromJson`):**
-```dart
-Message.fromJson(
-  {
-    ...
-    'createdAt': '2024-06-13T17:32:19.586412',
-    'message_type': 'text',
-    'voice_message_duration': '5000000',
-    ...
-  }
-)
-```
-
-**Before (`Message.toJson`):**
-```dart
-{
-  ...
-  createdAt: 2024-06-13 17:23:19.454789,
-  message_type: MessageType.text,
-  voice_message_duration: 0:00:05.000000,
-  ...
-}
-```
-
-**After (`Message.toJson`):**
-```dart
-{
-  ...
-  createdAt: 2024-06-13T17:32:19.586412,
-  message_type: text,
-  voice_message_duration: 5000000,
-  ...
-}
-```
-
-#### ReplyMessage
-
-**Before (`ReplyMessage.fromJson`):**
-```dart
-ReplyMessage.fromJson(
-  {
-    ...
-    'message_type': MessageType.text,  
-    'voiceMessageDuration': Duration(seconds: 5),
-    ...
-  }
-)
-```
-
-**After (`ReplyMessage.fromJson`):**
-```dart
-ReplyMessage.fromJson(
-  {
-    ...
-    'message_type': 'text',  
-    'voiceMessageDuration': '5000000',
-    ...
-  }
-)
-```
-
-**Before (`ReplyMessage.toJson`):**
-```dart
-{
-  ...
-  message_type: MessageType.text,
-  voiceMessageDuration: 0:00:05.000000,
-  ...
-}
-```
-
-**After (`ReplyMessage.toJson`):**
-```dart
-{
-  ...
-  message_type: text,
-  voiceMessageDuration: 5000000,
-  ...
-}
-```
-
-## Typing Indicator Changes
-
-**Before:**
-```dart
-ChatView(
-  showTypingIndicator: false,
-),
-```
-
-**After:**
-```dart
-// Use it with your ChatController instance
-_chatController.setTypingIndicator = true; // for showing indicator
-_chatController.setTypingIndicator = false; // for hiding indicator
-```
 
 # Contributors
 

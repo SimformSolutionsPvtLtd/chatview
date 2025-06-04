@@ -21,9 +21,9 @@
  */
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:chatview_utils/chatview_utils.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../values/typedefs.dart';
@@ -62,12 +62,6 @@ class SendMessageConfiguration {
   /// Enable/disable voice recording. Enabled by default.
   final bool allowRecordingVoice;
 
-  /// Enable/disable image picker from gallery. Enabled by default.
-  final bool enableGalleryImagePicker;
-
-  /// Enable/disable send image from camera. Enabled by default.
-  final bool enableCameraImagePicker;
-
   /// Color of mic icon when replying to some voice message.
   final Color? micIconColor;
 
@@ -89,8 +83,6 @@ class SendMessageConfiguration {
     this.replyMessageColor,
     this.closeIconColor,
     this.allowRecordingVoice = true,
-    this.enableCameraImagePicker = true,
-    this.enableGalleryImagePicker = true,
     this.voiceRecordingConfiguration,
     this.micIconColor,
     this.cancelRecordConfiguration,
@@ -168,6 +160,17 @@ class TextFieldConfiguration {
   /// Default is [true].
   final bool enabled;
 
+  /// List of widgets to be shown as action widget in text field.
+  final TextFieldActionWidgetBuilder? textFieldTrailingActionWidgetBuilder;
+
+  /// List of widgets to be shown as leading action widget in text field.
+  final TextFieldActionWidgetBuilder? textFieldLeadingActionWidgetBuilder;
+
+  /// hint text max lines in text field.
+  final int? hintMaxLines;
+
+  final bool hideLeadingActionsOnType;
+
   const TextFieldConfiguration({
     this.contentPadding,
     this.maxLines,
@@ -184,6 +187,10 @@ class TextFieldConfiguration {
     this.inputFormatters,
     this.textCapitalization,
     this.enabled = true,
+    this.textFieldTrailingActionWidgetBuilder,
+    this.textFieldLeadingActionWidgetBuilder,
+    this.hintMaxLines,
+    this.hideLeadingActionsOnType = true,
   });
 }
 

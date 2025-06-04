@@ -27,7 +27,6 @@ import 'package:chatview/src/utils/constants/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../chatview.dart';
 import '../utils/debounce.dart';
@@ -67,8 +66,6 @@ class ChatUITextField extends StatefulWidget {
 
 class _ChatUITextFieldState extends State<ChatUITextField> {
   final ValueNotifier<String> _inputText = ValueNotifier('');
-
-  final ImagePicker _imagePicker = ImagePicker();
 
   RecorderController? controller;
 
@@ -118,18 +115,24 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         HardwareKeyboard.instance.addHandler(handler);
       }
     }
+    widget.textEditingController.addListener(_handleTextChange);
   }
 
   @override
   void dispose() {
     debouncer.dispose();
     composingStatus.dispose();
+    widget.textEditingController.removeListener(_handleTextChange);
     isRecording.dispose();
     _inputText.dispose();
     if (_keyboardHandler case final handler?) {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     super.dispose();
+  }
+
+  void _handleTextChange() {
+    _onChanged(widget.textEditingController.text);
   }
 
   void attachListeners() {
@@ -224,39 +227,73 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                 )
               else
                 Expanded(
-                  child: TextField(
-                    focusNode: widget.focusNode,
-                    controller: widget.textEditingController,
-                    style: textFieldConfig?.textStyle ??
-                        const TextStyle(color: Colors.white),
-                    maxLines: textFieldConfig?.maxLines ?? 5,
-                    minLines: textFieldConfig?.minLines ?? 1,
-                    keyboardType: textFieldConfig?.textInputType,
-                    inputFormatters: textFieldConfig?.inputFormatters,
-                    onChanged: _onChanged,
-                    enabled: textFieldConfig?.enabled,
-                    textCapitalization: textFieldConfig?.textCapitalization ??
-                        TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      hintText: textFieldConfig?.hintText ??
-                          PackageStrings.currentLocale.message,
-                      fillColor: sendMessageConfig?.textFieldBackgroundColor ??
-                          Colors.white,
-                      filled: true,
-                      hintStyle: textFieldConfig?.hintStyle ??
-                          TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade600,
-                            letterSpacing: 0.25,
+                  child: Row(
+                    children: [
+                      if (textFieldConfig?.hideLeadingActionsOnType ?? false)
+                        ValueListenableBuilder(
+                          valueListenable: _inputText,
+                          builder: (context, value, child) {
+                            if (value.isNotEmpty) {
+                              return const SizedBox.shrink();
+                            } else {
+                              return Row(
+                                children: textFieldConfig
+                                        ?.textFieldLeadingActionWidgetBuilder
+                                        ?.call(
+                                      context,
+                                      widget.textEditingController,
+                                    ) ??
+                                    [],
+                              );
+                            }
+                          },
+                        )
+                      else
+                        ...?textFieldConfig?.textFieldLeadingActionWidgetBuilder
+                            ?.call(
+                          context,
+                          widget.textEditingController,
+                        ),
+                      Expanded(
+                        child: TextField(
+                          focusNode: widget.focusNode,
+                          controller: widget.textEditingController,
+                          style: textFieldConfig?.textStyle ??
+                              const TextStyle(color: Colors.white),
+                          maxLines: textFieldConfig?.maxLines ?? 5,
+                          minLines: textFieldConfig?.minLines ?? 1,
+                          keyboardType: textFieldConfig?.textInputType,
+                          inputFormatters: textFieldConfig?.inputFormatters,
+                          enabled: textFieldConfig?.enabled,
+                          textCapitalization:
+                              textFieldConfig?.textCapitalization ??
+                                  TextCapitalization.sentences,
+                          decoration: InputDecoration(
+                            hintText: textFieldConfig?.hintText ??
+                                PackageStrings.currentLocale.message,
+                            fillColor:
+                                sendMessageConfig?.textFieldBackgroundColor ??
+                                    Colors.white,
+                            filled: true,
+                            hintMaxLines: textFieldConfig?.hintMaxLines ?? 1,
+                            hintStyle: textFieldConfig?.hintStyle ??
+                                TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey.shade600,
+                                  letterSpacing: 0.25,
+                                ),
+                            contentPadding: textFieldConfig?.contentPadding ??
+                                const EdgeInsets.symmetric(horizontal: 6),
+                            border: outlineBorder,
+                            focusedBorder: outlineBorder,
+                            enabledBorder: outlineBorder,
+                            disabledBorder: outlineBorder,
                           ),
-                      contentPadding: textFieldConfig?.contentPadding ??
-                          const EdgeInsets.symmetric(horizontal: 6),
-                      border: outlineBorder,
-                      focusedBorder: outlineBorder,
-                      enabledBorder: outlineBorder,
-                      disabledBorder: outlineBorder,
-                    ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ValueListenableBuilder<String>(
@@ -278,46 +315,51 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                   } else {
                     return Row(
                       children: [
-                        if (!isRecordingValue) ...[
-                          if (sendMessageConfig?.enableCameraImagePicker ??
-                              true)
-                            IconButton(
-                              constraints: const BoxConstraints(),
-                              onPressed: (textFieldConfig?.enabled ?? true)
-                                  ? () => _onIconPressed(
-                                        ImageSource.camera,
-                                        config: sendMessageConfig
-                                            ?.imagePickerConfiguration,
-                                      )
-                                  : null,
-                              icon: imagePickerIconsConfig
-                                      ?.cameraImagePickerIcon ??
-                                  Icon(
-                                    Icons.camera_alt_outlined,
-                                    color:
-                                        imagePickerIconsConfig?.cameraIconColor,
-                                  ),
-                            ),
-                          if (sendMessageConfig?.enableGalleryImagePicker ??
-                              true)
-                            IconButton(
-                              constraints: const BoxConstraints(),
-                              onPressed: (textFieldConfig?.enabled ?? true)
-                                  ? () => _onIconPressed(
-                                        ImageSource.gallery,
-                                        config: sendMessageConfig
-                                            ?.imagePickerConfiguration,
-                                      )
-                                  : null,
-                              icon: imagePickerIconsConfig
-                                      ?.galleryImagePickerIcon ??
-                                  Icon(
-                                    Icons.image,
-                                    color: imagePickerIconsConfig
-                                        ?.galleryIconColor,
-                                  ),
-                            ),
-                        ],
+                        if (!isRecordingValue)
+                          ...textFieldConfig
+                                  ?.textFieldTrailingActionWidgetBuilder
+                                  ?.call(
+                                context,
+                                widget.textEditingController,
+                              ) ??
+                              [
+                                CameraActionButton(
+                                  icon: imagePickerIconsConfig
+                                          ?.cameraImagePickerIcon ??
+                                      Icon(
+                                        Icons.camera_alt_outlined,
+                                        color: imagePickerIconsConfig
+                                            ?.cameraIconColor,
+                                      ),
+                                  onPressed: (value) {
+                                    (textFieldConfig?.enabled ?? true)
+                                        ? widget.onImageSelected(
+                                            value ?? '',
+                                            '',
+                                          )
+                                        : null;
+                                  },
+                                ),
+                                GalleryActionButton(
+                                  icon: imagePickerIconsConfig
+                                          ?.galleryImagePickerIcon ??
+                                      Icon(
+                                        Icons.image,
+                                        color: imagePickerIconsConfig
+                                            ?.galleryIconColor,
+                                      ),
+                                  onPressed: (value) {
+                                    (textFieldConfig?.enabled ?? true)
+                                        ? widget.onImageSelected(
+                                            value ?? '',
+                                            '',
+                                          )
+                                        : null;
+                                  },
+                                ),
+                              ],
+
+                        // Always add the voice button at the end if allowed
                         if ((sendMessageConfig?.allowRecordingVoice ?? false) &&
                             !kIsWeb &&
                             (Platform.isIOS || Platform.isAndroid))
@@ -334,6 +376,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                       voiceRecordingConfig?.recorderIconColor,
                                 ),
                           ),
+
                         if (isRecordingValue &&
                             cancelRecordConfiguration != null)
                           IconButton(
@@ -398,44 +441,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       final path = await controller?.stop();
       isRecording.value = false;
       widget.onRecordingComplete(path);
-    }
-  }
-
-  void _onIconPressed(
-    ImageSource imageSource, {
-    ImagePickerConfiguration? config,
-  }) async {
-    final hasFocus = widget.focusNode.hasFocus;
-    try {
-      widget.focusNode.unfocus();
-      final XFile? image = await _imagePicker.pickImage(
-        source: imageSource,
-        maxHeight: config?.maxHeight,
-        maxWidth: config?.maxWidth,
-        imageQuality: config?.imageQuality,
-        preferredCameraDevice:
-            config?.preferredCameraDevice ?? CameraDevice.rear,
-      );
-      String? imagePath = image?.path;
-      if (config?.onImagePicked != null) {
-        String? updatedImagePath = await config?.onImagePicked!(imagePath);
-        if (updatedImagePath != null) imagePath = updatedImagePath;
-      }
-      widget.onImageSelected(imagePath ?? '', '');
-    } catch (e) {
-      widget.onImageSelected('', e.toString());
-    } finally {
-      // To maintain the iOS native behavior of text field,
-      // When the user taps on the gallery icon, and the text field has focus,
-      // the keyboard should close.
-      // We need to request focus again to open the keyboard.
-      // This is not required for Android.
-      // This is a workaround for the issue where the keyboard remain open and overlaps the text field.
-
-      // https://github.com/SimformSolutionsPvtLtd/chatview/issues/266
-      if (imageSource == ImageSource.gallery && Platform.isIOS && hasFocus) {
-        widget.focusNode.requestFocus();
-      }
     }
   }
 

@@ -67,3 +67,7 @@ typedef CustomViewForReplyMessage = Widget Function(
   ReplyMessage state,
 );
 typedef GetMessageSeparator = (Map<int, DateTime>, DateTime);
+typedef TextFieldActionWidgetBuilder = List<Widget> Function(
+  BuildContext context,
+  TextEditingController controller,
+);

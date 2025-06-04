@@ -30,6 +30,8 @@ import '../../values/typedefs.dart';
 
 class SendMessageConfiguration {
   const SendMessageConfiguration({
+    this.shouldSendImageWithText = false,
+    this.allowRecordingVoice = true,
     this.textFieldConfig,
     this.textFieldBackgroundColor,
     this.imagePickerIconsConfig,
@@ -40,13 +42,9 @@ class SendMessageConfiguration {
     this.replyTitleColor,
     this.replyMessageColor,
     this.closeIconColor,
-    this.allowRecordingVoice = true,
-    this.enableCameraImagePicker = true,
-    this.enableGalleryImagePicker = true,
     this.voiceRecordingConfiguration,
     this.micIconColor,
     this.cancelRecordConfiguration,
-    this.shouldSendImageWithText = false,
     this.removeImageIcon,
     this.removeImageIconColor,
     this.removeImageIconSize,
@@ -88,12 +86,6 @@ class SendMessageConfiguration {
 
   /// Enable/disable voice recording. Enabled by default.
   final bool allowRecordingVoice;
-
-  /// Enable/disable image picker from gallery. Enabled by default.
-  final bool enableGalleryImagePicker;
-
-  /// Enable/disable send image from camera. Enabled by default.
-  final bool enableCameraImagePicker;
 
   /// Color of mic icon when replying to some voice message.
   final Color? micIconColor;
@@ -152,6 +144,9 @@ class ImagePickerIconsConfiguration {
 
 class TextFieldConfiguration {
   const TextFieldConfiguration({
+    this.enabled = true,
+    this.hideLeadingActionsOnType = true,
+    this.compositionThresholdTime = const Duration(seconds: 1),
     this.contentPadding,
     this.maxLines,
     this.borderRadius,
@@ -163,11 +158,12 @@ class TextFieldConfiguration {
     this.minLines,
     this.textInputType,
     this.onMessageTyping,
-    this.compositionThresholdTime = const Duration(seconds: 1),
     this.inputFormatters,
     this.textCapitalization,
-    this.enabled = true,
     this.height,
+    this.hintMaxLines,
+    this.textFieldTrailingActionWidgetBuilder,
+    this.textFieldLeadingActionWidgetBuilder,
   });
 
   /// Used to give max lines in text field.
@@ -221,6 +217,17 @@ class TextFieldConfiguration {
 
   /// Used to give height of text field.
   final double? height;
+
+  /// List of widgets to be shown as action widget in text field.
+  final TextFieldActionWidgetBuilder? textFieldTrailingActionWidgetBuilder;
+
+  /// List of widgets to be shown as leading action widget in text field.
+  final TextFieldActionWidgetBuilder? textFieldLeadingActionWidgetBuilder;
+
+  /// hint text max lines in text field.
+  final int? hintMaxLines;
+
+  final bool hideLeadingActionsOnType;
 }
 
 class ImagePickerConfiguration {

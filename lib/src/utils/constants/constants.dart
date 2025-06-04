@@ -52,6 +52,7 @@ const double leftPadding3 = 12;
 const double textFieldBorderRadius = 27;
 const String defaultChatSeparatorDatePattern = 'MMM dd, yyyy';
 const double defaultChatTextFieldHeight = 10.0;
+const String emojiRegex = r'^(:[^:\s]+:)+$';
 
 applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {

@@ -1,3 +1,8 @@
+## [3.0.0] (unreleased)
+* **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/318)
+  Provide support for action item widgets on the chat text field with position options leading and trailing.
+  Also, provide a way to add plus/attach button to open the overlay for action items.
+
 ## [2.5.0]
 
 * **Feat**: [275](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/275)

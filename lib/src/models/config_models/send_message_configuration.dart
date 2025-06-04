@@ -29,33 +29,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../values/typedefs.dart';
 
 class SendMessageConfiguration {
-  const SendMessageConfiguration({
-    this.textFieldConfig,
-    this.textFieldBackgroundColor,
-    this.imagePickerIconsConfig,
-    this.imagePickerConfiguration,
-    this.defaultSendButtonColor,
-    this.sendButtonIcon,
-    this.replyDialogColor,
-    this.replyTitleColor,
-    this.replyMessageColor,
-    this.closeIconColor,
-    this.allowRecordingVoice = true,
-    this.enableCameraImagePicker = true,
-    this.enableGalleryImagePicker = true,
-    this.voiceRecordingConfiguration,
-    this.micIconColor,
-    this.cancelRecordConfiguration,
-    this.shouldSendImageWithText = false,
-    this.removeImageIcon,
-    this.removeImageIconColor,
-    this.removeImageIconSize,
-    this.selectedImageMargin,
-    this.selectedImageViewHeight,
-    this.imageBorderRadius,
-    this.selectedImageViewBuilder,
-  });
-
   /// Used to give background color to text field.
   final Color? textFieldBackgroundColor;
 
@@ -89,12 +62,6 @@ class SendMessageConfiguration {
   /// Enable/disable voice recording. Enabled by default.
   final bool allowRecordingVoice;
 
-  /// Enable/disable image picker from gallery. Enabled by default.
-  final bool enableGalleryImagePicker;
-
-  /// Enable/disable send image from camera. Enabled by default.
-  final bool enableCameraImagePicker;
-
   /// Color of mic icon when replying to some voice message.
   final Color? micIconColor;
 
@@ -127,6 +94,31 @@ class SendMessageConfiguration {
 
   /// Provides ability to build custom view for selected images in text field.
   final SelectedImageViewBuilder? selectedImageViewBuilder;
+
+  const SendMessageConfiguration({
+    this.textFieldConfig,
+    this.textFieldBackgroundColor,
+    this.imagePickerIconsConfig,
+    this.imagePickerConfiguration,
+    this.defaultSendButtonColor,
+    this.sendButtonIcon,
+    this.replyDialogColor,
+    this.replyTitleColor,
+    this.replyMessageColor,
+    this.closeIconColor,
+    this.allowRecordingVoice = true,
+    this.voiceRecordingConfiguration,
+    this.micIconColor,
+    this.cancelRecordConfiguration,
+    this.shouldSendImageWithText = false,
+    this.removeImageIcon,
+    this.removeImageIconColor,
+    this.removeImageIconSize,
+    this.selectedImageMargin,
+    this.selectedImageViewHeight,
+    this.imageBorderRadius,
+    this.selectedImageViewBuilder,
+  });
 }
 
 class ImagePickerIconsConfiguration {
@@ -151,25 +143,6 @@ class ImagePickerIconsConfiguration {
 }
 
 class TextFieldConfiguration {
-  const TextFieldConfiguration({
-    this.contentPadding,
-    this.maxLines,
-    this.borderRadius,
-    this.hintText,
-    this.hintStyle,
-    this.textStyle,
-    this.padding,
-    this.margin,
-    this.minLines,
-    this.textInputType,
-    this.onMessageTyping,
-    this.compositionThresholdTime = const Duration(seconds: 1),
-    this.inputFormatters,
-    this.textCapitalization,
-    this.enabled = true,
-    this.height,
-  });
-
   /// Used to give max lines in text field.
   final int? maxLines;
 
@@ -221,6 +194,40 @@ class TextFieldConfiguration {
 
   /// Used to give height of text field.
   final double? height;
+
+  /// List of widgets to be shown as action widget in text field.
+  final TextFieldActionWidgetBuilder? textFieldTrailingActionWidgetBuilder;
+
+  /// List of widgets to be shown as leading action widget in text field.
+  final TextFieldActionWidgetBuilder? textFieldLeadingActionWidgetBuilder;
+
+  /// hint text max lines in text field.
+  final int? hintMaxLines;
+
+  final bool hideLeadingActionsOnType;
+
+  const TextFieldConfiguration({
+    this.contentPadding,
+    this.maxLines,
+    this.borderRadius,
+    this.hintText,
+    this.hintStyle,
+    this.textStyle,
+    this.padding,
+    this.margin,
+    this.minLines,
+    this.textInputType,
+    this.onMessageTyping,
+    this.compositionThresholdTime = const Duration(seconds: 1),
+    this.inputFormatters,
+    this.textCapitalization,
+    this.enabled = true,
+    this.textFieldTrailingActionWidgetBuilder,
+    this.textFieldLeadingActionWidgetBuilder,
+    this.hintMaxLines,
+    this.hideLeadingActionsOnType = true,
+    this.height,
+  });
 }
 
 class ImagePickerConfiguration {

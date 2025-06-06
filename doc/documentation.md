@@ -22,6 +22,7 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 - Connect ChatView to any backend
   using [chatview_connect](https://pub.dev/packages/chatview_connect)
 - And a wide range of configuration options to customize your chat.
+- Internationalization support
 
 For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.github.io/chatview/).
 
@@ -491,6 +492,33 @@ ChatView(
   },
   // ...
 )
+```
+
+## Internationalization
+ChatView supports internationalization (i18n) for various languages. You can set the locale using the `PackageString.setLocale('en')`.
+
+```dart
+PackageStrings.addLocaleObject(
+  'es',
+  const ChatViewLocale(
+    today: 'Hoy',
+    yesterday: 'Ayer',
+    repliedToYou: 'Te respondió',
+    repliedBy: 'Respondido por',
+    more: 'Más',
+    unsend: 'Desenviar',
+    reply: 'Responder',
+    replyTo: 'Responder a',
+    message: 'Mensaje',
+    reactionPopupTitle: 'Mantén presionado para multiplicar tu reacción',
+    photo: 'Foto',
+    send: 'Enviar',
+    you: 'Tú',
+    report: 'Reportar',
+  ),
+);
+
+PackageStrings.setLocale('es');
 ```
 
 ## Backend Integration

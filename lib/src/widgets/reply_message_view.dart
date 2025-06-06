@@ -21,8 +21,8 @@
  */
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:flutter/material.dart';
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
 
 import '../models/models.dart';
 import '../utils/package_strings.dart';
@@ -70,7 +70,7 @@ class ReplyMessageView extends StatelessWidget {
                   sendMessageConfig?.replyMessageColor ?? Colors.grey.shade700,
             ),
             Text(
-              PackageStrings.photo,
+              PackageStrings.currentLocale.photo,
               style: TextStyle(
                 color: sendMessageConfig?.replyMessageColor ?? Colors.black,
               ),

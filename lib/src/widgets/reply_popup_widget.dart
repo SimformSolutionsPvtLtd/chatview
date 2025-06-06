@@ -19,9 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:flutter/material.dart';
-
 import 'package:chatview/src/utils/package_strings.dart';
+import 'package:flutter/material.dart';
 
 import '../values/typedefs.dart';
 
@@ -76,7 +75,7 @@ class ReplyPopupWidget extends StatelessWidget {
             child: InkWell(
               onTap: onReplyTap,
               child: Text(
-                PackageStrings.reply,
+                PackageStrings.currentLocale.reply,
                 textAlign: TextAlign.center,
                 style: textStyle,
               ),
@@ -87,7 +86,7 @@ class ReplyPopupWidget extends StatelessWidget {
               child: InkWell(
                 onTap: onUnsendTap,
                 child: Text(
-                  PackageStrings.unsend,
+                  PackageStrings.currentLocale.unsend,
                   textAlign: TextAlign.center,
                   style: textStyle,
                 ),
@@ -98,7 +97,7 @@ class ReplyPopupWidget extends StatelessWidget {
               child: InkWell(
                 onTap: onReportTap,
                 child: Text(
-                  PackageStrings.report,
+                  PackageStrings.currentLocale.report,
                   textAlign: TextAlign.center,
                   style: textStyle,
                 ),
@@ -108,7 +107,7 @@ class ReplyPopupWidget extends StatelessWidget {
             child: InkWell(
               onTap: onMoreTap,
               child: Text(
-                PackageStrings.more,
+                PackageStrings.currentLocale.more,
                 textAlign: TextAlign.center,
                 style: textStyle,
               ),

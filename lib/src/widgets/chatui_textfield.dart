@@ -31,7 +31,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../chatview.dart';
 import '../utils/debounce.dart';
-import '../utils/package_strings.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({
@@ -239,8 +238,8 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                     textCapitalization: textFieldConfig?.textCapitalization ??
                         TextCapitalization.sentences,
                     decoration: InputDecoration(
-                      hintText:
-                          textFieldConfig?.hintText ?? PackageStrings.message,
+                      hintText: textFieldConfig?.hintText ??
+                          PackageStrings.currentLocale.message,
                       fillColor: sendMessageConfig?.textFieldBackgroundColor ??
                           Colors.white,
                       filled: true,

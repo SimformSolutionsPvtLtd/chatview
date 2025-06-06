@@ -23,7 +23,6 @@ import 'dart:io' if (kIsWeb) 'dart:html';
 
 import 'package:chatview/chatview.dart';
 import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/utils/package_strings.dart';
 import 'package:chatview/src/widgets/chatui_textfield.dart';
 import 'package:chatview/src/widgets/reply_message_view.dart';
 import 'package:chatview/src/widgets/scroll_to_bottom_button.dart';
@@ -82,7 +81,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       : null;
 
   String get _replyTo => replyMessage.replyTo == currentUser?.id
-      ? PackageStrings.you
+      ? PackageStrings.currentLocale.you
       : repliedUser?.name ?? '';
 
   ChatUser? currentUser;
@@ -156,7 +155,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                               ValueListenableBuilder<ReplyMessage>(
                                 builder: (_, state, child) {
                                   final replyTitle =
-                                      "${PackageStrings.replyTo} $_replyTo";
+                                      "${PackageStrings.currentLocale.replyTo} $_replyTo";
                                   if (state.message.isNotEmpty) {
                                     return widget.replyMessageBuilder
                                             ?.call(context, state) ??

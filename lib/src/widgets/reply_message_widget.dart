@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:flutter/material.dart';
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
 
 import '../models/config_models/replied_message_configuration.dart';
 import '../utils/constants/constants.dart';
@@ -56,7 +56,8 @@ class ReplyMessageWidget extends StatelessWidget {
     final replyMessage = message.replyMessage.message;
     final messagedUser =
         chatController?.getUserFromId(message.replyMessage.replyBy);
-    final replyBy = replyBySender ? PackageStrings.you : messagedUser?.name;
+    final replyBy =
+        replyBySender ? PackageStrings.currentLocale.you : messagedUser?.name;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -73,7 +74,7 @@ class ReplyMessageWidget extends StatelessWidget {
               replyBySender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Text(
-              "${PackageStrings.repliedBy} $replyBy",
+              "${PackageStrings.currentLocale.repliedBy} $replyBy",
               style: repliedMessageConfig?.replyTitleTextStyle ??
                   textTheme.bodyMedium!
                       .copyWith(fontSize: 14, letterSpacing: 0.3),

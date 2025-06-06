@@ -19,20 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import 'chat_view_locale.dart';
+
 class PackageStrings {
-  static const String today = "Today";
-  static const String yesterday = "Yesterday";
-  static const String repliedToYou = "Replied to you";
-  static const String repliedBy = "Replied by";
-  static const String more = "More";
-  static const String unsend = "Unsend";
-  static const String reply = "Reply";
-  static const String replyTo = "Replying to";
-  static const String message = "Message";
-  static const String reactionPopupTitle =
-      "Tap and hold to multiply your reaction";
-  static const String photo = "Photo";
-  static const String send = "Send";
-  static const String you = "You";
-  static const String report = "Report";
+  static final Map<String, ChatViewLocale> _localeObjects = {
+    'en': ChatViewLocale.en,
+  };
+
+  static String _currentLocale = 'en';
+
+  /// Set the current locale for the package strings (e.g., 'en', 'es').
+  static void setLocale(String locale) {
+    assert(_localeObjects.containsKey(locale),
+        'Locale "$locale" not found. Please add it using PackageStrings.addLocaleObject("$locale", ChatViewLocale(...)) before setting.');
+    if (_localeObjects.containsKey(locale)) {
+      _currentLocale = locale;
+    }
+  }
+
+  /// Allow developers to add or override locales at runtime using a class
+  static void addLocaleObject(String locale, ChatViewLocale localeObj) {
+    _localeObjects[locale] = localeObj;
+  }
+
+  static ChatViewLocale get currentLocale =>
+      _localeObjects[_currentLocale] ?? ChatViewLocale.en;
 }

@@ -1,5 +1,7 @@
 ## [2.4.2] (unreleased)
 
+* **Feat**: [296](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/296)
+  Added support of internationalization for strings that are used in chat view
 * **Fix**: [303](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/303)
   Hit ENTER button on PC keyboard, then send out message immediately
 * **Fix**: [289](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/289)

@@ -1,5 +1,8 @@
 ## [2.4.2] (unreleased)
 
+* **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/318)
+  Provide support for action item widgets on the chat text field. Also, provide a way to add plus/attach
+  button to open the overlay for action items.
 * **Fix**: [303](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/303)
   Hit ENTER button on PC keyboard, then send out message immediately
 * **Fix**: [289](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/289)

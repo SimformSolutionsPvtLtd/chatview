@@ -31,7 +31,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../chatview.dart';
 import '../utils/debounce.dart';
-import '../utils/package_strings.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({

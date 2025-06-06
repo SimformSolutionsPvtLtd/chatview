@@ -19,20 +19,129 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+/// Class representing all localizable strings for ChatView package.
+class ChatViewLocale {
+  final String today;
+  final String yesterday;
+  final String repliedToYou;
+  final String repliedBy;
+  final String more;
+  final String unsend;
+  final String reply;
+  final String replyTo;
+  final String message;
+  final String reactionPopupTitle;
+  final String photo;
+  final String send;
+  final String you;
+  final String report;
+
+  const ChatViewLocale({
+    required this.today,
+    required this.yesterday,
+    required this.repliedToYou,
+    required this.repliedBy,
+    required this.more,
+    required this.unsend,
+    required this.reply,
+    required this.replyTo,
+    required this.message,
+    required this.reactionPopupTitle,
+    required this.photo,
+    required this.send,
+    required this.you,
+    required this.report,
+  });
+
+  /// Create from Map<String, String>
+  factory ChatViewLocale.fromMap(Map<String, String> map) {
+    return ChatViewLocale(
+      today: map['today'] ?? '',
+      yesterday: map['yesterday'] ?? '',
+      repliedToYou: map['repliedToYou'] ?? '',
+      repliedBy: map['repliedBy'] ?? '',
+      more: map['more'] ?? '',
+      unsend: map['unsend'] ?? '',
+      reply: map['reply'] ?? '',
+      replyTo: map['replyTo'] ?? '',
+      message: map['message'] ?? '',
+      reactionPopupTitle: map['reactionPopupTitle'] ?? '',
+      photo: map['photo'] ?? '',
+      send: map['send'] ?? '',
+      you: map['you'] ?? '',
+      report: map['report'] ?? '',
+    );
+  }
+
+  /// English defaults
+  static const en = ChatViewLocale(
+    today: 'Today',
+    yesterday: 'Yesterday',
+    repliedToYou: 'Replied to you',
+    repliedBy: 'Replied by',
+    more: 'More',
+    unsend: 'Unsend',
+    reply: 'Reply',
+    replyTo: 'Replying to',
+    message: 'Message',
+    reactionPopupTitle: 'Tap and hold to multiply your reaction',
+    photo: 'Photo',
+    send: 'Send',
+    you: 'You',
+    report: 'Report',
+  );
+}
+
 class PackageStrings {
-  static const String today = "Today";
-  static const String yesterday = "Yesterday";
-  static const String repliedToYou = "Replied to you";
-  static const String repliedBy = "Replied by";
-  static const String more = "More";
-  static const String unsend = "Unsend";
-  static const String reply = "Reply";
-  static const String replyTo = "Replying to";
-  static const String message = "Message";
-  static const String reactionPopupTitle =
-      "Tap and hold to multiply your reaction";
-  static const String photo = "Photo";
-  static const String send = "Send";
-  static const String you = "You";
-  static const String report = "Report";
+  static final Map<String, ChatViewLocale> _localeObjects = {
+    'en': ChatViewLocale.en,
+  };
+
+  static String _currentLocale = 'en';
+
+  /// Set the current locale for the package strings (e.g., 'en', 'es').
+  static void setLocale(String locale) {
+    assert(_localeObjects.containsKey(locale),
+        'Locale "$locale" not found. Please add it using PackageStrings.addLocaleObject("$locale", ChatViewLocale(...)) before setting.');
+    if (_localeObjects.containsKey(locale)) {
+      _currentLocale = locale;
+    }
+  }
+
+  /// Allow developers to add or override locales at runtime using a class
+  static void addLocaleObject(String locale, ChatViewLocale localeObj) {
+    _localeObjects[locale] = localeObj;
+  }
+
+  static ChatViewLocale get _activeLocale =>
+      _localeObjects[_currentLocale] ?? ChatViewLocale.en;
+
+  static String get today => _activeLocale.today;
+
+  static String get yesterday => _activeLocale.yesterday;
+
+  static String get repliedToYou => _activeLocale.repliedToYou;
+
+  static String get repliedBy => _activeLocale.repliedBy;
+
+  static String get more => _activeLocale.more;
+
+  static String get unsend => _activeLocale.unsend;
+
+  static String get reply => _activeLocale.reply;
+
+  static String get replyTo => _activeLocale.replyTo;
+
+  static String get message => _activeLocale.message;
+
+  static String get reactionPopupTitle => _activeLocale.reactionPopupTitle;
+
+  static String get photo => _activeLocale.photo;
+
+  static String get send => _activeLocale.send;
+
+  static String get you => _activeLocale.you;
+
+  static String get report => _activeLocale.report;
 }

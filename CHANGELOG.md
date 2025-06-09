@@ -1,5 +1,7 @@
 ## [2.4.2] (unreleased)
 
+* **Fix**: [266](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/266)
+  Fix the keyboard overlapping the text field
 * **Feat**: [296](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/296)
   Added support of internationalization for strings that are used in chat view
 * **Fix**: [303](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/303)

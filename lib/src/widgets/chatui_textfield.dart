@@ -405,7 +405,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     ImageSource imageSource, {
     ImagePickerConfiguration? config,
   }) async {
+    final hasFocus = widget.focusNode.hasFocus;
     try {
+      widget.focusNode.unfocus();
       final XFile? image = await _imagePicker.pickImage(
         source: imageSource,
         maxHeight: config?.maxHeight,
@@ -422,6 +424,18 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       widget.onImageSelected(imagePath ?? '', '');
     } catch (e) {
       widget.onImageSelected('', e.toString());
+    } finally {
+      // To maintain the iOS native behavior of text field,
+      // When the user taps on the gallery icon, and the text field has focus,
+      // the keyboard should close.
+      // We need to request focus again to open the keyboard.
+      // This is not required for Android.
+      // This is a workaround for the issue where the keyboard remain open and overlaps the text field.
+
+      // https://github.com/SimformSolutionsPvtLtd/chatview/issues/266
+      if (imageSource == ImageSource.gallery && Platform.isIOS && hasFocus) {
+        widget.focusNode.requestFocus();
+      }
     }
   }
 

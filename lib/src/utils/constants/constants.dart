@@ -56,6 +56,8 @@ const double replyBorderRadius2 = 18;
 const double leftPadding3 = 12;
 const double textFieldBorderRadius = 27;
 const String defaultChatSeparatorDatePattern = 'MMM dd, yyyy';
+const int primaryColorHex = 0xffEE5366;
+const String defaultDateFormat = 'dd/MM/yyyy';
 
 applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {

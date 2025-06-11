@@ -13,7 +13,7 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
     this.profileCircleConfig,
     this.swipeToReplyConfig,
     this.repliedMessageConfig,
-    this.typeIndicatorConfig,
+    this.typingIndicatorConfig,
     this.replyPopupConfig,
     this.emojiPickerSheetConfig,
     this.scrollToBottomButtonConfig,
@@ -43,7 +43,7 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
   final RepliedMessageConfiguration? repliedMessageConfig;
 
   /// Provides configuration of typing indicator's appearance.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypingIndicatorConfiguration? typingIndicatorConfig;
 
   /// Provides configuration for reply snack bar's appearance and options.
   final ReplyPopupConfiguration? replyPopupConfig;
@@ -54,10 +54,9 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
   /// Provides a configuration for scroll to bottom button config
   final ScrollToBottomButtonConfig? scrollToBottomButtonConfig;
 
-  static ConfigurationsInheritedWidget? of(BuildContext context) => context
-      .dependOnInheritedWidgetOfExactType<ConfigurationsInheritedWidget>();
+  static ConfigurationsInheritedWidget? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ConfigurationsInheritedWidget>();
 
   @override
-  bool updateShouldNotify(covariant ConfigurationsInheritedWidget oldWidget) =>
-      oldWidget != this;
+  bool updateShouldNotify(covariant ConfigurationsInheritedWidget oldWidget) => oldWidget != this;
 }

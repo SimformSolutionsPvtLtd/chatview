@@ -17,8 +17,7 @@ class Example extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color(0xffEE5366),
-        colorScheme:
-            ColorScheme.fromSwatch(accentColor: const Color(0xffEE5366)),
+        colorScheme: ColorScheme.fromSwatch(accentColor: const Color(0xffEE5366)),
       ),
       home: const ChatScreen(),
     );
@@ -131,13 +130,13 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           onReloadButtonTap: () {},
         ),
-        typeIndicatorConfig: TypeIndicatorConfiguration(
+        typingIndicatorConfig: TypingIndicatorConfiguration(
           flashingCircleBrightColor: theme.flashingCircleBrightColor,
           flashingCircleDarkColor: theme.flashingCircleDarkColor,
         ),
         appBar: ChatViewAppBar(
-          elevation: theme.elevation,
-          backGroundColor: theme.appBarColor,
+          elevation: theme.elevation!,
+          backgroundColor: theme.appBarColor!,
           profilePicture: Data.profileImage,
           backArrowColor: theme.backArrowColor,
           chatTitle: "Chat view",
@@ -148,14 +147,13 @@ class _ChatScreenState extends State<ChatScreen> {
             letterSpacing: 0.25,
           ),
           userStatus: "online",
+          centerTitle: false,
           userStatusTextStyle: const TextStyle(color: Colors.grey),
           actions: [
             IconButton(
               onPressed: _onThemeIconTap,
               icon: Icon(
-                isDarkTheme
-                    ? Icons.brightness_4_outlined
-                    : Icons.dark_mode_outlined,
+                isDarkTheme ? Icons.brightness_4_outlined : Icons.dark_mode_outlined,
                 color: theme.themeIconColor,
               ),
             ),
@@ -200,6 +198,8 @@ class _ChatScreenState extends State<ChatScreen> {
           textFieldBackgroundColor: theme.textFieldBackgroundColor,
           closeIconColor: theme.closeIconColor,
           textFieldConfig: TextFieldConfiguration(
+            enableEnterToSubmit: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             onMessageTyping: (status) {
               /// Do with status
               debugPrint(status.toString());
@@ -219,17 +219,16 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
         chatBubbleConfig: ChatBubbleConfiguration(
-          outgoingChatBubbleConfig: ChatBubble(
+          outgoingChatBubble: ChatBubble(
             linkPreviewConfig: LinkPreviewConfiguration(
               backgroundColor: theme.linkPreviewOutgoingChatColor,
               bodyStyle: theme.outgoingChatLinkBodyStyle,
               titleStyle: theme.outgoingChatLinkTitleStyle,
             ),
-            receiptsWidgetConfig:
-                const ReceiptsWidgetConfig(showReceiptsIn: ShowReceiptsIn.all),
+            receiptsWidgetConfig: const ReceiptsWidgetConfig(showReceiptsIn: ShowReceiptsIn.all),
             color: theme.outgoingChatBubbleColor,
           ),
-          inComingChatBubbleConfig: ChatBubble(
+          incomingChatBubble: ChatBubble(
             linkPreviewConfig: LinkPreviewConfiguration(
               linkStyle: TextStyle(
                 color: theme.inComingChatBubbleTextColor,
@@ -244,8 +243,7 @@ class _ChatScreenState extends State<ChatScreen> {
               /// send your message reciepts to the other client
               debugPrint('Message Read');
             },
-            senderNameTextStyle:
-                TextStyle(color: theme.inComingChatBubbleTextColor),
+            senderNameTextStyle: TextStyle(color: theme.inComingChatBubbleTextColor),
             color: theme.inComingChatBubbleColor,
           ),
         ),
@@ -265,10 +263,8 @@ class _ChatScreenState extends State<ChatScreen> {
           messageReactionConfig: MessageReactionConfiguration(
             backgroundColor: theme.messageReactionBackGroundColor,
             borderColor: theme.messageReactionBackGroundColor,
-            reactedUserCountTextStyle:
-                TextStyle(color: theme.inComingChatBubbleTextColor),
-            reactionCountTextStyle:
-                TextStyle(color: theme.inComingChatBubbleTextColor),
+            reactedUserCountTextStyle: TextStyle(color: theme.inComingChatBubbleTextColor),
+            reactionCountTextStyle: TextStyle(color: theme.inComingChatBubbleTextColor),
             reactionsBottomSheetConfig: ReactionsBottomSheetConfiguration(
               backgroundColor: theme.backgroundColor,
               reactedUserTextStyle: TextStyle(
@@ -329,8 +325,7 @@ class _ChatScreenState extends State<ChatScreen> {
               color: isDarkTheme ? Colors.white : Colors.black,
             ),
           ),
-          onTap: (item) =>
-              _onSendTap(item.text, const ReplyMessage(), MessageType.text),
+          onTap: (item) => _onSendTap(item.text, const ReplyMessage(), MessageType.text),
         ),
       ),
     );
@@ -352,8 +347,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
     Future.delayed(const Duration(milliseconds: 300), () {
-      _chatController.initialMessageList.last.setStatus =
-          MessageStatus.undelivered;
+      _chatController.initialMessageList.last.setStatus = MessageStatus.undelivered;
     });
     Future.delayed(const Duration(seconds: 1), () {
       _chatController.initialMessageList.last.setStatus = MessageStatus.read;

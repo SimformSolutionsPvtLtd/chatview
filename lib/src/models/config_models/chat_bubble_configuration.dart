@@ -39,10 +39,10 @@ class ChatBubbleConfiguration {
   final Duration? longPressAnimationDuration;
 
   /// Provides configuration of other users message's chat bubble.
-  final ChatBubble? inComingChatBubbleConfig;
+  final ChatBubble? incomingChatBubble;
 
   /// Provides configuration of current user message's chat bubble.
-  final ChatBubble? outgoingChatBubbleConfig;
+  final ChatBubble? outgoingChatBubble;
 
   /// Provides callback when user tap twice on chat bubble.
   final MessageCallBack? onDoubleTap;
@@ -63,8 +63,8 @@ class ChatBubbleConfiguration {
     this.margin,
     this.maxWidth,
     this.longPressAnimationDuration,
-    this.inComingChatBubbleConfig,
-    this.outgoingChatBubbleConfig,
+    this.incomingChatBubble,
+    this.outgoingChatBubble,
     this.onDoubleTap,
     this.receiptsWidgetConfig,
     this.disableLinkPreview = false,

@@ -261,7 +261,6 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 onPressed: _onPressed,
                                 sendMessageConfig: widget.sendMessageConfig,
                                 onRecordingComplete: _onRecordingComplete,
-                                onImageSelected: _onImageSelected,
                               )
                             ],
                           ),
@@ -278,14 +277,6 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   void _onRecordingComplete(String? path) {
     if (path != null) {
       widget.onSendTap.call(path, replyMessage, MessageType.voice);
-      _assignRepliedMessage();
-    }
-  }
-
-  void _onImageSelected(String imagePath, String error) {
-    debugPrint('Call in Send Message Widget');
-    if (imagePath.isNotEmpty) {
-      widget.onSendTap.call(imagePath, replyMessage, MessageType.image);
       _assignRepliedMessage();
     }
   }

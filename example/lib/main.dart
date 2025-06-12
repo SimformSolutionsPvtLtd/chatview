@@ -43,28 +43,28 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatController = ChatController(
       initialMessageList: Data.messageList,
       scrollController: ScrollController(),
-      currentUser: ChatUser(
+      currentUser: const ChatUser(
         id: '1',
         name: 'Flutter',
         profilePhoto: Data.profileImage,
       ),
       otherUsers: [
-        ChatUser(
+        const ChatUser(
           id: '2',
           name: 'Simform',
           profilePhoto: Data.profileImage,
         ),
-        ChatUser(
+        const ChatUser(
           id: '3',
           name: 'Jhon',
           profilePhoto: Data.profileImage,
         ),
-        ChatUser(
+        const ChatUser(
           id: '4',
           name: 'Mike',
           profilePhoto: Data.profileImage,
         ),
-        ChatUser(
+        const ChatUser(
           id: '5',
           name: 'Rich',
           profilePhoto: Data.profileImage,

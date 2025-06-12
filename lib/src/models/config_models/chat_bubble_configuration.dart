@@ -47,6 +47,9 @@ class ChatBubbleConfiguration {
   /// Provides callback when user tap twice on chat bubble.
   final MessageCallBack? onDoubleTap;
 
+  /// Provides callback when user tap on chat bubble.
+  final MessageCallBack? onTap;
+
   final ReceiptsWidgetConfig? receiptsWidgetConfig;
 
   /// A flag to disable link preview functionality.
@@ -68,5 +71,6 @@ class ChatBubbleConfiguration {
     this.onDoubleTap,
     this.receiptsWidgetConfig,
     this.disableLinkPreview = false,
+    this.onTap,
   });
 }

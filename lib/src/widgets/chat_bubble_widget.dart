@@ -297,6 +297,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
                           )
                         : null
                 : null,
+            onTap: chatListConfig.chatBubbleConfig?.onTap,
             shouldHighlight: widget.shouldHighlight,
             controller: chatController,
             highlightColor: chatListConfig.repliedMessageConfig

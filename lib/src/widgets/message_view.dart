@@ -48,6 +48,7 @@ class MessageView extends StatefulWidget {
     this.messageConfig,
     this.onMaxDuration,
     this.controller,
+    this.onTap,
   }) : super(key: key);
 
   /// Provides message instance of chat.
@@ -73,6 +74,9 @@ class MessageView extends StatefulWidget {
 
   /// Allow user to set some action when user double tap on chat bubble.
   final MessageCallBack? onDoubleTap;
+
+  /// Allow user to set some action when user tap on chat bubble.
+  final MessageCallBack? onTap;
 
   /// Allow users to pass colour of chat bubble when user taps on replied message.
   final Color highlightColor;
@@ -131,26 +135,45 @@ class _MessageViewState extends State<MessageView>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPressStart: isLongPressEnable ? _onLongPressStart : null,
-      onDoubleTap: () {
-        if (widget.onDoubleTap != null) widget.onDoubleTap!(widget.message);
-      },
-      child: (() {
-        if (isLongPressEnable) {
-          return AnimatedBuilder(
-            builder: (_, __) {
-              return Transform.scale(
-                scale: 1 - _animationController!.value,
-                child: _messageView,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onLongPressStart: isLongPressEnable ? _onLongPressStart : null,
+          onDoubleTap: () {
+            if (widget.onDoubleTap != null) widget.onDoubleTap!(widget.message);
+          },
+          child: (() {
+            if (isLongPressEnable) {
+              return AnimatedBuilder(
+                builder: (_, __) {
+                  return Transform.scale(
+                    scale: 1 - _animationController!.value,
+                    child: _messageView,
+                  );
+                },
+                animation: _animationController!,
               );
-            },
-            animation: _animationController!,
-          );
-        } else {
-          return _messageView;
-        }
-      }()),
+            } else {
+              return _messageView;
+            }
+          }()),
+        ),
+        //TODO: Maybe we can provide other options and also make it more customizable
+        if (!widget.isMessageBySender)
+          Padding(
+            padding: const EdgeInsets.only(left: 15),
+            child: InkWell(
+              onTap: () {
+                if (widget.onTap != null) {
+                  widget.onTap!(widget.message);
+                }
+              },
+              child:
+                  Text('Report', style: Theme.of(context).textTheme.bodySmall),
+            ),
+          ),
+      ],
     );
   }
 

@@ -67,3 +67,11 @@ typedef CustomViewForReplyMessage = Widget Function(
   ReplyMessage state,
 );
 typedef GetMessageSeparator = (Map<int, DateTime>, DateTime);
+typedef NullableChatViewListUserCallback = void Function(
+  ChatViewListUser user,
+)?;
+typedef BackgroundImageLoadError = void Function(
+  Object exception,
+  StackTrace? stackTrace,
+)?;
+typedef SearchUser = Future<List<ChatViewListUser>?> Function(String value)?;

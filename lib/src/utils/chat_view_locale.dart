@@ -17,6 +17,7 @@ final class ChatViewLocale {
     required this.report,
     required this.noMessage,
     required this.somethingWentWrong,
+    required this.search,
   });
 
   /// Create from Map<String, String>
@@ -38,6 +39,7 @@ final class ChatViewLocale {
       report: map['report']?.toString() ?? '',
       noMessage: map['noMessage']?.toString() ?? '',
       somethingWentWrong: map['somethingWentWrong']?.toString() ?? '',
+      search: map['search']?.toString() ?? '',
     );
   }
 
@@ -57,6 +59,7 @@ final class ChatViewLocale {
   final String report;
   final String noMessage;
   final String somethingWentWrong;
+  final String search;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -76,5 +79,6 @@ final class ChatViewLocale {
     report: 'Report',
     noMessage: 'No message',
     somethingWentWrong: 'Something went wrong !!',
+    search: 'Search',
   );
 }

@@ -421,6 +421,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         String? updatedImagePath = await config?.onImagePicked!(imagePath);
         if (updatedImagePath != null) imagePath = updatedImagePath;
       }
+
       widget.onImageSelected(imagePath ?? '', '');
     } catch (e) {
       widget.onImageSelected('', e.toString());

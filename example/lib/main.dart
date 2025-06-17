@@ -43,12 +43,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatController = ChatController(
       initialMessageList: Data.messageList,
       scrollController: ScrollController(),
-      currentUser: ChatUser(
+      currentUser: const ChatUser(
         id: '1',
         name: 'Flutter',
         profilePhoto: Data.profileImage,
       ),
-      otherUsers: [
+      otherUsers: const [
         ChatUser(
           id: '2',
           name: 'Simform',
@@ -341,22 +341,26 @@ class _ChatScreenState extends State<ChatScreen> {
     ReplyMessage replyMessage,
     MessageType messageType,
   ) {
-    _chatController.addMessage(
-      Message(
-        id: DateTime.now().toString(),
-        createdAt: DateTime.now(),
-        message: message,
-        sentBy: _chatController.currentUser.id,
-        replyMessage: replyMessage,
-        messageType: messageType,
-      ),
+    final messageObj = Message(
+      id: DateTime.now().toString(),
+      createdAt: DateTime.now(),
+      message: message,
+      sentBy: _chatController.currentUser.id,
+      replyMessage: replyMessage,
+      messageType: messageType,
     );
+    _chatController.addMessage(
+      messageObj,
+    );
+
     Future.delayed(const Duration(milliseconds: 300), () {
-      _chatController.initialMessageList.last.setStatus =
+      final index = _chatController.initialMessageList.indexOf(messageObj);
+      _chatController.initialMessageList[index].setStatus =
           MessageStatus.undelivered;
     });
     Future.delayed(const Duration(seconds: 1), () {
-      _chatController.initialMessageList.last.setStatus = MessageStatus.read;
+      final index = _chatController.initialMessageList.indexOf(messageObj);
+      _chatController.initialMessageList[index].setStatus = MessageStatus.read;
     });
   }
 

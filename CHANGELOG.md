@@ -1,5 +1,7 @@
 ## [2.4.2] (unreleased)
 
+* **Feat**: [275](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/275)
+  Sending image with text message
 * **Fix**: [294](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/294)
   Ensure onMessageRead is called correctly
 * **Fix**: [332](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/332)

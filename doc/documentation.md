@@ -521,6 +521,54 @@ PackageStrings.addLocaleObject(
 PackageStrings.setLocale('es');
 ```
 
+## Send Image With Message
+You can send images along with your messages by enabling the `shouldSendImageWithText` flag in `sendMessageConfig` all the other things will be handled by the package itself. Here's how to do it:
+
+```dart
+sendMessageConfig: SendMessageConfiguration(
+  shouldSendImageWithText: true, // Enable sending images with text
+),
+```
+
+You can also customize the view by using the `selectedImageViewBuilder` field of the `sendMessageConfig`:
+
+```dart
+sendMessageConfig: SendMessageConfiguration(
+  shouldSendImageWithText: true,
+  selectedImageViewBuilder: (images, onImageRemove) {
+    if (images.isNotEmpty) {
+      return SizedBox(
+        width: MediaQuery.sizeOf(context).width,
+        child: Stack(
+          children: [
+            Image.file(
+              File(images.first),
+              height: 100,
+            ),
+            Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              icon: const Icon(
+                Icons.close,
+              ),
+              onPressed: () {
+                 onImageRemove.call(
+                  imagePath: images.first,
+                 );
+               },
+             ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  },
+),
+```
+
 ## Backend Integration
 
 Easily connect Chatview UI to any backend using the [**Chatview Connect**](https://pub.dev/packages/chatview_connect)

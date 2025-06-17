@@ -77,6 +77,30 @@ class SendMessageConfiguration {
   /// Configuration for cancel voice recording
   final CancelRecordConfiguration? cancelRecordConfiguration;
 
+  /// If true, then image will be sent with text message.
+  final bool shouldSendImageWithText;
+
+  /// Icon to remove image from text field.
+  final Widget? removeImageIcon;
+
+  /// Color of remove image icon.
+  final Color? removeImageIconColor;
+
+  /// Size of remove image icon.
+  final double? removeImageIconSize;
+
+  /// Margin around selected image in text field.
+  final EdgeInsets? selectedImageMargin;
+
+  /// Height of selected image view in text field.
+  final double? selectedImageViewHeight;
+
+  /// Border radius of selected image in text field.
+  final double? imageBorderRadius;
+
+  /// Provides ability to build custom view for selected images in text field.
+  final SelectedImageViewBuilder? selectedImageViewBuilder;
+
   const SendMessageConfiguration({
     this.textFieldConfig,
     this.textFieldBackgroundColor,
@@ -94,6 +118,14 @@ class SendMessageConfiguration {
     this.voiceRecordingConfiguration,
     this.micIconColor,
     this.cancelRecordConfiguration,
+    this.shouldSendImageWithText = false,
+    this.removeImageIcon,
+    this.removeImageIconColor,
+    this.removeImageIconSize,
+    this.selectedImageMargin,
+    this.selectedImageViewHeight,
+    this.imageBorderRadius,
+    this.selectedImageViewBuilder,
   });
 }
 

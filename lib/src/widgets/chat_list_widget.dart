@@ -35,7 +35,6 @@ class ChatListWidget extends StatefulWidget {
     Key? key,
     required this.chatController,
     required this.assignReplyMessage,
-    required this.replyMessage,
     this.loadingWidget,
     this.loadMoreData,
     this.isLastPage,
@@ -48,9 +47,6 @@ class ChatListWidget extends StatefulWidget {
 
   /// Provides widget for loading view while pagination is enabled.
   final Widget? loadingWidget;
-
-  /// Provides reply message when user swipe to chat bubble.
-  final ReplyMessage replyMessage;
 
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
@@ -146,7 +142,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                     isEnableSwipeToSeeTime:
                         featureActiveConfig?.enableSwipeToSeeTime ?? true,
                     assignReplyMessage: widget.assignReplyMessage,
-                    replyMessage: widget.replyMessage,
                     onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
                       if (featureActiveConfig?.enableReactionPopup ?? false) {
                         chatViewIW?.reactionPopupKey.currentState

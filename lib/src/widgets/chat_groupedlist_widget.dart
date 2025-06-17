@@ -33,7 +33,6 @@ class ChatGroupedListWidget extends StatefulWidget {
     Key? key,
     required this.showPopUp,
     required this.scrollController,
-    required this.replyMessage,
     required this.assignReplyMessage,
     required this.onChatListTap,
     required this.onChatBubbleLongPress,
@@ -46,9 +45,6 @@ class ChatGroupedListWidget extends StatefulWidget {
 
   /// Pass scroll controller
   final ScrollController scrollController;
-
-  /// Provides reply message if actual message is sent by replying any message.
-  final ReplyMessage replyMessage;
 
   /// Provides callback for assigning reply message when user swipe on chat bubble.
   final MessageCallBack assignReplyMessage;
@@ -89,32 +85,10 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
   ChatBackgroundConfiguration get chatBackgroundConfig =>
       chatListConfig.chatBackgroundConfig;
 
-  double chatTextFieldHeight = 0;
-
   @override
   void initState() {
     super.initState();
     _initializeAnimation();
-    updateChatTextFieldHeight();
-  }
-
-  @override
-  void didUpdateWidget(covariant ChatGroupedListWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    updateChatTextFieldHeight();
-  }
-
-  void updateChatTextFieldHeight() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(() {
-        final height =
-            chatViewIW?.chatTextFieldViewKey.currentContext?.size?.height ?? 10;
-        chatTextFieldHeight = (widget.textFieldConfig?.height ?? 0) > height
-            ? widget.textFieldConfig?.height ?? 0
-            : height;
-      });
-    });
   }
 
   void _initializeAnimation() {
@@ -198,9 +172,11 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
           // Adds bottom space to the message list, ensuring it is displayed
           // above the message text field.
-          SizedBox(
-            height: chatTextFieldHeight,
-          ),
+          if (chatViewIW case final chatViewIWNonNull?)
+            ValueListenableBuilder<double>(
+              valueListenable: chatViewIWNonNull.chatTextFieldHeight,
+              builder: (_, value, __) => SizedBox(height: value),
+            ),
         ],
       ),
     );

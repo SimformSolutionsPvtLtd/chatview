@@ -153,9 +153,13 @@ class ChatView extends StatefulWidget {
 
   static void closeReplyMessageView(BuildContext context) {
     final state = context.findAncestorStateOfType<_ChatViewState>();
-    if (state == null) return;
 
-    state.replyMessageViewClose();
+    assert(
+      state != null,
+      'ChatViewState not found. Make sure to use correct context that contains the ChatViewState',
+    );
+
+    state?.replyMessageViewClose();
   }
 
   @override
@@ -165,8 +169,6 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<SendMessageWidgetState> _sendMessageKey = GlobalKey();
-  ValueNotifier<ReplyMessage> replyMessage =
-      ValueNotifier(const ReplyMessage());
 
   ChatController get chatController => widget.chatController;
 
@@ -264,29 +266,22 @@ class _ChatViewState extends State<ChatView>
                                     chatViewStateConfig?.onReloadButtonTap,
                               )
                             else if (chatViewState.hasMessages)
-                              ValueListenableBuilder<ReplyMessage>(
-                                valueListenable: replyMessage,
-                                builder: (_, state, child) {
-                                  return GestureDetector(
-                                    onTap: () => FocusManager
-                                        .instance.primaryFocus
-                                        ?.unfocus(),
-                                    behavior: HitTestBehavior.opaque,
-                                    child: ChatListWidget(
-                                      replyMessage: state,
-                                      chatController: widget.chatController,
-                                      loadMoreData: widget.loadMoreData,
-                                      isLastPage: widget.isLastPage,
-                                      loadingWidget: widget.loadingWidget,
-                                      onChatListTap: widget.onChatListTap,
-                                      assignReplyMessage: (message) =>
-                                          _sendMessageKey.currentState
-                                              ?.assignReplyMessage(message),
-                                      textFieldConfig: widget
-                                          .sendMessageConfig?.textFieldConfig,
-                                    ),
-                                  );
-                                },
+                              GestureDetector(
+                                onTap: () => FocusManager.instance.primaryFocus
+                                    ?.unfocus(),
+                                behavior: HitTestBehavior.opaque,
+                                child: ChatListWidget(
+                                  chatController: widget.chatController,
+                                  loadMoreData: widget.loadMoreData,
+                                  isLastPage: widget.isLastPage,
+                                  loadingWidget: widget.loadingWidget,
+                                  onChatListTap: widget.onChatListTap,
+                                  assignReplyMessage: (message) =>
+                                      _sendMessageKey.currentState
+                                          ?.assignReplyMessage(message),
+                                  textFieldConfig:
+                                      widget.sendMessageConfig?.textFieldConfig,
+                                ),
                               ),
                             if (featureActiveConfig.enableTextField)
                               SendMessageWidget(
@@ -303,10 +298,6 @@ class _ChatViewState extends State<ChatView>
                                   _onSendTap(
                                       message, replyMessage, messageType);
                                 },
-                                onReplyCallback: (reply) =>
-                                    replyMessage.value = reply,
-                                onReplyCloseCallback: () =>
-                                    replyMessage.value = const ReplyMessage(),
                                 messageConfig: widget.messageConfig,
                                 replyMessageBuilder: widget.replyMessageBuilder,
                               ),
@@ -353,22 +344,14 @@ class _ChatViewState extends State<ChatView>
       if (widget.onSendTap != null) {
         widget.onSendTap!(message, replyMessage, messageType);
       }
-      _assignReplyMessage();
     }
     chatController.scrollToLastMessage();
   }
 
   void replyMessageViewClose() => _sendMessageKey.currentState?.onCloseTap();
 
-  void _assignReplyMessage() {
-    if (replyMessage.value.message.isNotEmpty) {
-      replyMessage.value = const ReplyMessage();
-    }
-  }
-
   @override
   void dispose() {
-    replyMessage.dispose();
     chatViewIW?.showPopUp.dispose();
     super.dispose();
   }

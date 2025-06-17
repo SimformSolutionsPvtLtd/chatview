@@ -31,6 +31,7 @@ import 'package:chatview/src/widgets/reaction_popup.dart';
 import 'package:chatview/src/widgets/suggestions/suggestions_config_inherited_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
 import 'send_message_widget.dart';
@@ -266,16 +267,24 @@ class _ChatViewState extends State<ChatView>
                               ValueListenableBuilder<ReplyMessage>(
                                 valueListenable: replyMessage,
                                 builder: (_, state, child) {
-                                  return ChatListWidget(
-                                    replyMessage: state,
-                                    chatController: widget.chatController,
-                                    loadMoreData: widget.loadMoreData,
-                                    isLastPage: widget.isLastPage,
-                                    loadingWidget: widget.loadingWidget,
-                                    onChatListTap: widget.onChatListTap,
-                                    assignReplyMessage: (message) =>
-                                        _sendMessageKey.currentState
-                                            ?.assignReplyMessage(message),
+                                  return GestureDetector(
+                                    onTap: () => FocusManager
+                                        .instance.primaryFocus
+                                        ?.unfocus(),
+                                    behavior: HitTestBehavior.opaque,
+                                    child: ChatListWidget(
+                                      replyMessage: state,
+                                      chatController: widget.chatController,
+                                      loadMoreData: widget.loadMoreData,
+                                      isLastPage: widget.isLastPage,
+                                      loadingWidget: widget.loadingWidget,
+                                      onChatListTap: widget.onChatListTap,
+                                      assignReplyMessage: (message) =>
+                                          _sendMessageKey.currentState
+                                              ?.assignReplyMessage(message),
+                                      textFieldConfig: widget
+                                          .sendMessageConfig?.textFieldConfig,
+                                    ),
                                   );
                                 },
                               ),

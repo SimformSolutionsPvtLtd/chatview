@@ -21,9 +21,9 @@
  */
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:chatview_utils/chatview_utils.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../values/typedefs.dart';
@@ -168,6 +168,9 @@ class TextFieldConfiguration {
   /// Default is [true].
   final bool enabled;
 
+  /// Used to give height of text field.
+  final double? height;
+
   const TextFieldConfiguration({
     this.contentPadding,
     this.maxLines,
@@ -184,6 +187,7 @@ class TextFieldConfiguration {
     this.inputFormatters,
     this.textCapitalization,
     this.enabled = true,
+    this.height,
   });
 }
 

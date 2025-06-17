@@ -1,5 +1,7 @@
 ## [2.4.2] (unreleased)
 
+* **Fix**: [332](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/332)
+  Hide keyboard when tapping outside of the text field and add height field for the text field
 * **Fix**: [266](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/266)
   Fix the keyboard overlapping the text field
 * **Feat**: [296](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/296)

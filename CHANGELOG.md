@@ -1,5 +1,7 @@
 ## [2.4.2] (unreleased)
 
+* **Fix**: [294](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/294)
+  Ensure onMessageRead is called correctly
 * **Fix**: [332](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/332)
   Hide keyboard when tapping outside of the text field and add height field for the text field
 * **Fix**: [266](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/266)

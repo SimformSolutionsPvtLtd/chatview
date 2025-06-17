@@ -20,14 +20,14 @@
  * SOFTWARE.
  */
 import 'package:chatview/chatview.dart';
-import 'package:chatview/src/widgets/chat_view_inherited_widget.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chatview/src/extensions/extensions.dart';
+import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
+import 'chat_view_inherited_widget.dart';
 import 'image_message_view.dart';
-import 'text_message_view.dart';
 import 'reaction_widget.dart';
+import 'text_message_view.dart';
 import 'voice_message_view.dart';
 
 class MessageView extends StatefulWidget {
@@ -117,15 +117,16 @@ class _MessageViewState extends State<MessageView>
         upperBound: 0.1,
         lowerBound: 0.0,
       );
-      if (widget.message.status != MessageStatus.read &&
-          !widget.isMessageBySender) {
-        widget.inComingChatBubbleConfig?.onMessageRead?.call(widget.message);
-      }
+
       _animationController?.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _animationController?.reverse();
         }
       });
+    }
+    if (widget.message.status != MessageStatus.read &&
+        !widget.isMessageBySender) {
+      widget.inComingChatBubbleConfig?.onMessageRead?.call(widget.message);
     }
   }
 

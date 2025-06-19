@@ -19,13 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/models/config_models/receipts_widget_config.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../values/typedefs.dart';
 import '../models.dart';
 
 class ChatBubbleConfiguration {
+  const ChatBubbleConfiguration({
+    this.padding,
+    this.margin,
+    this.maxWidth,
+    this.longPressAnimationDuration,
+    this.inComingChatBubbleConfig,
+    this.outgoingChatBubbleConfig,
+    this.onDoubleTap,
+    this.disableLinkPreview = false,
+  });
+
   /// Used for giving padding of chat bubble.
   final EdgeInsetsGeometry? padding;
 
@@ -47,8 +58,6 @@ class ChatBubbleConfiguration {
   /// Provides callback when user tap twice on chat bubble.
   final MessageCallBack? onDoubleTap;
 
-  final ReceiptsWidgetConfig? receiptsWidgetConfig;
-
   /// A flag to disable link preview functionality.
   ///
   /// When `true`, link previews will be disabled, rendering links as plain text
@@ -57,16 +66,4 @@ class ChatBubbleConfiguration {
   ///
   /// Default value: `false`.
   final bool disableLinkPreview;
-
-  const ChatBubbleConfiguration({
-    this.padding,
-    this.margin,
-    this.maxWidth,
-    this.longPressAnimationDuration,
-    this.inComingChatBubbleConfig,
-    this.outgoingChatBubbleConfig,
-    this.onDoubleTap,
-    this.receiptsWidgetConfig,
-    this.disableLinkPreview = false,
-  });
 }

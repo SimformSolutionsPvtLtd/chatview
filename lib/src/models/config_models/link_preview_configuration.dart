@@ -19,10 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/values/typedefs.dart';
 import 'package:flutter/material.dart';
 
+import '../../values/typedefs.dart';
+
 class LinkPreviewConfiguration {
+  const LinkPreviewConfiguration({
+    this.onUrlDetect,
+    this.loadingColor,
+    this.backgroundColor,
+    this.borderRadius,
+    this.bodyStyle,
+    this.titleStyle,
+    this.linkStyle,
+    this.padding,
+    this.proxyUrl,
+    this.errorBody,
+  });
+
   /// Used for giving background colour of message with link.
   final Color? backgroundColor;
 
@@ -52,17 +66,4 @@ class LinkPreviewConfiguration {
 
   /// Displays an error message when the link cannot be parsed for preview.
   final String? errorBody;
-
-  const LinkPreviewConfiguration({
-    this.onUrlDetect,
-    this.loadingColor,
-    this.backgroundColor,
-    this.borderRadius,
-    this.bodyStyle,
-    this.titleStyle,
-    this.linkStyle,
-    this.padding,
-    this.proxyUrl,
-    this.errorBody,
-  });
 }

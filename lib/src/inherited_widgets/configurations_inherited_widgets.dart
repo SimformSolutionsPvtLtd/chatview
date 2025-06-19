@@ -1,6 +1,7 @@
-import 'package:chatview/src/models/models.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+
+import '../models/models.dart';
 
 class ConfigurationsInheritedWidget extends InheritedWidget {
   const ConfigurationsInheritedWidget({

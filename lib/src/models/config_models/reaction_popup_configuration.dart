@@ -24,6 +24,20 @@ import 'package:flutter/material.dart';
 import '../../values/typedefs.dart';
 
 class ReactionPopupConfiguration {
+  const ReactionPopupConfiguration({
+    this.userReactionCallback,
+    this.overrideUserReactionCallback = false,
+    this.showGlassMorphismEffect = false,
+    this.backgroundColor,
+    this.shadow,
+    this.animationDuration,
+    this.maxWidth,
+    this.margin,
+    this.padding,
+    this.emojiConfig,
+    this.glassMorphismConfig,
+  });
+
   /// Used for background color in reaction pop-up.
   final Color? backgroundColor;
 
@@ -56,36 +70,29 @@ class ReactionPopupConfiguration {
 
   /// Provides feasibility to completely override userReactionCallback defaults to false.
   final bool? overrideUserReactionCallback;
-
-  const ReactionPopupConfiguration({
-    this.userReactionCallback,
-    this.overrideUserReactionCallback = false,
-    this.showGlassMorphismEffect = false,
-    this.backgroundColor,
-    this.shadow,
-    this.animationDuration,
-    this.maxWidth,
-    this.margin,
-    this.padding,
-    this.emojiConfig,
-    this.glassMorphismConfig,
-  });
 }
 
 class EmojiConfiguration {
+  const EmojiConfiguration({
+    this.emojiList,
+    this.size,
+  });
+
   /// Provides list of emojis.
   final List<String>? emojiList;
 
   /// Used to give size of emoji.
   final double? size;
-
-  const EmojiConfiguration({
-    this.emojiList,
-    this.size,
-  });
 }
 
 class GlassMorphismConfiguration {
+  const GlassMorphismConfiguration({
+    this.borderColor,
+    this.strokeWidth,
+    this.backgroundColor,
+    this.borderRadius,
+  });
+
   /// Used to give border color of reaction pop-up.
   final Color? borderColor;
 
@@ -97,11 +104,4 @@ class GlassMorphismConfiguration {
 
   /// Used to give border radius of reaction pop-up.
   final double? borderRadius;
-
-  const GlassMorphismConfiguration({
-    this.borderColor,
-    this.strokeWidth,
-    this.backgroundColor,
-    this.borderRadius,
-  });
 }

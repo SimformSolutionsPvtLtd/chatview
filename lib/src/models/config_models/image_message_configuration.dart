@@ -24,6 +24,17 @@ import 'package:flutter/material.dart';
 import '../../values/typedefs.dart';
 
 class ImageMessageConfiguration {
+  const ImageMessageConfiguration({
+    this.hideShareIcon = false,
+    this.shareIconConfig,
+    this.onTap,
+    this.height,
+    this.width,
+    this.padding,
+    this.margin,
+    this.borderRadius,
+  });
+
   /// Provides configuration of share button while image message is appeared.
   final ShareIconConfiguration? shareIconConfig;
 
@@ -47,20 +58,18 @@ class ImageMessageConfiguration {
 
   /// Used for giving border radius of image message.
   final BorderRadius? borderRadius;
-
-  const ImageMessageConfiguration({
-    this.hideShareIcon = false,
-    this.shareIconConfig,
-    this.onTap,
-    this.height,
-    this.width,
-    this.padding,
-    this.margin,
-    this.borderRadius,
-  });
 }
 
 class ShareIconConfiguration {
+  ShareIconConfiguration({
+    this.onPressed,
+    this.icon,
+    this.defaultIconBackgroundColor,
+    this.padding,
+    this.margin,
+    this.defaultIconColor,
+  });
+
   /// Provides callback when user press on share button.
   final StringCallback? onPressed; // Returns imageURL
 
@@ -78,13 +87,4 @@ class ShareIconConfiguration {
 
   /// Used to give share icon color.
   final Color? defaultIconColor;
-
-  ShareIconConfiguration({
-    this.onPressed,
-    this.icon,
-    this.defaultIconBackgroundColor,
-    this.padding,
-    this.margin,
-    this.defaultIconColor,
-  });
 }

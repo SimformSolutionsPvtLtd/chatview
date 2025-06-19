@@ -19,12 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/models/config_models/replied_msg_auto_scroll_config.dart';
 import 'package:flutter/material.dart';
 
 import '../../values/typedefs.dart';
+import 'replied_msg_auto_scroll_config.dart';
 
 class RepliedMessageConfiguration {
+  const RepliedMessageConfiguration({
+    this.verticalBarColor,
+    this.backgroundColor,
+    this.textStyle,
+    this.replyTitleTextStyle,
+    this.margin,
+    this.padding,
+    this.maxWidth,
+    this.borderRadius,
+    this.verticalBarWidth,
+    this.repliedImageMessageHeight,
+    this.repliedImageMessageWidth,
+    this.repliedMessageWidgetBuilder,
+    this.opacity,
+    this.repliedMsgAutoScrollConfig = const RepliedMsgAutoScrollConfig(),
+    this.micIconColor,
+  });
+
   /// Used to give color to vertical bar.
   final Color? verticalBarColor;
 
@@ -58,10 +76,6 @@ class RepliedMessageConfiguration {
   /// Used to give width of image when there is image in replied message.
   final double? repliedImageMessageWidth;
 
-  /// Used to give border radius of image message when there is image in replied
-  /// message.
-  final BorderRadiusGeometry? repliedImageMessageBorderRadius;
-
   /// Used to give opacity of replied message.
   final double? opacity;
 
@@ -74,23 +88,4 @@ class RepliedMessageConfiguration {
 
   /// Color for microphone icon.
   final Color? micIconColor;
-
-  const RepliedMessageConfiguration({
-    this.verticalBarColor,
-    this.backgroundColor,
-    this.textStyle,
-    this.replyTitleTextStyle,
-    this.margin,
-    this.padding,
-    this.maxWidth,
-    this.borderRadius,
-    this.verticalBarWidth,
-    this.repliedImageMessageHeight,
-    this.repliedImageMessageWidth,
-    this.repliedImageMessageBorderRadius,
-    this.repliedMessageWidgetBuilder,
-    this.opacity,
-    this.repliedMsgAutoScrollConfig = const RepliedMsgAutoScrollConfig(),
-    this.micIconColor,
-  });
 }

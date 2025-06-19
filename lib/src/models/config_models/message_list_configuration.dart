@@ -26,6 +26,24 @@ import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 
 class ChatBackgroundConfiguration {
+  const ChatBackgroundConfiguration({
+    this.defaultGroupSeparatorConfig,
+    this.backgroundColor,
+    this.backgroundImage,
+    this.height,
+    this.width,
+    this.groupSeparatorBuilder,
+    this.groupedListOrder = GroupedListOrder.asc,
+    this.sortEnable = false,
+    this.padding,
+    this.margin,
+    this.messageTimeTextStyle,
+    this.messageTimeIconColor,
+    this.loadingWidget,
+    this.messageTimeAnimationCurve = Curves.decelerate,
+    this.messageSorter,
+  });
+
   /// Provides background color of chat view.
   final Color? backgroundColor;
 
@@ -73,27 +91,15 @@ class ChatBackgroundConfiguration {
 
   /// Provides callback to sort message
   final MessageSorter? messageSorter;
-
-  const ChatBackgroundConfiguration({
-    this.defaultGroupSeparatorConfig,
-    this.backgroundColor,
-    this.backgroundImage,
-    this.height,
-    this.width,
-    this.groupSeparatorBuilder,
-    this.groupedListOrder = GroupedListOrder.asc,
-    this.sortEnable = false,
-    this.padding,
-    this.margin,
-    this.messageTimeTextStyle,
-    this.messageTimeIconColor,
-    this.loadingWidget,
-    this.messageTimeAnimationCurve = Curves.decelerate,
-    this.messageSorter,
-  });
 }
 
 class DefaultGroupSeparatorConfiguration {
+  const DefaultGroupSeparatorConfiguration({
+    this.padding,
+    this.textStyle,
+    this.chatSeparatorDatePattern = defaultChatSeparatorDatePattern,
+  });
+
   /// Used for giving padding of chat separator widget.
   final EdgeInsetsGeometry? padding;
 
@@ -104,10 +110,4 @@ class DefaultGroupSeparatorConfiguration {
   /// Defaults to ['MMM dd, yyyy']
   /// e.g. May 21, 2024
   final String chatSeparatorDatePattern;
-
-  const DefaultGroupSeparatorConfiguration({
-    this.padding,
-    this.textStyle,
-    this.chatSeparatorDatePattern = defaultChatSeparatorDatePattern,
-  });
 }

@@ -24,6 +24,21 @@ import 'package:flutter/material.dart';
 import '../../values/typedefs.dart';
 
 class MessageReactionConfiguration {
+  const MessageReactionConfiguration({
+    this.reactionsBottomSheetConfig,
+    this.reactionCountTextStyle,
+    this.reactedUserCountTextStyle,
+    this.reactionSize,
+    this.margin,
+    this.padding,
+    this.backgroundColor,
+    this.borderRadius,
+    this.borderColor,
+    this.borderWidth,
+    this.profileCircleRadius,
+    this.profileCirclePadding,
+  });
+
   /// Used for giving size of reaction on message.
   final double? reactionSize;
 
@@ -60,21 +75,6 @@ class MessageReactionConfiguration {
 
   /// Used for padding to reacted user profile circle.
   final EdgeInsets? profileCirclePadding;
-
-  const MessageReactionConfiguration({
-    this.reactionsBottomSheetConfig,
-    this.reactionCountTextStyle,
-    this.reactedUserCountTextStyle,
-    this.reactionSize,
-    this.margin,
-    this.padding,
-    this.backgroundColor,
-    this.borderRadius,
-    this.borderColor,
-    this.borderWidth,
-    this.profileCircleRadius,
-    this.profileCirclePadding,
-  });
 }
 
 class ReactionsBottomSheetConfiguration {

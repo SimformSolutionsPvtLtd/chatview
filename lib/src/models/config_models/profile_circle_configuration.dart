@@ -19,11 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chatview_utils/chatview_utils.dart';
-
 class ProfileCircleConfiguration {
+  const ProfileCircleConfiguration({
+    this.onAvatarTap,
+    this.padding,
+    this.profileImageUrl,
+    this.bottomPadding,
+    this.circleRadius,
+    this.onAvatarLongPress,
+    this.imageType = ImageType.network,
+    this.defaultAvatarImage = Constants.profileImage,
+    this.networkImageErrorBuilder,
+    this.assetImageErrorBuilder,
+    this.networkImageProgressIndicatorBuilder,
+  });
+
   /// Used to give padding to profile circle.
   final EdgeInsetsGeometry? padding;
 
@@ -39,10 +52,10 @@ class ProfileCircleConfiguration {
   final double? circleRadius;
 
   /// Provides callback when user tap on profile circle.
-  final void Function(ChatUser)? onAvatarTap;
+  final ValueSetter<ChatUser>? onAvatarTap;
 
   /// Provides callback when user long press on profile circle.
-  final void Function(ChatUser)? onAvatarLongPress;
+  final ValueSetter<ChatUser>? onAvatarLongPress;
 
   /// Field to define image type [network, asset or base64]
   final ImageType imageType;
@@ -59,18 +72,4 @@ class ProfileCircleConfiguration {
   /// Progress indicator builder for network image
   final NetworkImageProgressIndicatorBuilder?
       networkImageProgressIndicatorBuilder;
-
-  const ProfileCircleConfiguration({
-    this.onAvatarTap,
-    this.padding,
-    this.profileImageUrl,
-    this.bottomPadding,
-    this.circleRadius,
-    this.onAvatarLongPress,
-    this.imageType = ImageType.network,
-    this.defaultAvatarImage = Constants.profileImage,
-    this.networkImageErrorBuilder,
-    this.assetImageErrorBuilder,
-    this.networkImageProgressIndicatorBuilder,
-  });
 }

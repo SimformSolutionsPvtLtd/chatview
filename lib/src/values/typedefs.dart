@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/chatview.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 typedef StringCallback = void Function(String);
@@ -70,4 +70,19 @@ typedef GetMessageSeparator = (Map<int, DateTime>, DateTime);
 typedef SelectedImageViewBuilder = Widget Function(
   List<String> images,
   ValueSetter<String> onImageRemove,
+);
+typedef CustomMessageBuilder = Widget Function(Message message);
+typedef ReceiptBuilder = Widget Function(MessageStatus status);
+typedef LastSeenAgoBuilder = Widget Function(
+  Message message,
+  String formattedDate,
+);
+typedef ReplyPopupBuilder = Widget Function(
+  Message message,
+  bool sentByCurrentUser,
+);
+typedef ImagePickedCallback = Future<String?> Function(String? path);
+typedef OnMessageSwipeCallback = void Function(
+  String message,
+  String sentBy,
 );

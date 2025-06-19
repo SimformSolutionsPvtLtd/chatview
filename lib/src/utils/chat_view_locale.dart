@@ -40,6 +40,9 @@ final class ChatViewLocale {
     required this.noMessage,
     required this.somethingWentWrong,
     required this.reload,
+    required this.search,
+    required this.now,
+    required this.minAgo,
   });
 
   /// Create from Map<String, String>
@@ -62,6 +65,9 @@ final class ChatViewLocale {
       noMessage: map['noMessage']?.toString() ?? '',
       somethingWentWrong: map['somethingWentWrong']?.toString() ?? '',
       reload: map['reload']?.toString() ?? '',
+      search: map['search']?.toString() ?? '',
+      now: map['now']?.toString() ?? '',
+      minAgo: map['minAgo']?.toString() ?? '',
     );
   }
 
@@ -82,6 +88,9 @@ final class ChatViewLocale {
   final String noMessage;
   final String somethingWentWrong;
   final String reload;
+  final String search;
+  final String now;
+  final String minAgo;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -102,5 +111,8 @@ final class ChatViewLocale {
     noMessage: 'No message',
     somethingWentWrong: 'Something went wrong !!',
     reload: 'Reload',
+    search: 'Search',
+    now: 'Now',
+    minAgo: 'min ago',
   );
 }

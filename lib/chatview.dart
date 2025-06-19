@@ -32,8 +32,15 @@ export 'package:audio_waveforms/audio_waveforms.dart'
 export 'package:chatview_utils/chatview_utils.dart';
 export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
+export 'src/chat_list_view_controller.dart';
 export 'src/extensions/extensions.dart' show MessageTypes;
+export 'src/models/config_models/chat_view_list_config.dart';
+export 'src/models/config_models/chat_view_list_time_config.dart';
+export 'src/models/config_models/chat_view_list_user_config.dart';
+export 'src/models/config_models/load_more_widget_config.dart';
 export 'src/models/config_models/receipts_widget_config.dart';
+export 'src/models/config_models/search_config.dart';
+export 'src/models/config_models/unread_widget_config.dart';
 export 'src/models/models.dart';
 export 'src/utils/chat_view_locale.dart';
 export 'src/utils/package_strings.dart';
@@ -41,3 +48,5 @@ export 'src/values/enumeration.dart';
 export 'src/values/typedefs.dart';
 export 'src/widgets/chat_view.dart';
 export 'src/widgets/chat_view_appbar.dart';
+export 'src/widgets/chat_view_list.dart';
+export 'src/widgets/chat_view_list_appbar.dart';

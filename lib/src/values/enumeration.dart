@@ -22,8 +22,8 @@
 
 // Different types Message of ChatView
 
-import 'package:flutter/material.dart';
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
 
 enum ShowReceiptsIn { all, lastMessage }
 
@@ -72,4 +72,45 @@ enum SuggestionItemsType {
   bool get isScrollType => this == SuggestionItemsType.scrollable;
 
   bool get isMultilineType => this == SuggestionItemsType.multiline;
+}
+
+/// Enum to distinguish between single user and group chat.
+enum ChatType {
+  user,
+  group;
+
+  bool get isUser => this == ChatType.user;
+
+  bool get isGroup => this == ChatType.group;
+}
+
+/// An enumeration of unread count views.
+enum UnreadCountView {
+  dot,
+  count,
+  ninetyNinePlus,
+  none;
+
+  bool get isDot => this == UnreadCountView.dot;
+
+  bool get isCount => this == UnreadCountView.count;
+
+  bool get isNinetyNinePlus => this == UnreadCountView.ninetyNinePlus;
+
+  bool get isNone => this == UnreadCountView.none;
+}
+
+/// An enumeration of user status.
+enum UserActiveStatus {
+  /// user is active
+  online,
+
+  /// user is inactive
+  offline;
+
+  /// is user inactive
+  bool get isOnline => this == online;
+
+  /// is user active
+  bool get isOffline => this == offline;
 }

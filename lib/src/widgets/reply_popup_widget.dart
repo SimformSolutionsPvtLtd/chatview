@@ -22,7 +22,6 @@
 import 'package:flutter/material.dart';
 
 import '../utils/package_strings.dart';
-import '../values/typedefs.dart';
 
 class ReplyPopupWidget extends StatelessWidget {
   const ReplyPopupWidget({
@@ -40,16 +39,16 @@ class ReplyPopupWidget extends StatelessWidget {
   final bool sentByCurrentUser;
 
   /// Provides call back when user tap on unsend button.
-  final VoidCallBack onUnsendTap;
+  final VoidCallback onUnsendTap;
 
   /// Provides call back when user tap on reply button.
-  final VoidCallBack onReplyTap;
+  final VoidCallback onReplyTap;
 
   /// Provides call back when user tap on report button.
-  final VoidCallBack onReportTap;
+  final VoidCallback onReportTap;
 
   /// Provides call back when user tap on more button.
-  final VoidCallBack onMoreTap;
+  final VoidCallback onMoreTap;
 
   /// Allow user to set text style of button are showed in reply snack bar.
   final TextStyle? buttonTextStyle;

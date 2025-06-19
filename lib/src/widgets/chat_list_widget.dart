@@ -50,17 +50,17 @@ class ChatListWidget extends StatefulWidget {
 
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
-  final VoidCallBackWithFuture? loadMoreData;
+  final ValueGetter<Future<void>>? loadMoreData;
 
   /// Provides flag if there is no more next data left in list.
   final bool? isLastPage;
 
   /// Provides callback for assigning reply message when user swipe to chat
   /// bubble.
-  final MessageCallBack assignReplyMessage;
+  final ValueSetter<Message> assignReplyMessage;
 
   /// Provides callback when user tap anywhere on whole chat.
-  final VoidCallBack? onChatListTap;
+  final VoidCallback? onChatListTap;
 
   /// Provides configuration for text field config.
   final TextFieldConfiguration? textFieldConfig;

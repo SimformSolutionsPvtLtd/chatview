@@ -54,10 +54,10 @@ class ChatGroupedListWidget extends StatefulWidget {
   final ScrollController scrollController;
 
   /// Provides callback for assigning reply message when user swipe on chat bubble.
-  final MessageCallBack assignReplyMessage;
+  final ValueSetter<Message> assignReplyMessage;
 
   /// Provides callback when user tap anywhere on whole chat.
-  final VoidCallBack onChatListTap;
+  final VoidCallback onChatListTap;
 
   /// Provides callback when user press chat bubble for certain time then usual.
   final ChatBubbleLongPressCallback onChatBubbleLongPress;

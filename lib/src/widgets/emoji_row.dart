@@ -23,7 +23,6 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
-import '../values/typedefs.dart';
 import 'emoji_picker_widget.dart';
 
 class EmojiRow extends StatelessWidget {
@@ -33,7 +32,7 @@ class EmojiRow extends StatelessWidget {
   }) : super(key: key);
 
   /// Provides callback when user taps on emoji in reaction pop-up.
-  final StringCallback onEmojiTap;
+  final ValueSetter<String> onEmojiTap;
 
   /// These are default emojis.
   final List<String> _emojiUnicodes = [

@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 import 'dart:io' if (kIsWeb) 'dart:html';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../../chatview.dart';
@@ -78,7 +78,7 @@ class ChatViewAppBar extends StatelessWidget {
   final double? elevation;
 
   /// Provides callback when user tap on back arrow.
-  final VoidCallBack? onBackPress;
+  final VoidCallback? onBackPress;
 
   /// Allow user to change padding in appbar.
   final EdgeInsets? padding;

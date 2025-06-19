@@ -100,7 +100,7 @@ class ChatView extends StatefulWidget {
 
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
-  final VoidCallBackWithFuture? loadMoreData;
+  final AsyncCallback? loadMoreData;
 
   /// Provides widget for loading view while pagination is enabled.
   final Widget? loadingWidget;
@@ -137,7 +137,7 @@ class ChatView extends StatefulWidget {
   final Widget? appBar;
 
   /// Provides callback when user tap on chat list.
-  final VoidCallBack? onChatListTap;
+  final VoidCallback? onChatListTap;
 
   /// Configuration for emoji picker sheet
   final Config? emojiPickerSheetConfig;

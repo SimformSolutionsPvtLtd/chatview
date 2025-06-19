@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../values/typedefs.dart';
 import '../models.dart';
 
 class ChatBubbleConfiguration {
@@ -56,7 +56,7 @@ class ChatBubbleConfiguration {
   final ChatBubble? outgoingChatBubbleConfig;
 
   /// Provides callback when user tap twice on chat bubble.
-  final MessageCallBack? onDoubleTap;
+  final ValueSetter<Message>? onDoubleTap;
 
   /// A flag to disable link preview functionality.
   ///

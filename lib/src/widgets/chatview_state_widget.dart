@@ -27,7 +27,6 @@ import '../extensions/extensions.dart';
 import '../models/config_models/chat_view_states_configuration.dart';
 import '../utils/package_strings.dart';
 import '../values/enumeration.dart';
-import '../values/typedefs.dart';
 
 class ChatViewStateWidget extends StatelessWidget {
   const ChatViewStateWidget({
@@ -46,7 +45,7 @@ class ChatViewStateWidget extends StatelessWidget {
 
   /// Provides callback when user taps on reload button in error and no messages
   /// state.
-  final VoidCallBack? onReloadButtonTap;
+  final VoidCallback? onReloadButtonTap;
 
   @override
   Widget build(BuildContext context) {

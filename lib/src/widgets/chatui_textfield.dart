@@ -56,7 +56,7 @@ class ChatUITextField extends StatefulWidget {
   final TextEditingController textEditingController;
 
   /// Provides callback when user tap on text field.
-  final VoidCallBack onPressed;
+  final VoidCallback onPressed;
 
   /// Provides callback once voice is recorded.
   final ValueSetter<String?> onRecordingComplete;

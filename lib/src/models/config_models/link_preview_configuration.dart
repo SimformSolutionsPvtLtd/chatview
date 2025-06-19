@@ -21,8 +21,6 @@
  */
 import 'package:flutter/material.dart';
 
-import '../../values/typedefs.dart';
-
 class LinkPreviewConfiguration {
   const LinkPreviewConfiguration({
     this.onUrlDetect,
@@ -62,7 +60,7 @@ class LinkPreviewConfiguration {
   final String? proxyUrl;
 
   /// Provides callback when message detect url in message.
-  final StringCallback? onUrlDetect;
+  final ValueSetter<String>? onUrlDetect;
 
   /// Displays an error message when the link cannot be parsed for preview.
   final String? errorBody;

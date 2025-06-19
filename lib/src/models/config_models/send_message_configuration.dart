@@ -328,5 +328,5 @@ class CancelRecordConfiguration {
   final Color? iconColor;
 
   /// Provides callback on voice record cancel
-  final VoidCallBack? onCancel;
+  final VoidCallback? onCancel;
 }

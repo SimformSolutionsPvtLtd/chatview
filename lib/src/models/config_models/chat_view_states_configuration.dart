@@ -22,8 +22,6 @@
 
 import 'package:flutter/material.dart';
 
-import '../../values/typedefs.dart';
-
 class ChatViewStateConfiguration {
   const ChatViewStateConfiguration({
     this.errorWidgetConfig = const ChatViewStateWidgetConfiguration(),
@@ -42,7 +40,7 @@ class ChatViewStateConfiguration {
   final ChatViewStateWidgetConfiguration? loadingWidgetConfig;
 
   /// Provides callback when user taps on reload button.
-  final VoidCallBack? onReloadButtonTap;
+  final VoidCallback? onReloadButtonTap;
 }
 
 class ChatViewStateWidgetConfiguration {

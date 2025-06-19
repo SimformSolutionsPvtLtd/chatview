@@ -52,7 +52,7 @@ class ChatBubbleWidget extends StatefulWidget {
   final DoubleCallBack onLongPress;
 
   /// Provides callback of when user swipe chat bubble for reply.
-  final MessageCallBack onSwipe;
+  final ValueSetter<Message> onSwipe;
 
   /// Provides slide animation when user swipe whole chat.
   final Animation<Offset>? slideAnimation;

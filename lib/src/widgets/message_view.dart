@@ -75,7 +75,7 @@ class MessageView extends StatefulWidget {
   final Duration? longPressAnimationDuration;
 
   /// Allow user to set some action when user double tap on chat bubble.
-  final MessageCallBack? onDoubleTap;
+  final ValueSetter<Message>? onDoubleTap;
 
   /// Allow users to pass colour of chat bubble when user taps on replied message.
   final Color highlightColor;

@@ -19,9 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
-
-import '../../values/typedefs.dart';
 
 class ImageMessageConfiguration {
   const ImageMessageConfiguration({
@@ -42,7 +41,7 @@ class ImageMessageConfiguration {
   final bool hideShareIcon;
 
   /// Provides callback when user taps on image message.
-  final MessageCallBack? onTap;
+  final ValueSetter<Message>? onTap;
 
   /// Used for giving height of image message.
   final double? height;
@@ -71,7 +70,7 @@ class ShareIconConfiguration {
   });
 
   /// Provides callback when user press on share button.
-  final StringCallback? onPressed; // Returns imageURL
+  final ValueSetter<String>? onPressed; // Returns imageURL
 
   /// Provides ability to add custom share icon.
   final Widget? icon;

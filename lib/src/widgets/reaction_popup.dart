@@ -25,7 +25,6 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/reaction_popup_configuration.dart';
-import '../values/typedefs.dart';
 import 'emoji_row.dart';
 import 'glassmorphism_reaction_popup.dart';
 
@@ -37,7 +36,7 @@ class ReactionPopup extends StatefulWidget {
   }) : super(key: key);
 
   /// Provides call back when user taps on reaction pop-up.
-  final VoidCallBack onTap;
+  final VoidCallback onTap;
 
   /// Represents should pop-up show or not.
   final bool showPopUp;

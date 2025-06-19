@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../values/typedefs.dart';
@@ -42,13 +43,13 @@ class ReplyPopupConfiguration {
   final ReplyPopupBuilder? replyPopupBuilder;
 
   /// Provides callback on unSend button.
-  final MessageCallBack? onUnsendTap;
+  final ValueSetter<Message>? onUnsendTap;
 
   /// Provides callback on onReply button.
-  final MessageCallBack? onReplyTap;
+  final ValueSetter<Message>? onReplyTap;
 
   /// Provides callback on onReport button.
-  final MessageCallBack? onReportTap;
+  final ValueSetter<Message>? onReportTap;
 
   /// Provides callback on onMore button.
   final MoreTapCallBack? onMoreTap;

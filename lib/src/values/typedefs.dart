@@ -86,3 +86,13 @@ typedef OnMessageSwipeCallback = void Function(
   String message,
   String sentBy,
 );
+typedef ChatBubbleLongPressCallback = void Function(
+  double yCordinate,
+  double xCordinate,
+  Message message,
+);
+typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
+  BuildContext context,
+  T value,
+  Widget? child,
+);

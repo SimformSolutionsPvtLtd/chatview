@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/utils/package_strings.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/package_strings.dart';
 import '../values/typedefs.dart';
 
 class ReplyPopupWidget extends StatelessWidget {

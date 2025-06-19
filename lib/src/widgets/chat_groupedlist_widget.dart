@@ -19,14 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/chatview.dart';
-import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/widgets/suggestions/suggestion_list.dart';
-import 'package:chatview/src/widgets/type_indicator_widget.dart';
+
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../extensions/extensions.dart';
+import '../models/config_models/feature_active_config.dart';
+import '../models/config_models/message_list_configuration.dart';
+import '../models/config_models/send_message_configuration.dart';
+import '../models/config_models/suggestion_list_config.dart';
+import '../values/enumeration.dart';
+import '../values/typedefs.dart';
 import 'chat_bubble_widget.dart';
 import 'chat_group_header.dart';
+import 'suggestions/suggestion_list.dart';
+import 'type_indicator_widget.dart';
 
 class ChatGroupedListWidget extends StatefulWidget {
   const ChatGroupedListWidget({
@@ -53,7 +60,7 @@ class ChatGroupedListWidget extends StatefulWidget {
   final VoidCallBack onChatListTap;
 
   /// Provides callback when user press chat bubble for certain time then usual.
-  final void Function(double, double, Message) onChatBubbleLongPress;
+  final ChatBubbleLongPressCallback onChatBubbleLongPress;
 
   /// Provide flag for turn on/off to see message crated time view when user
   /// swipe whole chat.

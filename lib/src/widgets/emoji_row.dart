@@ -19,10 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/extensions/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:chatview/src/utils/constants/constants.dart';
 
+import '../extensions/extensions.dart';
+import '../utils/constants/constants.dart';
 import '../values/typedefs.dart';
 import 'emoji_picker_widget.dart';
 

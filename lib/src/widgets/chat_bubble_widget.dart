@@ -19,12 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/utils/constants/constants.dart';
-import 'package:chatview/src/widgets/chat_view_inherited_widget.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../chatview.dart';
+import '../extensions/extensions.dart';
+import '../models/config_models/feature_active_config.dart';
+import '../utils/constants/constants.dart';
+import '../values/enumeration.dart';
+import '../values/typedefs.dart';
+import 'chat_view_inherited_widget.dart';
 import 'message_time_widget.dart';
 import 'message_view.dart';
 import 'profile_circle.dart';
@@ -55,7 +58,7 @@ class ChatBubbleWidget extends StatefulWidget {
   final Animation<Offset>? slideAnimation;
 
   /// Provides callback when user tap on replied message upon chat bubble.
-  final Function(String)? onReplyTap;
+  final ValueSetter<String>? onReplyTap;
 
   /// Flag for when user tap on replied message and highlight actual message.
   final bool shouldHighlight;

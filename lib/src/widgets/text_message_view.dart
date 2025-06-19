@@ -19,12 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chatview_utils/chatview_utils.dart';
-import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/models/models.dart';
-
+import '../extensions/extensions.dart';
+import '../models/chat_bubble.dart';
+import '../models/config_models/link_preview_configuration.dart';
+import '../models/config_models/message_reaction_configuration.dart';
 import '../utils/constants/constants.dart';
 import 'link_preview.dart';
 import 'reaction_widget.dart';

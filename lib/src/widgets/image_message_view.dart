@@ -23,10 +23,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chatview_utils/chatview_utils.dart';
-import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/models/models.dart';
 import 'package:flutter/material.dart';
 
+import '../extensions/extensions.dart';
+import '../models/config_models/image_message_configuration.dart';
+import '../models/config_models/message_reaction_configuration.dart';
 import 'reaction_widget.dart';
 import 'share_icon.dart';
 

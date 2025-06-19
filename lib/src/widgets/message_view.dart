@@ -19,11 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/chatview.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
+import '../models/chat_bubble.dart';
+import '../models/config_models/message_configuration.dart';
 import '../utils/constants/constants.dart';
+import '../values/typedefs.dart';
 import 'chat_view_inherited_widget.dart';
 import 'image_message_view.dart';
 import 'reaction_widget.dart';
@@ -92,7 +95,7 @@ class MessageView extends StatefulWidget {
 
   final ChatController? controller;
 
-  final Function(int)? onMaxDuration;
+  final ValueSetter<int>? onMaxDuration;
 
   @override
   State<MessageView> createState() => _MessageViewState();

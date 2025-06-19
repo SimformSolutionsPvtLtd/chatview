@@ -20,7 +20,8 @@
  * SOFTWARE.
  */
 import 'package:flutter/material.dart';
-import 'package:chatview/src/models/config_models/image_message_configuration.dart';
+
+import '../models/config_models/image_message_configuration.dart';
 
 class ShareIcon extends StatelessWidget {
   const ShareIcon({

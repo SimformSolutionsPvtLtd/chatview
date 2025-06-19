@@ -24,7 +24,7 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../models/models.dart';
+import '../models/config_models/send_message_configuration.dart';
 import '../utils/package_strings.dart';
 import '../values/typedefs.dart';
 
@@ -36,9 +36,13 @@ class ReplyMessageTypeView extends StatelessWidget {
     this.sendMessageConfig,
   });
 
+  /// Provides reply message instance of chat.
   final ReplyMessage message;
 
+  /// Provides builder callback to build the custom view of the reply message view.
   final CustomMessageReplyViewBuilder? customMessageReplyViewBuilder;
+
+  /// Provides configuration for send message
   final SendMessageConfiguration? sendMessageConfig;
 
   @override

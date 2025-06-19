@@ -19,12 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/utils/measure_size.dart';
-import 'package:chatview/src/widgets/reactions_bottomsheet.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../chatview.dart';
+import '../extensions/extensions.dart';
+import '../models/config_models/message_reaction_configuration.dart';
+import '../utils/measure_size.dart';
+import 'reactions_bottomsheet.dart';
 
 class ReactionWidget extends StatefulWidget {
   const ReactionWidget({

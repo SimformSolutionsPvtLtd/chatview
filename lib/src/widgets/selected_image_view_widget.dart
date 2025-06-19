@@ -26,7 +26,7 @@ class SelectedImageViewWidgetState extends State<SelectedImageViewWidget> {
   @override
   Widget build(BuildContext context) {
     final mqSize = MediaQuery.sizeOf(context);
-    return ChatTextFieldViewBuilder(
+    return ChatTextFieldViewBuilder<List<String>>(
       valueListenable: selectedImages,
       builder: (context, images, child) {
         if (widget.sendMessageConfig?.selectedImageViewBuilder != null) {

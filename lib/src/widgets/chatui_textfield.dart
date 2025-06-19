@@ -23,14 +23,17 @@ import 'dart:async';
 import 'dart:io' show File, Platform;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:chatview/src/utils/constants/constants.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../chatview.dart';
+import '../models/config_models/send_message_configuration.dart';
+import '../utils/constants/constants.dart';
 import '../utils/debounce.dart';
+import '../utils/package_strings.dart';
+import '../values/typedefs.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({
@@ -56,7 +59,7 @@ class ChatUITextField extends StatefulWidget {
   final VoidCallBack onPressed;
 
   /// Provides callback once voice is recorded.
-  final Function(String?) onRecordingComplete;
+  final ValueSetter<String?> onRecordingComplete;
 
   /// Provides callback when user select images from camera/gallery.
   final StringsCallBack onImageSelected;

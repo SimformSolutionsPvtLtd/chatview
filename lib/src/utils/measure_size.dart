@@ -22,19 +22,16 @@
 
 import 'package:flutter/material.dart';
 
-typedef OnWidgetSizeChange = void Function(bool needToExtend);
-
 /// This widget has been created for size of widget which is covered in view port
 /// It also gives update when size changes.
 class MeasureSize extends StatefulWidget {
-  final Widget? child;
-  final OnWidgetSizeChange onSizeChange;
-
   const MeasureSize({
     Key? key,
     required this.onSizeChange,
     required this.child,
   }) : super(key: key);
+  final Widget? child;
+  final ValueSetter<bool> onSizeChange;
 
   @override
   State<MeasureSize> createState() => _MeasureSizeState();

@@ -19,8 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
+
+import '../models/chat_view_list_tile.dart';
 
 typedef StringMessageCallBack = void Function(
   String message,
@@ -96,4 +99,13 @@ typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
   BuildContext context,
   T value,
   Widget? child,
+);
+typedef BackgroundImageLoadError = void Function(
+  Object exception,
+  StackTrace? stackTrace,
+)?;
+typedef SearchUserCallback = Future<List<ChatViewListModel>?> Function(
+    String value)?;
+typedef CustomLastMessageListViewBuilder = Widget Function(
+  Message? message,
 );

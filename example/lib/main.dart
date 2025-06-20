@@ -1,4 +1,5 @@
 import 'package:chatview/chatview.dart';
+import 'package:example/chat_view_list_screen.dart';
 import 'package:example/data.dart';
 import 'package:example/models/theme.dart';
 import 'package:flutter/material.dart';
@@ -20,13 +21,18 @@ class Example extends StatelessWidget {
         colorScheme:
             ColorScheme.fromSwatch(accentColor: const Color(0xffEE5366)),
       ),
-      home: const ChatScreen(),
+      home: const ChatViewListScreen(),
     );
   }
 }
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({
+    super.key,
+    required this.user,
+  });
+
+  final ChatViewListModel user;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -138,16 +144,17 @@ class _ChatScreenState extends State<ChatScreen> {
         appBar: ChatViewAppBar(
           elevation: theme.elevation,
           backGroundColor: theme.appBarColor,
-          profilePicture: Data.profileImage,
+          profilePicture: widget.user.imageUrl,
           backArrowColor: theme.backArrowColor,
-          chatTitle: "Chat view",
+          chatTitle: widget.user.name,
           chatTitleTextStyle: TextStyle(
             color: theme.appBarTitleTextStyle,
             fontWeight: FontWeight.bold,
             fontSize: 18,
             letterSpacing: 0.25,
           ),
-          userStatus: "online",
+          userStatus:
+              widget.user.userActiveStatus.isOnline ? 'Online' : 'Offline',
           userStatusTextStyle: const TextStyle(color: Colors.grey),
           actions: [
             IconButton(

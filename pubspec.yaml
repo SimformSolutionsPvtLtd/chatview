@@ -23,7 +23,7 @@ dependencies:
   chatview_utils:
     git:
       url: https://github.com/SimformSolutionsPvtLtd/chatview_utils
-      ref: feature/add_chatview_list_models
+      ref: feature/add_chatview_list_models_test
 
   emoji_picker_flutter: ^4.3.0
   flutter:

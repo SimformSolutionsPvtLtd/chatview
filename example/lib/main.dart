@@ -110,10 +110,38 @@ class _ChatScreenState extends State<ChatScreen> {
       body: ChatView(
         chatController: _chatController,
         onSendTap: _onSendTap,
+        loadMoreData: (direction, message) async {
+          await Future.delayed(const Duration(seconds: 1));
+          _chatController.loadMoreData(
+            [
+              Message(
+                id: (_chatController.initialMessageList.length + 1).toString(),
+                message: '${direction.name} meeting 1.',
+                createdAt: direction.isPrevious
+                    ? DateTime(2015, 21, 00)
+                    : DateTime.now(),
+                sentBy: '2',
+              ),
+              Message(
+                id: (_chatController.initialMessageList.length + 2).toString(),
+                message: '${direction.name} meeting 2.',
+                createdAt: direction.isPrevious
+                    ? DateTime(2015, 21, 00)
+                    : DateTime.now(),
+                sentBy: '2',
+              ),
+              if (direction.isNext &&
+                  _chatController.canRevertToInitialMessageList)
+                Data.messageList.first,
+            ],
+            direction: direction,
+          );
+        },
         featureActiveConfig: const FeatureActiveConfig(
           lastSeenAgoBuilderVisibility: true,
           receiptsBuilderVisibility: true,
           enableScrollToBottomButton: true,
+          enablePagination: true,
         ),
         scrollToBottomButtonConfig: ScrollToBottomButtonConfig(
           backgroundColor: theme.textFieldBackgroundColor,
@@ -303,6 +331,74 @@ class _ChatScreenState extends State<ChatScreen> {
           profileImageUrl: Data.profileImage,
         ),
         repliedMessageConfig: RepliedMessageConfiguration(
+          loadOldReplyMessage: (id) async {
+            _chatController.replaceMessageList(
+              [
+                Message(
+                  id: '123',
+                  message: 'What about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '1',
+                ),
+                Message(
+                  id: (_chatController.initialMessageList.length + 1)
+                      .toString(),
+                  message: 'I will ignore the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '2',
+                ),
+                Message(
+                  id: (_chatController.initialMessageList.length + 2)
+                      .toString(),
+                  message: 'I will join the meeting.',
+                  createdAt: DateTime(2015, 6, 20),
+                  sentBy: '3',
+                ),
+                Message(
+                  id: '123',
+                  message: 'Such a boring meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '1',
+                ),
+                Message(
+                  id: '123',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '123',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '123',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '123',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '123',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '140',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+              ],
+            );
+          },
           backgroundColor: theme.repliedMessageColor,
           verticalBarColor: theme.verticalBarColor,
           repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(

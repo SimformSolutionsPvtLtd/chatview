@@ -1,18 +1,22 @@
+## [3.0.0] (Unreleased)
+* **Breaking**: [330](https://github.com/SimformSolutionsPvtLtd/chatview/issues/330) 
+  Memory usage optimization.
+
 ## [2.5.0]
 
-* **Feat**: [275](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/275)
+* **Feat**: [275](https://github.com/SimformSolutionsPvtLtd/chatview/issues/275)
   Sending image with text message
-* **Fix**: [294](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/294)
+* **Fix**: [294](https://github.com/SimformSolutionsPvtLtd/chatview/issues/294)
   Ensure onMessageRead is called correctly
-* **Fix**: [332](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/332)
+* **Fix**: [332](https://github.com/SimformSolutionsPvtLtd/chatview/issues/332)
   Hide keyboard when tapping outside of the text field and add height field for the text field
-* **Fix**: [266](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/266)
+* **Fix**: [266](https://github.com/SimformSolutionsPvtLtd/chatview/issues/266)
   Fix the keyboard overlapping the text field
-* **Feat**: [296](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/296)
+* **Feat**: [296](https://github.com/SimformSolutionsPvtLtd/chatview/issues/296)
   Added support of internationalization for strings that are used in chat view
-* **Fix**: [303](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/303)
+* **Fix**: [303](https://github.com/SimformSolutionsPvtLtd/chatview/issues/303)
   Hit ENTER button on PC keyboard, then send out message immediately
-* **Fix**: [289](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/289)
+* **Fix**: [289](https://github.com/SimformSolutionsPvtLtd/chatview/issues/289)
   ScrollController is disposed when parent widget state changes
 
 ## [2.4.1]

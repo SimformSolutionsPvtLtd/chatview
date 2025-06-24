@@ -34,6 +34,7 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 - Message styling
 - Typing indicators
 - Reply suggestions
+- Two-way pagination with lazy loading
 - Connect ChatView to any backend
   using [chatview_connect](https://pub.dev/packages/chatview_connect)
 - And a wide range of configuration options to customize your chat.
@@ -43,11 +44,11 @@ For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.gi
 
 ## Compatible Message Types
 
-| Message Types   | Android | iOS | MacOS | Web | Linux | Windows |
-| :-----:        | :-----: | :-: | :---: | :-: | :---: | :-----: |
-| Text messages   |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
+|  Message Types  | Android | iOS | MacOS | Web | Linux | Windows |
+|:---------------:|:-------:|:---:|:-----:|:---:|:-----:|:-------:|
+|  Text messages  |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
 | Image messages  |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
-| Voice messages  |   ✔️    | ✔️  |  ❌   | ❌  |  ❌   |   ❌    |
+| Voice messages  |   ✔️    | ✔️  |   ❌   |  ❌  |   ❌   |    ❌    |
 | Custom messages |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
 
 
@@ -600,6 +601,10 @@ ChatView(
 ChatView(
   // ...
   repliedMessageConfig: RepliedMessageConfiguration(
+    loadOldReplyMessage: (messageId) async {
+      // Load older messages that contain the replied message
+      await _loadMessagesAround(messageId);
+    },
     backgroundColor: Colors.blue,
     verticalBarColor: Colors.black,
     repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
@@ -610,6 +615,43 @@ ChatView(
   ),
   // ...
 )
+```
+
+### Loading Old Reply Messages
+
+The `loadOldReplyMessage` callback is essential for handling replies to messages that aren't 
+currently loaded in the chat view. When a user taps on a replied message, ChatView automatically 
+searches for the original message in the current message list. If the original message isn't 
+found (typically because it's an older message), this callback is triggered to load the 
+necessary historical messages.
+
+It is recommended to fetch messages such that the target message would fall in the middle of the 
+loaded messages, i.e., if the target message id is 25 and page size is 20, then load messages 
+with ids from 15 to 35.
+
+#### Example:
+
+```dart
+repliedMessageConfig: RepliedMessageConfiguration(
+  loadOldReplyMessage: (messageId) async {
+    try {
+      // 1. Fetch historical messages containing the target message
+      // Ensure to handle loading UI state till messages are fetched
+      final historicalMessages = await _apiService.getMessagesAroundId(
+        messageId: messageId,
+        limit: 20, // Load messages around the target
+      );
+
+      // 2. Update the message list with historical data
+      _chatController.replaceMessageList(historicalMessages);
+    } catch (error) {
+      // Handle errors gracefully
+      debugPrint('Failed to load old reply message: $error');
+      // Optionally show user-friendly error message
+    }
+  },
+  // Other configuration options...
+),
 ```
 
 ## Chat Bubble Customization
@@ -743,6 +785,76 @@ ChatView(
   // ...
 )
 ```
+
+## Two-Way Pagination
+
+ChatView supports two-way pagination for efficiently loading messages in both directions - 
+loading older messages when scrolling to the top and newer messages when scrolling to the bottom.
+This feature enables lazy loading and memory optimization for large chat histories.
+
+### Example
+
+```dart
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: ChatView(
+      chatController: _chatController,
+      // Enable pagination
+      featureActiveConfig: FeatureActiveConfig(
+        enablePagination: true,
+      ),
+
+      // Prevent further pagination when no more data is available.
+      isLastPage: () => _messageCount >= _totalMessageCount,
+
+      // Customize the loading indicator shown during pagination.
+      loadingWidget: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 8),
+          Text('Loading messages...'),
+        ],
+      ),
+
+      // Handle loading more data for pagination.
+      loadMoreData: (ChatPaginationDirection direction, Message referenceMessage) async {
+        // Call your API service to load messages based on the direction and reference message
+        final newMessages = switch (direction) {
+          // Load older messages (when user scrolls to top)
+          // referenceMessage is the first message in the current list
+          ChatPaginationDirection.previous => await _apiService.getOlderMessages(
+            beforeMessageId: referenceMessage.id,
+            limit: 20,
+          ),
+          // Load newer messages (when user scrolls to bottom)
+          // referenceMessage is the last message in the current list
+          ChatPaginationDirection.next => await _apiService.getNewerMessages(
+            afterMessageId: referenceMessage.id,
+            limit: 20,
+          ),
+        };
+        
+        // Add the loaded messages to the chat controller
+        _chatController.loadMoreData(
+          newMessages,
+          direction: direction,
+        );
+      },
+    ),
+  );
+}
+```
+
+### Best Practices
+
+1. **Batch Size**: Load messages in reasonable batches (e.g., 20-50 messages per request)
+2. **Error Handling**: Always handle API errors gracefully in your `loadMoreData` callback
+3. **Loading States**: Use the built-in loading indicators or customize them for better UX
+4. **Pagination State**: Properly manage `isLastPage` to prevent unnecessary API calls
+5. **Reference Messages**: Use the provided reference message for cursor-based pagination for 
+   better performance
 
 ## Link Preview Configuration
 
@@ -986,9 +1098,9 @@ The format for `fromJson` and `toJson` methods changed for several classes:
 ```dart
 ChatUser.fromJson(
   { 
-    ...
+    // ...
     'imageType': ImageType.asset,
-    ...
+    // ...
   },
 ),
 ```
@@ -997,9 +1109,9 @@ ChatUser.fromJson(
 ```dart
 ChatUser.fromJson(
   {
-    ...
+    // ...
     'imageType': 'asset',
-    ...
+    // ...
   },
 ),
 ```
@@ -1007,18 +1119,18 @@ ChatUser.fromJson(
 **Before (`ChatUser.toJson`):**
 ```dart
 {
-  ...
+  // ...
   imageType: ImageType.asset,
-  ...
+  // ...
 }
 ```
 
 **After (`ChatUser.toJson`):**
 ```dart
 {
-  ...
+  // ...
   imageType: asset,
-  ...
+  // ...
 }
 ```
 
@@ -1028,11 +1140,11 @@ ChatUser.fromJson(
 ```dart
 Message.fromJson(
   {
-    ...
+    // ...
     'createdAt': DateTime.now(),
     'message_type': MessageType.text,
     'voice_message_duration': Duration(seconds: 5),
-    ...
+    // ...
   }
 )
 ```
@@ -1041,11 +1153,11 @@ Message.fromJson(
 ```dart
 Message.fromJson(
   {
-    ...
+    // ...
     'createdAt': '2024-06-13T17:32:19.586412',
     'message_type': 'text',
     'voice_message_duration': '5000000',
-    ...
+    // ...
   }
 )
 ```
@@ -1053,22 +1165,22 @@ Message.fromJson(
 **Before (`Message.toJson`):**
 ```dart
 {
-  ...
+  // ...
   createdAt: 2024-06-13 17:23:19.454789,
   message_type: MessageType.text,
   voice_message_duration: 0:00:05.000000,
-  ...
+  // ...
 }
 ```
 
 **After (`Message.toJson`):**
 ```dart
 {
-  ...
+  // ...
   createdAt: 2024-06-13T17:32:19.586412,
   message_type: text,
   voice_message_duration: 5000000,
-  ...
+  // ...
 }
 ```
 
@@ -1078,10 +1190,10 @@ Message.fromJson(
 ```dart
 ReplyMessage.fromJson(
   {
-    ...
+    // ...
     'message_type': MessageType.text,  
     'voiceMessageDuration': Duration(seconds: 5),
-    ...
+    // ...
   }
 )
 ```
@@ -1090,10 +1202,10 @@ ReplyMessage.fromJson(
 ```dart
 ReplyMessage.fromJson(
   {
-    ...
+    // ...
     'message_type': 'text',  
     'voiceMessageDuration': '5000000',
-    ...
+    // ...
   }
 )
 ```
@@ -1101,20 +1213,20 @@ ReplyMessage.fromJson(
 **Before (`ReplyMessage.toJson`):**
 ```dart
 {
-  ...
+  // ...
   message_type: MessageType.text,
   voiceMessageDuration: 0:00:05.000000,
-  ...
+  // ...
 }
 ```
 
 **After (`ReplyMessage.toJson`):**
 ```dart
 {
-  ...
+  // ...
   message_type: text,
   voiceMessageDuration: 5000000,
-  ...
+  // ...
 }
 ```
 
@@ -1139,8 +1251,8 @@ _chatController.setTypingIndicator = false; // for hiding indicator
 ## Main Contributors
 
 | ![img](https://avatars.githubusercontent.com/u/25323183?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/56400956?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/65003381?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/41247722?v=4&s=200) |
-|:------------------------------------------------------------------:|:------------------------------------------------------------:|:------------------------------------------------------------:|:------------------------------------------------------------:|
-|           [Vatsal Tanna](https://github.com/vatsaltanna)           |   [Ujas Majithiya](https://github.com/Ujas-Majithiya)      |      [Apurva Kanthraviya](https://github.com/apurva780)      |      [Aditya Chavda](https://github.com/aditya-chavda)       |
+|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|
+|           [Vatsal Tanna](https://github.com/vatsaltanna)           |        [Ujas Majithiya](https://github.com/Ujas-Majithiya)         |         [Apurva Kanthraviya](https://github.com/apurva780)         |         [Aditya Chavda](https://github.com/aditya-chavda)          |
 
 ## How to Contribute
 

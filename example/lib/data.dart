@@ -141,5 +141,26 @@ class Data {
       sentBy: '2',
       status: MessageStatus.read,
     ),
+    Message(
+      id: '13',
+      message: "Check this out",
+      createdAt: DateTime.now(),
+      replyMessage: const ReplyMessage(
+        messageId: '140',
+        replyTo: '2',
+        replyBy: '1',
+        message: "This",
+      ),
+      sentBy: '1',
+      status: MessageStatus.read,
+    ),
+    for (int i = 14; i <= 19; i++)
+      Message(
+        id: i.toString(),
+        message: "This is message number $i",
+        createdAt: DateTime.now(),
+        sentBy: (i % 2 == 0) ? '1' : '2',
+        status: MessageStatus.read,
+      ),
   ];
 }

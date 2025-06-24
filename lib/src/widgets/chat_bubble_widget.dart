@@ -263,16 +263,14 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
             ),
           ),
         if (replyMessage.isNotEmpty)
-          chatListConfig.repliedMessageConfig?.repliedMessageWidgetBuilder !=
-                  null
-              ? chatListConfig.repliedMessageConfig!
-                  .repliedMessageWidgetBuilder!(widget.message.replyMessage)
-              : ReplyMessageWidget(
-                  message: widget.message,
-                  repliedMessageConfig: chatListConfig.repliedMessageConfig,
-                  onTap: () => widget.onReplyTap
-                      ?.call(widget.message.replyMessage.messageId),
-                ),
+          chatListConfig.repliedMessageConfig?.repliedMessageWidgetBuilder
+                  ?.call(widget.message.replyMessage) ??
+              ReplyMessageWidget(
+                message: widget.message,
+                repliedMessageConfig: chatListConfig.repliedMessageConfig,
+                onTap: () => widget.onReplyTap
+                    ?.call(widget.message.replyMessage.messageId),
+              ),
         SwipeToReply(
           isMessageByCurrentUser: isMessageBySender,
           onSwipe: isMessageBySender ? onLeftSwipe : onRightSwipe,

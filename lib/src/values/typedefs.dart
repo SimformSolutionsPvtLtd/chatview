@@ -64,9 +64,10 @@ typedef CustomViewForReplyMessage = Widget Function(
   BuildContext context,
   ReplyMessage state,
 );
-typedef GetMessageSeparator = (
-  Map<int, DateTime> messageSeparator,
-  DateTime dateTime,
+typedef GetMessageSeparatorWithCounts = (
+  Map<int, DateTime> separators,
+  DateTime lastMatchedDate,
+  Map<int, int> separatorCounts
 );
 typedef SelectedImageViewBuilder = Widget Function(
   List<String> images,

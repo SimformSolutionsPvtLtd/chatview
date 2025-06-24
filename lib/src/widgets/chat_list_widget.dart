@@ -50,7 +50,7 @@ class ChatListWidget extends StatefulWidget {
 
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
-  final ValueGetter<Future<void>>? loadMoreData;
+  final Future<void> Function(ChatPaginationDirection direction)? loadMoreData;
 
   /// Provides flag if there is no more next data left in list.
   final bool? isLastPage;
@@ -71,6 +71,7 @@ class ChatListWidget extends StatefulWidget {
 
 class _ChatListWidgetState extends State<ChatListWidget> {
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isPrevPageLoading = ValueNotifier<bool>(false);
 
   ChatController get chatController => widget.chatController;
 
@@ -113,72 +114,71 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ValueListenableBuilder<bool>(
-          valueListenable: _isNextPageLoading,
-          builder: (_, isNextPageLoading, child) {
-            if (isNextPageLoading &&
-                (featureActiveConfig?.enablePagination ?? false)) {
-              return SizedBox(
-                height: Scaffold.of(context).appBarMaxHeight,
-                child: Center(
-                  child:
-                      widget.loadingWidget ?? const CircularProgressIndicator(),
-                ),
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
-          },
-        ),
+        if (featureActiveConfig?.enablePagination ?? false)
+          PaginationLoader(
+            listenable: _isPrevPageLoading,
+            loader: widget.loadingWidget,
+          ),
         Expanded(
           child: ValueListenableBuilder<bool>(
             valueListenable: chatViewIW!.showPopUp,
-            builder: (_, showPopupValue, child) {
-              return Stack(
-                children: [
-                  ChatGroupedListWidget(
-                    showPopUp: showPopupValue,
-                    scrollController: scrollController,
-                    isEnableSwipeToSeeTime:
-                        featureActiveConfig?.enableSwipeToSeeTime ?? true,
-                    assignReplyMessage: widget.assignReplyMessage,
-                    onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
-                      if (featureActiveConfig?.enableReactionPopup ?? false) {
-                        chatViewIW?.reactionPopupKey.currentState
-                            ?.refreshWidget(
+            builder: (_, showPopupValue, __) => ChatGroupedListWidget(
+              showPopUp: showPopupValue,
+              scrollController: scrollController,
+              isEnableSwipeToSeeTime:
+                  featureActiveConfig?.enableSwipeToSeeTime ?? true,
+              assignReplyMessage: widget.assignReplyMessage,
+              onChatListTap: _onChatListTap,
+              textFieldConfig: widget.textFieldConfig,
+              onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
+                if (featureActiveConfig?.enableReactionPopup ?? false) {
+                  chatViewIW
+                    ?..reactionPopupKey.currentState?.refreshWidget(
                           message: message,
                           xCoordinate: xCoordinate,
                           yCoordinate: yCoordinate,
-                        );
-                        chatViewIW?.showPopUp.value = true;
-                      }
-                      if (featureActiveConfig?.enableReplySnackBar ?? false) {
-                        _showReplyPopup(
-                          message: message,
-                          sentByCurrentUser: message.sentBy == currentUser?.id,
-                        );
-                      }
-                    },
-                    onChatListTap: _onChatListTap,
-                    textFieldConfig: widget.textFieldConfig,
-                  ),
-                ],
-              );
-            },
+                        )
+                    ..showPopUp.value = true;
+                }
+                if (featureActiveConfig?.enableReplySnackBar ?? false) {
+                  _showReplyPopup(
+                    message: message,
+                    sentByCurrentUser: message.sentBy == currentUser?.id,
+                  );
+                }
+              },
+            ),
           ),
         ),
+        if (featureActiveConfig?.enablePagination ?? false)
+          PaginationLoader(
+            listenable: _isNextPageLoading,
+            loader: widget.loadingWidget,
+          ),
       ],
     );
   }
 
   void _pagination() {
     if (widget.loadMoreData == null || widget.isLastPage == true) return;
-    if ((scrollController.position.pixels ==
-            scrollController.position.maxScrollExtent) &&
-        !_isNextPageLoading.value) {
-      _isNextPageLoading.value = true;
-      widget.loadMoreData!()
-          .whenComplete(() => _isNextPageLoading.value = false);
+    final position = scrollController.position;
+    final pixels = position.pixels;
+    if (((pixels == position.maxScrollExtent) ||
+            (pixels == position.minScrollExtent)) &&
+        !_isPrevPageLoading.value) {
+      if (pixels == position.maxScrollExtent) {
+        _isPrevPageLoading.value = true;
+        widget.loadMoreData
+            ?.call(ChatPaginationDirection.previous)
+            .whenComplete(
+              () => _isPrevPageLoading.value = false,
+            );
+      } else {
+        _isNextPageLoading.value = true;
+        widget.loadMoreData
+            ?.call(ChatPaginationDirection.next)
+            .whenComplete(() => _isNextPageLoading.value = false);
+      }
     }
   }
 
@@ -193,43 +193,43 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         SnackBar(
           duration: const Duration(hours: 1),
           backgroundColor: replyPopup?.backgroundColor ?? Colors.white,
-          content: replyPopup?.replyPopupBuilder != null
-              ? replyPopup!.replyPopupBuilder!(message, sentByCurrentUser)
-              : ReplyPopupWidget(
-                  buttonTextStyle: replyPopup?.buttonTextStyle,
-                  topBorderColor: replyPopup?.topBorderColor,
-                  onMoreTap: () {
-                    _onChatListTap();
-                    replyPopup?.onMoreTap?.call(
-                      message,
-                      sentByCurrentUser,
-                    );
-                  },
-                  onReportTap: () {
-                    _onChatListTap();
-                    replyPopup?.onReportTap?.call(
-                      message,
-                    );
-                  },
-                  onUnsendTap: () {
-                    _onChatListTap();
-                    replyPopup?.onUnsendTap?.call(
-                      message,
-                    );
-                  },
-                  onReplyTap: () {
-                    widget.assignReplyMessage(message);
-                    if (featureActiveConfig?.enableReactionPopup ?? false) {
-                      chatViewIW?.showPopUp.value = false;
-                    }
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    if (replyPopup?.onReplyTap != null) {
-                      replyPopup?.onReplyTap!(message);
-                    }
-                  },
-                  sentByCurrentUser: sentByCurrentUser,
-                ),
           padding: EdgeInsets.zero,
+          content: replyPopup?.replyPopupBuilder?.call(
+                message,
+                sentByCurrentUser,
+              ) ??
+              ReplyPopupWidget(
+                buttonTextStyle: replyPopup?.buttonTextStyle,
+                topBorderColor: replyPopup?.topBorderColor,
+                onMoreTap: () {
+                  _onChatListTap();
+                  replyPopup?.onMoreTap?.call(
+                    message,
+                    sentByCurrentUser,
+                  );
+                },
+                onReportTap: () {
+                  _onChatListTap();
+                  replyPopup?.onReportTap?.call(
+                    message,
+                  );
+                },
+                onUnsendTap: () {
+                  _onChatListTap();
+                  replyPopup?.onUnsendTap?.call(
+                    message,
+                  );
+                },
+                onReplyTap: () {
+                  widget.assignReplyMessage(message);
+                  if (featureActiveConfig?.enableReactionPopup ?? false) {
+                    chatViewIW?.showPopUp.value = false;
+                  }
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  replyPopup?.onReplyTap?.call(message);
+                },
+                sentByCurrentUser: sentByCurrentUser,
+              ),
         ),
       ).closed;
   }
@@ -247,5 +247,34 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   void dispose() {
     _isNextPageLoading.dispose();
     super.dispose();
+  }
+}
+
+class PaginationLoader extends StatelessWidget {
+  const PaginationLoader({
+    required this.listenable,
+    this.loader,
+    super.key,
+  });
+
+  final ValueNotifier<bool> listenable;
+  final Widget? loader;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: listenable,
+      builder: (_, isLoading, child) {
+        if (isLoading) {
+          return SizedBox(
+            height: Scaffold.of(context).appBarMaxHeight,
+            child: child,
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+      child: Center(child: loader ?? const CircularProgressIndicator()),
+    );
   }
 }

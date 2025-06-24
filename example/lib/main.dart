@@ -107,10 +107,36 @@ class _ChatScreenState extends State<ChatScreen> {
       body: ChatView(
         chatController: _chatController,
         onSendTap: _onSendTap,
+        loadMoreData: (direction) async {
+          print('loading ${direction.name}');
+          await Future.delayed(const Duration(seconds: 1));
+          _chatController.loadMoreData(
+            [
+              Message(
+                id: (_chatController.initialMessageList.length + 1).toString(),
+                message: 'I will schedule the meeting.',
+                createdAt: direction.isPrevious
+                    ? DateTime(2015, 21, 00)
+                    : DateTime.now(),
+                sentBy: '2',
+              ),
+              Message(
+                id: (_chatController.initialMessageList.length + 2).toString(),
+                message: 'I will schedule the meeting.',
+                createdAt: direction.isPrevious
+                    ? DateTime(2015, 21, 00)
+                    : DateTime.now(),
+                sentBy: '2',
+              ),
+            ],
+            direction: direction,
+          );
+        },
         featureActiveConfig: const FeatureActiveConfig(
           lastSeenAgoBuilderVisibility: true,
           receiptsBuilderVisibility: true,
           enableScrollToBottomButton: true,
+          enablePagination: true,
         ),
         scrollToBottomButtonConfig: ScrollToBottomButtonConfig(
           backgroundColor: theme.textFieldBackgroundColor,

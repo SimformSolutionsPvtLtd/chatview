@@ -34,6 +34,7 @@ class ScrollToBottomButton extends StatefulWidget {
 class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
   bool isButtonVisible = false;
   ScrollController? scrollController;
+  var _isLoadingPreviousMessages = false;
 
   @override
   void initState() {
@@ -52,19 +53,38 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
     final double buttonDisplayOffset =
         chatListConfig.scrollToBottomButtonConfig?.buttonDisplayOffset ?? 300;
     final bool isOffsetCrossedLimit = currentOffset > buttonDisplayOffset;
+
+    // Check if we need to load previous messages (pagination at bottom)
+    _checkForBottomPagination();
+
     if (isOffsetCrossedLimit) {
-      if (!isButtonVisible) {
-        setState(() {
-          isButtonVisible = true;
-        });
-      }
-    } else {
-      if (isButtonVisible) {
-        setState(() {
-          isButtonVisible = false;
-        });
-      }
+      if (!isButtonVisible) setState(() => isButtonVisible = true);
+    } else if (isButtonVisible) {
+      setState(() => isButtonVisible = false);
     }
+  }
+
+  void _checkForBottomPagination() {
+    // Early return conditions
+    if (!mounted ||
+        scrollController == null ||
+        !scrollController!.hasClients ||
+        _isLoadingPreviousMessages ||
+        !(chatViewIW?.featureActiveConfig.enablePagination ?? false)) return;
+
+    // Check if scroll position is at or near bottom
+    // final position = scrollController!.position;
+    // final threshold =
+    //     chatListConfig.scrollToBottomButtonConfig?.paginationThreshold ?? 20.0;
+    // final isAtBottom = position.pixels >= position.maxScrollExtent - threshold;
+    //
+    // // Load more if at bottom and callback exists
+    // if (isAtBottom && chatViewIW?.chatController.onLoadMoreMessages != null) {
+    //   _isLoadingPreviousMessages = true;
+    //   chatViewIW?.chatController.onLoadMoreMessages!().whenComplete(() {
+    //     _isLoadingPreviousMessages = false;
+    //   });
+    // }
   }
 
   @override

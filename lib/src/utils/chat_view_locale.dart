@@ -42,7 +42,7 @@ final class ChatViewLocale {
     required this.reload,
   });
 
-  /// Create from Map<String, String>
+  /// Create from Map
   factory ChatViewLocale.fromMap(Map<String, String> map) {
     return ChatViewLocale(
       today: map['today']?.toString() ?? '',

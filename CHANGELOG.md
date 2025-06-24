@@ -1,4 +1,4 @@
-## [2.4.2] (unreleased)
+## [2.5.0]
 
 * **Feat**: [275](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/275)
   Sending image with text message

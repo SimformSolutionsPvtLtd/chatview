@@ -100,13 +100,13 @@ class ChatView extends StatefulWidget {
 
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
-  final AsyncCallback? loadMoreData;
+  final PaginationCallback? loadMoreData;
 
   /// Provides widget for loading view while pagination is enabled.
   final Widget? loadingWidget;
 
   /// Provides flag if there is no more next data left in list.
-  final bool? isLastPage;
+  final ValueGetter<bool>? isLastPage;
 
   /// Provides call back when user tap on send button in text field. It returns
   /// message, reply message and message type.
@@ -205,20 +205,20 @@ class _ChatViewState extends State<ChatView>
       chatTextFieldViewKey: chatTextFieldViewKey,
       child: SuggestionsConfigIW(
         suggestionsConfig: widget.replySuggestionsConfig,
-        child: Builder(builder: (context) {
-          return ConfigurationsInheritedWidget(
-            chatBackgroundConfig: widget.chatBackgroundConfig,
-            reactionPopupConfig: widget.reactionPopupConfig,
-            typeIndicatorConfig: widget.typeIndicatorConfig,
-            chatBubbleConfig: widget.chatBubbleConfig,
-            replyPopupConfig: widget.replyPopupConfig,
-            messageConfig: widget.messageConfig,
-            profileCircleConfig: widget.profileCircleConfig,
-            repliedMessageConfig: widget.repliedMessageConfig,
-            swipeToReplyConfig: widget.swipeToReplyConfig,
-            emojiPickerSheetConfig: widget.emojiPickerSheetConfig,
-            scrollToBottomButtonConfig: widget.scrollToBottomButtonConfig,
-            child: Stack(
+        child: ConfigurationsInheritedWidget(
+          chatBackgroundConfig: widget.chatBackgroundConfig,
+          reactionPopupConfig: widget.reactionPopupConfig,
+          typeIndicatorConfig: widget.typeIndicatorConfig,
+          chatBubbleConfig: widget.chatBubbleConfig,
+          replyPopupConfig: widget.replyPopupConfig,
+          messageConfig: widget.messageConfig,
+          profileCircleConfig: widget.profileCircleConfig,
+          repliedMessageConfig: widget.repliedMessageConfig,
+          swipeToReplyConfig: widget.swipeToReplyConfig,
+          emojiPickerSheetConfig: widget.emojiPickerSheetConfig,
+          scrollToBottomButtonConfig: widget.scrollToBottomButtonConfig,
+          child: Builder(
+            builder: (context) => Stack(
               children: [
                 Container(
                   height: chatBackgroundConfig.height ??
@@ -227,13 +227,14 @@ class _ChatViewState extends State<ChatView>
                       MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: chatBackgroundConfig.backgroundColor ?? Colors.white,
-                    image: chatBackgroundConfig.backgroundImage != null
-                        ? DecorationImage(
+                    image: chatBackgroundConfig.backgroundImage == null
+                        ? null
+                        : DecorationImage(
                             fit: BoxFit.fill,
                             image: NetworkImage(
-                                chatBackgroundConfig.backgroundImage!),
-                          )
-                        : null,
+                              chatBackgroundConfig.backgroundImage!,
+                            ),
+                          ),
                   ),
                   padding: chatBackgroundConfig.padding,
                   margin: chatBackgroundConfig.margin,
@@ -320,8 +321,8 @@ class _ChatViewState extends State<ChatView>
                   ),
               ],
             ),
-          );
-        }),
+          ),
+        ),
       ),
     );
   }

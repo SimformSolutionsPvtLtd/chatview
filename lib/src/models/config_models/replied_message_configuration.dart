@@ -26,6 +26,7 @@ import 'replied_msg_auto_scroll_config.dart';
 
 class RepliedMessageConfiguration {
   const RepliedMessageConfiguration({
+    required this.loadOldReplyMessage,
     this.verticalBarColor,
     this.backgroundColor,
     this.textStyle,
@@ -42,6 +43,8 @@ class RepliedMessageConfiguration {
     this.repliedMsgAutoScrollConfig = const RepliedMsgAutoScrollConfig(),
     this.micIconColor,
   });
+
+  final OldReplyMessageFetchCallback loadOldReplyMessage;
 
   /// Used to give color to vertical bar.
   final Color? verticalBarColor;

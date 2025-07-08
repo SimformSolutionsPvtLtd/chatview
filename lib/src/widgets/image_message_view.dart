@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io'; // Ensure this is imported
 
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +102,59 @@ class ImageMessageView extends StatelessWidget {
                     borderRadius: imageMessageConfig?.borderRadius ??
                         BorderRadius.circular(14),
                     child: (() {
-                      if (imageUrl.isUrl) {
+                      // --- MODIFIED LOGIC STARTS HERE ---
+
+                      // 1. Check if it's a local file path
+                      // We're being explicit here for Windows paths as well
+                      // Consider using Uri.tryParse for a more robust scheme check
+                      final bool isLocalFilePath = imageUrl.startsWith('file:///') ||
+                                                   (Platform.isWindows && imageUrl.contains(':') && imageUrl.startsWith(RegExp(r'^[a-zA-Z]:[/\\]')));
+
+                      if (isLocalFilePath) {
+                        String path = imageUrl;
+                        if (imageUrl.startsWith('file:///')) {
+                          path = imageUrl.substring('file:///'.length);
+                        }
+
+                        final File localFile = File(path);
+                        print('offline-chatview: Attempting to load local file: $path');
+                        return FutureBuilder<bool>(
+                          future: localFile.exists(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              if (snapshot.hasData && snapshot.data == true) {
+                                return Image.file(
+                                  localFile,
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print('offline-chatview: Error loading local file: $error');
+                                    return const Icon(Icons.broken_image, size: 50, color: Colors.grey);
+                                  },
+                                );
+                              } else {
+                                print('offline-chatview: Local file does not exist: $path');
+                                return const Icon(Icons.broken_image, size: 50, color: Colors.grey);
+                              }
+                            }
+                            return const CircularProgressIndicator(); // Show loading while checking existence
+                          },
+                        );
+                      }
+                      // 2. Check if it's a Base64 string (using your existing `fromMemory` extension)
+                      else if (imageUrl.fromMemory) {
+                        print('offline-chatview: Displaying image from memory (Base64).');
+                        return Image.memory(
+                          base64Decode(imageUrl.substring(imageUrl.indexOf('base64') + 7)),
+                          fit: BoxFit.fill,
+                          errorBuilder: (context, error, stackTrace) {
+                             print('offline-chatview: Error loading Base64 image: $error');
+                             return const Icon(Icons.broken_image, size: 50, color: Colors.redAccent);
+                          },
+                        );
+                      }
+                      // 3. Otherwise, assume it's a network URL (using your existing `isUrl` extension)
+                      else if (imageUrl.isUrl) { // This check remains but is now the last resort for URLs
+                        print('offline-chatview: Displaying network image from: $imageUrl');
                         return Image.network(
                           imageUrl,
                           fit: BoxFit.fitHeight,
@@ -110,27 +162,25 @@ class ImageMessageView extends StatelessWidget {
                             if (loadingProgress == null) return child;
                             return Center(
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
+                                value: loadingProgress.expectedTotalBytes != null
                                     ? loadingProgress.cumulativeBytesLoaded /
                                         loadingProgress.expectedTotalBytes!
                                     : null,
                               ),
                             );
                           },
-                        );
-                      } else if (imageUrl.fromMemory) {
-                        return Image.memory(
-                          base64Decode(imageUrl
-                              .substring(imageUrl.indexOf('base64') + 7)),
-                          fit: BoxFit.fill,
-                        );
-                      } else {
-                        return Image.file(
-                          File(imageUrl),
-                          fit: BoxFit.fill,
+                          errorBuilder: (context, error, stackTrace) {
+                            print('offline-chatview: Error loading network image: $error');
+                            return const Icon(Icons.error, size: 50, color: Colors.red);
+                          },
                         );
                       }
+                      // 4. Fallback for any other unrecognized format
+                      else {
+                        print('offline-chatview: Unrecognized image URL format: $imageUrl');
+                        return const Icon(Icons.broken_image, size: 50, color: Colors.purple);
+                      }
+                      // --- MODIFIED LOGIC ENDS HERE ---
                     }()),
                   ),
                 ),

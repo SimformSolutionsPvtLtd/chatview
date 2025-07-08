@@ -84,6 +84,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   VoiceRecordingConfiguration? get voiceRecordingConfig =>
       widget.sendMessageConfig?.voiceRecordingConfiguration;
 
+  // FIX: Corrected getter name from imagePickerIconsConfiguration to imagePickerIconsConfig
   ImagePickerIconsConfiguration? get imagePickerIconsConfig =>
       sendMessageConfig?.imagePickerIconsConfig;
 
@@ -283,7 +284,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                       children: [
                         if (!isRecordingValue) ...[
                           if (sendMessageConfig?.enableCameraImagePicker ??
-                              true)
+                                  true)
                             IconButton(
                               constraints: const BoxConstraints(),
                               onPressed: (textFieldConfig?.enabled ?? true)
@@ -302,7 +303,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                   ),
                             ),
                           if (sendMessageConfig?.enableGalleryImagePicker ??
-                              true)
+                                  true)
                             IconButton(
                               constraints: const BoxConstraints(),
                               onPressed: (textFieldConfig?.enabled ?? true)
@@ -349,6 +350,8 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                             color: cancelRecordConfiguration?.iconColor ??
                                 voiceRecordingConfig?.recorderIconColor,
                           ),
+                        if (sendMessageConfig?.trailing != null)
+                          ...sendMessageConfig!.trailing!,
                       ],
                     );
                   }

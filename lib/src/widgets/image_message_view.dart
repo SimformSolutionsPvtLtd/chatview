@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:async'; // Added this import for Completer if not already present
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -59,32 +59,70 @@ class _ImageMessageViewState extends State<ImageMessageView> {
   String get imageUrl => widget.message.message;
   double _imageAspectRatio = 1.0;
 
+  // New: Declare ImageStream and ImageStreamListener to manage their lifecycle
+  ImageStream? _imageStream;
+  ImageStreamListener? _imageListener;
+
   @override
   void initState() {
     super.initState();
-    _loadImageAndGetAspectRatio();
+    // Only load aspect ratio if it's a local file.
+    // Network/Base64 images usually resolve aspect ratio internally.
+    if (_isLocalFilePath(imageUrl)) {
+      _loadImageAndGetAspectRatio();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ImageMessageView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the image URL changes, reset aspect ratio and reload if local
+    if (widget.message.message != oldWidget.message.message) {
+      _imageAspectRatio = 1.0; // Reset aspect ratio
+      _removeImageListener(); // Clean up old listener
+      if (_isLocalFilePath(imageUrl)) {
+        _loadImageAndGetAspectRatio();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeImageListener(); // Crucial: Remove listener when widget is disposed
+    super.dispose();
+  }
+
+  // New: Helper method to remove the image stream listener
+  void _removeImageListener() {
+    if (_imageStream != null && _imageListener != null) {
+      _imageStream!.removeListener(_imageListener!);
+      print('offline-chatview: ImageStreamListener removed for: $imageUrl');
+    }
+    _imageStream = null;
+    _imageListener = null;
+  }
+
+  // New: Helper to determine if the path is a local file path
+  bool _isLocalFilePath(String path) {
+    return path.startsWith('file:///') ||
+           path.startsWith('/') ||
+           (Platform.isWindows && (path.contains(':') && path.startsWith(RegExp(r'^[a-zA-Z]:[/\\]'))));
   }
 
   // Helper to robustly get a clean local path and handle decoding
   String _getCleanLocalPath(String pathOrUrl) {
     String cleanedPath = pathOrUrl;
 
-    // First, try to parse as URI to handle file:/// and potential encoding
     try {
       final Uri uri = Uri.parse(pathOrUrl);
       if (uri.scheme == 'file') {
-        // This is a file URI, extract its path component
-        // Uri.file.path handles decoding automatically
         cleanedPath = uri.toFilePath();
         print('offline-chatview: _getCleanLocalPath: Parsed as file URI: $cleanedPath');
       } else {
-        // Not a file URI, treat as a regular path and just decode
         cleanedPath = Uri.decodeComponent(pathOrUrl);
         print('offline-chatview: _getCleanLocalPath: Not file URI, just decoded: $cleanedPath');
       }
     } catch (e) {
-      // If Uri.parse fails (e.g., it's just a raw path like /storage/emulated/0/...),
-      // then try to decode it directly as a component.
       cleanedPath = Uri.decodeComponent(pathOrUrl);
       print('offline-chatview: _getCleanLocalPath: URI parse failed, direct decode: $cleanedPath');
     }
@@ -92,39 +130,60 @@ class _ImageMessageViewState extends State<ImageMessageView> {
   }
 
   Future<void> _loadImageAndGetAspectRatio() async {
+    // Only proceed if aspect ratio is still default, meaning it hasn't been calculated yet
+    if (_imageAspectRatio != 1.0) {
+      print('offline-chatview: Aspect ratio already calculated for $imageUrl, skipping.');
+      return;
+    }
+
     final String cleanPath = _getCleanLocalPath(imageUrl);
     final File imageFile = File(cleanPath);
 
     if (await imageFile.exists()) {
       try {
-        final Image image = Image.file(imageFile);
-        final Completer<ui.Image> completer = Completer<ui.Image>();
-        image.image.resolve(const ImageConfiguration()).addListener(
-          ImageStreamListener((ImageInfo info, bool _) {
-            completer.complete(info.image);
-          }),
-        );
-        final ui.Image uiImage = await completer.future;
-        final double actualWidth = uiImage.width.toDouble();
-        final double actualHeight = uiImage.height.toDouble();
-        uiImage.dispose(); // Release image resources
+        final ImageProvider imageProvider = FileImage(imageFile);
+        
+        // Ensure old listener is removed before adding a new one
+        _removeImageListener(); 
+        _imageStream = imageProvider.resolve(const ImageConfiguration());
+        _imageListener = ImageStreamListener(
+          (ImageInfo info, bool synchronousCall) {
+            // Check mounted to ensure widget is still in tree
+            if (mounted) {
+              final double actualWidth = info.image.width.toDouble();
+              final double actualHeight = info.image.height.toDouble();
+              info.image.dispose(); // Release native image resources immediately
 
-        if (actualHeight > 0 && mounted) {
-          setState(() {
-            _imageAspectRatio = actualWidth / actualHeight;
-            print('offline-chatview: Calculated image aspect ratio: $_imageAspectRatio');
-          });
-        }
+              if (actualHeight > 0) {
+                setState(() {
+                  _imageAspectRatio = actualWidth / actualHeight;
+                  print('offline-chatview: Calculated image aspect ratio: $_imageAspectRatio for $cleanPath');
+                });
+              } else {
+                print('offline-chatview: Image height is 0 for $cleanPath, using default aspect ratio.');
+                if (mounted) {
+                  setState(() { _imageAspectRatio = 1.0; });
+                }
+              }
+            }
+          },
+          onError: (exception, stackTrace) {
+            print('offline-chatview: Error resolving image stream for $cleanPath: $exception');
+            if (mounted) {
+              setState(() { _imageAspectRatio = 1.0; }); // Fallback on error
+            }
+          },
+        );
+        _imageStream!.addListener(_imageListener!);
+        print('offline-chatview: Added ImageStreamListener for: $cleanPath');
       } catch (e) {
         print('offline-chatview: Error getting image dimensions for $cleanPath: $e');
-        // Fallback to default aspect ratio
         if (mounted) {
           setState(() { _imageAspectRatio = 1.0; });
         }
       }
     } else {
       print('offline-chatview: Image file does not exist for aspect ratio calculation: $cleanPath');
-      // If file doesn't exist, use a default aspect ratio and ensure UI fallback
       if (mounted) {
         setState(() { _imageAspectRatio = 1.0; }); // Keep default
       }
@@ -174,12 +233,7 @@ class _ImageMessageViewState extends State<ImageMessageView> {
                     borderRadius: widget.imageMessageConfig?.borderRadius ??
                         BorderRadius.circular(14),
                     child: (() {
-                      // More robust check for local file path
-                      final bool isLocalFilePath = imageUrl.startsWith('file:///') || // explicit file URI
-                                                   imageUrl.startsWith('/') ||      // absolute path on Unix-like (Android/iOS)
-                                                   (Platform.isWindows && (imageUrl.contains(':') && imageUrl.startsWith(RegExp(r'^[a-zA-Z]:[/\\]')))); // Windows path
-
-                      if (isLocalFilePath) {
+                      if (_isLocalFilePath(imageUrl)) {
                         final String cleanPath = _getCleanLocalPath(imageUrl);
                         final File localFile = File(cleanPath);
 
@@ -214,7 +268,7 @@ class _ImageMessageViewState extends State<ImageMessageView> {
                       else if (imageUrl.fromMemory) {
                         print('offline-chatview: Displaying image from memory (Base64).');
                         return AspectRatio(
-                          aspectRatio: _imageAspectRatio,
+                          aspectRatio: _imageAspectRatio, // Aspect ratio will be 1.0 unless explicitly set for base64
                           child: Image.memory(
                             base64Decode(imageUrl.substring(imageUrl.indexOf('base64') + 7)),
                             fit: BoxFit.contain,
@@ -230,7 +284,7 @@ class _ImageMessageViewState extends State<ImageMessageView> {
                       else if (imageUrl.isUrl) {
                         print('offline-chatview: Displaying network image from: $imageUrl');
                         return AspectRatio(
-                          aspectRatio: _imageAspectRatio,
+                          aspectRatio: _imageAspectRatio, // Aspect ratio will be 1.0 unless explicitly set for network images
                           child: Image.network(
                             imageUrl,
                             fit: BoxFit.contain,

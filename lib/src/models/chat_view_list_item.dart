@@ -22,6 +22,8 @@
 import 'package:chatview_utils/chatview_utils.dart';
 
 import '../values/enumeration.dart';
+import '../values/typedefs.dart';
+import 'omit.dart';
 
 /// Model class representing a user or group in the chat list.
 class ChatViewListItem {
@@ -30,6 +32,7 @@ class ChatViewListItem {
     required this.id,
     required this.name,
     this.chatType = ChatType.user,
+    this.typingUsers = const <String>{},
     this.userActiveStatus = UserActiveStatus.offline,
     this.lastMessage,
     this.imageUrl,
@@ -60,4 +63,34 @@ class ChatViewListItem {
   ///
   /// Defaults to [UserActiveStatus.offline].
   final UserActiveStatus userActiveStatus;
+
+  // TODO(YASH): Switch to User Object instead of string.
+  /// Set of users currently typing in the chat.
+  final Set<String> typingUsers;
+
+  ChatViewListItem copyWith({
+    Defaulted<String> id = const Omit(),
+    Defaulted<String> name = const Omit(),
+    Defaulted<ChatType> chatType = const Omit(),
+    Defaulted<Set<String>> typingUsers = const Omit(),
+    Defaulted<UserActiveStatus> userActiveStatus = const Omit(),
+    Defaulted<Message>? lastMessage = const Omit(),
+    Defaulted<String>? imageUrl = const Omit(),
+    Defaulted<int>? unreadCount = const Omit(),
+  }) {
+    return ChatViewListItem(
+      id: id is Omit ? this.id : id as String,
+      name: name is Omit ? this.name : name as String,
+      chatType: chatType is Omit ? this.chatType : chatType as ChatType,
+      typingUsers:
+          typingUsers is Omit ? this.typingUsers : typingUsers as Set<String>,
+      userActiveStatus: userActiveStatus is Omit
+          ? this.userActiveStatus
+          : userActiveStatus as UserActiveStatus,
+      lastMessage:
+          lastMessage is Omit ? this.lastMessage : lastMessage as Message?,
+      imageUrl: imageUrl is Omit ? this.imageUrl : imageUrl as String?,
+      unreadCount: unreadCount is Omit ? this.unreadCount : unreadCount as int?,
+    );
+  }
 }

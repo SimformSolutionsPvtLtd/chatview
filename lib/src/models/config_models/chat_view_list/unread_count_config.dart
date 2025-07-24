@@ -23,15 +23,19 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/constants/constants.dart';
 import '../../../values/enumeration.dart';
+import '../../../values/typedefs.dart';
 
 /// Configuration class for the unread message widget in the chat list UI.
 class UnreadCountConfig {
   /// Creates a configuration object for the unread message widget in the chat list UI.
   const UnreadCountConfig({
+    this.maxLines = 1,
+    this.textScaler = TextScaler.noScaling,
     this.style = UnreadCountStyle.dot,
     this.backgroundColor = primaryColor,
     this.textColor = Colors.white,
     this.fontSize = 12,
+    this.countWidgetBuilder,
     this.height,
     this.width,
     this.decoration,
@@ -62,11 +66,24 @@ class UnreadCountConfig {
   /// Decoration for the unread count widget.
   final BoxDecoration? decoration;
 
-  /// View style for the unread count.
+  /// Style for the unread count in the user widget.
   ///
   /// Defaults to `UnreadCountStyle.dot`.
   final UnreadCountStyle style;
 
   /// Text styles for the unread count widget.
   final TextStyle? textStyle;
+
+  /// Maximum number of lines for the unread count text.
+  ///
+  /// Defaults to `1`.
+  final int? maxLines;
+
+  /// Custom text scaler for the unread count text.
+  ///
+  /// Defaults to `TextScaler.noScaling`.
+  final TextScaler? textScaler;
+
+  /// Custom widget builder for the unread count widget.
+  final UnreadCountWidgetBuilder? countWidgetBuilder;
 }

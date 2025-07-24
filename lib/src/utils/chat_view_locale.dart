@@ -44,6 +44,11 @@ final class ChatViewLocale {
     required this.now,
     required this.minAgo,
     required this.voice,
+    required this.typing,
+    required this.isVerb,
+    required this.areVerb,
+    required this.other,
+    required this.others,
   });
 
   /// Create from Map
@@ -70,6 +75,11 @@ final class ChatViewLocale {
       now: map['now']?.toString() ?? '',
       minAgo: map['minAgo']?.toString() ?? '',
       voice: map['voice']?.toString() ?? '',
+      typing: map['typing']?.toString() ?? '',
+      isVerb: map['isVerb']?.toString() ?? '',
+      areVerb: map['areVerb']?.toString() ?? '',
+      other: map['other']?.toString() ?? '',
+      others: map['others']?.toString() ?? '',
     );
   }
 
@@ -94,6 +104,11 @@ final class ChatViewLocale {
   final String now;
   final String minAgo;
   final String voice;
+  final String typing;
+  final String isVerb;
+  final String areVerb;
+  final String other;
+  final String others;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -118,5 +133,10 @@ final class ChatViewLocale {
     now: 'Now',
     minAgo: 'min ago',
     voice: 'Voice',
+    typing: 'typing',
+    areVerb: 'are',
+    isVerb: 'is',
+    other: 'other',
+    others: 'others',
   );
 }

@@ -35,7 +35,9 @@ import 'search_text_field.dart';
 class ChatViewList extends StatefulWidget {
   const ChatViewList({
     required this.controller,
+    // TODO(YASH): take this as a callback rather than a bool
     this.isLastPage = false,
+    // TODO(YASH): remove the necessity for this.
     this.showSearchTextField = true,
     this.config = const ChatViewListConfig(),
     this.scrollViewKeyboardDismissBehavior =
@@ -44,7 +46,6 @@ class ChatViewList extends StatefulWidget {
     this.trailing,
     this.userName,
     this.lastMessageTime,
-    this.unreadCount,
     this.chatListUserWidgetBuilder,
     this.appbar,
     this.loadMoreChats,
@@ -69,9 +70,6 @@ class ChatViewList extends StatefulWidget {
 
   /// Provides widget for last message time in chat list.
   final Widget? lastMessageTime;
-
-  /// Provides widget for unread count in chat list.
-  final Widget? unreadCount;
 
   /// Provides widget builder for users in chat list.
   final NullableIndexedWidgetBuilder? chatListUserWidgetBuilder;
@@ -168,7 +166,6 @@ class _ChatViewListState extends State<ChatViewList> {
                         trailing: widget.trailing,
                         userName: widget.userName,
                         lastMessageTime: widget.lastMessageTime,
-                        unreadCount: widget.unreadCount,
                         tileConfig: widget.config.tileConfig,
                       );
                 },

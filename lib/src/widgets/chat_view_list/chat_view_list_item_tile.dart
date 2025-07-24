@@ -19,13 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../../extensions/extensions.dart';
 import '../../models/chat_view_list_item.dart';
 import '../../models/config_models/chat_view_list/list_tile_config.dart';
 import '../../utils/helper.dart';
-import '../../utils/package_strings.dart';
+import 'last_message_view.dart';
+import 'unread_count_view.dart';
 import 'user_avatar_view.dart';
 
 class ChatViewListItemTile extends StatelessWidget {
@@ -36,7 +37,6 @@ class ChatViewListItemTile extends StatelessWidget {
     this.userName,
     this.lastMessageTime,
     this.trailing,
-    this.unreadCount,
     super.key,
   });
 
@@ -58,13 +58,19 @@ class ChatViewListItemTile extends StatelessWidget {
   /// Provides widget for trailing elements in chat list.
   final Widget? trailing;
 
-  /// Provides widget for unread count in chat list.
-  final Widget? unreadCount;
-
   @override
   Widget build(BuildContext context) {
+    final typingStatusConfig = tileConfig.typingStatusConfig;
     final unreadCountConfig = tileConfig.unreadCountConfig;
     final lastMessageTimeConfig = tileConfig.timeConfig;
+    final unreadCount = chat.unreadCount ?? 0;
+    final isAnyUserTyping = chat.typingUsers.isNotEmpty;
+    final showUnreadCount =
+        unreadCountConfig.countWidgetBuilder != null || unreadCount > 0;
+    final lastMessage = chat.lastMessage;
+    final typingStatusText = typingStatusConfig.textBuilder?.call(chat) ??
+        TypingStatusConfigExtension(typingStatusConfig)
+            .toTypingStatus(chat.typingUsers.toList());
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onLongPress: () => tileConfig.onLongPress?.call(chat),
@@ -90,6 +96,7 @@ class ChatViewListItemTile extends StatelessWidget {
               child: Padding(
                 padding: tileConfig.middleWidgetPadding,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     userName ??
@@ -103,70 +110,46 @@ class ChatViewListItemTile extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
-                    if (chat.lastMessage?.message.isNotEmpty ?? false)
-                      tileConfig.customLastMessageListViewBuilder
-                              ?.call(chat.lastMessage) ??
-                          switch (chat.lastMessage?.messageType) {
-                            MessageType.image => Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.photo,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    PackageStrings.currentLocale.photo,
-                                    style: TextStyle(
-                                      fontWeight: chat.unreadCount != null &&
-                                              chat.unreadCount! > 0
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                ],
+                    if (isAnyUserTyping || lastMessage != null)
+                      AnimatedSwitcher(
+                        switchOutCurve: Curves.easeOut,
+                        switchInCurve: Curves.easeIn,
+                        duration: const Duration(milliseconds: 200),
+                        reverseDuration: const Duration(milliseconds: 150),
+                        child: isAnyUserTyping
+                            ? typingStatusConfig.widgetBuilder?.call(chat) ??
+                                Text(
+                                  key: ValueKey(typingStatusText),
+                                  typingStatusText,
+                                  maxLines: typingStatusConfig.maxLines,
+                                  overflow: typingStatusConfig.overflow,
+                                  style: typingStatusConfig.textStyle,
+                                )
+                            : LastMessageView(
+                                key: lastMessage?.id.isEmpty ?? true
+                                    ? null
+                                    : ValueKey(lastMessage?.id),
+                                unreadCount: unreadCount,
+                                lastMessage: lastMessage,
+                                lastMessageType: lastMessage?.messageType,
+                                lastMessageMaxLines:
+                                    tileConfig.lastMessageMaxLines,
+                                lastMessageTextOverflow:
+                                    tileConfig.lastMessageTextOverflow,
+                                lastMessageTextStyle:
+                                    tileConfig.lastMessageTextStyle,
+                                lastMessageBuilder: tileConfig
+                                    .lastMessageTileBuilder
+                                    ?.call(lastMessage),
                               ),
-                            MessageType.text => Text(
-                                chat.lastMessage?.message ?? '',
-                                maxLines: tileConfig.lastMessageMaxLines,
-                                overflow: tileConfig.lastMessageTextOverflow,
-                                style: tileConfig.lastMessageTextStyle ??
-                                    TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: chat.unreadCount != null &&
-                                              chat.unreadCount! > 0
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                              ),
-                            MessageType.voice => Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.mic,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    PackageStrings.currentLocale.voice,
-                                  ),
-                                ],
-                              ),
-                            // Provides the view for the custom message type in [customLastMessageListViewBuilder]
-                            MessageType.custom ||
-                            null =>
-                              const SizedBox.shrink(),
-                          }
+                      ),
                   ],
                 ),
               ),
             ),
             trailing ??
                 Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (lastMessageTime case final widget?)
@@ -186,66 +169,12 @@ class ChatViewListItemTile extends StatelessWidget {
                       height:
                           lastMessageTimeConfig.spaceBetweenTimeAndUnreadCount,
                     ),
-                    if (unreadCount case final widget?)
-                      widget
-                    else if (chat.unreadCount != null && chat.unreadCount! > 0)
-                      Builder(
-                        builder: (context) {
-                          if (unreadCountConfig.style.isDot) {
-                            final dotSize = unreadCountConfig.width ?? 12;
-                            return Container(
-                              width: dotSize,
-                              height: dotSize,
-                              decoration: unreadCountConfig.decoration ??
-                                  BoxDecoration(
-                                    color: unreadCountConfig.backgroundColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                            );
-                          } else if (unreadCountConfig.style.isNone) {
-                            return const SizedBox.shrink();
-                          } else {
-                            final displayCount =
-                                ((unreadCountConfig.style.isNinetyNinePlus) &&
-                                        chat.unreadCount! > 99)
-                                    ? '99+'
-                                    : '${chat.unreadCount}';
-                            final isSingleDigit = chat.unreadCount! < 10;
-                            final minWidth = unreadCountConfig.width ?? 20;
-                            final padding = isSingleDigit ? 0.0 : 4.0;
-                            return Container(
-                              constraints: BoxConstraints(
-                                minWidth: minWidth,
-                                minHeight: unreadCountConfig.height ?? 20,
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: padding,
-                              ),
-                              decoration: unreadCountConfig.decoration ??
-                                  BoxDecoration(
-                                    color: unreadCountConfig.backgroundColor,
-                                    shape: isSingleDigit
-                                        ? BoxShape.circle
-                                        : BoxShape.rectangle,
-                                    borderRadius: isSingleDigit
-                                        ? null
-                                        : BorderRadius.circular(minWidth),
-                                  ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                displayCount,
-                                style: unreadCountConfig.textStyle ??
-                                    TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: unreadCountConfig.textColor,
-                                      fontSize: unreadCountConfig.fontSize,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                            );
-                          }
-                        },
-                      ),
+                    if (showUnreadCount)
+                      unreadCountConfig.countWidgetBuilder?.call(unreadCount) ??
+                          UnreadCountView(
+                            unreadCount: unreadCount,
+                            config: unreadCountConfig,
+                          ),
                   ],
                 ),
           ],

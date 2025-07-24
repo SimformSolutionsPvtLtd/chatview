@@ -44,6 +44,7 @@ final class ChatViewLocale {
     required this.now,
     required this.minAgo,
     required this.voice,
+    required this.typing,
   });
 
   /// Create from Map<String, String>
@@ -70,6 +71,7 @@ final class ChatViewLocale {
       now: map['now']?.toString() ?? '',
       minAgo: map['minAgo']?.toString() ?? '',
       voice: map['voice']?.toString() ?? '',
+      typing: map['typing']?.toString() ?? '',
     );
   }
 
@@ -94,6 +96,7 @@ final class ChatViewLocale {
   final String now;
   final String minAgo;
   final String voice;
+  final String typing;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -118,5 +121,6 @@ final class ChatViewLocale {
     now: 'Now',
     minAgo: 'min ago',
     voice: 'Voice',
+    typing: 'typing',
   );
 }

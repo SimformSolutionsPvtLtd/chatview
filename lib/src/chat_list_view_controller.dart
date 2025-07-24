@@ -24,56 +24,99 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'models/chat_view_list_tile.dart';
+import 'values/typedefs.dart';
 
 class ChatViewListController {
   ChatViewListController({
-    required this.initialUsersList,
+    required List<ChatViewListModel> initialChatList,
     required this.scrollController,
-  });
+  }) {
+    final chatListLength = initialChatList.length;
 
-  /// Represents initial chat list users.
-  List<ChatViewListModel> initialUsersList = [];
+    final chatsMap = {
+      for (var i = 0; i < chatListLength; i++)
+        if (initialChatList[i] case final chat) chat.id: chat,
+    };
+
+    initialChatMap = chatsMap;
+
+    // Add the initial chat map to the stream controller after the first frame
+    Future.delayed(
+      Duration.zero,
+      () => _chatListStreamController.sink.add(initialChatMap),
+    );
+  }
+
+  /// Initial chat list to be displayed in the chat list view.
+  Map<String, ChatViewListModel> initialChatMap = {};
 
   /// Provides scroll controller for chat list.
   ScrollController scrollController;
 
-  /// Represents chat list user stream
-  StreamController<List<ChatViewListModel>> chatListStreamController =
-      StreamController.broadcast();
+  /// Stream controller to manage the chat list stream.
+  final StreamController<Map<String, ChatViewListModel>>
+      _chatListStreamController =
+      StreamController<Map<String, ChatViewListModel>>.broadcast();
 
-  /// Used to add user in the chat list.
-  void addUser(ChatViewListModel user) {
-    initialUsersList.add(user);
-    if (chatListStreamController.isClosed) return;
-    chatListStreamController.sink.add(initialUsersList);
+  late final Stream<List<ChatViewListModel>> chatListStream =
+      _chatListStreamController.stream.map(
+    (chatMap) => chatMap.values.toList(),
+  );
+
+  /// Adds a chat to the chat list.
+  void addChat(ChatViewListModel chat) {
+    initialChatMap[chat.id] = chat;
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatMap);
   }
 
   /// Function for loading data while pagination.
-  void loadMoreUsers(List<ChatViewListModel> userList) {
-    initialUsersList.addAll(userList);
-    if (chatListStreamController.isClosed) return;
-    chatListStreamController.sink.add(initialUsersList);
+  void loadMoreChats(List<ChatViewListModel> chatList) {
+    final chatListLength = chatList.length;
+    initialChatMap.addAll(
+      {
+        for (var i = 0; i < chatListLength; i++)
+          if (chatList[i] case final chat) chat.id: chat,
+      },
+    );
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatMap);
+  }
+
+  void updateChat(String chatId, UpdateChatCallback newChat) {
+    final chat = initialChatMap[chatId];
+    if (chat == null) return;
+
+    initialChatMap[chatId] = newChat(chat);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatMap);
   }
 
   /// Function to add search results of the chat list in the stream.
   void updateChatList(List<ChatViewListModel> searchResults) {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        if (chatListStreamController.isClosed) return;
-        chatListStreamController.sink.add(searchResults);
+        if (_chatListStreamController.isClosed) return;
+        final searchResultLength = searchResults.length;
+        _chatListStreamController.sink.add(
+          {
+            for (var i = 0; i < searchResultLength; i++)
+              if (searchResults[i] case final chat) chat.id: chat,
+          },
+        );
       },
     );
   }
 
   /// Function to clear the search results and show the original chat list.
   void clearSearch() {
-    if (chatListStreamController.isClosed) return;
-    chatListStreamController.sink.add(initialUsersList);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatMap);
   }
 
   /// Used to dispose ValueNotifiers and Streams.
   void dispose() {
     scrollController.dispose();
-    chatListStreamController.close();
+    _chatListStreamController.close();
   }
 }

@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 
 import '../chat_list_view_controller.dart';
 import '../models/chat_view_list_tile.dart';
+import '../models/config_models/chat_list/chat_list_type_indicator_config.dart';
 import '../models/config_models/chat_view_list_config.dart';
 import '../models/config_models/chat_view_list_time_config.dart';
 import '../models/config_models/chat_view_list_user_config.dart';
@@ -36,9 +37,13 @@ import 'chat_view_list_user_widget.dart';
 
 class ChatViewList extends StatefulWidget {
   const ChatViewList({
-    super.key,
-    this.config,
     required this.controller,
+    this.isLastPage = false,
+    this.showSearchTextField = true,
+    this.scrollViewKeyboardDismissBehavior =
+        ScrollViewKeyboardDismissBehavior.onDrag,
+    this.typeIndicatorConfig = const ChatListTypeIndicatorConfig(),
+    this.config = const ChatViewListConfig(),
     this.profileWidget,
     this.trailingWidget,
     this.userNameWidget,
@@ -47,16 +52,13 @@ class ChatViewList extends StatefulWidget {
     this.chatListUserWidgetBuilder,
     this.appbar,
     this.loadMoreChats,
-    this.isLastPage = false,
     this.loadMoreChatWidget,
-    this.showSearchTextField = true,
     this.filterChipWidget,
-    this.scrollViewKeyboardDismissBehavior =
-        ScrollViewKeyboardDismissBehavior.onDrag,
+    super.key,
   });
 
   /// Provides configuration for chat list UI.
-  final ChatViewListConfig? config;
+  final ChatViewListConfig config;
 
   /// Provides controller for managing the chat list.
   final ChatViewListController controller;
@@ -100,31 +102,34 @@ class ChatViewList extends StatefulWidget {
   /// Behavior for dismissing the keyboard when scrolling.
   final ScrollViewKeyboardDismissBehavior scrollViewKeyboardDismissBehavior;
 
+  /// Provides configurations related to typing indicator appearance.
+  final ChatListTypeIndicatorConfig typeIndicatorConfig;
+
   @override
   State<ChatViewList> createState() => _ChatViewListState();
 }
 
 class _ChatViewListState extends State<ChatViewList> {
   SearchConfig get searchConfig =>
-      widget.config?.searchConfig ??
+      widget.config.searchConfig ??
       SearchConfig(
         textEditingController: TextEditingController(),
       );
 
   ChatViewListTileConfig get chatViewListTileConfig =>
-      widget.config?.chatViewListTileConfig ?? const ChatViewListTileConfig();
+      widget.config.chatViewListTileConfig ?? const ChatViewListTileConfig();
 
   UnreadWidgetConfig get unreadWidgetConfig =>
-      widget.config?.unreadWidgetConfig ?? const UnreadWidgetConfig();
+      widget.config.unreadWidgetConfig ?? const UnreadWidgetConfig();
 
   ChatViewListTimeConfig get timeConfig =>
-      widget.config?.timeConfig ??
+      widget.config.timeConfig ??
       const ChatViewListTimeConfig(
         dateFormatPattern: defaultDateFormat,
       );
 
   LoadMoreChatListConfig get loadMoreChatListConfig =>
-      widget.config?.loadMoreChatListConfig ?? const LoadMoreChatListConfig();
+      widget.config.loadMoreChatListConfig ?? const LoadMoreChatListConfig();
 
   ScrollController get scrollController => widget.controller.scrollController;
 
@@ -133,7 +138,7 @@ class _ChatViewListState extends State<ChatViewList> {
 
   @override
   void didChangeDependencies() {
-    if (widget.config?.enablePagination ?? false) {
+    if (widget.config.enablePagination) {
       scrollController.addListener(_pagination);
     }
     super.didChangeDependencies();
@@ -149,7 +154,7 @@ class _ChatViewListState extends State<ChatViewList> {
         if (widget.showSearchTextField)
           SliverToBoxAdapter(
             child: Padding(
-              padding: searchConfig.padding ?? const EdgeInsets.all(10.0),
+              padding: searchConfig.padding ?? const EdgeInsets.all(10),
               child: ChatViewListSearch(
                 searchConfig: searchConfig,
                 chatViewListController: widget.controller,
@@ -158,32 +163,33 @@ class _ChatViewListState extends State<ChatViewList> {
           ),
         if (widget.filterChipWidget != null)
           SliverToBoxAdapter(
-            child: widget.filterChipWidget!,
+            child: widget.filterChipWidget,
           ),
         StreamBuilder<List<ChatViewListModel>>(
-          stream: widget.controller.chatListStreamController.stream,
+          stream: widget.controller.chatListStream,
           builder: (context, snapshot) {
-            final users = snapshot.data ?? widget.controller.initialUsersList;
-            final itemCount = users.isEmpty ? 0 : users.length * 2 - 1;
+            final chats = snapshot.data ?? List.empty();
+            final itemCount = chats.isEmpty ? 0 : chats.length * 2 - 1;
             return SliverList(
               delegate: SliverChildBuilderDelegate(
                 childCount: itemCount,
                 (context, index) {
                   final itemIndex = index ~/ 2;
                   if (index.isOdd) {
-                    return widget.config?.separatorWidget ??
+                    return widget.config.separatorWidget ??
                         const Divider(height: 12);
                   }
-                  final user = users[itemIndex];
+                  final chat = chats[itemIndex];
 
                   return widget.chatListUserWidgetBuilder
                           ?.call(context, itemIndex) ??
                       ChatViewListUserWidget(
                         config: widget.config,
-                        user: user,
+                        chat: chat,
                         profileWidget: widget.profileWidget,
                         trailingWidget: widget.trailingWidget,
                         userNameWidget: widget.userNameWidget,
+                        typeIndicatorConfig: widget.typeIndicatorConfig,
                         lastMessageTimeWidget: widget.lastMessageTimeWidget,
                         unReadCountWidget: widget.unReadCountWidget,
                         chatViewListTileConfig: chatViewListTileConfig,
@@ -203,7 +209,7 @@ class _ChatViewListState extends State<ChatViewList> {
               if (!isLoading) return const SizedBox.shrink();
               return Padding(
                 padding: loadMoreChatListConfig.padding ??
-                    const EdgeInsets.symmetric(vertical: 16.0),
+                    const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: widget.loadMoreChatWidget ??
                       CircularProgressIndicator(
@@ -217,7 +223,7 @@ class _ChatViewListState extends State<ChatViewList> {
         // Add extra space at the bottom to avoid overlap with iOS home bar
         SliverToBoxAdapter(
           child: SizedBox(
-            height: widget.config?.extraSpaceAtLast ?? 32.0,
+            height: widget.config.extraSpaceAtLast ?? 32.0,
           ),
         ),
       ],
@@ -226,7 +232,7 @@ class _ChatViewListState extends State<ChatViewList> {
 
   @override
   void dispose() {
-    if (widget.config?.enablePagination ?? false) {
+    if (widget.config.enablePagination) {
       scrollController.removeListener(_pagination);
     }
     _isNextPageLoading.dispose();

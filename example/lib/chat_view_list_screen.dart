@@ -20,10 +20,11 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - 1);
     final lastMessageTime = DateTime.parse('2025-06-06T13:58:00.000Z');
-    var initialUsersList = [
+    final initialChatList = [
       ChatViewListModel(
         id: '1',
-        name: 'Breaking Bad',
+        name: 'Breaking Bad Group',
+        typingUsers: {'Heisenberg', 'Jessie Pinkman', 'Walter White'},
         lastMessage: Message(
           message:
               'I am not in danger, Skyler. I am the danger. A guy opens his door and gets shot and you think that of me? No. I am the one who knocks!',
@@ -93,7 +94,7 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
     ];
 
     controller = ChatViewListController(
-      initialUsersList: initialUsersList,
+      initialChatList: initialChatList,
       scrollController: ScrollController(),
     );
     super.initState();
@@ -113,14 +114,18 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
         appbar: const ChatViewListAppBar(
           title: 'Breaking Bad',
         ),
+        typeIndicatorConfig: const ChatListTypeIndicatorConfig(),
         config: ChatViewListConfig(
+          unreadWidgetConfig: const UnreadWidgetConfig(
+            unreadCountView: UnreadCountView.count,
+          ),
           chatViewListTileConfig: ChatViewListTileConfig(
             backgroundColor: Colors.blue,
-            onTap: (user) {
+            onTap: (chat) {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ChatScreen(
-                    user: user,
+                    chat: chat,
                   ),
                 ),
               );
@@ -135,9 +140,9 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
               if (value.isEmpty) {
                 return null;
               }
-              final list = controller.initialUsersList
-                  .where((user) =>
-                      user.name.toLowerCase().contains(value.toLowerCase()))
+              final list = controller.initialChatMap.values
+                  .where((chat) =>
+                      chat.name.toLowerCase().contains(value.toLowerCase()))
                   .toList();
               return list;
             },

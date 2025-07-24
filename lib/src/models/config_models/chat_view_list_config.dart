@@ -31,6 +31,8 @@ import 'unread_widget_config.dart';
 class ChatViewListConfig {
   /// Creates a configuration object for the chat list UI.
   const ChatViewListConfig({
+    this.backgroundColor = Colors.white,
+    this.enablePagination = false,
     this.searchConfig,
     this.separatorWidget,
     this.padding,
@@ -39,7 +41,6 @@ class ChatViewListConfig {
     this.extraSpaceAtLast,
     this.loadMoreChatListConfig,
     this.timeConfig,
-    this.enablePagination = false,
   });
 
   /// Configuration for the search text field in the chat list.
@@ -68,4 +69,7 @@ class ChatViewListConfig {
 
   /// Flag to enable or disable pagination in the chat list.
   final bool enablePagination;
+
+  /// Background color for the chat list.
+  final Color backgroundColor;
 }

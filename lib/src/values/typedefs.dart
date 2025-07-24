@@ -109,3 +109,8 @@ typedef SearchUserCallback = Future<List<ChatViewListModel>?> Function(
 typedef CustomLastMessageListViewBuilder = Widget Function(
   Message? message,
 );
+typedef ChatListTextBuilder = String? Function(ChatViewListModel chat);
+typedef ChatListWidgetBuilder = Widget? Function(ChatViewListModel chat);
+typedef UpdateChatCallback = ChatViewListModel Function(
+  ChatViewListModel previousChat,
+);

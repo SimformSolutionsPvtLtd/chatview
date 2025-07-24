@@ -33,14 +33,14 @@ class ChatUserAvatar extends StatelessWidget {
   const ChatUserAvatar({
     super.key,
     this.chatViewListTileConfig,
-    required this.user,
+    required this.chat,
   });
 
   /// Configuration for the profile widget.
   final ChatViewListTileConfig? chatViewListTileConfig;
 
-  /// User data for the chat list tile.
-  final ChatViewListModel user;
+  /// Containing the chat details.
+  final ChatViewListModel chat;
 
   @override
   Widget build(BuildContext context) {
@@ -48,25 +48,25 @@ class ChatUserAvatar extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: chatViewListTileConfig?.circleAvatarRadius,
-          backgroundImage: user.imageUrl == null || user.imageUrl!.isEmpty
+          backgroundImage: chat.imageUrl == null || chat.imageUrl!.isEmpty
               ? null
-              : user.imageUrl!.isUrl
-                  ? CachedNetworkImageProvider(user.imageUrl!)
-                  : user.imageUrl!.fromMemory
+              : chat.imageUrl!.isUrl
+                  ? CachedNetworkImageProvider(chat.imageUrl!)
+                  : chat.imageUrl!.fromMemory
                       ? MemoryImage(
                           base64Decode(
-                            user.imageUrl!.substring(
-                              user.imageUrl!.indexOf('base64') + 7,
+                            chat.imageUrl!.substring(
+                              chat.imageUrl!.indexOf('base64') + 7,
                             ),
                           ),
                         )
-                      : FileImage(File(user.imageUrl!)),
+                      : FileImage(File(chat.imageUrl!)),
           backgroundColor: chatViewListTileConfig?.backgroundColor,
           onBackgroundImageError:
               chatViewListTileConfig?.onBackgroundImageError,
         ),
         if ((chatViewListTileConfig?.showOnlineStatus ?? false) &&
-            user.userActiveStatus.isOnline)
+            chat.userActiveStatus.isOnline)
           const Positioned(
             right: 0,
             bottom: 0,

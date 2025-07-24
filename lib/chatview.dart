@@ -24,11 +24,11 @@ library chatview;
 
 export 'package:audio_waveforms/audio_waveforms.dart'
     show
-        WaveStyle,
-        PlayerWaveStyle,
         AndroidEncoder,
+        AndroidOutputFormat,
         IosEncoder,
-        AndroidOutputFormat;
+        PlayerWaveStyle,
+        WaveStyle;
 export 'package:chatview_utils/chatview_utils.dart';
 export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 

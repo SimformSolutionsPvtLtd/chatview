@@ -25,6 +25,18 @@ import '../values/enumeration.dart';
 
 /// Model class representing a user or group in the chat list.
 class ChatViewListModel {
+  /// Creates a user or group object for the chat list.
+  const ChatViewListModel({
+    required this.id,
+    required this.name,
+    this.chatType = ChatType.user,
+    this.typingUsers = const <String>{},
+    this.userActiveStatus = UserActiveStatus.offline,
+    this.lastMessage,
+    this.imageUrl,
+    this.unreadCount,
+  });
+
   /// Unique identifier for the user or group.
   final String id;
 
@@ -47,14 +59,31 @@ class ChatViewListModel {
   /// Defaults to [UserActiveStatus.offline].
   final UserActiveStatus userActiveStatus;
 
-  /// Creates a user or group object for the chat list.
-  const ChatViewListModel({
-    required this.id,
-    required this.name,
-    this.lastMessage,
-    this.imageUrl,
-    this.unreadCount,
-    this.chatType = ChatType.user,
-    this.userActiveStatus = UserActiveStatus.offline,
-  });
+  /// Set of users currently typing in the chat.
+  final Set<String> typingUsers;
+
+  ChatViewListModel copyWith({
+    String? id,
+    String? name,
+    Message? lastMessage,
+    String? imageUrl,
+    int? unreadCount,
+    ChatType? chatType,
+    UserActiveStatus? userActiveStatus,
+    Set<String>? typingUsers,
+    bool forceNullValue = false,
+  }) {
+    return ChatViewListModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      chatType: chatType ?? this.chatType,
+      typingUsers: typingUsers ?? this.typingUsers,
+      userActiveStatus: userActiveStatus ?? this.userActiveStatus,
+      lastMessage:
+          forceNullValue ? lastMessage : lastMessage ?? this.lastMessage,
+      imageUrl: forceNullValue ? imageUrl : imageUrl ?? this.imageUrl,
+      unreadCount:
+          forceNullValue ? unreadCount : unreadCount ?? this.unreadCount,
+    );
+  }
 }

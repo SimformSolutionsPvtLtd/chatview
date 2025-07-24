@@ -22,6 +22,7 @@
 import 'package:chatview_utils/chatview_utils.dart';
 
 import '../values/enumeration.dart';
+import 'config_models/chat_list/chat_list_chat_settings.dart';
 
 /// Model class representing a user or group in the chat list.
 class ChatViewListModel {
@@ -32,6 +33,7 @@ class ChatViewListModel {
     this.chatType = ChatType.user,
     this.typingUsers = const <String>{},
     this.userActiveStatus = UserActiveStatus.offline,
+    this.settings = const ChatSettings(),
     this.lastMessage,
     this.imageUrl,
     this.unreadCount,
@@ -62,6 +64,9 @@ class ChatViewListModel {
   /// Set of users currently typing in the chat.
   final Set<String> typingUsers;
 
+  /// Settings for the chat list view.
+  final ChatSettings settings;
+
   ChatViewListModel copyWith({
     String? id,
     String? name,
@@ -71,6 +76,7 @@ class ChatViewListModel {
     ChatType? chatType,
     UserActiveStatus? userActiveStatus,
     Set<String>? typingUsers,
+    ChatSettings? settings,
     bool forceNullValue = false,
   }) {
     return ChatViewListModel(
@@ -84,6 +90,7 @@ class ChatViewListModel {
       imageUrl: forceNullValue ? imageUrl : imageUrl ?? this.imageUrl,
       unreadCount:
           forceNullValue ? unreadCount : unreadCount ?? this.unreadCount,
+      settings: settings ?? this.settings,
     );
   }
 }

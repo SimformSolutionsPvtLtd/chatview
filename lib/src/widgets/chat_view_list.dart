@@ -25,6 +25,8 @@ import 'package:flutter/material.dart';
 import '../chat_list_view_controller.dart';
 import '../models/chat_view_list_tile.dart';
 import '../models/config_models/chat_list/chat_list_type_indicator_config.dart';
+import '../models/config_models/chat_list/mute_icon_config.dart';
+import '../models/config_models/chat_list/pin_icon_config.dart';
 import '../models/config_models/chat_view_list_config.dart';
 import '../models/config_models/chat_view_list_time_config.dart';
 import '../models/config_models/chat_view_list_user_config.dart';
@@ -43,6 +45,8 @@ class ChatViewList extends StatefulWidget {
     this.scrollViewKeyboardDismissBehavior =
         ScrollViewKeyboardDismissBehavior.onDrag,
     this.typeIndicatorConfig = const ChatListTypeIndicatorConfig(),
+    this.muteIconConfig = const MuteIconConfig(),
+    this.pinIconConfig = const PinIconConfig(),
     this.config = const ChatViewListConfig(),
     this.profileWidget,
     this.trailingWidget,
@@ -104,6 +108,12 @@ class ChatViewList extends StatefulWidget {
 
   /// Provides configurations related to typing indicator appearance.
   final ChatListTypeIndicatorConfig typeIndicatorConfig;
+
+  /// Provides configurations related to mute icon appearance.
+  final MuteIconConfig muteIconConfig;
+
+  /// Provides configurations related to pin icon appearance.
+  final PinIconConfig pinIconConfig;
 
   @override
   State<ChatViewList> createState() => _ChatViewListState();
@@ -195,6 +205,8 @@ class _ChatViewListState extends State<ChatViewList> {
                         chatViewListTileConfig: chatViewListTileConfig,
                         unreadWidgetConfig: unreadWidgetConfig,
                         timeConfig: timeConfig,
+                        muteIconConfig: widget.muteIconConfig,
+                        pinIconConfig: widget.pinIconConfig,
                       );
                 },
               ),

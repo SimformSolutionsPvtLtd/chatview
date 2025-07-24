@@ -45,9 +45,13 @@ final class ChatViewLocale {
     required this.minAgo,
     required this.voice,
     required this.typing,
+    required this.mute,
+    required this.unmute,
+    required this.pin,
+    required this.unpin,
   });
 
-  /// Create from Map<String, String>
+  /// Create from `Map<String, String>`
   factory ChatViewLocale.fromMap(Map<String, String> map) {
     return ChatViewLocale(
       today: map['today']?.toString() ?? '',
@@ -72,6 +76,10 @@ final class ChatViewLocale {
       minAgo: map['minAgo']?.toString() ?? '',
       voice: map['voice']?.toString() ?? '',
       typing: map['typing']?.toString() ?? '',
+      mute: map['mute']?.toString() ?? '',
+      unmute: map['unmute']?.toString() ?? '',
+      pin: map['pin']?.toString() ?? '',
+      unpin: map['unpin']?.toString() ?? '',
     );
   }
 
@@ -97,6 +105,10 @@ final class ChatViewLocale {
   final String minAgo;
   final String voice;
   final String typing;
+  final String mute;
+  final String unmute;
+  final String pin;
+  final String unpin;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -122,5 +134,9 @@ final class ChatViewLocale {
     minAgo: 'min ago',
     voice: 'Voice',
     typing: 'typing',
+    mute: 'Mute',
+    unmute: 'Unmute',
+    pin: 'Pin',
+    unpin: 'Unpin',
   );
 }

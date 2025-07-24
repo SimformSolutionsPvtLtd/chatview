@@ -41,6 +41,11 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
       ChatViewListModel(
         id: '2',
         name: 'Heisenberg',
+        settings: ChatSettings(
+          muteStatus: MuteStatus.muted,
+          pinStatus: PinStatus.pinned,
+          pinTime: DateTime.now().subtract(const Duration(minutes: 5)),
+        ),
         lastMessage: Message(
           message: 'Say my name!!',
           createdAt: fiveMinAgo,
@@ -63,11 +68,18 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
           id: '3',
           status: MessageStatus.read,
         ),
+        settings: ChatSettings(
+          pinStatus: PinStatus.pinned,
+          pinTime: DateTime.now().subtract(const Duration(hours: 1)),
+        ),
         imageUrl: 'https://i.insider.com/5d9f454ee94e865e924818da?width=700',
       ),
       ChatViewListModel(
         id: '4',
         name: 'Walter White',
+        settings: const ChatSettings(
+          muteStatus: MuteStatus.muted,
+        ),
         lastMessage: Message(
           message: 'Whats up?',
           createdAt: yesterday,
@@ -115,6 +127,8 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
           title: 'Breaking Bad',
         ),
         typeIndicatorConfig: const ChatListTypeIndicatorConfig(),
+        pinIconConfig: const PinIconConfig(),
+        muteIconConfig: const MuteIconConfig(),
         config: ChatViewListConfig(
           unreadWidgetConfig: const UnreadWidgetConfig(
             unreadCountView: UnreadCountView.count,

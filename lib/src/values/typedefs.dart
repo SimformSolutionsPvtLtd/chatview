@@ -24,6 +24,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chat_view_list_tile.dart';
+import '../models/config_models/chat_list/chat_list_chat_settings.dart';
 
 typedef StringMessageCallBack = void Function(
   String message,
@@ -114,3 +115,9 @@ typedef ChatListWidgetBuilder = Widget? Function(ChatViewListModel chat);
 typedef UpdateChatCallback = ChatViewListModel Function(
   ChatViewListModel previousChat,
 );
+typedef UpdateChatSettingsCallback = ChatSettings Function(
+  ChatSettings previousSettings,
+);
+typedef ChatStatusCallback<T> = void Function(
+    ({ChatViewListModel chat, T status}) result);
+typedef StatusTrailingIcon<T> = IconData Function(T status);

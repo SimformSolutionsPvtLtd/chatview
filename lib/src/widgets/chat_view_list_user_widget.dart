@@ -23,6 +23,8 @@ import 'package:flutter/material.dart';
 
 import '../models/chat_view_list_tile.dart';
 import '../models/config_models/chat_list/chat_list_type_indicator_config.dart';
+import '../models/config_models/chat_list/mute_icon_config.dart';
+import '../models/config_models/chat_list/pin_icon_config.dart';
 import '../models/config_models/chat_view_list_config.dart';
 import '../models/config_models/chat_view_list_time_config.dart';
 import '../models/config_models/chat_view_list_user_config.dart';
@@ -39,6 +41,8 @@ class ChatViewListUserWidget extends StatelessWidget {
     required this.chat,
     required this.typeIndicatorConfig,
     required this.config,
+    required this.muteIconConfig,
+    required this.pinIconConfig,
     this.profileWidget,
     this.userNameWidget,
     this.chatViewListTileConfig,
@@ -82,6 +86,12 @@ class ChatViewListUserWidget extends StatelessWidget {
 
   /// Configuration for the typing indicator in the chat list.
   final ChatListTypeIndicatorConfig typeIndicatorConfig;
+
+  /// Configuration for the mute icon in the chat list.
+  final MuteIconConfig muteIconConfig;
+
+  /// Configuration for the pin icon in the chat list.
+  final PinIconConfig pinIconConfig;
 
   @override
   Widget build(BuildContext context) {
@@ -188,12 +198,35 @@ class ChatViewListUserWidget extends StatelessWidget {
                     SizedBox(
                       height: timeConfig?.spaceBetweenTimeAndUnreadCount ?? 5,
                     ),
-                    if (showUnreadCount)
-                      unReadCountWidget ??
-                          UnreadCountTile(
-                            chat: chat,
-                            config: unreadWidgetConfig,
-                          ),
+                    Row(
+                      children: [
+                        if (chat.settings.pinStatus.isPinned) ...[
+                          pinIconConfig.widget ??
+                              Icon(
+                                Icons.push_pin,
+                                size: pinIconConfig.iconSize,
+                                color: pinIconConfig.iconColor,
+                              ),
+                          if (chat.settings.muteStatus.isMuted)
+                            const SizedBox(width: 10),
+                        ],
+                        if (chat.settings.muteStatus.isMuted) ...[
+                          muteIconConfig.widget ??
+                              Icon(
+                                Icons.notifications_off,
+                                size: muteIconConfig.iconSize,
+                                color: muteIconConfig.iconColor,
+                              ),
+                          if (showUnreadCount) const SizedBox(width: 10),
+                        ],
+                        if (showUnreadCount)
+                          unReadCountWidget ??
+                              UnreadCountTile(
+                                chat: chat,
+                                config: unreadWidgetConfig,
+                              ),
+                      ],
+                    ),
                   ],
                 ),
           ],

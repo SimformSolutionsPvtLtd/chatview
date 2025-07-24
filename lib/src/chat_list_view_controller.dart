@@ -83,6 +83,20 @@ class ChatViewListController {
     _chatListStreamController.sink.add(initialChatMap);
   }
 
+  void updateChatSettings(
+    String chatId,
+    UpdateChatSettingsCallback newSettings,
+  ) {
+    final chat = initialChatMap[chatId];
+    if (chat == null) return;
+
+    initialChatMap[chatId] = chat.copyWith(
+      settings: newSettings(chat.settings),
+    );
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatMap);
+  }
+
   void updateChat(String chatId, UpdateChatCallback newChat) {
     final chat = initialChatMap[chatId];
     if (chat == null) return;

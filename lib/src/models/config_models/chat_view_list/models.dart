@@ -22,6 +22,7 @@
 export 'chat_view_list_config.dart';
 export 'list_tile_config.dart';
 export 'last_message_time_config.dart';
+export 'list_type_indicator_config.dart';
 export 'load_more_config.dart';
 export 'search_config.dart';
 export 'unread_count_config.dart';

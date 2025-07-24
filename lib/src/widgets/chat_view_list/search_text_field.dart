@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../controller/chat_list_view_controller.dart';
@@ -117,7 +119,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
     widget.chatViewListController?.clearSearch();
   }
 
-  void _onSearchChanged(String value) async {
+  FutureOr<void> _onSearchChanged(String value) async {
     _inputText.value = value;
     final chatList = await _config.onSearch?.call(value);
     if (chatList != null) {

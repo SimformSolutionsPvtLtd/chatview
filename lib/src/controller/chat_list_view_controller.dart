@@ -24,63 +24,100 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/chat_view_list_item.dart';
+import '../values/typedefs.dart';
 
 class ChatViewListController {
   ChatViewListController({
-    required this.initialChatList,
+    required List<ChatViewListItem> initialChatList,
     required this.scrollController,
     this.disposeOtherResources = true,
   }) {
-    // Add the initial chat list to the stream controller after the first frame.
+    final chatListLength = initialChatList.length;
+
+    final chatsMap = {
+      for (var i = 0; i < chatListLength; i++)
+        if (initialChatList[i] case final chat) chat.id: chat,
+    };
+
+    chatListMap = chatsMap;
+
+    // Adds the current chat map to the stream controller
+    // after the first frame render.
     Future.delayed(
       Duration.zero,
-      () => _chatListStreamController.add(initialChatList),
+      () => _chatListStreamController.add(chatListMap),
     );
   }
 
-  /// Represents initial chat list.
-  List<ChatViewListItem> initialChatList = [];
+  /// Stores and manages chat items by their unique IDs.
+  /// A map is used for efficient lookup, update, and removal of chats
+  /// by their unique id.
+  Map<String, ChatViewListItem> chatListMap = {};
 
   /// Provides scroll controller for chat list.
   ScrollController scrollController;
 
   final bool disposeOtherResources;
 
-  /// Represents chat list user stream
-  final StreamController<List<ChatViewListItem>> _chatListStreamController =
-      StreamController.broadcast();
+  /// Stream controller to manage the chat list stream.
+  final StreamController<Map<String, ChatViewListItem>>
+      _chatListStreamController =
+      StreamController<Map<String, ChatViewListItem>>.broadcast();
 
   late final Stream<List<ChatViewListItem>> chatListStream =
-      _chatListStreamController.stream;
+      _chatListStreamController.stream.map(
+    (chatMap) => chatMap.values.toList(),
+  );
 
   /// Adds a chat to the chat list.
   void addChat(ChatViewListItem chat) {
-    initialChatList.add(chat);
+    chatListMap[chat.id] = chat;
     if (_chatListStreamController.isClosed) return;
-    _chatListStreamController.sink.add(initialChatList);
+    _chatListStreamController.add(chatListMap);
   }
 
   /// Function for loading data while pagination.
   void loadMoreChats(List<ChatViewListItem> chatList) {
-    initialChatList.addAll(chatList);
+    final chatListLength = chatList.length;
+    chatListMap.addAll(
+      {
+        for (var i = 0; i < chatListLength; i++)
+          if (chatList[i] case final chat) chat.id: chat,
+      },
+    );
     if (_chatListStreamController.isClosed) return;
-    _chatListStreamController.sink.add(initialChatList);
+    _chatListStreamController.add(chatListMap);
+  }
+
+  /// Updates the chat entry in [chatListMap] for the given [chatId] using
+  /// the provided [newChat] callback.
+  ///
+  /// If the chat with [chatId] does not exist, the method returns without
+  /// making changes.
+  void updateChat(String chatId, UpdateChatCallback newChat) {
+    final chat = chatListMap[chatId];
+    if (chat == null) return;
+
+    chatListMap[chatId] = newChat(chat);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.add(chatListMap);
   }
 
   /// Adds the given chat search results to the stream after the current frame.
   void setSearchChats(List<ChatViewListItem> searchResults) {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (_chatListStreamController.isClosed) return;
-        _chatListStreamController.sink.add(searchResults);
-      },
-    );
+    final searchResultLength = searchResults.length;
+    final searchResultMap = {
+      for (var i = 0; i < searchResultLength; i++)
+        if (searchResults[i] case final chat) chat.id: chat,
+    };
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.add(searchResultMap);
   }
 
   /// Function to clear the search results and show the original chat list.
   void clearSearch() {
     if (_chatListStreamController.isClosed) return;
-    _chatListStreamController.sink.add(initialChatList);
+    _chatListStreamController.add(chatListMap);
   }
 
   /// Used to dispose ValueNotifiers and Streams.

@@ -29,6 +29,7 @@ import 'search_config.dart';
 class ChatViewListConfig {
   /// Creates a configuration object for the chat list UI.
   const ChatViewListConfig({
+    this.backgroundColor = Colors.white,
     this.enablePagination = false,
     this.loadMoreConfig = const LoadMoreConfig(),
     this.tileConfig = const ListTileConfig(),
@@ -60,4 +61,7 @@ class ChatViewListConfig {
   ///
   /// Defaults to `false`.
   final bool enablePagination;
+
+  /// Background color for the chat list.
+  final Color backgroundColor;
 }

@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import '../../../values/typedefs.dart';
 import '../../chat_view_list_item.dart';
 import 'last_message_time_config.dart';
+import 'list_type_indicator_config.dart';
 import 'unread_count_config.dart';
 import 'user_active_status_config.dart';
 import 'user_avatar_config.dart';
@@ -37,6 +38,7 @@ class ListTileConfig {
     this.userAvatarConfig = const UserAvatarConfig(),
     this.unreadCountConfig = const UnreadCountConfig(),
     this.userActiveStatusConfig = const UserActiveStatusConfig(),
+    this.typingStatusConfig = const TypingStatusConfig(),
     this.userNameMaxLines = 1,
     this.userNameTextOverflow = TextOverflow.ellipsis,
     this.lastMessageMaxLines = 1,
@@ -47,7 +49,7 @@ class ListTileConfig {
     this.lastMessageTextStyle,
     this.onTap,
     this.onLongPress,
-    this.customLastMessageListViewBuilder,
+    this.lastMessageTileBuilder,
   });
 
   /// Padding around the widget in the chat list.
@@ -113,5 +115,8 @@ class ListTileConfig {
   final bool showOnlineStatus;
 
   /// Custom builder for the last message view in the chat list.
-  final CustomLastMessageListViewBuilder? customLastMessageListViewBuilder;
+  final ChatViewListLastMessageTileBuilder? lastMessageTileBuilder;
+
+  /// Configuration for the typing status indicator in the chat list.
+  final TypingStatusConfig typingStatusConfig;
 }

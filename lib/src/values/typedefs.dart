@@ -20,10 +20,14 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chat_view_list_item.dart';
+
+typedef Defaulted<T> = FutureOr<T>;
 
 typedef StringMessageCallBack = void Function(
   String message,
@@ -104,9 +108,15 @@ typedef BackgroundImageLoadError = void Function(
   Object exception,
   StackTrace? stackTrace,
 )?;
-typedef SearchUserCallback = Future<List<ChatViewListItem>?> Function(
+typedef SearchUserCallback = FutureOr<List<ChatViewListItem>?> Function(
   String value,
 );
-typedef CustomLastMessageListViewBuilder = Widget Function(
+typedef ChatViewListLastMessageTileBuilder = Widget Function(
   Message? message,
 );
+typedef ChatViewListTextBuilder = String? Function(ChatViewListItem chat);
+typedef ChatViewListWidgetBuilder = Widget? Function(ChatViewListItem chat);
+typedef UpdateChatCallback = ChatViewListItem Function(
+  ChatViewListItem previousChat,
+);
+typedef UnreadCountWidgetBuilder = Widget Function(int count);

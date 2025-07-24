@@ -35,7 +35,9 @@ import 'search_text_field.dart';
 class ChatViewList extends StatefulWidget {
   const ChatViewList({
     required this.controller,
+    // TODO(YASH): take this as a callback rather than a bool
     this.isLastPage = false,
+    // TODO(YASH): remove the necessity for this.
     this.showSearchTextField = true,
     this.config = const ChatViewListConfig(),
     this.scrollViewKeyboardDismissBehavior =

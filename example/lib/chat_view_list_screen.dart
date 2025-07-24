@@ -47,6 +47,9 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                 enablePagination: true,
                 loadMoreConfig: const LoadMoreConfig(),
                 tileConfig: ChatViewListTileConfig(
+                  typingStatusConfig: const TypingStatusConfig(
+                    showUserNames: true,
+                  ),
                   unreadCountConfig: const UnreadCountConfig(
                     backgroundColor: Colors.red,
                     style: UnreadCountStyle.ninetyNinePlus,
@@ -76,7 +79,7 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                     if (value.isEmpty) {
                       return null;
                     }
-                    final list = controller?.initialChatList
+                    final list = controller?.chatListMap.values
                         .where((chat) => chat.name
                             .toLowerCase()
                             .contains(value.toLowerCase()))

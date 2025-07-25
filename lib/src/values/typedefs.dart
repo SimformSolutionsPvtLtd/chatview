@@ -121,3 +121,8 @@ typedef UpdateChatSettingsCallback = ChatSettings Function(
 typedef ChatStatusCallback<T> = void Function(
     ({ChatViewListModel chat, T status}) result);
 typedef StatusTrailingIcon<T> = IconData Function(T status);
+
+typedef ChatSorter = int Function(
+  ChatViewListModel chat1,
+  ChatViewListModel chat2,
+);

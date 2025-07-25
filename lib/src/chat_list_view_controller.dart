@@ -24,13 +24,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'models/chat_view_list_tile.dart';
+import 'values/enumeration.dart';
 import 'values/typedefs.dart';
 
 class ChatViewListController {
   ChatViewListController({
     required List<ChatViewListModel> initialChatList,
     required this.scrollController,
+    bool sortEnable = true,
+    ChatSorter? chatSorter,
   }) {
+    if (sortEnable) {
+      _chatSorterCallback = chatSorter ?? ChatListSortBy.pinFirstByPinTime.sort;
+    }
+
     final chatListLength = initialChatList.length;
 
     final chatsMap = {
@@ -53,6 +60,8 @@ class ChatViewListController {
   /// Provides scroll controller for chat list.
   ScrollController scrollController;
 
+  ChatSorter? _chatSorterCallback;
+
   /// Stream controller to manage the chat list stream.
   final StreamController<Map<String, ChatViewListModel>>
       _chatListStreamController =
@@ -60,7 +69,15 @@ class ChatViewListController {
 
   late final Stream<List<ChatViewListModel>> chatListStream =
       _chatListStreamController.stream.map(
-    (chatMap) => chatMap.values.toList(),
+    (chatMap) {
+      final chatList = chatMap.values.toList();
+      final sortCallback = _chatSorterCallback;
+      if (sortCallback == null) {
+        return chatList;
+      } else {
+        return chatList..sort(sortCallback);
+      }
+    },
   );
 
   /// Adds a chat to the chat list.

@@ -44,7 +44,7 @@ export 'src/models/config_models/unread_widget_config.dart';
 export 'src/models/models.dart';
 export 'src/utils/chat_view_locale.dart';
 export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
+export 'src/values/enumeration.dart' hide ChatListSortBy;
 export 'src/values/typedefs.dart';
 export 'src/widgets/chat_view.dart';
 export 'src/widgets/chat_view_appbar.dart';

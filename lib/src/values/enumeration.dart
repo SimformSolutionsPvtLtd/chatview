@@ -25,6 +25,8 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../extensions/extensions.dart';
+import '../models/models.dart';
 import '../utils/package_strings.dart';
 
 enum ShowReceiptsIn { all, lastMessage }
@@ -165,4 +167,47 @@ enum PinStatus {
         pinned => Icons.push_pin,
         unpinned => Icons.push_pin_outlined,
       };
+}
+
+/// Enum for different chat list sorting options
+enum ChatListSortBy {
+  /// No sorting applied.
+  none,
+
+  /// Pin chats first (sorted by pin time), then unpinned by message date/time
+  pinFirstByPinTime;
+
+  int sort(ChatViewListModel chat1, ChatViewListModel chat2) {
+    switch (this) {
+      case ChatListSortBy.none:
+        return 0;
+      case ChatListSortBy.pinFirstByPinTime:
+        final isChatAPinned = chat1.settings.pinStatus.isPinned;
+        final isChatBPinned = chat2.settings.pinStatus.isPinned;
+
+        // 1. Pinned chats first
+        if (isChatAPinned && !isChatBPinned) return -1;
+        if (!isChatAPinned && isChatBPinned) return 1;
+
+        // 2. Sort pinned chats by pinTime descending (latest first)
+        if (isChatAPinned && isChatBPinned) {
+          final pinTimeA = chat1.settings.pinTime;
+          final pinTimeB = chat2.settings.pinTime;
+          if (pinTimeA != null && pinTimeB != null) {
+            return pinTimeB.compareTo(pinTimeA);
+          }
+          // If one has null pinTime, treat it as older
+          if (pinTimeA == null && pinTimeB != null) return 1;
+          if (pinTimeA != null && pinTimeB == null) return -1;
+        }
+
+        // 3. Sort unpinned chats by message date/time (newest first)
+        if (!isChatAPinned && !isChatBPinned) {
+          final chatBCreateAt = chat2.lastMessage?.createdAt;
+          return chatBCreateAt.compareWith(chat1.lastMessage?.createdAt);
+        }
+
+        return 0;
+    }
+  }
 }

@@ -106,6 +106,9 @@ class ChatViewListUserWidget extends StatelessWidget {
     final lastMessage = chat.lastMessage;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
+      onLongPress: () {
+        chatViewListTileConfig?.onLongPress?.call(chat);
+      },
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         chatViewListTileConfig?.onTap?.call(chat);

@@ -43,6 +43,31 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
               ),
               loadMoreChats: () async =>
                   await Future.delayed(const Duration(seconds: 2)),
+              menuConfig: ChatMenuConfig(
+                enabled: true,
+                muteStatusCallback: (result) {
+                  controller?.updateChat(
+                    result.chat.id,
+                    (previousChat) => previousChat.copyWith(
+                      settings: previousChat.settings.copyWith(
+                        muteStatus: result.status,
+                      ),
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                pinStatusCallback: (result) {
+                  controller?.updateChat(
+                    result.chat.id,
+                    (previousChat) => previousChat.copyWith(
+                      settings: previousChat.settings.copyWith(
+                        pinStatus: result.status,
+                      ),
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+              ),
               config: ChatViewListConfig(
                 enablePagination: true,
                 loadMoreConfig: const LoadMoreConfig(),
@@ -70,9 +95,6 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                         ),
                       ),
                     );
-                  },
-                  onLongPress: (chat) {
-                    debugPrint('Long pressed on chat: ${chat.name}');
                   },
                 ),
                 searchConfig: ChatViewListSearchConfig(

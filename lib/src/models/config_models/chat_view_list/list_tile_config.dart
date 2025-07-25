@@ -52,7 +52,6 @@ class ListTileConfig {
     this.userNameTextStyle,
     this.lastMessageTextStyle,
     this.onTap,
-    this.onLongPress,
     this.lastMessageTileBuilder,
     this.userNameBuilder,
     this.trailingBuilder,
@@ -108,9 +107,6 @@ class ListTileConfig {
 
   /// Callback function that is called when a user taps on a chat item.
   final ValueSetter<ChatViewListItem>? onTap;
-
-  /// Callback function that is called when the user long presses on a chat item.
-  final ValueSetter<ChatViewListItem>? onLongPress;
 
   /// Configuration for the user avatar in the chat list.
   final UserAvatarConfig userAvatarConfig;

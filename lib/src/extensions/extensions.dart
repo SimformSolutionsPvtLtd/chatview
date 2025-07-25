@@ -220,3 +220,30 @@ extension BuildContextExtension on BuildContext {
   ChatBubbleConfiguration? get chatBubbleConfig =>
       chatListConfig.chatBubbleConfig;
 }
+
+/// Extension methods for nullable [DateTime] objects.
+///
+/// Provides utility methods for comparing nullable [DateTime] instances.
+extension NullableDateTimeExtension on DateTime? {
+  /// Compares this nullable [DateTime] with another nullable [other].
+  ///
+  /// Returns:
+  /// - `0` if both dates are null or occur at the same moment.
+  /// - A negative value if this date is null (considered earlier)
+  /// or occurs before [other].
+  /// - A positive value if [other] is null (considered later)
+  /// or occurs after this date.
+  int compareWith(DateTime? other) {
+    final a = this;
+    final b = other;
+    if (a == null && b == null) {
+      return 0;
+    } else if (a == null) {
+      return -1;
+    } else if (b == null) {
+      return 1;
+    } else {
+      return a.compareTo(b);
+    }
+  }
+}

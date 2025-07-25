@@ -37,7 +37,7 @@ export 'src/extensions/extensions.dart' show MessageTypes;
 export 'src/models/models.dart';
 export 'src/utils/chat_view_locale.dart';
 export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
+export 'src/values/enumeration.dart' hide ChatViewListSortBy;
 export 'src/values/typedefs.dart';
 export 'src/widgets/chat_view.dart';
 export 'src/widgets/chat_view_appbar.dart';

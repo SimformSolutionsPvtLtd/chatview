@@ -132,3 +132,7 @@ typedef ChatViewListTileBuilder = Widget Function(
 typedef UserAvatarBuilder = Widget Function(ChatViewListItem chat);
 typedef UserNameBuilder = Widget Function(ChatViewListItem chat);
 typedef TrailingBuilder = Widget Function(ChatViewListItem chat);
+typedef ChatSorter = int Function(
+  ChatViewListItem chat1,
+  ChatViewListItem chat2,
+);

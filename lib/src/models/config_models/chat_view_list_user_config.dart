@@ -36,7 +36,6 @@ class ChatViewListTileConfig {
     this.lastMessageTextOverflow,
     this.userNameAndLastMessagePadding,
     this.onTap,
-    this.onLongPress,
     this.userNameMaxLines,
     this.lastMessageMaxLines,
     this.circleAvatarRadius = userAvatarRadius,
@@ -67,9 +66,6 @@ class ChatViewListTileConfig {
 
   /// Callback function that is called when a user taps on a chat item.
   final ValueSetter<ChatViewListModel>? onTap;
-
-  /// Callback function that is called when the user long presses on a chat item.
-  final ValueSetter<ChatViewListModel>? onLongPress;
 
   /// Maximum number of lines for the user name text.
   final int? userNameMaxLines;

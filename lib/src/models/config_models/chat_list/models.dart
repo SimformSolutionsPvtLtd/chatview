@@ -22,5 +22,6 @@
 
 export 'chat_list_chat_settings.dart';
 export 'chat_list_type_indicator_config.dart';
+export 'chat_menu_config.dart';
 export 'mute_icon_config.dart';
 export 'pin_icon_config.dart';

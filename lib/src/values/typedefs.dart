@@ -126,3 +126,8 @@ typedef ChatSorter = int Function(
   ChatViewListModel chat1,
   ChatViewListModel chat2,
 );
+typedef MenuWidgetCallback = Widget Function(ChatViewListModel chat);
+typedef MenuBuilderCallback = Widget Function(
+  BuildContext context,
+  ChatViewListModel chat,
+);

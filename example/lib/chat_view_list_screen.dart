@@ -129,6 +129,27 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
         typeIndicatorConfig: const ChatListTypeIndicatorConfig(),
         pinIconConfig: const PinIconConfig(),
         muteIconConfig: const MuteIconConfig(),
+        menuConfig: ChatMenuConfig(
+          enabled: true,
+          muteStatusCallback: (result) {
+            controller.updateChatSettings(
+              result.chat.id,
+              (previousSettings) => previousSettings.copyWith(
+                muteStatus: result.status,
+              ),
+            );
+            Navigator.of(context).pop();
+          },
+          pinStatusCallback: (result) {
+            controller.updateChatSettings(
+              result.chat.id,
+              (previousSettings) => previousSettings.copyWith(
+                pinStatus: result.status,
+              ),
+            );
+            Navigator.of(context).pop();
+          },
+        ),
         config: ChatViewListConfig(
           unreadWidgetConfig: const UnreadWidgetConfig(
             unreadCountView: UnreadCountView.count,
@@ -143,9 +164,6 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                   ),
                 ),
               );
-            },
-            onLongPress: (user) {
-              debugPrint('Long pressed on user: ${user.name}');
             },
           ),
           searchConfig: SearchConfig(

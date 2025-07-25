@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import '../chat_list_view_controller.dart';
 import '../models/chat_view_list_tile.dart';
 import '../models/config_models/chat_list/chat_list_type_indicator_config.dart';
+import '../models/config_models/chat_list/chat_menu_config.dart';
 import '../models/config_models/chat_list/mute_icon_config.dart';
 import '../models/config_models/chat_list/pin_icon_config.dart';
 import '../models/config_models/chat_view_list_config.dart';
@@ -34,6 +35,7 @@ import '../models/config_models/load_more_widget_config.dart';
 import '../models/config_models/search_config.dart';
 import '../models/config_models/unread_widget_config.dart';
 import '../utils/constants/constants.dart';
+import 'chat_list/chat_list_tile_context_menu.dart';
 import 'chat_list_search_text_field.dart';
 import 'chat_view_list_user_widget.dart';
 
@@ -48,6 +50,7 @@ class ChatViewList extends StatefulWidget {
     this.muteIconConfig = const MuteIconConfig(),
     this.pinIconConfig = const PinIconConfig(),
     this.config = const ChatViewListConfig(),
+    this.menuConfig = const ChatMenuConfig(),
     this.profileWidget,
     this.trailingWidget,
     this.userNameWidget,
@@ -114,6 +117,9 @@ class ChatViewList extends StatefulWidget {
 
   /// Provides configurations related to pin icon appearance.
   final PinIconConfig pinIconConfig;
+
+  /// Callback to provide a widget for the menu in the chat list.
+  final ChatMenuConfig menuConfig;
 
   @override
   State<ChatViewList> createState() => _ChatViewListState();
@@ -191,23 +197,29 @@ class _ChatViewListState extends State<ChatViewList> {
                   }
                   final chat = chats[itemIndex];
 
-                  return widget.chatListUserWidgetBuilder
-                          ?.call(context, itemIndex) ??
-                      ChatViewListUserWidget(
-                        config: widget.config,
-                        chat: chat,
-                        profileWidget: widget.profileWidget,
-                        trailingWidget: widget.trailingWidget,
-                        userNameWidget: widget.userNameWidget,
-                        typeIndicatorConfig: widget.typeIndicatorConfig,
-                        lastMessageTimeWidget: widget.lastMessageTimeWidget,
-                        unReadCountWidget: widget.unReadCountWidget,
-                        chatViewListTileConfig: chatViewListTileConfig,
-                        unreadWidgetConfig: unreadWidgetConfig,
-                        timeConfig: timeConfig,
-                        muteIconConfig: widget.muteIconConfig,
-                        pinIconConfig: widget.pinIconConfig,
-                      );
+                  return ChatListTileContextMenu(
+                    key: ValueKey(chat.id),
+                    chat: chat,
+                    config: widget.menuConfig,
+                    chatTileColor: widget.config.backgroundColor,
+                    child: widget.chatListUserWidgetBuilder
+                            ?.call(context, itemIndex) ??
+                        ChatViewListUserWidget(
+                          config: widget.config,
+                          chat: chat,
+                          profileWidget: widget.profileWidget,
+                          trailingWidget: widget.trailingWidget,
+                          userNameWidget: widget.userNameWidget,
+                          typeIndicatorConfig: widget.typeIndicatorConfig,
+                          lastMessageTimeWidget: widget.lastMessageTimeWidget,
+                          unReadCountWidget: widget.unReadCountWidget,
+                          chatViewListTileConfig: chatViewListTileConfig,
+                          unreadWidgetConfig: unreadWidgetConfig,
+                          timeConfig: timeConfig,
+                          muteIconConfig: widget.muteIconConfig,
+                          pinIconConfig: widget.pinIconConfig,
+                        ),
+                  );
                 },
               ),
             );

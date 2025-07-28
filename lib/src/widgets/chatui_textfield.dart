@@ -444,9 +444,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   }
 
   void _onChanged(String inputText) {
-    debouncer.run(() {
+    debouncer.run(onComplete: () {
       composingStatus.value = TypeWriterStatus.typed;
-    }, () {
+    }, onInterrupt: () {
       composingStatus.value = TypeWriterStatus.typing;
     });
     _inputText.value = inputText;

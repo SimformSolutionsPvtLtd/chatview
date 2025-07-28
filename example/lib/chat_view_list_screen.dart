@@ -99,6 +99,7 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                 ),
                 searchConfig: ChatViewListSearchConfig(
                   textEditingController: TextEditingController(),
+                  debounceDuration: const Duration(milliseconds: 300),
                   onSearch: (value) async {
                     if (value.isEmpty) {
                       return null;

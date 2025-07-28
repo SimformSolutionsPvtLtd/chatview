@@ -54,7 +54,9 @@ class ChatViewListController {
         if (initialChatList[i] case final chat) chat.id: chat,
     };
 
-    chatListMap = chatsMap;
+    chatListMap
+      ..clear()
+      ..addAll(chatsMap);
 
     // Adds the current chat map to the stream controller
     // after the first frame render.
@@ -67,10 +69,10 @@ class ChatViewListController {
   /// Stores and manages chat items by their unique IDs.
   /// A map is used for efficient lookup, update, and removal of chats
   /// by their unique id.
-  Map<String, ChatViewListItem> chatListMap = {};
+  final Map<String, ChatViewListItem> chatListMap = {};
 
   /// Provides scroll controller for chat list.
-  ScrollController scrollController;
+  final ScrollController scrollController;
 
   final bool disposeOtherResources;
 

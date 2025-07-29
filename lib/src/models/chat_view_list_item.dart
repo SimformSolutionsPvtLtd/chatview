@@ -23,6 +23,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 
 import '../values/enumeration.dart';
 import '../values/typedefs.dart';
+import 'config_models/chat_view_list/chat_settings.dart';
 import 'omit.dart';
 
 /// Model class representing a user or group in the chat list.
@@ -32,8 +33,9 @@ class ChatViewListItem {
     required this.id,
     required this.name,
     this.chatType = ChatType.user,
-    this.typingUsers = const <String>{},
+    this.typingUsers = const <ChatUser>{},
     this.userActiveStatus = UserActiveStatus.offline,
+    this.settings = const ChatSettings(),
     this.lastMessage,
     this.imageUrl,
     this.unreadCount,
@@ -64,16 +66,19 @@ class ChatViewListItem {
   /// Defaults to [UserActiveStatus.offline].
   final UserActiveStatus userActiveStatus;
 
-  // TODO(YASH): Switch to User Object instead of string.
   /// Set of users currently typing in the chat.
-  final Set<String> typingUsers;
+  final Set<ChatUser> typingUsers;
+
+  /// Settings for the chat list view.
+  final ChatSettings settings;
 
   ChatViewListItem copyWith({
     Defaulted<String> id = const Omit(),
     Defaulted<String> name = const Omit(),
     Defaulted<ChatType> chatType = const Omit(),
-    Defaulted<Set<String>> typingUsers = const Omit(),
+    Defaulted<Set<ChatUser>> typingUsers = const Omit(),
     Defaulted<UserActiveStatus> userActiveStatus = const Omit(),
+    Defaulted<ChatSettings> settings = const Omit(),
     Defaulted<Message>? lastMessage = const Omit(),
     Defaulted<String>? imageUrl = const Omit(),
     Defaulted<int>? unreadCount = const Omit(),
@@ -83,10 +88,11 @@ class ChatViewListItem {
       name: name is Omit ? this.name : name as String,
       chatType: chatType is Omit ? this.chatType : chatType as ChatType,
       typingUsers:
-          typingUsers is Omit ? this.typingUsers : typingUsers as Set<String>,
+          typingUsers is Omit ? this.typingUsers : typingUsers as Set<ChatUser>,
       userActiveStatus: userActiveStatus is Omit
           ? this.userActiveStatus
           : userActiveStatus as UserActiveStatus,
+      settings: settings is Omit ? this.settings : settings as ChatSettings,
       lastMessage:
           lastMessage is Omit ? this.lastMessage : lastMessage as Message?,
       imageUrl: imageUrl is Omit ? this.imageUrl : imageUrl as String?,

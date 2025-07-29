@@ -152,7 +152,7 @@ extension ChatViewStateTitleExtension on String? {
   }
 }
 
-extension TypingIndicatorExtension on List<String> {
+extension TypingIndicatorExtension on List<ChatUser> {
   String toTypingStatus(ListTypeIndicatorConfig listTypeIndicatorConfig) {
     final prefix = listTypeIndicatorConfig.prefix ?? '';
     final suffix = listTypeIndicatorConfig.suffix ?? '';
@@ -163,20 +163,20 @@ extension TypingIndicatorExtension on List<String> {
 
     final count = length;
 
-    final firstName = this[0];
+    final firstName = this[0].name;
 
     if (count == 1) {
       return '$firstName ${locale.isVerb} $text';
     } else if (count == 2) {
       final newText = showUserNames
-          ? '$firstName & ${this[1]} ${locale.areVerb}'
+          ? '$firstName & ${this[1].name} ${locale.areVerb}'
           : '$firstName & 1 ${locale.other} ${locale.isVerb}';
       return '$newText $text';
     } else if (showUserNames && count == 3) {
-      return '${this[0]}, ${this[1]} & ${this[2]} ${locale.areVerb} $text';
+      return '$firstName, ${this[1].name} & ${this[2].name} ${locale.areVerb} $text';
     } else {
       final newText = showUserNames
-          ? '$firstName, ${this[1]} & ${length - 2}'
+          ? '$firstName, ${this[1].name} & ${length - 2}'
           : '$firstName & ${count - 1}';
       return '$newText ${locale.others} ${locale.areVerb} $text';
     }

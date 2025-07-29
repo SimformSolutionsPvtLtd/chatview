@@ -49,9 +49,13 @@ final class ChatViewLocale {
     required this.areVerb,
     required this.other,
     required this.others,
+    required this.mute,
+    required this.unmute,
+    required this.pin,
+    required this.unpin,
   });
 
-  /// Create from Map<String, String>
+  /// Create from `Map<String, String>`
   factory ChatViewLocale.fromMap(Map<String, String> map) {
     return ChatViewLocale(
       today: map['today']?.toString() ?? '',
@@ -80,6 +84,10 @@ final class ChatViewLocale {
       areVerb: map['areVerb']?.toString() ?? '',
       other: map['other']?.toString() ?? '',
       others: map['others']?.toString() ?? '',
+      mute: map['mute']?.toString() ?? '',
+      unmute: map['unmute']?.toString() ?? '',
+      pin: map['pin']?.toString() ?? '',
+      unpin: map['unpin']?.toString() ?? '',
     );
   }
 
@@ -109,6 +117,10 @@ final class ChatViewLocale {
   final String areVerb;
   final String other;
   final String others;
+  final String mute;
+  final String unmute;
+  final String pin;
+  final String unpin;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -138,5 +150,9 @@ final class ChatViewLocale {
     isVerb: 'is',
     other: 'other',
     others: 'others',
+    mute: 'Mute',
+    unmute: 'Unmute',
+    pin: 'Pin',
+    unpin: 'Unpin',
   );
 }

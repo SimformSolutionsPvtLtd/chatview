@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview/src/values/typedefs.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/constants/constants.dart';
@@ -30,6 +31,7 @@ class LastMessageTimeConfig {
     this.dateFormatPattern = defaultDateFormat,
     this.spaceBetweenTimeAndUnreadCount = 5,
     this.textStyle,
+    this.timeBuilder,
   });
 
   /// Maximum number of lines for the last message time in the chat list.
@@ -54,4 +56,6 @@ class LastMessageTimeConfig {
   ///
   /// Defaults to `5.0`.
   final double spaceBetweenTimeAndUnreadCount;
+
+  final LastMessageTimeBuilder? timeBuilder;
 }

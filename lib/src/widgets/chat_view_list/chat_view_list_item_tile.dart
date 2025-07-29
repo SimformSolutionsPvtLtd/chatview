@@ -32,37 +32,23 @@ import 'user_avatar_view.dart';
 class ChatViewListItemTile extends StatelessWidget {
   const ChatViewListItemTile({
     required this.chat,
-    required this.tileConfig,
-    this.profile,
-    this.userName,
-    this.lastMessageTime,
-    this.trailing,
+    required this.config,
     super.key,
   });
 
   /// User object to display in the chat list.
   final ChatViewListItem chat;
 
-  /// Provides widget for profile in chat list.
-  final Widget? profile;
-
-  /// Provides widget for user name in chat list.
-  final Widget? userName;
-
   /// Provides configuration for the user widget in chat list.
-  final ListTileConfig tileConfig;
-
-  /// Provides widget for last message time in chat list.
-  final Widget? lastMessageTime;
-
-  /// Provides widget for trailing elements in chat list.
-  final Widget? trailing;
+  final ListTileConfig config;
 
   @override
   Widget build(BuildContext context) {
-    final typingStatusConfig = tileConfig.typingStatusConfig;
-    final unreadCountConfig = tileConfig.unreadCountConfig;
-    final lastMessageTimeConfig = tileConfig.timeConfig;
+    final pinIconConfig = config.pinIconConfig;
+    final muteIconConfig = config.muteIconConfig;
+    final typingStatusConfig = config.typingStatusConfig;
+    final unreadCountConfig = config.unreadCountConfig;
+    final lastMessageTimeConfig = config.timeConfig;
     final unreadCount = chat.unreadCount ?? 0;
     final isAnyUserTyping = chat.typingUsers.isNotEmpty;
     final showUnreadCount =
@@ -71,40 +57,42 @@ class ChatViewListItemTile extends StatelessWidget {
     final typingStatusText = typingStatusConfig.textBuilder?.call(chat) ??
         TypingStatusConfigExtension(typingStatusConfig)
             .toTypingStatus(chat.typingUsers.toList());
+    final isPinned = chat.settings.pinStatus.isPinned;
+    final isMuted = chat.settings.muteStatus.isMuted;
+    final hasTimeSubChild = isPinned || isMuted || showUnreadCount;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onLongPress: () => tileConfig.onLongPress?.call(chat),
+      onLongPress: () => config.onLongPress?.call(chat),
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        tileConfig.onTap?.call(chat);
+        config.onTap?.call(chat);
       },
       child: Padding(
-        padding: tileConfig.padding,
+        padding: config.padding,
         child: Row(
           children: [
-            profile ??
+            config.userAvatarConfig.avatarBuilder?.call(chat) ??
                 UserAvatarView(
                   imageUrl: chat.imageUrl ?? '',
-                  onTap: () =>
-                      tileConfig.userAvatarConfig.onProfileTap?.call(chat),
-                  config: tileConfig.userAvatarConfig,
-                  showOnlineStatus: tileConfig.showOnlineStatus &&
-                      chat.userActiveStatus.isOnline,
-                  userActiveStatusConfig: tileConfig.userActiveStatusConfig,
+                  onTap: () => config.userAvatarConfig.onProfileTap?.call(chat),
+                  config: config.userAvatarConfig,
+                  showOnlineStatus:
+                      config.showOnlineStatus && chat.userActiveStatus.isOnline,
+                  userActiveStatusConfig: config.userActiveStatusConfig,
                 ),
             Expanded(
               child: Padding(
-                padding: tileConfig.middleWidgetPadding,
+                padding: config.middleWidgetPadding,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    userName ??
+                    config.userNameBuilder?.call(chat) ??
                         Text(
                           chat.name,
-                          maxLines: tileConfig.userNameMaxLines,
-                          overflow: tileConfig.userNameTextOverflow,
-                          style: tileConfig.userNameTextStyle ??
+                          maxLines: config.userNameMaxLines,
+                          overflow: config.userNameTextOverflow,
+                          style: config.userNameTextStyle ??
                               const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -132,13 +120,12 @@ class ChatViewListItemTile extends StatelessWidget {
                                 unreadCount: unreadCount,
                                 lastMessage: lastMessage,
                                 lastMessageType: lastMessage?.messageType,
-                                lastMessageMaxLines:
-                                    tileConfig.lastMessageMaxLines,
+                                lastMessageMaxLines: config.lastMessageMaxLines,
                                 lastMessageTextOverflow:
-                                    tileConfig.lastMessageTextOverflow,
+                                    config.lastMessageTextOverflow,
                                 lastMessageTextStyle:
-                                    tileConfig.lastMessageTextStyle,
-                                lastMessageBuilder: tileConfig
+                                    config.lastMessageTextStyle,
+                                lastMessageBuilder: config
                                     .lastMessageTileBuilder
                                     ?.call(lastMessage),
                               ),
@@ -147,34 +134,58 @@ class ChatViewListItemTile extends StatelessWidget {
                 ),
               ),
             ),
-            trailing ??
+            config.trailingBuilder?.call(chat) ??
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    if (lastMessageTime case final widget?)
-                      widget
-                    else if (chat.lastMessage?.createdAt case final createAt?)
-                      Text(
-                        formatLastMessageTime(
-                          createAt.toString(),
-                          lastMessageTimeConfig.dateFormatPattern,
-                        ),
-                        maxLines: lastMessageTimeConfig.maxLines,
-                        overflow: lastMessageTimeConfig.overflow,
-                        style: lastMessageTimeConfig.textStyle ??
-                            const TextStyle(fontSize: 12),
-                      ),
-                    SizedBox(
-                      height:
-                          lastMessageTimeConfig.spaceBetweenTimeAndUnreadCount,
-                    ),
-                    if (showUnreadCount)
-                      unreadCountConfig.countWidgetBuilder?.call(unreadCount) ??
-                          UnreadCountView(
-                            unreadCount: unreadCount,
-                            config: unreadCountConfig,
+                    if (chat.lastMessage?.createdAt case final createAt?) ...[
+                      lastMessageTimeConfig.timeBuilder?.call(createAt) ??
+                          Text(
+                            formatLastMessageTime(
+                              createAt.toString(),
+                              lastMessageTimeConfig.dateFormatPattern,
+                            ),
+                            maxLines: lastMessageTimeConfig.maxLines,
+                            overflow: lastMessageTimeConfig.overflow,
+                            style: lastMessageTimeConfig.textStyle ??
+                                const TextStyle(fontSize: 12),
                           ),
+                      if (hasTimeSubChild)
+                        SizedBox(
+                          height: lastMessageTimeConfig
+                              .spaceBetweenTimeAndUnreadCount,
+                        ),
+                    ],
+                    Row(
+                      children: [
+                        if (isPinned) ...[
+                          pinIconConfig.widget ??
+                              Icon(
+                                Icons.push_pin,
+                                size: pinIconConfig.size,
+                                color: pinIconConfig.color,
+                              ),
+                          if (isMuted) const SizedBox(width: 10),
+                        ],
+                        if (isMuted) ...[
+                          muteIconConfig.widget ??
+                              Icon(
+                                Icons.notifications_off,
+                                size: muteIconConfig.size,
+                                color: muteIconConfig.color,
+                              ),
+                          if (showUnreadCount) const SizedBox(width: 10),
+                        ],
+                        if (showUnreadCount)
+                          unreadCountConfig.countWidgetBuilder
+                                  ?.call(unreadCount) ??
+                              UnreadCountView(
+                                unreadCount: unreadCount,
+                                config: unreadCountConfig,
+                              ),
+                      ],
+                    ),
                   ],
                 ),
           ],

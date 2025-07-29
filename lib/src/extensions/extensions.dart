@@ -153,7 +153,7 @@ extension ChatViewStateTitleExtension on String? {
 }
 
 extension type const TypingStatusConfigExtension(TypingStatusConfig config) {
-  String toTypingStatus(List<String> users) {
+  String toTypingStatus(List<ChatUser> users) {
     final prefix = config.prefix ?? '';
     final suffix = config.suffix ?? '';
     final showUserNames = config.showUserNames;
@@ -163,20 +163,20 @@ extension type const TypingStatusConfigExtension(TypingStatusConfig config) {
 
     final count = users.length;
 
-    final firstName = users[0];
+    final firstName = users[0].name;
 
     if (count == 1) {
       return '$firstName ${locale.isVerb} $text';
     } else if (count == 2) {
       final newText = showUserNames
-          ? '$firstName & ${users[1]} ${locale.areVerb}'
+          ? '$firstName & ${users[1].name} ${locale.areVerb}'
           : '$firstName & 1 ${locale.other} ${locale.isVerb}';
       return '$newText $text';
     } else if (showUserNames && count == 3) {
-      return '${users[0]}, ${users[1]} & ${users[2]} ${locale.areVerb} $text';
+      return '$firstName, ${users[1].name} & ${users[2].name} ${locale.areVerb} $text';
     } else {
       final newText = showUserNames
-          ? '$firstName, ${users[1]} & ${count - 2}'
+          ? '$firstName, ${users[1].name} & ${count - 2}'
           : '$firstName & ${count - 1}';
       return '$newText ${locale.others} ${locale.areVerb} $text';
     }

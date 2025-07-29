@@ -120,3 +120,15 @@ typedef UpdateChatCallback = ChatViewListItem Function(
   ChatViewListItem previousChat,
 );
 typedef UnreadCountWidgetBuilder = Widget Function(int count);
+typedef ChatStatusCallback<T> = void Function(
+  ({ChatViewListItem chat, T status}) result,
+);
+typedef StatusTrailingIcon<T> = IconData Function(T status);
+typedef LastMessageTimeBuilder = Widget Function(DateTime time);
+typedef ChatViewListTileBuilder = Widget Function(
+  BuildContext context,
+  ChatViewListItem chat,
+);
+typedef UserAvatarBuilder = Widget Function(ChatViewListItem chat);
+typedef UserNameBuilder = Widget Function(ChatViewListItem chat);
+typedef TrailingBuilder = Widget Function(ChatViewListItem chat);

@@ -25,6 +25,8 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/package_strings.dart';
+
 enum ShowReceiptsIn { all, lastMessage }
 
 enum SuggestionListAlignment {
@@ -130,4 +132,54 @@ enum UserActiveStatus {
 
   /// is user active
   bool get isOffline => this == offline;
+}
+
+/// An enumeration representing mute status options.
+enum MuteStatus {
+  /// The chat is muted.
+  muted,
+
+  /// The chat is not muted.
+  unmute;
+
+  /// Returns true if the chat is muted.
+  bool get isMuted => this == muted;
+
+  /// Returns true if the chat is unmuted.
+  bool get isUnmute => this == unmute;
+
+  String get menuName => switch (this) {
+        muted => PackageStrings.currentLocale.mute,
+        unmute => PackageStrings.currentLocale.unmute,
+      };
+
+  IconData get iconData => switch (this) {
+        muted => Icons.notifications_off,
+        unmute => Icons.notifications,
+      };
+}
+
+/// An enumeration representing the status of a chat pinning operation.
+enum PinStatus {
+  /// The chat is pinned.
+  pinned,
+
+  /// The chat is unpinned.
+  unpinned;
+
+  /// Returns true if the chat is pinned.
+  bool get isPinned => this == pinned;
+
+  /// Returns true if the chat is unpinned.
+  bool get isNone => this == unpinned;
+
+  String get menuName => switch (this) {
+        pinned => PackageStrings.currentLocale.pin,
+        unpinned => PackageStrings.currentLocale.unpin,
+      };
+
+  IconData get iconData => switch (this) {
+        pinned => Icons.push_pin,
+        unpinned => Icons.push_pin_outlined,
+      };
 }

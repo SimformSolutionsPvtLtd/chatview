@@ -27,7 +27,7 @@ import '../../controller/chat_list_view_controller.dart';
 import '../../models/chat_view_list_item.dart';
 import '../../models/config_models/chat_view_list/chat_view_list_config.dart';
 import '../../models/config_models/chat_view_list/load_more_config.dart';
-import '../../models/config_models/chat_view_list/search_config.dart';
+import '../../values/typedefs.dart';
 import '../../utils/constants/constants.dart';
 import 'chat_view_list_item_tile.dart';
 import 'search_text_field.dart';
@@ -35,21 +35,14 @@ import 'search_text_field.dart';
 class ChatViewList extends StatefulWidget {
   const ChatViewList({
     required this.controller,
-    // TODO(YASH): take this as a callback rather than a bool
-    this.isLastPage = false,
-    // TODO(YASH): remove the necessity for this.
-    this.showSearchTextField = true,
     this.config = const ChatViewListConfig(),
     this.scrollViewKeyboardDismissBehavior =
         ScrollViewKeyboardDismissBehavior.onDrag,
-    this.profile,
-    this.trailing,
-    this.userName,
-    this.lastMessageTime,
-    this.chatListUserWidgetBuilder,
+    this.chatBuilder,
     this.appbar,
     this.loadMoreChats,
     this.header,
+    this.isLastPage,
     super.key,
   });
 
@@ -59,20 +52,8 @@ class ChatViewList extends StatefulWidget {
   /// Provides controller for managing the chat list.
   final ChatViewListController controller;
 
-  /// Provides widget for profile in chat list.
-  final Widget? profile;
-
-  /// Provides widget for trailing elements in chat list.
-  final Widget? trailing;
-
-  /// Provides widget for user name in chat list.
-  final Widget? userName;
-
-  /// Provides widget for last message time in chat list.
-  final Widget? lastMessageTime;
-
   /// Provides widget builder for users in chat list.
-  final NullableIndexedWidgetBuilder? chatListUserWidgetBuilder;
+  final ChatViewListTileBuilder? chatBuilder;
 
   /// Provides custom app bar for chat list page.
   final Widget? appbar;
@@ -84,12 +65,7 @@ class ChatViewList extends StatefulWidget {
   ///
   /// Defaults to `false`.
   /// If set to `true`, pagination will not trigger loading more chats.
-  final bool isLastPage;
-
-  /// Flag to show/hide the search text field in the chat list.
-  ///
-  /// Defaults to `true`.
-  final bool showSearchTextField;
+  final ValueGetter<bool>? isLastPage;
 
   /// Header widget to be displayed at the top of the chat list.
   final Widget? header;
@@ -106,12 +82,6 @@ class ChatViewList extends StatefulWidget {
 class _ChatViewListState extends State<ChatViewList> {
   /// ValueNotifier to track if the next page is currently loading.
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
-
-  SearchConfig get searchConfig =>
-      widget.config.searchConfig ??
-      SearchConfig(
-        textEditingController: TextEditingController(),
-      );
 
   LoadMoreConfig get _loadMoreConfig => widget.config.loadMoreConfig;
 
@@ -132,12 +102,12 @@ class _ChatViewListState extends State<ChatViewList> {
       keyboardDismissBehavior: widget.scrollViewKeyboardDismissBehavior,
       slivers: [
         if (widget.appbar case final appbar?) appbar,
-        if (widget.showSearchTextField)
+        if (widget.config.searchConfig case final config?)
           SliverToBoxAdapter(
             child: Padding(
-              padding: searchConfig.padding,
+              padding: config.padding,
               child: SearchTextField(
-                config: searchConfig,
+                config: config,
                 disposeResources: widget.controller.disposeOtherResources,
                 chatViewListController: widget.controller,
               ),
@@ -158,15 +128,11 @@ class _ChatViewListState extends State<ChatViewList> {
                     return widget.config.separator;
                   }
 
-                  return widget.chatListUserWidgetBuilder
-                          ?.call(context, itemIndex) ??
+                  final chat = chats[itemIndex];
+                  return widget.chatBuilder?.call(context, chat) ??
                       ChatViewListItemTile(
-                        chat: chats[itemIndex],
-                        profile: widget.profile,
-                        trailing: widget.trailing,
-                        userName: widget.userName,
-                        lastMessageTime: widget.lastMessageTime,
-                        tileConfig: widget.config.tileConfig,
+                        chat: chat,
+                        config: widget.config.tileConfig,
                       );
                 },
               ),
@@ -227,7 +193,9 @@ class _ChatViewListState extends State<ChatViewList> {
   }
 
   void _pagination() {
-    if (widget.loadMoreChats == null || widget.isLastPage) return;
+    if (widget.loadMoreChats == null || (widget.isLastPage?.call() ?? false)) {
+      return;
+    }
     // Check if the user has scrolled to the bottom of the list
     if ((_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 50) &&

@@ -65,6 +65,14 @@ extension TimeDifference on DateTime {
   }
 
   String get getTimeFromDateTime => DateFormat.Hm().format(this);
+
+  /// Returns `true` if [other] occurs on the same calendar day as
+  /// this [DateTime].
+  ///
+  /// This comparison checks only the year, month, and day components,
+  /// and **ignores the time** (hour, minute, second, etc.).
+  bool isSameCalendarDay(DateTime other) =>
+      year == other.year && month == other.month && day == other.day;
 }
 
 /// Extension on String which implements different types string validations.

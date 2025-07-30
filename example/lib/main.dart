@@ -27,12 +27,9 @@ class Example extends StatelessWidget {
 }
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({
-    super.key,
-    required this.user,
-  });
+  const ChatScreen({required this.chat, super.key});
 
-  final ChatViewListModel user;
+  final ChatViewListItem chat;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -144,9 +141,9 @@ class _ChatScreenState extends State<ChatScreen> {
         appBar: ChatViewAppBar(
           elevation: theme.elevation,
           backGroundColor: theme.appBarColor,
-          profilePicture: widget.user.imageUrl,
+          profilePicture: widget.chat.imageUrl,
           backArrowColor: theme.backArrowColor,
-          chatTitle: widget.user.name,
+          chatTitle: widget.chat.name,
           chatTitleTextStyle: TextStyle(
             color: theme.appBarTitleTextStyle,
             fontWeight: FontWeight.bold,
@@ -154,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
             letterSpacing: 0.25,
           ),
           userStatus:
-              widget.user.userActiveStatus.isOnline ? 'Online' : 'Offline',
+              widget.chat.userActiveStatus.isOnline ? 'Online' : 'Offline',
           userStatusTextStyle: const TextStyle(color: Colors.grey),
           actions: [
             IconButton(

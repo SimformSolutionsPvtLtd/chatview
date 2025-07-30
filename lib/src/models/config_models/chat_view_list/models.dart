@@ -19,19 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:flutter/material.dart';
-
-/// Configuration class for the load more chat list widget.
-class LoadMoreChatListConfig {
-  /// Creates a configuration object for the load more chat list widget.
-  const LoadMoreChatListConfig({
-    this.padding,
-    this.color,
-  });
-
-  /// Padding for the load more widget.
-  final EdgeInsets? padding;
-
-  /// Color for the load more widget.
-  final Color? color;
-}
+export 'chat_view_list_config.dart';
+export 'list_tile_config.dart';
+export 'last_message_time_config.dart';
+export 'load_more_config.dart';
+export 'search_config.dart';
+export 'unread_count_config.dart';
+export 'user_active_status_config.dart';
+export 'user_avatar_config.dart';

@@ -23,57 +23,74 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'models/chat_view_list_tile.dart';
+import '../models/chat_view_list_item.dart';
 
 class ChatViewListController {
   ChatViewListController({
-    required this.initialUsersList,
+    required this.initialChatList,
     required this.scrollController,
-  });
+    this.disposeOtherResources = true,
+  }) {
+    // Add the initial chat list to the stream controller after the first frame.
+    Future.delayed(
+      Duration.zero,
+      () => _chatListStreamController.add(initialChatList),
+    );
+  }
 
-  /// Represents initial chat list users.
-  List<ChatViewListModel> initialUsersList = [];
+  /// Represents initial chat list.
+  List<ChatViewListItem> initialChatList = [];
 
   /// Provides scroll controller for chat list.
   ScrollController scrollController;
 
+  final bool disposeOtherResources;
+
   /// Represents chat list user stream
-  StreamController<List<ChatViewListModel>> chatListStreamController =
+  final StreamController<List<ChatViewListItem>> _chatListStreamController =
       StreamController.broadcast();
 
-  /// Used to add user in the chat list.
-  void addUser(ChatViewListModel user) {
-    initialUsersList.add(user);
-    if (chatListStreamController.isClosed) return;
-    chatListStreamController.sink.add(initialUsersList);
+  late final Stream<List<ChatViewListItem>> chatListStream =
+      _chatListStreamController.stream;
+
+  /// Adds a chat to the chat list.
+  void addChat(ChatViewListItem chat) {
+    initialChatList.add(chat);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatList);
   }
 
   /// Function for loading data while pagination.
-  void loadMoreUsers(List<ChatViewListModel> userList) {
-    initialUsersList.addAll(userList);
-    if (chatListStreamController.isClosed) return;
-    chatListStreamController.sink.add(initialUsersList);
+  void loadMoreChats(List<ChatViewListItem> chatList) {
+    initialChatList.addAll(chatList);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatList);
   }
 
-  /// Function to add search results of the chat list in the stream.
-  void updateChatList(List<ChatViewListModel> searchResults) {
+  /// Adds the given chat search results to the stream after the current frame.
+  void setSearchChats(List<ChatViewListItem> searchResults) {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        if (chatListStreamController.isClosed) return;
-        chatListStreamController.sink.add(searchResults);
+        if (_chatListStreamController.isClosed) return;
+        _chatListStreamController.sink.add(searchResults);
       },
     );
   }
 
   /// Function to clear the search results and show the original chat list.
   void clearSearch() {
-    if (chatListStreamController.isClosed) return;
-    chatListStreamController.sink.add(initialUsersList);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.sink.add(initialChatList);
   }
 
   /// Used to dispose ValueNotifiers and Streams.
+  ///
+  /// If [disposeOtherResources] is true,
+  /// it will also dispose the scroll controller and text editing controller if provided.
   void dispose() {
-    scrollController.dispose();
-    chatListStreamController.close();
+    _chatListStreamController.close();
+    if (disposeOtherResources) {
+      scrollController.dispose();
+    }
   }
 }

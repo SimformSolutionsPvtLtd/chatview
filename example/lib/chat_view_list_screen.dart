@@ -1,7 +1,8 @@
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 
-import 'main.dart';
+import 'chat_view_screen.dart';
+import 'data.dart';
 
 class ChatViewListScreen extends StatefulWidget {
   const ChatViewListScreen({super.key});
@@ -11,144 +12,92 @@ class ChatViewListScreen extends StatefulWidget {
 }
 
 class _ChatViewListScreenState extends State<ChatViewListScreen> {
-  late final ChatViewListController controller;
+  ChatViewListController? controller;
 
+  ScrollController? _scrollController;
+
+  // Assign the controller in didChangeDependencies
+  // to ensure PrimaryScrollController is available.
   @override
-  void initState() {
-    final now = DateTime.now().toUtc();
-    final fiveMinAgo = now.subtract(const Duration(minutes: 5));
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
-    final lastMessageTime = DateTime.parse('2025-06-06T13:58:00.000Z');
-    var initialUsersList = [
-      ChatViewListModel(
-        id: '1',
-        name: 'Breaking Bad',
-        lastMessage: Message(
-          message:
-              'I am not in danger, Skyler. I am the danger. A guy opens his door and gets shot and you think that of me? No. I am the one who knocks!',
-          createdAt: now,
-          sentBy: '2',
-          id: '1',
-          status: MessageStatus.read,
-        ),
-        unreadCount: 1,
-        imageUrl:
-            'https://m.media-amazon.com/images/M/MV5BMzU5ZGYzNmQtMTdhYy00OGRiLTg0NmQtYjVjNzliZTg1ZGE4XkEyXkFqcGc@._V1_.jpg',
-        chatType: ChatType.group,
-      ),
-      ChatViewListModel(
-        id: '2',
-        name: 'Heisenberg',
-        lastMessage: Message(
-          message: 'Say my name!!',
-          createdAt: fiveMinAgo,
-          sentBy: '3',
-          id: '2',
-          status: MessageStatus.read,
-        ),
-        imageUrl:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzc87OtZ7mZe-kca89Mfi4o1--95dQI7Ne-w&s',
-        unreadCount: 2,
-        userActiveStatus: UserActiveStatus.online,
-      ),
-      ChatViewListModel(
-        id: '3',
-        name: 'Jessie Pinkman',
-        lastMessage: Message(
-          message: 'Yeah....!!!!',
-          createdAt: today,
-          sentBy: '4',
-          id: '3',
-          status: MessageStatus.read,
-        ),
-        imageUrl: 'https://i.insider.com/5d9f454ee94e865e924818da?width=700',
-      ),
-      ChatViewListModel(
-        id: '4',
-        name: 'Walter White',
-        lastMessage: Message(
-          message: 'Whats up?',
-          createdAt: yesterday,
-          sentBy: '4',
-          id: '4',
-          status: MessageStatus.read,
-        ),
-        imageUrl:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1Efw6_noLe4BzEsbgsfHIhvZNqWKaDtckdQ&s',
-      ),
-      ChatViewListModel(
-        id: '5',
-        name: 'Hank Schrader',
-        lastMessage: Message(
-          message: 'Hello',
-          createdAt: lastMessageTime,
-          sentBy: '6',
-          id: '5',
-          status: MessageStatus.read,
-        ),
-        imageUrl:
-            'https://upload.wikimedia.org/wikipedia/en/d/db/Hank_Schrader_S5B.png',
-      ),
-    ];
-
-    controller = ChatViewListController(
-      initialUsersList: initialUsersList,
-      scrollController: ScrollController(),
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scrollController ??= PrimaryScrollController.of(context);
+    controller ??= ChatViewListController(
+      initialChatList: Data.chatList(),
+      scrollController: _scrollController ??= ScrollController(),
+      disposeOtherResources: false,
     );
-    super.initState();
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  final _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ChatViewList(
-        controller: controller,
-        appbar: const ChatViewListAppBar(
-          title: 'Breaking Bad',
-        ),
-        config: ChatViewListConfig(
-          chatViewListTileConfig: ChatViewListTileConfig(
-            backgroundColor: Colors.blue,
-            onTap: (user) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(
-                    user: user,
+      body: controller == null
+          ? const Center(child: CircularProgressIndicator())
+          : ChatViewList(
+              controller: controller!,
+              appbar: const ChatViewListAppBar(
+                titleText: 'Breaking Bad',
+              ),
+              loadMoreChats: () async =>
+                  await Future.delayed(const Duration(seconds: 2)),
+              config: ChatViewListConfig(
+                enablePagination: true,
+                loadMoreConfig: const LoadMoreConfig(),
+                tileConfig: ListTileConfig(
+                  unreadCountConfig: const UnreadCountConfig(
+                    backgroundColor: Colors.red,
+                    style: UnreadCountStyle.ninetyNinePlus,
+                  ),
+                  userActiveStatusConfig: const UserActiveStatusConfig(
+                    color: Colors.red,
+                  ),
+                  userAvatarConfig: const UserAvatarConfig(
+                    backgroundColor: Colors.blue,
+                  ),
+                  onTap: (chat) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ChatViewScreen(
+                          chat: chat,
+                        ),
+                      ),
+                    );
+                  },
+                  onLongPress: (chat) {
+                    debugPrint('Long pressed on chat: ${chat.name}');
+                  },
+                ),
+                searchConfig: ChatViewListSearchConfig(
+                  textEditingController: _searchController,
+                  onSearch: (value) async {
+                    if (value.isEmpty) {
+                      return null;
+                    }
+                    final list = controller?.initialChatList
+                        .where((chat) => chat.name
+                            .toLowerCase()
+                            .contains(value.toLowerCase()))
+                        .toList();
+                    return list;
+                  },
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
                   ),
                 ),
-              );
-            },
-            onLongPress: (user) {
-              debugPrint('Long pressed on user: ${user.name}');
-            },
-          ),
-          searchConfig: SearchConfig(
-            textEditingController: TextEditingController(),
-            onSearch: (value) async {
-              if (value.isEmpty) {
-                return null;
-              }
-              final list = controller.initialUsersList
-                  .where((user) =>
-                      user.name.toLowerCase().contains(value.toLowerCase()))
-                  .toList();
-              return list;
-            },
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(10),
               ),
             ),
-          ),
-        ),
-      ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 }

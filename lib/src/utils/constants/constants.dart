@@ -54,7 +54,8 @@ const String defaultChatSeparatorDatePattern = 'MMM dd, yyyy';
 const double defaultChatTextFieldHeight = 10.0;
 const Color primaryColor = Color(0xffEE5366);
 const String defaultDateFormat = 'dd/MM/yyyy';
-const double userAvatarRadius = 24.0;
+const double userAvatarRadius = 24;
+const double loadMoreCircularProgressIndicatorSize = 36;
 
 applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {

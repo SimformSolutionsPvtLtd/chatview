@@ -22,114 +22,91 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chat_view_list_tile.dart';
-import '../models/config_models/chat_view_list_config.dart';
-import '../models/config_models/chat_view_list_time_config.dart';
-import '../models/config_models/chat_view_list_user_config.dart';
-import '../models/config_models/unread_widget_config.dart';
-import '../utils/constants/constants.dart';
-import '../utils/helper.dart';
-import '../utils/package_strings.dart';
-import 'chat_user_avatar.dart';
+import '../../models/chat_view_list_item.dart';
+import '../../models/config_models/chat_view_list/list_tile_config.dart';
+import '../../utils/helper.dart';
+import '../../utils/package_strings.dart';
+import 'user_avatar_view.dart';
 
-class ChatViewListUserWidget extends StatelessWidget {
-  const ChatViewListUserWidget({
+class ChatViewListItemTile extends StatelessWidget {
+  const ChatViewListItemTile({
+    required this.chat,
+    required this.tileConfig,
+    this.profile,
+    this.userName,
+    this.lastMessageTime,
+    this.trailing,
+    this.unreadCount,
     super.key,
-    this.config,
-    required this.user,
-    this.profileWidget,
-    this.userNameWidget,
-    this.chatViewListTileConfig,
-    this.lastMessageTimeWidget,
-    this.trailingWidget,
-    this.unReadCountWidget,
-    this.unreadWidgetConfig,
-    this.timeConfig,
   });
 
-  /// Provides configuration for chat list UI.
-  final ChatViewListConfig? config;
-
   /// User object to display in the chat list.
-  final ChatViewListModel user;
+  final ChatViewListItem chat;
 
   /// Provides widget for profile in chat list.
-  final Widget? profileWidget;
+  final Widget? profile;
 
   /// Provides widget for user name in chat list.
-  final Widget? userNameWidget;
+  final Widget? userName;
 
   /// Provides configuration for the user widget in chat list.
-  final ChatViewListTileConfig? chatViewListTileConfig;
-
-  /// Configuration for the time display in the chat list.
-  final ChatViewListTimeConfig? timeConfig;
+  final ListTileConfig tileConfig;
 
   /// Provides widget for last message time in chat list.
-  final Widget? lastMessageTimeWidget;
+  final Widget? lastMessageTime;
 
   /// Provides widget for trailing elements in chat list.
-  final Widget? trailingWidget;
+  final Widget? trailing;
 
   /// Provides widget for unread count in chat list.
-  final Widget? unReadCountWidget;
-
-  /// Configuration for the unread message widget in the chat list.
-  final UnreadWidgetConfig? unreadWidgetConfig;
+  final Widget? unreadCount;
 
   @override
   Widget build(BuildContext context) {
+    final unreadCountConfig = tileConfig.unreadCountConfig;
+    final lastMessageTimeConfig = tileConfig.timeConfig;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onLongPress: () {
-        chatViewListTileConfig?.onLongPress?.call(user);
-      },
+      onLongPress: () => tileConfig.onLongPress?.call(chat),
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        chatViewListTileConfig?.onTap?.call(user);
+        tileConfig.onTap?.call(chat);
       },
       child: Padding(
-        padding: config?.padding ??
-            const EdgeInsets.symmetric(
-              vertical: 6,
-              horizontal: 8,
-            ),
+        padding: tileConfig.padding,
         child: Row(
           children: [
-            profileWidget ??
-                GestureDetector(
-                  onTap: () => chatViewListTileConfig?.onProfileTap?.call(user),
-                  child: ChatUserAvatar(
-                    user: user,
-                    chatViewListTileConfig: chatViewListTileConfig,
-                  ),
+            profile ??
+                UserAvatarView(
+                  imageUrl: chat.imageUrl ?? '',
+                  onTap: () =>
+                      tileConfig.userAvatarConfig.onProfileTap?.call(chat),
+                  config: tileConfig.userAvatarConfig,
+                  showOnlineStatus: tileConfig.showOnlineStatus &&
+                      chat.userActiveStatus.isOnline,
+                  userActiveStatusConfig: tileConfig.userActiveStatusConfig,
                 ),
             Expanded(
               child: Padding(
-                padding:
-                    chatViewListTileConfig?.userNameAndLastMessagePadding ??
-                        const EdgeInsets.symmetric(horizontal: 12),
+                padding: tileConfig.middleWidgetPadding,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    userNameWidget ??
+                    userName ??
                         Text(
-                          user.name,
-                          maxLines:
-                              chatViewListTileConfig?.userNameMaxLines ?? 1,
-                          overflow:
-                              chatViewListTileConfig?.userNameTextOverflow ??
-                                  TextOverflow.ellipsis,
-                          style: chatViewListTileConfig?.userNameTextStyle ??
+                          chat.name,
+                          maxLines: tileConfig.userNameMaxLines,
+                          overflow: tileConfig.userNameTextOverflow,
+                          style: tileConfig.userNameTextStyle ??
                               const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
-                    if (user.lastMessage?.message.isNotEmpty ?? false)
-                      chatViewListTileConfig?.customLastMessageListViewBuilder
-                              ?.call(user.lastMessage) ??
-                          switch (user.lastMessage?.messageType) {
+                    if (chat.lastMessage?.message.isNotEmpty ?? false)
+                      tileConfig.customLastMessageListViewBuilder
+                              ?.call(chat.lastMessage) ??
+                          switch (chat.lastMessage?.messageType) {
                             MessageType.image => Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -143,8 +120,8 @@ class ChatViewListUserWidget extends StatelessWidget {
                                   Text(
                                     PackageStrings.currentLocale.photo,
                                     style: TextStyle(
-                                      fontWeight: user.unreadCount != null &&
-                                              user.unreadCount! > 0
+                                      fontWeight: chat.unreadCount != null &&
+                                              chat.unreadCount! > 0
                                           ? FontWeight.bold
                                           : FontWeight.normal,
                                     ),
@@ -152,19 +129,14 @@ class ChatViewListUserWidget extends StatelessWidget {
                                 ],
                               ),
                             MessageType.text => Text(
-                                user.lastMessage?.message ?? '',
-                                maxLines:
-                                    chatViewListTileConfig?.userNameMaxLines ??
-                                        1,
-                                overflow: chatViewListTileConfig
-                                        ?.lastMessageTextOverflow ??
-                                    TextOverflow.ellipsis,
-                                style: chatViewListTileConfig
-                                        ?.lastMessageTextStyle ??
+                                chat.lastMessage?.message ?? '',
+                                maxLines: tileConfig.lastMessageMaxLines,
+                                overflow: tileConfig.lastMessageTextOverflow,
+                                style: tileConfig.lastMessageTextStyle ??
                                     TextStyle(
                                       fontSize: 14,
-                                      fontWeight: user.unreadCount != null &&
-                                              user.unreadCount! > 0
+                                      fontWeight: chat.unreadCount != null &&
+                                              chat.unreadCount! > 0
                                           ? FontWeight.bold
                                           : FontWeight.normal,
                                     ),
@@ -193,68 +165,65 @@ class ChatViewListUserWidget extends StatelessWidget {
                 ),
               ),
             ),
-            trailingWidget ??
+            trailing ??
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    if (lastMessageTimeWidget != null)
-                      lastMessageTimeWidget!
-                    else if (user.lastMessage?.createdAt != null)
+                    if (lastMessageTime case final widget?)
+                      widget
+                    else if (chat.lastMessage?.createdAt case final createAt?)
                       Text(
                         formatLastMessageTime(
-                          user.lastMessage?.createdAt.toString() ?? '',
-                          timeConfig?.dateFormatPattern ?? defaultDateFormat,
+                          createAt.toString(),
+                          lastMessageTimeConfig.dateFormatPattern,
                         ),
-                        style:
-                            chatViewListTileConfig?.lastMessageTimeTextStyle ??
-                                const TextStyle(fontSize: 12),
+                        maxLines: lastMessageTimeConfig.maxLines,
+                        overflow: lastMessageTimeConfig.overflow,
+                        style: lastMessageTimeConfig.textStyle ??
+                            const TextStyle(fontSize: 12),
                       ),
                     SizedBox(
-                      height: timeConfig?.spaceBetweenTimeAndUnreadCount ?? 5,
+                      height:
+                          lastMessageTimeConfig.spaceBetweenTimeAndUnreadCount,
                     ),
-                    if (unReadCountWidget != null)
-                      unReadCountWidget!
-                    else if (user.unreadCount != null && user.unreadCount! > 0)
+                    if (unreadCount case final widget?)
+                      widget
+                    else if (chat.unreadCount != null && chat.unreadCount! > 0)
                       Builder(
                         builder: (context) {
-                          if (unreadWidgetConfig?.unreadCountView.isDot ??
-                              false) {
-                            double dotSize = unreadWidgetConfig?.width ?? 12;
+                          if (unreadCountConfig.style.isDot) {
+                            final dotSize = unreadCountConfig.width ?? 12;
                             return Container(
                               width: dotSize,
                               height: dotSize,
-                              decoration: unreadWidgetConfig?.decoration ??
-                                  const BoxDecoration(
-                                    color: primaryColor,
+                              decoration: unreadCountConfig.decoration ??
+                                  BoxDecoration(
+                                    color: unreadCountConfig.backgroundColor,
                                     shape: BoxShape.circle,
                                   ),
                             );
-                          } else if (unreadWidgetConfig
-                                  ?.unreadCountView.isNone ??
-                              false) {
+                          } else if (unreadCountConfig.style.isNone) {
                             return const SizedBox.shrink();
                           } else {
-                            String displayCount = ((unreadWidgetConfig
-                                            ?.unreadCountView
-                                            .isNinetyNinePlus ??
-                                        false) &&
-                                    user.unreadCount! > 99)
-                                ? '99+'
-                                : '${user.unreadCount}';
-                            bool isSingleDigit = user.unreadCount! < 10;
-                            double minWidth = unreadWidgetConfig?.width ?? 20;
-                            double padding = isSingleDigit ? 0 : 4;
+                            final displayCount =
+                                ((unreadCountConfig.style.isNinetyNinePlus) &&
+                                        chat.unreadCount! > 99)
+                                    ? '99+'
+                                    : '${chat.unreadCount}';
+                            final isSingleDigit = chat.unreadCount! < 10;
+                            final minWidth = unreadCountConfig.width ?? 20;
+                            final padding = isSingleDigit ? 0.0 : 4.0;
                             return Container(
                               constraints: BoxConstraints(
                                 minWidth: minWidth,
-                                minHeight: unreadWidgetConfig?.height ?? 20,
+                                minHeight: unreadCountConfig.height ?? 20,
                               ),
                               padding: EdgeInsets.symmetric(
                                 horizontal: padding,
                               ),
-                              decoration: unreadWidgetConfig?.decoration ??
+                              decoration: unreadCountConfig.decoration ??
                                   BoxDecoration(
-                                    color: primaryColor,
+                                    color: unreadCountConfig.backgroundColor,
                                     shape: isSingleDigit
                                         ? BoxShape.circle
                                         : BoxShape.rectangle,
@@ -265,13 +234,12 @@ class ChatViewListUserWidget extends StatelessWidget {
                               alignment: Alignment.center,
                               child: Text(
                                 displayCount,
-                                style:
-                                    unreadWidgetConfig?.unreadCountTextStyle ??
-                                        const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
+                                style: unreadCountConfig.textStyle ??
+                                    TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: unreadCountConfig.textColor,
+                                      fontSize: unreadCountConfig.fontSize,
+                                    ),
                                 textAlign: TextAlign.center,
                               ),
                             );

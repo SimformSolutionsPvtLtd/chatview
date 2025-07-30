@@ -19,15 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-class ChatViewListTimeConfig {
-  const ChatViewListTimeConfig({
-    required this.dateFormatPattern,
-    this.spaceBetweenTimeAndUnreadCount,
+import 'package:flutter/material.dart';
+
+import '../../../utils/constants/constants.dart';
+
+class LastMessageTimeConfig {
+  const LastMessageTimeConfig({
+    this.maxLines = 1,
+    this.overflow = TextOverflow.ellipsis,
+    this.dateFormatPattern = defaultDateFormat,
+    this.spaceBetweenTimeAndUnreadCount = 5,
+    this.textStyle,
   });
 
+  /// Maximum number of lines for the last message time in the chat list.
+  ///
+  /// Defaults to `1`.
+  final int? maxLines;
+
+  /// Text overflow behavior for the last message time in the chat list.
+  ///
+  /// Defaults to `TextOverflow.ellipsis`.
+  final TextOverflow? overflow;
+
+  /// Text style for the last message time in the chat list.
+  final TextStyle? textStyle;
+
   /// Time format pattern for displaying time in the chat list.
+  ///
+  /// Defaults to `dd/MM/yyyy` format.
   final String dateFormatPattern;
 
   /// Space between the time and unread count in the user widget.
-  final double? spaceBetweenTimeAndUnreadCount;
+  ///
+  /// Defaults to `5.0`.
+  final double spaceBetweenTimeAndUnreadCount;
 }

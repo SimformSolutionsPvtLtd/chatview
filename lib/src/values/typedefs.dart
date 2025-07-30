@@ -23,7 +23,7 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chat_view_list_tile.dart';
+import '../models/chat_view_list_item.dart';
 
 typedef StringMessageCallBack = void Function(
   String message,
@@ -104,8 +104,9 @@ typedef BackgroundImageLoadError = void Function(
   Object exception,
   StackTrace? stackTrace,
 )?;
-typedef SearchUserCallback = Future<List<ChatViewListModel>?> Function(
-    String value)?;
+typedef SearchUserCallback = Future<List<ChatViewListItem>?> Function(
+  String value,
+);
 typedef CustomLastMessageListViewBuilder = Widget Function(
   Message? message,
 );

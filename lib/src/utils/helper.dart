@@ -21,6 +21,7 @@
  */
 import 'package:intl/intl.dart';
 
+import '../extensions/extensions.dart';
 import 'package_strings.dart';
 
 /// Formats the last message time based on the provided date string.
@@ -39,7 +40,7 @@ String formatLastMessageTime(String dateStr, String dateFormatPattern) {
     return PackageStrings.currentLocale.now;
   } else if (diff.inMinutes < 60) {
     return '${diff.inMinutes} ${PackageStrings.currentLocale.minAgo}';
-  } else if (_isSameDay(now, inputDate)) {
+  } else if (now.isSameCalendarDay(inputDate)) {
     return DateFormat('hh:mm a').format(inputDate); // Today
   } else if (_isYesterday(inputDate, now)) {
     return PackageStrings.currentLocale.yesterday;
@@ -48,13 +49,8 @@ String formatLastMessageTime(String dateStr, String dateFormatPattern) {
   }
 }
 
-/// Checks if two DateTime objects represent the same day.
-bool _isSameDay(DateTime d1, DateTime d2) {
-  return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
-}
-
 /// Checks if the given date is yesterday relative to the reference date.
 bool _isYesterday(DateTime date, DateTime reference) {
   final yesterday = reference.subtract(const Duration(days: 1));
-  return _isSameDay(date, yesterday);
+  return date.isSameCalendarDay(yesterday);
 }

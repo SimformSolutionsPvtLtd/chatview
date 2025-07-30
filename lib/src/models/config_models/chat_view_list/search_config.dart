@@ -22,35 +22,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../values/typedefs.dart';
+import '../../../utils/constants/constants.dart';
+import '../../../values/typedefs.dart';
 
 /// Configuration class for the search text field in the chat list UI.
 class SearchConfig {
-  /// Creates a configuration object for the search text field in the chat list UI.
+  /// Creates a configuration object for the search text field in
+  /// the chat list UI.
   const SearchConfig({
-    this.padding,
     required this.textEditingController,
+    this.padding = const EdgeInsets.all(10),
+    this.prefixIcon = const Icon(Icons.search),
+    this.textFieldBackgroundColor = Colors.white,
+    this.textInputAction = TextInputAction.search,
+    this.textCapitalization = TextCapitalization.none,
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
+    this.borderRadius = const BorderRadius.all(
+      Radius.circular(textFieldBorderRadius),
+    ),
+    this.onTapOutside,
     this.textStyle,
     this.maxLines,
     this.minLines,
     this.textInputType,
     this.inputFormatters,
     this.enabled,
-    this.textCapitalization,
     this.hintText,
     this.hintStyle,
-    this.contentPadding,
-    this.textFieldBackgroundColor,
-    this.borderRadius,
     this.border,
-    this.prefixIcon,
     this.suffixIcon,
     this.onSearch,
     this.decoration,
+    this.maxLength,
   });
 
   /// Padding for the search text field in the chat list.
-  final EdgeInsets? padding;
+  ///
+  /// Defaults to `EdgeInsets.all(10)`.
+  final EdgeInsets padding;
 
   /// Text editing controller for the search text field.
   final TextEditingController textEditingController;
@@ -74,7 +83,9 @@ class SearchConfig {
   final bool? enabled;
 
   /// Text capitalization for the search text field.
-  final TextCapitalization? textCapitalization;
+  ///
+  /// Defaults to `TextCapitalization.none`.
+  final TextCapitalization textCapitalization;
 
   /// Hint text for the search text field.
   final String? hintText;
@@ -83,25 +94,47 @@ class SearchConfig {
   final TextStyle? hintStyle;
 
   /// Padding for the content of the search text field.
+  ///
+  /// Defaults to `EdgeInsets.symmetric(horizontal: 6)`.
   final EdgeInsets? contentPadding;
 
   /// Background color for the search text field.
+  ///
+  /// Defaults to `Colors.white`.
   final Color? textFieldBackgroundColor;
 
   /// Border radius for the search text field.
-  final BorderRadius? borderRadius;
+  ///
+  /// Defaults to circular border with radius of `10`.
+  final BorderRadius borderRadius;
 
   /// Border for the search text field.
   final InputBorder? border;
 
   /// Prefix icon for the search text field.
+  ///
+  /// Defaults to an search icon `Icons.search`.
   final Widget? prefixIcon;
 
   /// Suffix icon for the search text field.
   final Widget? suffixIcon;
 
   /// Callback function that is called when the search text changes.
-  final SearchUserCallback onSearch;
+  final SearchUserCallback? onSearch;
 
+  /// Decoration for the search text field.
   final InputDecoration? decoration;
+
+  /// Callback function that is called when the user taps outside the search
+  /// text field.
+  final TapRegionCallback? onTapOutside;
+
+  /// Action to be performed when the user submits the text in the search
+  /// text field.
+  ///
+  /// Defaults to `TextInputAction.search`.
+  final TextInputAction? textInputAction;
+
+  /// Maximum length of the text in the search text field.
+  final int? maxLength;
 }

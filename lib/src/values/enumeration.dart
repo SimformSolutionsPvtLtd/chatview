@@ -76,28 +76,45 @@ enum SuggestionItemsType {
 
 /// Enum to distinguish between single user and group chat.
 enum ChatType {
+  /// Represents a single user chat.
   user,
+
+  /// Represents a group chat.
   group;
 
-  bool get isUser => this == ChatType.user;
+  /// Returns true if the chat type is user.
+  bool get isUser => this == user;
 
-  bool get isGroup => this == ChatType.group;
+  /// Returns true if the chat type is group.
+  bool get isGroup => this == group;
 }
 
-/// An enumeration of unread count views.
-enum UnreadCountView {
+/// An enumeration of unread count styles.
+enum UnreadCountStyle {
+  /// Represents unread count as a dot.
   dot,
+
+  /// Represents unread count as a number.
   count,
+
+  /// Represents unread count as 99+ when the count exceeds 99.
+  /// Otherwise, it will show the actual count.
   ninetyNinePlus,
+
+  /// Represents no unread count.
   none;
 
-  bool get isDot => this == UnreadCountView.dot;
+  /// Returns true if the unread count style is dot.
+  bool get isDot => this == dot;
 
-  bool get isCount => this == UnreadCountView.count;
+  /// Returns true if the unread count style is count.
+  bool get isCount => this == count;
 
-  bool get isNinetyNinePlus => this == UnreadCountView.ninetyNinePlus;
+  /// Returns true if the unread count style is ninety-nine plus.
+  bool get isNinetyNinePlus => this == ninetyNinePlus;
 
-  bool get isNone => this == UnreadCountView.none;
+  /// Returns true if the unread count style is none.
+  bool get isNone => this == none;
 }
 
 /// An enumeration of user status.

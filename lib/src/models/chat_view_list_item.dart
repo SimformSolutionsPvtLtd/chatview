@@ -19,45 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:flutter/material.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 
-import '../../values/enumeration.dart';
+import '../values/enumeration.dart';
 
-/// Configuration class for the unread message widget in the chat list UI.
-class UnreadWidgetConfig {
-  /// Creates a configuration object for the unread message widget in the chat list UI.
-  const UnreadWidgetConfig({
-    this.backgroundColor,
-    this.textColor,
-    this.fontSize,
-    this.height,
-    this.width,
-    this.decoration,
-    this.unreadCountView = UnreadCountView.dot,
-    this.unreadCountTextStyle,
+/// Model class representing a user or group in the chat list.
+class ChatViewListItem {
+  /// Creates a user or group object for the chat list.
+  const ChatViewListItem({
+    required this.id,
+    required this.name,
+    this.chatType = ChatType.user,
+    this.userActiveStatus = UserActiveStatus.offline,
+    this.lastMessage,
+    this.imageUrl,
+    this.unreadCount,
   });
 
-  /// Background color for the unread message widget.
-  final Color? backgroundColor;
+  /// Unique identifier for the user or group.
+  final String id;
 
-  /// Text color for the unread message widget.
-  final Color? textColor;
+  /// Provides name of the user or group.
+  final String name;
 
-  /// Font size for the unread message text.
-  final double? fontSize;
+  /// Provides last message in chat list.
+  final Message? lastMessage;
 
-  /// Height for the unread message widget.
-  final double? height;
+  /// Provides image URL for user or group profile in chat list.
+  final String? imageUrl;
 
-  /// Width for the unread message widget.
-  final double? width;
+  /// Provides unread message count for user or group in chat list.
+  final int? unreadCount;
 
-  /// Decoration for the unread message widget.
-  final BoxDecoration? decoration;
+  /// Type of chat: user or group.
+  ///
+  /// Defaults to [ChatType.user].
+  final ChatType chatType;
 
-  /// View style for the unread count.
-  final UnreadCountView unreadCountView;
-
-  /// Text styles for the unread count in the user widget.
-  final TextStyle? unreadCountTextStyle;
+  /// User's active status in the chat list.
+  ///
+  /// Defaults to [UserActiveStatus.offline].
+  final UserActiveStatus userActiveStatus;
 }

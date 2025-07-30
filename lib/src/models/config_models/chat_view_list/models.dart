@@ -19,42 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview_utils/chatview_utils.dart';
-
-import '../values/enumeration.dart';
-
-/// Model class representing a user or group in the chat list.
-class ChatViewListModel {
-  /// Unique identifier for the user or group.
-  final String id;
-
-  /// Provides name of the user or group.
-  final String name;
-
-  /// Provides last message in chat list.
-  final Message? lastMessage;
-
-  /// Provides image URL for user or group profile in chat list.
-  final String? imageUrl;
-
-  /// Provides unread message count for user or group in chat list.
-  final int? unreadCount;
-
-  /// Type of chat: user or group.
-  final ChatType chatType;
-
-  /// User's active status in the chat list.
-  /// Defaults to [UserActiveStatus.offline].
-  final UserActiveStatus userActiveStatus;
-
-  /// Creates a user or group object for the chat list.
-  const ChatViewListModel({
-    required this.id,
-    required this.name,
-    this.lastMessage,
-    this.imageUrl,
-    this.unreadCount,
-    this.chatType = ChatType.user,
-    this.userActiveStatus = UserActiveStatus.offline,
-  });
-}
+export 'chat_view_list_config.dart';
+export 'chat_view_list_tile_config.dart';
+export 'last_message_time_config.dart';
+export 'load_more_config.dart';
+export 'search_config.dart';
+export 'unread_count_config.dart';
+export 'user_active_status_config.dart';
+export 'user_avatar_config.dart';

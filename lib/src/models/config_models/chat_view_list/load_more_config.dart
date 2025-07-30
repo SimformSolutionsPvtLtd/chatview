@@ -21,17 +21,29 @@
  */
 import 'package:flutter/material.dart';
 
+import '../../../utils/constants/constants.dart';
+
 /// Configuration class for the load more chat list widget.
-class LoadMoreChatListConfig {
+class LoadMoreConfig {
   /// Creates a configuration object for the load more chat list widget.
-  const LoadMoreChatListConfig({
-    this.padding,
-    this.color,
+  const LoadMoreConfig({
+    this.padding = const EdgeInsets.symmetric(vertical: 16),
+    this.color = primaryColor,
+    this.loadMoreBuilder,
   });
 
+  /// Widget to display while loading more chats.
+  ///
+  /// If null, a default loading widget will be used.
+  final Widget? loadMoreBuilder;
+
   /// Padding for the load more widget.
-  final EdgeInsets? padding;
+  ///
+  /// Defaults to `EdgeInsets.symmetric(vertical: 16)`.
+  final EdgeInsets padding;
 
   /// Color for the load more widget.
+  ///
+  /// Defaults to chatview `primaryColor`.
   final Color? color;
 }

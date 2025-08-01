@@ -19,26 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-library chatview;
-
-export 'package:audio_waveforms/audio_waveforms.dart'
-    show
-        AndroidEncoder,
-        AndroidOutputFormat,
-        IosEncoder,
-        PlayerWaveStyle,
-        WaveStyle;
-export 'package:chatview_utils/chatview_utils.dart';
-export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-
-export 'src/controller/chat_list_view_controller.dart';
-export 'src/extensions/extensions.dart' show MessageTypes;
-export 'src/models/models.dart';
-export 'src/utils/chat_view_locale.dart';
-export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
-export 'src/values/typedefs.dart';
-export 'src/widgets/chat_view.dart';
-export 'src/widgets/chat_view_appbar.dart';
-export 'src/widgets/chat_view_list/chatview_list.dart';
+export 'chat_view_list_config.dart';
+export 'chat_view_list_tile_config.dart';
+export 'last_message_time_config.dart';
+export 'load_more_config.dart';
+export 'search_config.dart';
+export 'unread_count_config.dart';
+export 'user_active_status_config.dart';
+export 'user_avatar_config.dart';

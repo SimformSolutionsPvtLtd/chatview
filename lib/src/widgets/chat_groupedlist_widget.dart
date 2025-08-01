@@ -92,6 +92,8 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
   ChatBackgroundConfiguration get chatBackgroundConfig =>
       chatListConfig.chatBackgroundConfig;
 
+  final Map<String, GlobalKey> _messageKeys = {};
+
   @override
   void initState() {
     super.initState();
@@ -189,17 +191,17 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     );
   }
 
-  Future<void> _onReplyTap(String id, List<Message>? messages) async {
+  Future<void> _onReplyTap(String id) async {
     // Finds the replied message if exists
-    final repliedMessages = messages?.firstWhere((message) => id == message.id);
+    final replyMsgCurrentState = _messageKeys[id]?.currentState;
     final repliedMsgAutoScrollConfig =
         chatListConfig.repliedMessageConfig?.repliedMsgAutoScrollConfig;
     final highlightDuration = repliedMsgAutoScrollConfig?.highlightDuration ??
         const Duration(milliseconds: 300);
     // Scrolls to replied message and highlights
-    if (repliedMessages != null && repliedMessages.key.currentState != null) {
+    if (replyMsgCurrentState != null) {
       await Scrollable.ensureVisible(
-        repliedMessages.key.currentState!.context,
+        replyMsgCurrentState.context,
         // This value will make widget to be in center when auto scrolled.
         alignment: 0.5,
         curve:
@@ -266,6 +268,8 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
               messages,
               lastMatchedDate,
             );
+          } else {
+            _initMessageKeys(messages);
           }
 
           /// [count] that indicates how many separators
@@ -299,13 +303,14 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                 valueListenable: _replyId,
                 builder: (context, state, child) {
                   final message = messages[newIndex];
+                  final messageKey = _messageKeys[message.id] ??= GlobalKey();
                   final enableScrollToRepliedMsg = chatListConfig
                           .repliedMessageConfig
                           ?.repliedMsgAutoScrollConfig
                           .enableScrollToRepliedMsg ??
                       false;
                   return ChatBubbleWidget(
-                    key: message.key,
+                    key: messageKey,
                     message: message,
                     slideAnimation: _slideAnimation,
                     onLongPress: (yCoordinate, xCoordinate) =>
@@ -316,9 +321,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                     ),
                     onSwipe: widget.assignReplyMessage,
                     shouldHighlight: state == message.id,
-                    onReplyTap: enableScrollToRepliedMsg
-                        ? (replyId) => _onReplyTap(replyId, snapshot.data)
-                        : null,
+                    onReplyTap: enableScrollToRepliedMsg ? _onReplyTap : null,
                   );
                 },
               );
@@ -379,13 +382,15 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
     /// Holds index and separator mapping to display in chat
     for (var i = 0; i < messages.length; i++) {
+      final message = messages[i];
+      _messageKeys.putIfAbsent(message.id, () => GlobalKey());
       if (messageSeparator.isEmpty) {
         /// Separator for initial message
-        messageSeparator[0] = messages[0].createdAt;
+        messageSeparator[0] = message.createdAt;
         continue;
       }
       lastMatchedDate = _groupBy(
-        messages[i],
+        message,
         lastMatchedDate,
       );
       var previousDate = _groupBy(
@@ -403,6 +408,14 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     }
 
     return (messageSeparator, lastMatchedDate);
+  }
+
+  void _initMessageKeys(List<Message> messages) {
+    final messagesLength = messages.length;
+    for (var i = 0; i < messagesLength; i++) {
+      final message = messages[i];
+      _messageKeys.putIfAbsent(message.id, () => GlobalKey());
+    }
   }
 }
 

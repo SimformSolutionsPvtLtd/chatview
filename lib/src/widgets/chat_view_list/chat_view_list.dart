@@ -30,6 +30,7 @@ import '../../models/config_models/chat_view_list/chat_view_list_config.dart';
 import '../../models/config_models/chat_view_list/load_more_config.dart';
 import '../../values/typedefs.dart';
 import '../../utils/constants/constants.dart';
+import 'auto_animate_sliver_list.dart';
 import 'chat_list_tile_context_menu.dart';
 import 'chat_view_list_item_tile.dart';
 import 'search_text_field.dart';
@@ -122,38 +123,29 @@ class _ChatViewListState extends State<ChatViewList> {
         if (widget.header case final header?) SliverToBoxAdapter(child: header),
         StreamBuilder<List<ChatViewListItem>>(
           stream: widget.controller.chatListStream,
-          builder: (context, snapshot) {
-            final chats = snapshot.data ?? List.empty();
-            final itemCount = chats.isEmpty ? 0 : chats.length * 2 - 1;
-            return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                childCount: itemCount,
-                (context, index) {
-                  final itemIndex = index ~/ 2;
-                  if (index.isOdd) {
-                    return widget.config.separator;
-                  }
+          builder: (context, snapshot) =>
+              AutoAnimateSliverList<ChatViewListItem>(
+            key: widget.controller.animatedList,
+            items: snapshot.data ?? List.empty(),
+            itemKeyExtractor: (chat) => chat.id,
+            builder: (context, index, _, chat) {
+              final child = widget.chatBuilder?.call(context, chat) ??
+                  ChatViewListItemTile(
+                    chat: chat,
+                    config: widget.config.tileConfig,
+                  );
 
-                  final chat = chats[itemIndex];
-                  final child = widget.chatBuilder?.call(context, chat) ??
-                      ChatViewListItemTile(
-                        chat: chat,
-                        config: widget.config.tileConfig,
-                      );
-
-                  return widget.menuConfig.enabled
-                      ? ChatListTileContextMenu(
-                          key: ValueKey(chat.id),
-                          chat: chat,
-                          config: widget.menuConfig,
-                          chatTileColor: widget.config.backgroundColor,
-                          child: child,
-                        )
-                      : child;
-                },
-              ),
-            );
-          },
+              return widget.menuConfig.enabled
+                  ? ChatListTileContextMenu(
+                      key: ValueKey(chat.id),
+                      chat: chat,
+                      config: widget.menuConfig,
+                      chatTileColor: widget.config.backgroundColor,
+                      child: child,
+                    )
+                  : child;
+            },
+          ),
         ),
         // Show loading indicator at the bottom when loading next page
         SliverToBoxAdapter(

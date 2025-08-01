@@ -33,18 +33,12 @@ class ChatViewListConfig {
     this.enablePagination = false,
     this.loadMoreConfig = const LoadMoreConfig(),
     this.tileConfig = const ListTileConfig(),
-    this.separator = const Divider(height: 12),
     this.extraSpaceAtLast = 32,
     this.searchConfig,
   });
 
   /// Configuration for the search text field in the chat list.
   final SearchConfig? searchConfig;
-
-  /// Widget to be used as a separator between chat items.
-  ///
-  /// Defaults to a `Divider` with a height of `12`.
-  final Widget separator;
 
   /// Configuration for the chat tile widget in the chat list.
   final ListTileConfig tileConfig;

@@ -144,3 +144,11 @@ typedef MenuBuilderCallback = Widget Function(
   Widget child,
 );
 typedef MenuActionBuilder = List<Widget> Function(ChatViewListItem chat);
+typedef AutoAnimateItemBuilder<T> = Widget Function(
+  BuildContext context,
+  int index,
+  bool isLastItem,
+  T item,
+);
+typedef AutoAnimateItemExtractor<T> = String Function(T item);
+typedef ChatPinnedCallback<T> = bool Function(T chat);

@@ -19,8 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
+
+import '../models/chat_view_list_item.dart';
+
+typedef Defaulted<T> = FutureOr<T>;
 
 typedef StringMessageCallBack = void Function(
   String message,
@@ -97,3 +104,19 @@ typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
   T value,
   Widget? child,
 );
+typedef BackgroundImageLoadError = void Function(
+  Object exception,
+  StackTrace? stackTrace,
+)?;
+typedef SearchUserCallback = FutureOr<List<ChatViewListItem>?> Function(
+  String value,
+);
+typedef ChatViewListLastMessageTileBuilder = Widget Function(
+  Message? message,
+);
+typedef ChatViewListTextBuilder = String? Function(ChatViewListItem chat);
+typedef ChatViewListWidgetBuilder = Widget? Function(ChatViewListItem chat);
+typedef UpdateChatCallback = ChatViewListItem Function(
+  ChatViewListItem previousChat,
+);
+typedef UnreadCountWidgetBuilder = Widget Function(int count);

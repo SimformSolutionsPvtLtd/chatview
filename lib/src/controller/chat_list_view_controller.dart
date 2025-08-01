@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import '../models/chat_view_list_item.dart';
 import '../values/enumeration.dart';
 import '../values/typedefs.dart';
+import '../widgets/chat_view_list/auto_animate_sliver_list.dart';
 
 class ChatViewListController {
   ChatViewListController({
@@ -63,10 +64,14 @@ class ChatViewListController {
     );
   }
 
+  final animatedList =
+      GlobalKey<AutoAnimateSliverListState<ChatViewListItem>>();
+
   /// Stores and manages chat items by their unique IDs.
   /// A map is used for efficient lookup, update, and removal of chats
   /// by their unique id.
   Map<String, ChatViewListItem> chatListMap = {};
+  Map<String, ChatViewListItem>? _searchResultMap;
 
   /// Provides scroll controller for chat list.
   ScrollController scrollController;
@@ -80,8 +85,34 @@ class ChatViewListController {
 
   /// Adds a chat to the chat list.
   void addChat(ChatViewListItem chat) {
+    if (_searchResultMap != null) {
+      chatListMap[chat.id] = chat;
+      return;
+    }
+
     chatListMap[chat.id] = chat;
     if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.add(chatListMap);
+    animatedList.currentState?.addChatItem(
+      chat,
+      isPinned: (item) => item.settings.pinStatus.isPinned,
+    );
+  }
+
+  void removeChat(String chatId) {
+    chatListMap.remove(chatId);
+
+    if (_searchResultMap != null) {
+      if (_searchResultMap?.containsKey(chatId) ?? false) {
+        _searchResultMap?.remove(chatId);
+        if (_chatListStreamController.isClosed) return;
+        animatedList.currentState?.removeItemByKey(chatId);
+        _chatListStreamController.add(_searchResultMap ?? chatListMap);
+      }
+      return;
+    }
+    if (_chatListStreamController.isClosed) return;
+    animatedList.currentState?.removeItemByKey(chatId);
     _chatListStreamController.add(chatListMap);
   }
 
@@ -104,6 +135,23 @@ class ChatViewListController {
   /// If the chat with [chatId] does not exist, the method returns without
   /// making changes.
   void updateChat(String chatId, UpdateChatCallback newChat) {
+    if (_searchResultMap != null) {
+      final searchChat = _searchResultMap?[chatId];
+      if (searchChat == null) {
+        final chat = chatListMap[chatId];
+        if (chat == null) return;
+        chatListMap[chatId] = newChat(chat);
+        return;
+      }
+
+      final updatedChat = newChat(searchChat);
+      _searchResultMap?[chatId] = updatedChat;
+      chatListMap[chatId] = updatedChat;
+      if (_chatListStreamController.isClosed) return;
+      _chatListStreamController.add(_searchResultMap ?? chatListMap);
+      return;
+    }
+
     final chat = chatListMap[chatId];
     if (chat == null) return;
 
@@ -115,16 +163,18 @@ class ChatViewListController {
   /// Adds the given chat search results to the stream after the current frame.
   void setSearchChats(List<ChatViewListItem> searchResults) {
     final searchResultLength = searchResults.length;
-    final searchResultMap = {
+    _searchResultMap = {
       for (var i = 0; i < searchResultLength; i++)
         if (searchResults[i] case final chat) chat.id: chat,
     };
     if (_chatListStreamController.isClosed) return;
-    _chatListStreamController.add(searchResultMap);
+    _chatListStreamController.add(_searchResultMap ?? chatListMap);
   }
 
   /// Function to clear the search results and show the original chat list.
   void clearSearch() {
+    _searchResultMap?.clear();
+    _searchResultMap = null;
     if (_chatListStreamController.isClosed) return;
     _chatListStreamController.add(chatListMap);
   }

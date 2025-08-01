@@ -79,111 +79,133 @@ class ChatViewListItemTile extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: config.middleWidgetPadding,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    config.userNameBuilder?.call(chat) ??
-                        Text(
-                          chat.name,
-                          maxLines: config.userNameMaxLines,
-                          overflow: config.userNameTextOverflow,
-                          style: config.userNameTextStyle ??
-                              const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                child: AnimatedSize(
+                  alignment: Alignment.topCenter,
+                  duration: const Duration(milliseconds: 400),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      config.userNameBuilder?.call(chat) ??
+                          AnimatedSwitcher(
+                            switchInCurve: Curves.easeIn,
+                            switchOutCurve: Curves.easeOut,
+                            duration: const Duration(milliseconds: 200),
+                            reverseDuration: const Duration(milliseconds: 150),
+                            child: Align(
+                              key: ValueKey(chat.name),
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                chat.name,
+                                maxLines: config.userNameMaxLines,
+                                overflow: config.userNameTextOverflow,
+                                style: config.userNameTextStyle ??
+                                    const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
+                            ),
+                          ),
+                      if (isAnyUserTyping || lastMessage != null)
+                        AnimatedSwitcher(
+                          switchOutCurve: Curves.easeOut,
+                          switchInCurve: Curves.easeIn,
+                          duration: const Duration(milliseconds: 200),
+                          reverseDuration: const Duration(milliseconds: 150),
+                          child: isAnyUserTyping
+                              ? listTypeIndicatorConfig.widgetBuilder
+                                      ?.call(chat) ??
+                                  Text(
+                                    listTypeIndicatorConfig.textBuilder
+                                            ?.call(chat) ??
+                                        chat.typingUsers
+                                            .toList()
+                                            .toTypingStatus(
+                                              listTypeIndicatorConfig,
+                                            ),
+                                    maxLines: listTypeIndicatorConfig.maxLines,
+                                    overflow: listTypeIndicatorConfig.overflow,
+                                    style: listTypeIndicatorConfig.textStyle,
+                                  )
+                              : LastMessageView(
+                                  unreadCount: unreadCount,
+                                  lastMessage: lastMessage,
+                                  lastMessageType: lastMessage?.messageType,
+                                  lastMessageMaxLines:
+                                      config.lastMessageMaxLines,
+                                  lastMessageTextOverflow:
+                                      config.lastMessageTextOverflow,
+                                  lastMessageTextStyle:
+                                      config.lastMessageTextStyle,
+                                  lastMessageBuilder: config
+                                      .lastMessageTileBuilder
+                                      ?.call(lastMessage),
+                                ),
                         ),
-                    if (isAnyUserTyping || lastMessage != null)
-                      AnimatedSwitcher(
-                        switchOutCurve: Curves.easeOut,
-                        switchInCurve: Curves.easeIn,
-                        duration: const Duration(milliseconds: 200),
-                        reverseDuration: const Duration(milliseconds: 150),
-                        child: isAnyUserTyping
-                            ? listTypeIndicatorConfig.widgetBuilder
-                                    ?.call(chat) ??
-                                Text(
-                                  listTypeIndicatorConfig.textBuilder
-                                          ?.call(chat) ??
-                                      chat.typingUsers.toList().toTypingStatus(
-                                            listTypeIndicatorConfig,
-                                          ),
-                                  maxLines: listTypeIndicatorConfig.maxLines,
-                                  overflow: listTypeIndicatorConfig.overflow,
-                                  style: listTypeIndicatorConfig.textStyle,
-                                )
-                            : LastMessageView(
-                                unreadCount: unreadCount,
-                                lastMessage: lastMessage,
-                                lastMessageType: lastMessage?.messageType,
-                                lastMessageMaxLines: config.lastMessageMaxLines,
-                                lastMessageTextOverflow:
-                                    config.lastMessageTextOverflow,
-                                lastMessageTextStyle:
-                                    config.lastMessageTextStyle,
-                                lastMessageBuilder: config
-                                    .lastMessageTileBuilder
-                                    ?.call(lastMessage),
-                              ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
             config.trailingBuilder?.call(chat) ??
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (chat.lastMessage?.createdAt case final createAt?) ...[
-                      lastMessageTimeConfig.timeBuilder?.call(createAt) ??
-                          Text(
-                            formatLastMessageTime(
-                              createAt.toString(),
-                              lastMessageTimeConfig.dateFormatPattern,
+                AnimatedSize(
+                  alignment: Alignment.topCenter,
+                  duration: const Duration(milliseconds: 400),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (chat.lastMessage?.createdAt case final createAt?) ...[
+                        lastMessageTimeConfig.timeBuilder?.call(createAt) ??
+                            Text(
+                              formatLastMessageTime(
+                                createAt.toString(),
+                                lastMessageTimeConfig.dateFormatPattern,
+                              ),
+                              maxLines: lastMessageTimeConfig.maxLines,
+                              overflow: lastMessageTimeConfig.overflow,
+                              style: lastMessageTimeConfig.textStyle ??
+                                  const TextStyle(fontSize: 12),
                             ),
-                            maxLines: lastMessageTimeConfig.maxLines,
-                            overflow: lastMessageTimeConfig.overflow,
-                            style: lastMessageTimeConfig.textStyle ??
-                                const TextStyle(fontSize: 12),
+                        if (hasTimeSubChild)
+                          SizedBox(
+                            height: lastMessageTimeConfig
+                                .spaceBetweenTimeAndUnreadCount,
                           ),
-                      if (hasTimeSubChild)
-                        SizedBox(
-                          height: lastMessageTimeConfig
-                              .spaceBetweenTimeAndUnreadCount,
-                        ),
-                    ],
-                    Row(
-                      children: [
-                        if (isPinned) ...[
-                          pinIconConfig.widget ??
-                              Icon(
-                                Icons.push_pin,
-                                size: pinIconConfig.size,
-                                color: pinIconConfig.color,
-                              ),
-                          if (isMuted) const SizedBox(width: 10),
-                        ],
-                        if (isMuted) ...[
-                          muteIconConfig.widget ??
-                              Icon(
-                                Icons.notifications_off,
-                                size: muteIconConfig.size,
-                                color: muteIconConfig.color,
-                              ),
-                          if (showUnreadCount) const SizedBox(width: 10),
-                        ],
-                        if (showUnreadCount)
-                          unreadCountConfig.countWidgetBuilder
-                                  ?.call(unreadCount) ??
-                              UnreadCountView(
-                                unreadCount: unreadCount,
-                                config: unreadCountConfig,
-                              ),
                       ],
-                    ),
-                  ],
+                      Row(
+                        children: [
+                          if (isPinned) ...[
+                            pinIconConfig.widget ??
+                                Icon(
+                                  Icons.push_pin,
+                                  size: pinIconConfig.size,
+                                  color: pinIconConfig.color,
+                                ),
+                            if (isMuted || showUnreadCount)
+                              const SizedBox(width: 10),
+                          ],
+                          if (isMuted) ...[
+                            muteIconConfig.widget ??
+                                Icon(
+                                  Icons.notifications_off,
+                                  size: muteIconConfig.size,
+                                  color: muteIconConfig.color,
+                                ),
+                            if (showUnreadCount) const SizedBox(width: 10),
+                          ],
+                          if (showUnreadCount)
+                            unreadCountConfig.countWidgetBuilder
+                                    ?.call(unreadCount) ??
+                                UnreadCountView(
+                                  unreadCount: unreadCount,
+                                  config: unreadCountConfig,
+                                ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
           ],
         ),

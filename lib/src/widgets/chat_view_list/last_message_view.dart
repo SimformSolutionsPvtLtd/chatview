@@ -35,43 +35,56 @@ class LastMessageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return lastMessageBuilder ??
-        switch (lastMessageType) {
-          MessageType.image => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.photo, size: 14),
-                const SizedBox(width: 5),
-                Text(
-                  PackageStrings.currentLocale.photo,
-                  style: TextStyle(
-                    fontWeight:
-                        unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
-                  ),
+        AnimatedSwitcher(
+          switchOutCurve: Curves.easeOut,
+          switchInCurve: Curves.easeIn,
+          duration: const Duration(milliseconds: 300),
+          reverseDuration: const Duration(milliseconds: 200),
+          child: Align(
+            key: ValueKey('${lastMessage?.id}_${lastMessage?.message}'),
+            alignment: Alignment.centerLeft,
+            child: switch (lastMessageType) {
+              MessageType.image => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.photo, size: 14),
+                    const SizedBox(width: 5),
+                    Text(
+                      PackageStrings.currentLocale.photo,
+                      style: TextStyle(
+                        fontWeight: unreadCount > 0
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          MessageType.text => Text(
-              lastMessage?.message ?? '',
-              maxLines: lastMessageMaxLines,
-              overflow: lastMessageTextOverflow,
-              style: lastMessageTextStyle ??
-                  TextStyle(
-                    fontSize: 14,
-                    fontWeight:
-                        unreadCount > 0 ? FontWeight.bold : FontWeight.normal,
-                  ),
-            ),
-          MessageType.voice => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.mic, size: 14),
-                const SizedBox(width: 5),
-                Text(PackageStrings.currentLocale.voice),
-              ],
-            ),
-          // Provides the view for the custom message type in
-          // `lastMessageTileBuilder`
-          MessageType.custom || null => const SizedBox.shrink(),
-        };
+              MessageType.text => Text(
+                  lastMessage?.message ?? '',
+                  textAlign: TextAlign.left,
+                  maxLines: lastMessageMaxLines,
+                  overflow: lastMessageTextOverflow,
+                  style: lastMessageTextStyle ??
+                      TextStyle(
+                        fontSize: 14,
+                        fontWeight: unreadCount > 0
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                ),
+              MessageType.voice => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.mic, size: 14),
+                    const SizedBox(width: 5),
+                    Text(PackageStrings.currentLocale.voice),
+                  ],
+                ),
+              // Provides the view for the custom message type in
+              // `lastMessageTileBuilder`
+              MessageType.custom || null => const SizedBox.shrink(),
+            },
+          ),
+        );
   }
 }

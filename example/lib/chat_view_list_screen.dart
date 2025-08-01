@@ -57,11 +57,16 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                   Navigator.of(context).pop();
                 },
                 pinStatusCallback: (result) {
-                  controller?.updateChat(
-                    result.chat.id,
-                    (previousChat) => previousChat.copyWith(
-                      settings: previousChat.settings.copyWith(
-                        pinStatus: result.status,
+                  Future.delayed(
+                    // Call this after the animation of menu is completed
+                    // To show the pin status change animation
+                    const Duration(milliseconds: 800),
+                    () => controller?.updateChat(
+                      result.chat.id,
+                      (previousChat) => previousChat.copyWith(
+                        settings: previousChat.settings.copyWith(
+                          pinStatus: result.status,
+                        ),
                       ),
                     ),
                   );
@@ -69,7 +74,7 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                 },
               ),
               config: ChatViewListConfig(
-                enablePagination: true,
+                enablePagination: false,
                 loadMoreConfig: const LoadMoreConfig(),
                 tileConfig: ChatViewListTileConfig(
                   pinIconConfig: const PinIconConfig(),

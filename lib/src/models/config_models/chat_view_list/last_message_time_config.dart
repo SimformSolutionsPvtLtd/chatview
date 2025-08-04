@@ -19,26 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:flutter/material.dart';
 
-library chatview;
+import '../../../utils/constants/constants.dart';
 
-export 'package:audio_waveforms/audio_waveforms.dart'
-    show
-        AndroidEncoder,
-        AndroidOutputFormat,
-        IosEncoder,
-        PlayerWaveStyle,
-        WaveStyle;
-export 'package:chatview_utils/chatview_utils.dart';
-export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+class LastMessageTimeConfig {
+  const LastMessageTimeConfig({
+    this.maxLines = 1,
+    this.overflow = TextOverflow.ellipsis,
+    this.dateFormatPattern = defaultDateFormat,
+    this.spaceBetweenTimeAndUnreadCount = 5,
+    this.textStyle,
+  });
 
-export 'src/controller/chat_list_view_controller.dart';
-export 'src/extensions/extensions.dart' show MessageTypes;
-export 'src/models/models.dart';
-export 'src/utils/chat_view_locale.dart';
-export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
-export 'src/values/typedefs.dart';
-export 'src/widgets/chat_view.dart';
-export 'src/widgets/chat_view_appbar.dart';
-export 'src/widgets/chat_view_list/chatview_list.dart';
+  /// Maximum number of lines for the last message time in the chat list.
+  ///
+  /// Defaults to `1`.
+  final int? maxLines;
+
+  /// Text overflow behavior for the last message time in the chat list.
+  ///
+  /// Defaults to `TextOverflow.ellipsis`.
+  final TextOverflow? overflow;
+
+  /// Text style for the last message time in the chat list.
+  final TextStyle? textStyle;
+
+  /// Time format pattern for displaying time in the chat list.
+  ///
+  /// Defaults to `dd/MM/yyyy` format.
+  final String dateFormatPattern;
+
+  /// Space between the time and unread count in the user widget.
+  ///
+  /// Defaults to `5.0`.
+  final double spaceBetweenTimeAndUnreadCount;
+}

@@ -1,10 +1,10 @@
 import 'dart:ui';
 
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../utils/constants/constants.dart';
 import '../../../values/typedefs.dart';
-import '../../chat_view_list_item.dart';
 
 class UserAvatarConfig {
   const UserAvatarConfig({

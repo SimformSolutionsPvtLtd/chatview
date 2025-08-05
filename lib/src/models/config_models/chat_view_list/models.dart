@@ -19,9 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-export 'chat_settings.dart';
 export 'chat_menu_config.dart';
-export 'chat_view_list_config.dart';
 export 'list_tile_config.dart';
 export 'last_message_time_config.dart';
 export 'list_type_indicator_config.dart';

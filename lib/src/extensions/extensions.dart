@@ -173,7 +173,8 @@ extension type const TypingStatusConfigExtension(TypingStatusConfig config) {
           : '$firstName & 1 ${locale.other} ${locale.isVerb}';
       return '$newText $text';
     } else if (showUserNames && count == 3) {
-      return '$firstName, ${users[1].name} & ${users[2].name} ${locale.areVerb} $text';
+      return '$firstName, ${users[1].name} & ${users[2].name} '
+          '${locale.areVerb} $text';
     } else {
       final newText = showUserNames
           ? '$firstName, ${users[1].name} & ${count - 2}'
@@ -221,29 +222,50 @@ extension BuildContextExtension on BuildContext {
       chatListConfig.chatBubbleConfig;
 }
 
-/// Extension methods for nullable [DateTime] objects.
-///
-/// Provides utility methods for comparing nullable [DateTime] instances.
-extension NullableDateTimeExtension on DateTime? {
-  /// Compares this nullable [DateTime] with another nullable [other].
-  ///
-  /// Returns:
-  /// - `0` if both dates are null or occur at the same moment.
-  /// - A negative value if this date is null (considered earlier)
-  /// or occurs before [other].
-  /// - A positive value if [other] is null (considered later)
-  /// or occurs after this date.
-  int compareWith(DateTime? other) {
-    final a = this;
-    final b = other;
-    if (a == null && b == null) {
-      return 0;
-    } else if (a == null) {
-      return -1;
-    } else if (b == null) {
-      return 1;
-    } else {
-      return a.compareTo(b);
-    }
+/// Extension for [MuteStatus] providing utilities
+/// for displaying mute status in menus and icons.
+extension MuteStatusExtension on MuteStatus {
+  /// Toggles the mute status.
+  /// If the current status is muted, it returns unmute.
+  /// If the current status is unmute, it returns muted.
+  MuteStatus get toggle {
+    return switch (this) {
+      MuteStatus.muted => MuteStatus.unmuted,
+      MuteStatus.unmuted => MuteStatus.muted,
+    };
   }
+
+  String get menuName => switch (this) {
+        MuteStatus.muted => PackageStrings.currentLocale.mute,
+        MuteStatus.unmuted => PackageStrings.currentLocale.unmute,
+      };
+
+  IconData get iconData => switch (this) {
+        MuteStatus.muted => Icons.notifications_off,
+        MuteStatus.unmuted => Icons.notifications,
+      };
+}
+
+/// Extension for [PinStatus] providing utilities
+/// for displaying pin status in menus and icons.
+extension PinStatusExtension on PinStatus {
+  /// Toggles the pin status.
+  /// If the current status is pinned, it returns unpinned.
+  /// If the current status is unpinned, it returns pinned.
+  PinStatus get toggle {
+    return switch (this) {
+      PinStatus.pinned => PinStatus.unpinned,
+      PinStatus.unpinned => PinStatus.pinned,
+    };
+  }
+
+  String get menuName => switch (this) {
+        PinStatus.pinned => PackageStrings.currentLocale.pin,
+        PinStatus.unpinned => PackageStrings.currentLocale.unpin,
+      };
+
+  IconData get iconData => switch (this) {
+        PinStatus.pinned => Icons.push_pin,
+        PinStatus.unpinned => Icons.push_pin_outlined,
+      };
 }

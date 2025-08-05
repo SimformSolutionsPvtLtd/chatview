@@ -24,28 +24,35 @@ import 'package:intl/intl.dart';
 import '../extensions/extensions.dart';
 import 'package_strings.dart';
 
-/// Formats the last message time based on the provided date string.
-/// If the date is today, it shows the time in 'hh:mm a' format.
-/// If the date is yesterday, it shows 'Yesterday'.
-/// If the date is older, it formats the date using the provided pattern.
-/// If the date is less than a minute ago, it shows 'Now'.
-/// If the date is less than an hour ago, it shows 'X min ago'.
-String formatLastMessageTime(String dateStr, String dateFormatPattern) {
-  final inputDate =
-      DateTime.parse(dateStr).toLocal(); // Convert from UTC to local
+/// Returns a formatted string representing the time of the last message.
+/// - If the message was sent less than a minute ago, returns 'Now'.
+/// - If the message was sent less than an hour ago, returns 'X min ago'.
+/// - If the message was sent today, returns the time in 'hh:mm a' format.
+/// - If the message was sent yesterday, returns 'Yesterday'.
+/// - Otherwise, formats the date using the provided pattern.
+///
+/// [messageDateStr] is the date string of the message in UTC.
+/// [dateFormatPattern] is the pattern to format dates older than yesterday.
+String formatLastMessageTime(
+  String messageDateStr,
+  String dateFormatPattern,
+) {
+  final messageDate =
+      DateTime.tryParse(messageDateStr)?.toLocal(); // Convert from UTC to local
+  if (messageDate == null) return '';
   final now = DateTime.now();
-  final diff = now.difference(inputDate);
+  final diff = now.difference(messageDate);
 
   if (diff.inMinutes < 1) {
     return PackageStrings.currentLocale.now;
   } else if (diff.inMinutes < 60) {
     return '${diff.inMinutes} ${PackageStrings.currentLocale.minAgo}';
-  } else if (now.isSameCalendarDay(inputDate)) {
-    return DateFormat('hh:mm a').format(inputDate); // Today
-  } else if (_isYesterday(inputDate, now)) {
+  } else if (now.isSameCalendarDay(messageDate)) {
+    return DateFormat('hh:mm a').format(messageDate); // Today
+  } else if (_isYesterday(messageDate, now)) {
     return PackageStrings.currentLocale.yesterday;
   } else {
-    return DateFormat(dateFormatPattern).format(inputDate);
+    return DateFormat(dateFormatPattern).format(messageDate);
   }
 }
 

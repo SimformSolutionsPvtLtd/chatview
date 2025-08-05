@@ -19,7 +19,12 @@ dependencies:
   any_link_preview: ^3.0.2
   audio_waveforms: ^1.2.0
   cached_network_image: ^3.4.1
-  chatview_utils: ^0.0.1
+  # TODO(YASH): Use pub.dev version once chatview_utils latest version is released
+  chatview_utils:
+    git:
+      url: https://github.com/SimformSolutionsPvtLtd/chatview_utils
+      ref: feature/add_chatview_list_models
+
   emoji_picker_flutter: ^4.3.0
   flutter:
     sdk: flutter

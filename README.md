@@ -12,6 +12,20 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 
 ## Features
 
+### ChatViewList:
+
+- Smooth animations for adding, removing, and pinning chats
+- Pagination support for large chat histories
+- Search functionality by name or other criteria
+- Long press menu with options like pin and mute
+- User online status indicators
+- Typing indicators for active users
+- Unread message count badges
+- Highly customizable UI components
+- Plug-and-play backend support using [chatview_connect][chatViewConnect]
+
+### ChatView:
+
 - One-on-one and group chat support
 - Message reactions with emoji
 - Reply to messages functionality

@@ -1,8 +1,9 @@
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../extensions/extensions.dart';
 import '../../models/models.dart';
-import '../../values/enumeration.dart';
 
 class ChatListTileContextMenu extends StatelessWidget {
   const ChatListTileContextMenu({
@@ -26,8 +27,8 @@ class ChatListTileContextMenu extends StatelessWidget {
     if (menu != null) return menu;
 
     final newMuteStatus = switch (chat.settings.muteStatus) {
-      MuteStatus.muted => MuteStatus.unmute,
-      MuteStatus.unmute => MuteStatus.muted,
+      MuteStatus.muted => MuteStatus.unmuted,
+      MuteStatus.unmuted => MuteStatus.muted,
     };
     final newPinStatus = switch (chat.settings.pinStatus) {
       PinStatus.pinned => PinStatus.unpinned,

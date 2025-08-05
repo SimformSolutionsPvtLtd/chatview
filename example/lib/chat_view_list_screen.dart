@@ -1,4 +1,5 @@
 import 'package:chatview/chatview.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'chat_view_screen.dart';
@@ -12,14 +13,14 @@ class ChatViewListScreen extends StatefulWidget {
 }
 
 class _ChatViewListScreenState extends State<ChatViewListScreen> {
-  ChatViewListController? controller;
+  ChatViewListController? chatListController;
 
   // Assign the controller in didChangeDependencies
   // to ensure PrimaryScrollController is available.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    controller ??= ChatViewListController(
+    chatListController ??= ChatViewListController(
       initialChatList: Data.chatList(),
       scrollController: PrimaryScrollController.of(context),
     );
@@ -27,41 +28,115 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
 
   @override
   void dispose() {
-    controller?.dispose();
+    chatListController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: controller == null
+      body: chatListController == null
           ? const Center(child: CircularProgressIndicator())
           : ChatViewList(
-              controller: controller!,
-              appbar: const ChatViewListAppBar(
-                title: 'Breaking Bad',
+              controller: chatListController!,
+              appbar: ChatViewListAppBar(
+                title: 'ChatView',
+                centerTitle: false,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      // Handle search action
+                    },
+                  ),
+                ],
+                scrolledUnderElevation: 0,
+              ),
+              header: SizedBox(
+                height: 60,
+                child: ListView(
+                  padding: const EdgeInsetsGeometry.all(12),
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    FilterChip.elevated(
+                      backgroundColor: Colors.grey.shade200,
+                      label: Text(
+                          'All Chats (${chatListController?.chatListMap.length ?? 0})'),
+                      onSelected: (bool value) =>
+                          chatListController?.clearSearch(),
+                    ),
+                    const SizedBox(width: 12),
+                    FilterChip.elevated(
+                      backgroundColor: Colors.grey.shade200,
+                      label: const Text('Pinned Chats'),
+                      onSelected: (bool value) {
+                        chatListController?.setSearchChats(
+                          chatListController?.chatListMap.values
+                                  .where((e) => e.settings.pinStatus.isPinned)
+                                  .toList() ??
+                              [],
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    FilterChip.elevated(
+                      backgroundColor: Colors.grey.shade200,
+                      label: const Text('Unread Chats'),
+                      onSelected: (bool value) {
+                        chatListController?.setSearchChats(
+                          chatListController?.chatListMap.values
+                                  .where((e) => (e.unreadCount ?? 0) > 0)
+                                  .toList() ??
+                              [],
+                        );
+                      },
+                    ),
+                  ],
+                  // separatorBuilder: (_, __) => const SizedBox(width: 12),
+                ),
+              ),
+              searchConfig: ChatViewListSearchConfig(
+                textEditingController: TextEditingController(),
+                debounceDuration: const Duration(milliseconds: 300),
+                onSearch: (value) async {
+                  if (value.isEmpty) {
+                    return null;
+                  }
+                  final list = chatListController?.chatListMap.values
+                      .where((chat) =>
+                          chat.name.toLowerCase().contains(value.toLowerCase()))
+                      .toList();
+                  return list;
+                },
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
               ),
               loadMoreChats: () async =>
                   await Future.delayed(const Duration(seconds: 2)),
               menuConfig: ChatMenuConfig(
                 enabled: true,
-                muteStatusCallback: (result) {
-                  controller?.updateChat(
-                    result.chat.id,
-                    (previousChat) => previousChat.copyWith(
-                      settings: previousChat.settings.copyWith(
-                        muteStatus: result.status,
-                      ),
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                },
+                actions: (chat) => [
+                  CupertinoContextMenuAction(
+                    trailingIcon: Icons.delete_forever,
+                    onPressed: () {
+                      Future.delayed(
+                        // Call this after the animation of menu is completed
+                        // To show the pin status change animation
+                        const Duration(milliseconds: 800),
+                        () => chatListController?.removeChat(chat.id),
+                      );
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Delete Chat'),
+                  ),
+                ],
                 pinStatusCallback: (result) {
                   Future.delayed(
                     // Call this after the animation of menu is completed
                     // To show the pin status change animation
                     const Duration(milliseconds: 800),
-                    () => controller?.updateChat(
+                    () => chatListController?.updateChat(
                       result.chat.id,
                       (previousChat) => previousChat.copyWith(
                         settings: previousChat.settings.copyWith(
@@ -73,55 +148,33 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                   Navigator.of(context).pop();
                 },
               ),
-              config: ChatViewListConfig(
-                enablePagination: false,
-                loadMoreConfig: const LoadMoreConfig(),
-                tileConfig: ChatViewListTileConfig(
-                  pinIconConfig: const PinIconConfig(),
-                  muteIconConfig: const MuteIconConfig(),
-                  listTypeIndicatorConfig: const ListTypeIndicatorConfig(
-                    showUserNames: true,
-                  ),
-                  unreadCountConfig: const UnreadCountConfig(
-                    backgroundColor: Colors.red,
-                    style: UnreadCountStyle.ninetyNinePlus,
-                  ),
-                  userActiveStatusConfig: const UserActiveStatusConfig(
-                    color: Colors.red,
-                  ),
-                  userAvatarConfig: const UserAvatarConfig(
-                    backgroundColor: Colors.blue,
-                  ),
-                  onTap: (chat) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ChatViewScreen(
-                          chat: chat,
-                        ),
+              enablePagination: false,
+              loadMoreConfig: const LoadMoreConfig(),
+              tileConfig: ChatViewListTileConfig(
+                pinIconConfig: const PinIconConfig(),
+                muteIconConfig: const MuteIconConfig(),
+                listTypeIndicatorConfig: const ListTypeIndicatorConfig(
+                  showUserNames: true,
+                ),
+                unreadCountConfig: const UnreadCountConfig(
+                  backgroundColor: Colors.red,
+                  style: UnreadCountStyle.ninetyNinePlus,
+                ),
+                userActiveStatusConfig: const UserActiveStatusConfig(
+                  color: Colors.red,
+                ),
+                userAvatarConfig: const UserAvatarConfig(
+                  backgroundColor: Colors.blue,
+                ),
+                onTap: (chat) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ChatViewScreen(
+                        chat: chat,
                       ),
-                    );
-                  },
-                ),
-                searchConfig: ChatViewListSearchConfig(
-                  textEditingController: TextEditingController(),
-                  debounceDuration: const Duration(milliseconds: 300),
-                  onSearch: (value) async {
-                    if (value.isEmpty) {
-                      return null;
-                    }
-                    final list = controller?.chatListMap.values
-                        .where((chat) => chat.name
-                            .toLowerCase()
-                            .contains(value.toLowerCase()))
-                        .toList();
-                    return list;
-                  },
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
     );

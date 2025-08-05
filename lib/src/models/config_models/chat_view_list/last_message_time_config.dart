@@ -47,7 +47,8 @@ class LastMessageTimeConfig {
   /// Text style for the last message time in the chat list.
   final TextStyle? textStyle;
 
-  /// Time format pattern for displaying time in the chat list.
+  /// Time format pattern for displaying time in the chat list
+  /// if the last message date older than yesterday.
   ///
   /// Defaults to `dd/MM/yyyy` format.
   final String dateFormatPattern;

@@ -28,7 +28,7 @@ class ChatOperations extends StatelessWidget {
                 ),
                 settings: const ChatSettings(
                   pinStatus: PinStatus.unpinned,
-                  muteStatus: MuteStatus.unmute,
+                  muteStatus: MuteStatus.unmuted,
                 ),
               ),
             );

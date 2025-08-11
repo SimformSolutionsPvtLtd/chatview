@@ -158,3 +158,7 @@ typedef PaginationCallback = Future<void> Function(
 typedef OldReplyMessageFetchCallback = Future<void> Function(
   String messageId,
 );
+typedef PaginationScrollUpdateResult = ({
+  ChatPaginationDirection? direction,
+  Message? message,
+});

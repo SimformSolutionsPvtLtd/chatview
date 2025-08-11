@@ -82,6 +82,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   FeatureActiveConfig? featureActiveConfig;
   ChatUser? currentUser;
 
+  bool get isPaginationEnabled =>
+      featureActiveConfig?.enablePagination ?? false;
+
   @override
   void initState() {
     super.initState();
@@ -95,18 +98,13 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       featureActiveConfig = chatViewIW!.featureActiveConfig;
       currentUser = chatViewIW!.chatController.currentUser;
     }
-    if (featureActiveConfig?.enablePagination ?? false) {
-      // When flag is on then it will include pagination logic to scroll
-      // controller.
-      scrollController.addListener(_pagination);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (featureActiveConfig?.enablePagination ?? false)
+        if (isPaginationEnabled)
           PaginationLoader(
             listenable: _isPrevPageLoading,
             loader: widget.loadingWidget,
@@ -115,6 +113,10 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           child: ValueListenableBuilder<bool>(
             valueListenable: chatViewIW!.showPopUp,
             builder: (_, showPopupValue, __) => ChatGroupedListWidget(
+              isLastPage: widget.isLastPage,
+              loadMoreData: widget.loadMoreData,
+              nextPageLoadingNotifier: _isNextPageLoading,
+              prevPageLoadingNotifier: _isPrevPageLoading,
               showPopUp: showPopupValue,
               scrollController: scrollController,
               isEnableSwipeToSeeTime:
@@ -142,7 +144,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             ),
           ),
         ),
-        if (featureActiveConfig?.enablePagination ?? false)
+        if (isPaginationEnabled)
           PaginationLoader(
             listenable: _isNextPageLoading,
             loader: widget.loadingWidget,
@@ -172,33 +174,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       }
       if (messageList.isNotEmpty) chatController.scrollToLastMessage();
     });
-  }
-
-  void _pagination() {
-    if (widget.loadMoreData == null || (widget.isLastPage?.call() ?? false)) {
-      return;
-    }
-
-    final position = scrollController.position;
-    final pixels = position.pixels;
-    if (pixels >= (position.maxScrollExtent + 5) && !_isPrevPageLoading.value) {
-      _isPrevPageLoading.value = true;
-      widget.loadMoreData
-          ?.call(
-            ChatPaginationDirection.previous,
-            chatController.initialMessageList.first,
-          )
-          .whenComplete(() => _isPrevPageLoading.value = false);
-    } else if (pixels <= (position.minScrollExtent - 5) &&
-        !_isNextPageLoading.value) {
-      _isNextPageLoading.value = true;
-      widget.loadMoreData
-          ?.call(
-            ChatPaginationDirection.next,
-            chatController.initialMessageList.last,
-          )
-          .whenComplete(() => _isNextPageLoading.value = false);
-    }
   }
 
   void _showReplyPopup({

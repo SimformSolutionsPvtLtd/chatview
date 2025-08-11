@@ -158,7 +158,7 @@ class Data {
       Message(
         id: i.toString(),
         message: "This is message number $i",
-        createdAt: DateTime.now(),
+        createdAt: DateTime.now().subtract(Duration(hours: i % 2 == 0 ? i : i *2)),
         sentBy: (i % 2 == 0) ? '1' : '2',
         status: MessageStatus.read,
       ),

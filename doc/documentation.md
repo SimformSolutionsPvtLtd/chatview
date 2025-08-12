@@ -133,40 +133,26 @@ ChatViewList(
   appbar: const ChatViewListAppBar(
     title: 'ChatViewList Demo',
   ),
-  menuConfig: ChatMenuConfig( 
-    actions: (chat) => [
-      CupertinoContextMenuAction(
-        trailingIcon: Icons.delete_forever,
-        onPressed: () {
-          Future.delayed(
-            // Call this after the animation of menu is completed
-            // To show the pin status change animation
-            const Duration(milliseconds: 800),
-            () => chatListController.removeChat(chat.id),
-          );
-          Navigator.pop(context);
-        },
-        child: const Text('Delete Chat'),
-      ),
-    ],
-    pinStatusCallback: (result) {
-      Future.delayed(
-        // Call this after the animation of menu is completed
-        // To show the pin status change animation
-        const Duration(milliseconds: 800),
-        () => chatListController.updateChat(
-          result.chat.id,
-          (previousChat) => previousChat.copyWith(
-            settings: previousChat.settings.copyWith(
-              pinStatus: result.status,
-            ),
-          ),
+  menuConfig: ChatMenuConfig(
+    deleteCallback: (chat) => chatListController.removeChat(chat.id),
+    muteStatusCallback: (result) => chatListController.updateChat(
+      result.chat.id,
+      (previousChat) => previousChat.copyWith(
+        settings: previousChat.settings.copyWith(
+          muteStatus: result.status,
         ),
-      );
-      Navigator.of(context).pop();
-    },
+      ),
+    ),
+    pinStatusCallback: (result) => chatListController.updateChat(
+      result.chat.id,
+      (previousChat) => previousChat.copyWith(
+        settings: previousChat.settings.copyWith(
+          pinStatus: result.status,
+        ),
+      ),
+    ),
   ),
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     onTap: (chat) {,
       // Handle chat tile tap
     },
@@ -236,7 +222,7 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  searchConfig: ChatViewListSearchConfig(
+  searchConfig: SearchConfig(
      textEditingController: TextEditingController(),
      debounceDuration: const Duration(milliseconds: 300),
      onSearch: (value) async {
@@ -271,20 +257,18 @@ ChatViewList(
        FilterChip.elevated(
          backgroundColor: Colors.grey.shade200,
          label: Text(
-             'All Chats (${chatListController?.chatListMap.length ?? 0})'),
-         onSelected: (bool value) =>
-             chatListController?.clearSearch(),
+             'All Chats (${chatListController.chatListMap.length ?? 0})'),
+         onSelected: (bool value) => chatListController.clearSearch(),
        ),
        const SizedBox(width: 12),
        FilterChip.elevated(
          backgroundColor: Colors.grey.shade200,
          label: const Text('Pinned Chats'),
          onSelected: (bool value) {
-           chatListController?.setSearchChats(
-             chatListController?.chatListMap.values
+           chatListController.setSearchChats(
+             chatListController.chatListMap.values
                      .where((e) => e.settings.pinStatus.isPinned)
-                     .toList() ??
-                 [],
+                     .toList(),
            );
          },
        ),
@@ -293,11 +277,10 @@ ChatViewList(
          backgroundColor: Colors.grey.shade200,
          label: const Text('Unread Chats'),
          onSelected: (bool value) {
-           chatListController?.setSearchChats(
-             chatListController?.chatListMap.values
+           chatListController.setSearchChats(
+             chatListController.chatListMap.values
                      .where((e) => (e.unreadCount ?? 0) > 0)
-                     .toList() ??
-                 [],
+                     .toList(),
            );
          },
        ),
@@ -313,38 +296,42 @@ ChatViewList(
 ChatViewList(
   // ...
   menuConfig: ChatMenuConfig(
-    enabled: true,
     actions: (chat) => [
       CupertinoContextMenuAction(
-        trailingIcon: Icons.delete_forever,
+        trailingIcon: Icons.favorite_outline_rounded,
+        child: const Text(
+          'Add to Favorite',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         onPressed: () {
           Future.delayed(
-            // Call this after the animation of menu is completed
-            // To show the pin status change animation
             const Duration(milliseconds: 800),
-            () => chatListController?.removeChat(chat.id),
+            () {
+              // YOUR CODE HERE
+            },
           );
           Navigator.pop(context);
         },
-        child: const Text('Delete Chat'),
       ),
     ],
-    pinStatusCallback: (result) {
-      Future.delayed(
-        // Call this after the animation of menu is completed
-        // To show the pin status change animation
-        const Duration(milliseconds: 800),
-        () => chatListController?.updateChat(
-          result.chat.id,
-          (previousChat) => previousChat.copyWith(
-            settings: previousChat.settings.copyWith(
-              pinStatus: result.status,
-            ),
-          ),
+    deleteCallback: (chat) => chatListController.removeChat(chat.id),
+    muteStatusCallback: (result) => chatListController.updateChat(
+      result.chat.id,
+      (previousChat) => previousChat.copyWith(
+        settings: previousChat.settings.copyWith(
+          muteStatus: result.status,
         ),
-      );
-      Navigator.of(context).pop();
-    },
+      ),
+    ),
+    pinStatusCallback: (result) => chatListController.updateChat(
+      result.chat.id,
+      (previousChat) => previousChat.copyWith(
+        settings: previousChat.settings.copyWith(
+          pinStatus: result.status,
+        ),
+      ),
+    ),
     // ...
   ),
   // ...
@@ -356,7 +343,7 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     // ...
     onTap: (chat) {
       // Handle chat tile tap
@@ -383,9 +370,9 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     // ...
-    listTypeIndicatorConfig: ListTypeIndicatorConfig(
+    typingStatusConfig: TypingStatusConfig(
       // ...
       suffix: '.....',
       showUserNames: true,
@@ -403,7 +390,7 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     // ...
     timeConfig: LastMessageTimeConfig(
       // Specify to format dates older than yesterday
@@ -422,7 +409,7 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     // ...
     unreadCountConfig: const UnreadCountConfig(
       backgroundColor: Colors.green,
@@ -439,7 +426,7 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     // ...
     userActiveStatusConfig: UserActiveStatusConfig(
       shape: BoxShape.rectangle,
@@ -461,7 +448,7 @@ ChatViewList(
 ```dart
 ChatViewList(
   // ...
-  tileConfig: ChatViewListTileConfig(
+  tileConfig: ListTileConfig(
     // ...
     userAvatarConfig: UserAvatarConfig(
       backgroundColor: Colors.blue,
@@ -1250,9 +1237,9 @@ _chatController.setTypingIndicator = false; // for hiding indicator
 
 ## Main Contributors
 
-| ![img](https://avatars.githubusercontent.com/u/25323183?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/56400956?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/65003381?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/41247722?v=4&s=200) |
-|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|
-|           [Vatsal Tanna](https://github.com/vatsaltanna)           |        [Ujas Majithiya](https://github.com/Ujas-Majithiya)         |         [Apurva Kanthraviya](https://github.com/apurva780)         |         [Aditya Chavda](https://github.com/aditya-chavda)          |
+| ![img](https://avatars.githubusercontent.com/u/25323183?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/56400956?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/65003381?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/41247722?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/72062416?v=4&s=200) |
+|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|
+|           [Vatsal Tanna](https://github.com/vatsaltanna)           |        [Ujas Majithiya](https://github.com/Ujas-Majithiya)         |         [Apurva Kanthraviya](https://github.com/apurva780)         |         [Aditya Chavda](https://github.com/aditya-chavda)          |    [Yash Dhrangdhariya](https://github.com/Yash-Dhrangdhariya)     |
 
 ## How to Contribute
 

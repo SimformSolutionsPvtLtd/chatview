@@ -27,7 +27,6 @@ import 'package:flutter/material.dart';
 import '../../chatview.dart';
 import '../extensions/extensions.dart';
 import 'chat_groupedlist_widget.dart';
-import 'pagination_loader.dart';
 import 'reply_popup_widget.dart';
 
 class ChatListWidget extends StatefulWidget {
@@ -70,9 +69,6 @@ class ChatListWidget extends StatefulWidget {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
-  final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
-  final ValueNotifier<bool> _isPrevPageLoading = ValueNotifier<bool>(false);
-
   ChatController get chatController => widget.chatController;
 
   List<Message> get messageList => chatController.initialMessageList;
@@ -102,69 +98,38 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (isPaginationEnabled)
-          PaginationLoader(
-            listenable: _isPrevPageLoading,
-            loader: widget.loadingWidget,
-          ),
-        Expanded(
-          child: ValueListenableBuilder<bool>(
-            valueListenable: chatViewIW!.showPopUp,
-            builder: (_, showPopupValue, __) => ChatGroupedListWidget(
-              isLastPage: widget.isLastPage,
-              loadMoreData: widget.loadMoreData,
-              nextPageLoadingNotifier: _isNextPageLoading,
-              prevPageLoadingNotifier: _isPrevPageLoading,
-              showPopUp: showPopupValue,
-              scrollController: scrollController,
-              isEnableSwipeToSeeTime:
-                  featureActiveConfig?.enableSwipeToSeeTime ?? true,
-              assignReplyMessage: widget.assignReplyMessage,
-              onChatListTap: _onChatListTap,
-              textFieldConfig: widget.textFieldConfig,
-              onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
-                if (featureActiveConfig?.enableReactionPopup ?? false) {
-                  chatViewIW
-                    ?..reactionPopupKey.currentState?.refreshWidget(
-                          message: message,
-                          xCoordinate: xCoordinate,
-                          yCoordinate: yCoordinate,
-                        )
-                    ..showPopUp.value = true;
-                }
-                if (featureActiveConfig?.enableReplySnackBar ?? false) {
-                  _showReplyPopup(
+    return ValueListenableBuilder<bool>(
+      valueListenable: chatViewIW!.showPopUp,
+      builder: (_, showPopupValue, __) => ChatGroupedListWidget(
+        isLastPage: widget.isLastPage,
+        loadMoreData: widget.loadMoreData,
+        loadingWidget: widget.loadingWidget,
+        showPopUp: showPopupValue,
+        scrollController: scrollController,
+        isEnableSwipeToSeeTime:
+            featureActiveConfig?.enableSwipeToSeeTime ?? true,
+        assignReplyMessage: widget.assignReplyMessage,
+        onChatListTap: _onChatListTap,
+        textFieldConfig: widget.textFieldConfig,
+        onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
+          if (featureActiveConfig?.enableReactionPopup ?? false) {
+            chatViewIW
+              ?..reactionPopupKey.currentState?.refreshWidget(
                     message: message,
-                    sentByCurrentUser: message.sentBy == currentUser?.id,
-                  );
-                }
-              },
-            ),
-          ),
-        ),
-        if (isPaginationEnabled)
-          PaginationLoader(
-            listenable: _isNextPageLoading,
-            loader: widget.loadingWidget,
-          ),
-        // Adds bottom space to the message list, ensuring it is displayed
-        // above the message text field.
-        if (chatViewIW?.chatTextFieldHeight case final height?)
-          ValueListenableBuilder<double>(
-            valueListenable: height,
-            builder: (_, value, __) => SizedBox(height: value),
-          ),
-      ],
+                    xCoordinate: xCoordinate,
+                    yCoordinate: yCoordinate,
+                  )
+              ..showPopUp.value = true;
+          }
+          if (featureActiveConfig?.enableReplySnackBar ?? false) {
+            _showReplyPopup(
+              message: message,
+              sentByCurrentUser: message.sentBy == currentUser?.id,
+            );
+          }
+        },
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    _isNextPageLoading.dispose();
-    _isPrevPageLoading.dispose();
-    super.dispose();
   }
 
   void _initialize() {

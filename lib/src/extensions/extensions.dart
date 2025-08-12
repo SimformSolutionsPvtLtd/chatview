@@ -253,8 +253,8 @@ extension MuteStatusExtension on MuteStatus {
       };
 
   IconData get iconData => switch (this) {
-        MuteStatus.muted => Icons.notifications_off,
-        MuteStatus.unmuted => Icons.notifications,
+        MuteStatus.muted => Icons.notifications_off_outlined,
+        MuteStatus.unmuted => Icons.notifications_outlined,
       };
 }
 

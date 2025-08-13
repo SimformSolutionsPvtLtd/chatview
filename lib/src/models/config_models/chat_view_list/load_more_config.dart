@@ -19,26 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:flutter/material.dart';
 
-library chatview;
+import '../../../utils/constants/constants.dart';
 
-export 'package:audio_waveforms/audio_waveforms.dart'
-    show
-        AndroidEncoder,
-        AndroidOutputFormat,
-        IosEncoder,
-        PlayerWaveStyle,
-        WaveStyle;
-export 'package:chatview_utils/chatview_utils.dart';
-export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+/// Configuration class for the load more chat list widget.
+class LoadMoreConfig {
+  /// Creates a configuration object for the load more chat list widget.
+  const LoadMoreConfig({
+    this.padding = const EdgeInsets.symmetric(vertical: 16),
+    this.color = primaryColor,
+    this.loadMoreBuilder,
+  });
 
-export 'src/controller/chat_list_view_controller.dart';
-export 'src/extensions/extensions.dart' show MessageTypes;
-export 'src/models/models.dart';
-export 'src/utils/chat_view_locale.dart';
-export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
-export 'src/values/typedefs.dart';
-export 'src/widgets/chat_view.dart';
-export 'src/widgets/chat_view_appbar.dart';
-export 'src/widgets/chat_view_list/chatview_list.dart';
+  /// Widget to display while loading more chats.
+  ///
+  /// If null, a default loading widget will be used.
+  final Widget? loadMoreBuilder;
+
+  /// Padding for the load more widget.
+  ///
+  /// Defaults to `EdgeInsets.symmetric(vertical: 16)`.
+  final EdgeInsets padding;
+
+  /// Color for the load more widget.
+  ///
+  /// Defaults to chatview `primaryColor`.
+  final Color? color;
+}

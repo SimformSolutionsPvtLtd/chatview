@@ -22,8 +22,8 @@
 
 // Different types Message of ChatView
 
-import 'package:flutter/material.dart';
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
 
 enum ShowReceiptsIn { all, lastMessage }
 
@@ -72,4 +72,62 @@ enum SuggestionItemsType {
   bool get isScrollType => this == SuggestionItemsType.scrollable;
 
   bool get isMultilineType => this == SuggestionItemsType.multiline;
+}
+
+/// Enum to distinguish between single user and group chat.
+enum ChatType {
+  /// Represents a single user chat.
+  user,
+
+  /// Represents a group chat.
+  group;
+
+  /// Returns true if the chat type is user.
+  bool get isUser => this == user;
+
+  /// Returns true if the chat type is group.
+  bool get isGroup => this == group;
+}
+
+/// An enumeration of unread count styles.
+enum UnreadCountStyle {
+  /// Represents unread count as a dot.
+  dot,
+
+  /// Represents unread count as a number.
+  count,
+
+  /// Represents unread count as 99+ when the count exceeds 99.
+  /// Otherwise, it will show the actual count.
+  ninetyNinePlus,
+
+  /// Represents no unread count.
+  none;
+
+  /// Returns true if the unread count style is dot.
+  bool get isDot => this == dot;
+
+  /// Returns true if the unread count style is count.
+  bool get isCount => this == count;
+
+  /// Returns true if the unread count style is ninety-nine plus.
+  bool get isNinetyNinePlus => this == ninetyNinePlus;
+
+  /// Returns true if the unread count style is none.
+  bool get isNone => this == none;
+}
+
+/// An enumeration of user status.
+enum UserActiveStatus {
+  /// user is active
+  online,
+
+  /// user is inactive
+  offline;
+
+  /// is user inactive
+  bool get isOnline => this == online;
+
+  /// is user active
+  bool get isOffline => this == offline;
 }

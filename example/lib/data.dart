@@ -3,6 +3,32 @@ import 'package:chatview/chatview.dart';
 class Data {
   static const profileImage =
       "https://github.com/SimformSolutionsPvtLtd/chatview/blob/main/example/assets/images/simform.png?raw=true";
+
+  static List<ChatViewListItem> chatList() {
+    final now = DateTime.now().toUtc();
+    return [
+      ChatViewListItem(
+        id: '2',
+        name: 'Simform',
+        unreadCount: 2,
+        imageUrl: Data.profileImage,
+        lastMessage: Message(
+          id: '12',
+          sentBy: '2',
+          message: "🤩🤩",
+          createdAt: now,
+          status: MessageStatus.delivered,
+        ),
+      ),
+      const ChatViewListItem(
+        id: '1',
+        name: 'Flutter',
+        imageUrl: Data.profileImage,
+        userActiveStatus: UserActiveStatus.online,
+      ),
+    ];
+  }
+
   static final messageList = [
     Message(
       id: '1',

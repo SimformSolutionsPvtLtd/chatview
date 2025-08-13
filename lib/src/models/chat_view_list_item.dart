@@ -19,26 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 
-library chatview;
+import '../values/enumeration.dart';
 
-export 'package:audio_waveforms/audio_waveforms.dart'
-    show
-        AndroidEncoder,
-        AndroidOutputFormat,
-        IosEncoder,
-        PlayerWaveStyle,
-        WaveStyle;
-export 'package:chatview_utils/chatview_utils.dart';
-export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+/// Model class representing a user or group in the chat list.
+class ChatViewListItem {
+  /// Creates a user or group object for the chat list.
+  const ChatViewListItem({
+    required this.id,
+    required this.name,
+    this.chatType = ChatType.user,
+    this.userActiveStatus = UserActiveStatus.offline,
+    this.lastMessage,
+    this.imageUrl,
+    this.unreadCount,
+  });
 
-export 'src/controller/chat_list_view_controller.dart';
-export 'src/extensions/extensions.dart' show MessageTypes;
-export 'src/models/models.dart';
-export 'src/utils/chat_view_locale.dart';
-export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
-export 'src/values/typedefs.dart';
-export 'src/widgets/chat_view.dart';
-export 'src/widgets/chat_view_appbar.dart';
-export 'src/widgets/chat_view_list/chatview_list.dart';
+  /// Unique identifier for the user or group.
+  final String id;
+
+  /// Provides name of the user or group.
+  final String name;
+
+  /// Provides last message in chat list.
+  final Message? lastMessage;
+
+  /// Provides image URL for user or group profile in chat list.
+  final String? imageUrl;
+
+  /// Provides unread message count for user or group in chat list.
+  final int? unreadCount;
+
+  /// Type of chat: user or group.
+  ///
+  /// Defaults to [ChatType.user].
+  final ChatType chatType;
+
+  /// User's active status in the chat list.
+  ///
+  /// Defaults to [UserActiveStatus.offline].
+  final UserActiveStatus userActiveStatus;
+}

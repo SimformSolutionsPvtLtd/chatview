@@ -26,6 +26,7 @@ import 'package:intl/intl.dart';
 
 import '../inherited_widgets/configurations_inherited_widgets.dart';
 import '../models/config_models/chat_bubble_configuration.dart';
+import '../models/config_models/chat_view_list/list_type_indicator_config.dart';
 import '../models/config_models/message_list_configuration.dart';
 import '../models/config_models/reply_suggestions_config.dart';
 import '../utils/constants/constants.dart';
@@ -65,6 +66,14 @@ extension TimeDifference on DateTime {
   }
 
   String get getTimeFromDateTime => DateFormat.Hm().format(this);
+
+  /// Returns `true` if [other] occurs on the same calendar day as
+  /// this [DateTime].
+  ///
+  /// This comparison checks only the year, month, and day components,
+  /// and **ignores the time** (hour, minute, second, etc.).
+  bool isSameCalendarDay(DateTime other) =>
+      year == other.year && month == other.month && day == other.day;
 }
 
 /// Extension on String which implements different types string validations.
@@ -139,6 +148,37 @@ extension ChatViewStateTitleExtension on String? {
         return this ?? '';
       case ChatViewState.error:
         return this ?? PackageStrings.currentLocale.somethingWentWrong;
+    }
+  }
+}
+
+extension type const TypingStatusConfigExtension(TypingStatusConfig config) {
+  String toTypingStatus(List<String> users) {
+    final prefix = config.prefix ?? '';
+    final suffix = config.suffix ?? '';
+    final showUserNames = config.showUserNames;
+    final locale = PackageStrings.currentLocale;
+    final text = '$prefix${locale.typing}$suffix';
+    if (users.isEmpty) return text;
+
+    final count = users.length;
+
+    final firstName = users[0];
+
+    if (count == 1) {
+      return '$firstName ${locale.isVerb} $text';
+    } else if (count == 2) {
+      final newText = showUserNames
+          ? '$firstName & ${users[1]} ${locale.areVerb}'
+          : '$firstName & 1 ${locale.other} ${locale.isVerb}';
+      return '$newText $text';
+    } else if (showUserNames && count == 3) {
+      return '${users[0]}, ${users[1]} & ${users[2]} ${locale.areVerb} $text';
+    } else {
+      final newText = showUserNames
+          ? '$firstName, ${users[1]} & ${count - 2}'
+          : '$firstName & ${count - 1}';
+      return '$newText ${locale.others} ${locale.areVerb} $text';
     }
   }
 }

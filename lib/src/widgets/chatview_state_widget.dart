@@ -30,15 +30,19 @@ import '../values/enumeration.dart';
 
 class ChatViewStateWidget extends StatelessWidget {
   const ChatViewStateWidget({
-    Key? key,
-    this.chatViewStateWidgetConfig,
+    required this.type,
+    required this.chatViewStateWidgetConfig,
     required this.chatViewState,
     this.onReloadButtonTap,
-  }) : super(key: key);
+    super.key,
+  });
+
+  /// Creates a widget that displays different states of the chat view.
+  final ChatViewStateType type;
 
   /// Provides configuration of chat view's different states such as text styles,
   /// widgets and etc.
-  final ChatViewStateWidgetConfiguration? chatViewStateWidgetConfig;
+  final ChatViewStateWidgetConfiguration chatViewStateWidgetConfig;
 
   /// Provides current state of chat view.
   final ChatViewState chatViewState;
@@ -50,42 +54,46 @@ class ChatViewStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: chatViewStateWidgetConfig?.widget ??
+      child: chatViewStateWidgetConfig.widget ??
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                (chatViewStateWidgetConfig?.title
-                    .getChatViewStateTitle(chatViewState))!,
-                style: chatViewStateWidgetConfig?.titleTextStyle ??
+                switch (type) {
+                  ChatViewStateType.chatView => chatViewStateWidgetConfig.title
+                      .getChatViewStateTitle(chatViewState),
+                  ChatViewStateType.chatViewList => chatViewStateWidgetConfig
+                      .title
+                      .getChatViewStateListTitle(chatViewState),
+                },
+                style: chatViewStateWidgetConfig.titleTextStyle ??
                     const TextStyle(
                       fontSize: 22,
                     ),
               ),
-              if (chatViewStateWidgetConfig?.subTitle != null)
+              if (chatViewStateWidgetConfig.subTitle != null)
                 Text(
-                  (chatViewStateWidgetConfig?.subTitle)!,
-                  style: chatViewStateWidgetConfig?.subTitleTextStyle,
+                  (chatViewStateWidgetConfig.subTitle)!,
+                  style: chatViewStateWidgetConfig.subTitleTextStyle,
                 ),
               if (chatViewState.isLoading)
                 CircularProgressIndicator(
-                  color: chatViewStateWidgetConfig?.loadingIndicatorColor,
+                  color: chatViewStateWidgetConfig.loadingIndicatorColor,
                 ),
-              if (chatViewStateWidgetConfig?.imageWidget != null)
-                (chatViewStateWidgetConfig?.imageWidget)!,
-              if (chatViewStateWidgetConfig?.reloadButton != null)
-                (chatViewStateWidgetConfig?.reloadButton)!,
-              if (chatViewStateWidgetConfig != null &&
-                  (chatViewStateWidgetConfig?.showDefaultReloadButton)! &&
-                  chatViewStateWidgetConfig?.reloadButton == null &&
+              if (chatViewStateWidgetConfig.imageWidget != null)
+                (chatViewStateWidgetConfig.imageWidget)!,
+              if (chatViewStateWidgetConfig.reloadButton != null)
+                (chatViewStateWidgetConfig.reloadButton)!,
+              if (chatViewStateWidgetConfig.showDefaultReloadButton &&
+                  chatViewStateWidgetConfig.reloadButton == null &&
                   (chatViewState.isError || chatViewState.noMessages)) ...[
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: onReloadButtonTap,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        chatViewStateWidgetConfig?.reloadButtonColor ??
+                        chatViewStateWidgetConfig.reloadButtonColor ??
                             const Color(0xffEE5366),
                   ),
                   child: Text(PackageStrings.currentLocale.reload),

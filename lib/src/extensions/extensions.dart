@@ -150,6 +150,17 @@ extension ChatViewStateTitleExtension on String? {
         return this ?? PackageStrings.currentLocale.somethingWentWrong;
     }
   }
+
+  String getChatViewStateListTitle(ChatViewState state) {
+    return this ??
+        switch (state) {
+          ChatViewState.hasMessages => '',
+          ChatViewState.noData => PackageStrings.currentLocale.noChats,
+          ChatViewState.loading => '',
+          ChatViewState.error =>
+            PackageStrings.currentLocale.somethingWentWrong,
+        };
+  }
 }
 
 extension type const TypingStatusConfigExtension(TypingStatusConfig config) {
@@ -268,4 +279,18 @@ extension PinStatusExtension on PinStatus {
         PinStatus.pinned => Icons.push_pin,
         PinStatus.unpinned => Icons.push_pin_outlined,
       };
+}
+
+extension AsyncSnapshotExtension<T> on AsyncSnapshot<List<T>> {
+  ChatViewState get chatViewState {
+    if (hasError) {
+      return ChatViewState.error;
+    } else if (data?.isNotEmpty ?? false) {
+      return ChatViewState.hasMessages;
+    } else if (connectionState.isWaiting) {
+      return ChatViewState.loading;
+    } else {
+      return ChatViewState.noData;
+    }
+  }
 }

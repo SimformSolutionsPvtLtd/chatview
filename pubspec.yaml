@@ -19,7 +19,10 @@ dependencies:
   any_link_preview: ^3.0.2
   audio_waveforms: ^1.2.0
   cached_network_image: ^3.4.1
-  chatview_utils: ^0.0.1
+  chatview_utils:
+    git:
+      url: https://github.com/SimformSolutionsPvtLtd/chatview_utils
+      ref: feature/two_way_pagination
   emoji_picker_flutter: ^4.3.0
   flutter:
     sdk: flutter

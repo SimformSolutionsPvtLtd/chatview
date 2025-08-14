@@ -110,3 +110,18 @@ enum ChatViewStateType {
 
   bool get isChatViewList => this == ChatViewStateType.chatViewList;
 }
+
+enum UserActiveStatusAlignment {
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight;
+
+  bool get isTopLeft => this == topLeft;
+
+  bool get isTopRight => this == topRight;
+
+  bool get isBottomLeft => this == bottomLeft;
+
+  bool get isBottomRight => this == bottomRight;
+}

@@ -74,10 +74,13 @@ class ChatViewListItemTile extends StatelessWidget {
             config.userAvatarConfig.avatarBuilder?.call(chat) ??
                 UserAvatarView(
                   imageUrl: chat.imageUrl ?? '',
+                  activeStatus: chat.userActiveStatus,
                   onTap: () => config.userAvatarConfig.onProfileTap?.call(chat),
                   config: config.userAvatarConfig,
-                  showOnlineStatus:
-                      config.showOnlineStatus && chat.userActiveStatus.isOnline,
+                  showStatus: config.showUserActiveStatusIndicator &&
+                      (config.userActiveStatusConfig.showIndicatorFor
+                              ?.call(chat.userActiveStatus) ??
+                          true),
                   userActiveStatusConfig: config.userActiveStatusConfig,
                 ),
             Expanded(

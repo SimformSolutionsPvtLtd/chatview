@@ -363,7 +363,7 @@ ChatViewList(
     // Custom padding for chat tile
     padding: const EdgeInsets.all(12),
     middleWidgetPadding: const EdgeInsets.symmetric(horizontal: 12),
-    showOnlineStatus: true,
+    showUserActiveStatusIndicator: true,
     // Custom text styles for chat tile
     lastMessageTextStyle: const TextStyle(color: Colors.red),
     userNameTextStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -440,9 +440,14 @@ ChatViewList(
   // ...
   tileConfig: ChatViewListTileConfig(
     // ...
-    userActiveStatusConfig: const UserActiveStatusConfig(
-      color: Colors.blue,
+    userActiveStatusConfig: UserActiveStatusConfig(
       shape: BoxShape.rectangle,
+      color: (status) => switch (status) {
+        UserActiveStatus.online => Colors.green,
+        UserActiveStatus.offline => Colors.red,
+      },
+      alignment: UserActiveStatusAlignment.topRight,
+      showIndicatorFor: (status) => status.isOnline,
     ),
     // ...
   ),

@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 export 'chat_menu_config.dart';
+export 'list_state_config.dart';
 export 'list_tile_config.dart';
 export 'last_message_time_config.dart';
 export 'list_type_indicator_config.dart';

@@ -152,12 +152,11 @@ extension ChatViewStateTitleExtension on String? {
     }
   }
 
-  String getChatViewStateListTitle(ChatViewState state) {
+  String getChatViewListStateTitle(ChatViewState state) {
     return this ??
         switch (state) {
-          ChatViewState.hasMessages => '',
           ChatViewState.noData => PackageStrings.currentLocale.noChats,
-          ChatViewState.loading => '',
+          ChatViewState.hasMessages || ChatViewState.loading => '',
           ChatViewState.error =>
             PackageStrings.currentLocale.somethingWentWrong,
         };

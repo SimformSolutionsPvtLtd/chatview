@@ -36,7 +36,9 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
   void initState() {
     super.initState();
     _updateSubscription ??= _controller.updateStream.listen(
-      (_) => setState(() {}),
+      (_) {
+        if (mounted) setState(() {});
+      },
     );
     _controller.initialize(tickerProvider: this);
   }
@@ -139,9 +141,9 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
 
   @override
   void dispose() {
-    super.dispose();
-    _controller.dispose();
     _updateSubscription?.cancel();
     _updateSubscription = null;
+    _controller.dispose();
+    super.dispose();
   }
 }

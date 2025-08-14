@@ -32,6 +32,7 @@ import '../models/config_models/reply_suggestions_config.dart';
 import '../utils/constants/constants.dart';
 import '../utils/emoji_parser.dart';
 import '../utils/package_strings.dart';
+import '../values/enumeration.dart';
 import '../widgets/chat_view_inherited_widget.dart';
 import '../widgets/profile_image_widget.dart';
 import '../widgets/suggestions/suggestions_config_inherited_widget.dart';
@@ -278,6 +279,45 @@ extension PinStatusExtension on PinStatus {
   IconData get iconData => switch (this) {
         PinStatus.pinned => Icons.push_pin,
         PinStatus.unpinned => Icons.push_pin_outlined,
+      };
+}
+
+/// Extension for [UserActiveStatus] providing utilities
+/// for displaying user active/inactive status colors.
+extension UserActiveStatusExtension on UserActiveStatus {
+  Color get indicatorColor => switch (this) {
+        UserActiveStatus.online => Colors.green,
+        UserActiveStatus.offline => Colors.grey,
+      };
+}
+
+extension UserActiveStatusAlignmentExtension on UserActiveStatusAlignment {
+  double? get right => switch (this) {
+        UserActiveStatusAlignment.bottomRight ||
+        UserActiveStatusAlignment.topRight =>
+          0,
+        _ => null,
+      };
+
+  double? get left => switch (this) {
+        UserActiveStatusAlignment.bottomLeft ||
+        UserActiveStatusAlignment.topLeft =>
+          0,
+        _ => null,
+      };
+
+  double? get top => switch (this) {
+        UserActiveStatusAlignment.topLeft ||
+        UserActiveStatusAlignment.topRight =>
+          0,
+        _ => null,
+      };
+
+  double? get bottom => switch (this) {
+        UserActiveStatusAlignment.bottomLeft ||
+        UserActiveStatusAlignment.bottomRight =>
+          0,
+        _ => null,
       };
 }
 

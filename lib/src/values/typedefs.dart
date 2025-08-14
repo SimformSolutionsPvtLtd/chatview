@@ -140,3 +140,9 @@ typedef AutoAnimateItemBuilder<T> = Widget Function(
   T item,
 );
 typedef ChatPinnedCallback<T> = bool Function(T chat);
+typedef ShowUserActiveIndicatorCallback = bool Function(
+  UserActiveStatus status,
+);
+typedef ActiveStatusIndicatorColorResolver = Color Function(
+  UserActiveStatus status,
+);

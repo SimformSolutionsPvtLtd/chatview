@@ -23,6 +23,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
@@ -34,13 +35,17 @@ class UserAvatarView extends StatelessWidget {
     required this.imageUrl,
     required this.config,
     required this.userActiveStatusConfig,
-    this.showOnlineStatus = false,
+    required this.showStatus,
+    required this.activeStatus,
     this.onTap,
     super.key,
   });
 
   /// Whether to show the online status of the user in the chat list.
-  final bool showOnlineStatus;
+  final bool showStatus;
+
+  /// The active status of the user.
+  final UserActiveStatus activeStatus;
 
   /// Configuration for the profile widget.
   final UserAvatarConfig config;
@@ -56,6 +61,7 @@ class UserAvatarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusAlignment = userActiveStatusConfig.alignment;
     return GestureDetector(
       onTap: onTap,
       child: Stack(
@@ -78,14 +84,17 @@ class UserAvatarView extends StatelessWidget {
                           )
                         : FileImage(File(imageUrl)),
           ),
-          if (showOnlineStatus)
+          if (showStatus)
             Positioned(
-              right: 0,
-              bottom: 0,
+              right: statusAlignment.right,
+              bottom: statusAlignment.bottom,
+              top: statusAlignment.top,
+              left: statusAlignment.left,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: userActiveStatusConfig.shape,
-                  color: userActiveStatusConfig.color,
+                  color: userActiveStatusConfig.color?.call(activeStatus) ??
+                      activeStatus.indicatorColor,
                   border: userActiveStatusConfig.border,
                 ),
                 child: SizedBox.square(dimension: userActiveStatusConfig.size),

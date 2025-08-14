@@ -31,13 +31,13 @@ class ChatViewStateConfiguration {
   });
 
   /// Provides configuration of error state's widget.
-  final ChatViewStateWidgetConfiguration? errorWidgetConfig;
+  final ChatViewStateWidgetConfiguration errorWidgetConfig;
 
   /// Provides configuration of no message state's widget.
-  final ChatViewStateWidgetConfiguration? noMessageWidgetConfig;
+  final ChatViewStateWidgetConfiguration noMessageWidgetConfig;
 
   /// Provides configuration of loading state's widget.
-  final ChatViewStateWidgetConfiguration? loadingWidgetConfig;
+  final ChatViewStateWidgetConfiguration loadingWidgetConfig;
 
   /// Provides callback when user taps on reload button.
   final VoidCallback? onReloadButtonTap;

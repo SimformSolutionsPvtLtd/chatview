@@ -35,7 +35,7 @@ import 'user_avatar_config.dart';
 class ListTileConfig {
   /// Creates a configuration object for the user widget in the chat list UI.
   const ListTileConfig({
-    this.showOnlineStatus = true,
+    this.showUserActiveStatusIndicator = true,
     this.muteIconConfig = const MuteIconConfig(),
     this.pinIconConfig = const PinIconConfig(),
     this.timeConfig = const LastMessageTimeConfig(),
@@ -114,13 +114,14 @@ class ListTileConfig {
   /// Configuration for the online status of the user in the chat list.
   final UserActiveStatusConfig userActiveStatusConfig;
 
-  /// Whether to show the online status of the user in the chat list.
+  /// Whether to show the online/offline status of the user
+  /// in the chat list.
   ///
   /// Defaults to `true`.
   ///
   /// Note: This is only applicable for one-to-one chats.
   /// Group chats will not show online status.
-  final bool showOnlineStatus;
+  final bool showUserActiveStatusIndicator;
 
   /// Custom builder for the last message view in the chat list.
   final ChatViewListLastMessageTileBuilder? lastMessageTileBuilder;

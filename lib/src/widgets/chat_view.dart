@@ -32,6 +32,7 @@ import '../extensions/extensions.dart';
 import '../inherited_widgets/configurations_inherited_widgets.dart';
 import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
+import '../values/enumeration.dart';
 import 'chat_view_inherited_widget.dart';
 import 'send_message_widget.dart';
 import 'suggestions/suggestions_config_inherited_widget.dart';
@@ -128,7 +129,7 @@ class ChatView extends StatefulWidget {
   final ChatViewState chatViewState;
 
   /// Provides configuration for chat view state appearance and functionality.
-  final ChatViewStateConfiguration? chatViewStateConfig;
+  final ChatViewStateConfiguration chatViewStateConfig;
 
   /// Provides configuration for turn on/off specific features.
   final FeatureActiveConfig featureActiveConfig;
@@ -177,7 +178,7 @@ class _ChatViewState extends State<ChatView>
 
   ChatViewState get chatViewState => widget.chatViewState;
 
-  ChatViewStateConfiguration? get chatViewStateConfig =>
+  ChatViewStateConfiguration get chatViewStateConfig =>
       widget.chatViewStateConfig;
 
   FeatureActiveConfig get featureActiveConfig => widget.featureActiveConfig;
@@ -245,25 +246,28 @@ class _ChatViewState extends State<ChatView>
                           children: [
                             if (chatViewState.isLoading)
                               ChatViewStateWidget(
+                                type: ChatViewStateType.chatView,
                                 chatViewStateWidgetConfig:
-                                    chatViewStateConfig?.loadingWidgetConfig,
+                                    chatViewStateConfig.loadingWidgetConfig,
                                 chatViewState: chatViewState,
                               )
                             else if (chatViewState.noMessages)
                               ChatViewStateWidget(
+                                type: ChatViewStateType.chatView,
                                 chatViewStateWidgetConfig:
-                                    chatViewStateConfig?.noMessageWidgetConfig,
+                                    chatViewStateConfig.noMessageWidgetConfig,
                                 chatViewState: chatViewState,
                                 onReloadButtonTap:
-                                    chatViewStateConfig?.onReloadButtonTap,
+                                    chatViewStateConfig.onReloadButtonTap,
                               )
                             else if (chatViewState.isError)
                               ChatViewStateWidget(
+                                type: ChatViewStateType.chatView,
                                 chatViewStateWidgetConfig:
-                                    chatViewStateConfig?.errorWidgetConfig,
+                                    chatViewStateConfig.errorWidgetConfig,
                                 chatViewState: chatViewState,
                                 onReloadButtonTap:
-                                    chatViewStateConfig?.onReloadButtonTap,
+                                    chatViewStateConfig.onReloadButtonTap,
                               )
                             else if (chatViewState.hasMessages)
                               GestureDetector(

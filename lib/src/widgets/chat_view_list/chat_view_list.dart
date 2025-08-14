@@ -20,16 +20,20 @@
  * SOFTWARE.
  */
 import 'package:chatview_utils/chatview_utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view_list/chat_menu_config.dart';
 import '../../models/config_models/chat_view_list/list_tile_config.dart';
 import '../../models/config_models/chat_view_list/load_more_config.dart';
 import '../../models/config_models/chat_view_list/search_config.dart';
+import '../../models/config_models/chat_view_states_configuration.dart';
 import '../../utils/constants/constants.dart';
+import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
+import '../chatview_state_widget.dart';
+import 'adaptive_progress_indicator.dart';
 import 'auto_animate_sliver_list.dart';
 import 'chat_list_tile_context_menu.dart';
 import 'chat_view_list_item_tile.dart';
@@ -46,6 +50,7 @@ class ChatViewList extends StatefulWidget {
     this.backgroundColor = Colors.white,
     this.loadMoreConfig = const LoadMoreConfig(),
     this.tileConfig = const ListTileConfig(),
+    this.stateConfig = const ChatViewStateConfiguration(),
     this.searchConfig,
     this.chatBuilder,
     this.appbar,
@@ -106,6 +111,14 @@ class ChatViewList extends StatefulWidget {
   /// Background color for the chat list.
   final Color backgroundColor;
 
+  /// Provides configuration for chat view list state appearance.
+  ///
+  /// For example:
+  /// - if the stream has no data, it will show a no data state.
+  /// if the stream is loading, it will show a loading state.
+  /// If there is an error in stream, it will show an error state.
+  final ChatViewStateConfiguration stateConfig;
+
   @override
   State<ChatViewList> createState() => _ChatViewListState();
 }
@@ -149,28 +162,57 @@ class _ChatViewListState extends State<ChatViewList> {
           stream: widget.controller.chatListStream,
           builder: (context, snapshot) {
             final chats = snapshot.data ?? List.empty();
-            return AutoAnimateSliverList<ChatViewListItem>(
-              items: chats,
-              controller: widget.controller.animatedListController
-                ..updateItems(chats),
-              builder: (context, _, __, chat) {
-                final child = widget.chatBuilder?.call(context, chat) ??
-                    ChatViewListItemTile(
-                      chat: chat,
-                      config: widget.tileConfig,
-                    );
-
-                return widget.menuConfig.enabled
-                    ? ChatListTileContextMenu(
-                        key: ValueKey(chat.id),
-                        chat: chat,
-                        config: widget.menuConfig,
-                        chatTileColor: widget.backgroundColor,
-                        child: child,
-                      )
-                    : child;
-              },
-            );
+            final state = snapshot.chatViewState;
+            return switch (state) {
+              ChatViewState.hasMessages =>
+                AutoAnimateSliverList<ChatViewListItem>(
+                  items: chats,
+                  controller: widget.controller.animatedListController
+                    ..updateItems(chats),
+                  builder: (context, _, __, chat) {
+                    final child = widget.chatBuilder?.call(context, chat) ??
+                        ChatViewListItemTile(
+                          chat: chat,
+                          config: widget.tileConfig,
+                        );
+                    return widget.menuConfig.enabled
+                        ? ChatListTileContextMenu(
+                            key: ValueKey(chat.id),
+                            chat: chat,
+                            config: widget.menuConfig,
+                            chatTileColor: widget.backgroundColor,
+                            child: child,
+                          )
+                        : child;
+                  },
+                ),
+              ChatViewState.noData => SliverFillRemaining(
+                  child: ChatViewStateWidget(
+                    chatViewState: state,
+                    type: ChatViewStateType.chatViewList,
+                    chatViewStateWidgetConfig:
+                        widget.stateConfig.noMessageWidgetConfig,
+                    onReloadButtonTap: widget.stateConfig.onReloadButtonTap,
+                  ),
+                ),
+              ChatViewState.loading => SliverFillRemaining(
+                  child: ChatViewStateWidget(
+                    chatViewState: state,
+                    type: ChatViewStateType.chatViewList,
+                    chatViewStateWidgetConfig:
+                        widget.stateConfig.loadingWidgetConfig,
+                  ),
+                ),
+              ChatViewState.error => SliverFillRemaining(
+                  child: ChatViewStateWidget(
+                    chatViewState: state,
+                    type: ChatViewStateType.chatViewList,
+                    chatViewStateWidgetConfig:
+                        widget.stateConfig.errorWidgetConfig,
+                    onReloadButtonTap: widget.stateConfig.onReloadButtonTap,
+                  ),
+                ),
+            };
           },
         ),
         // Show loading indicator at the bottom when loading next page
@@ -183,26 +225,9 @@ class _ChatViewListState extends State<ChatViewList> {
                 padding: _loadMoreConfig.padding,
                 child: Center(
                   child: _loadMoreConfig.loadMoreBuilder ??
-                      RepaintBoundary(
-                        child: switch (defaultTargetPlatform) {
-                          TargetPlatform.iOS ||
-                          TargetPlatform.macOS =>
-                            CupertinoActivityIndicator(
-                              color: _loadMoreConfig.color,
-                              radius:
-                                  loadMoreCircularProgressIndicatorSize * 0.5,
-                            ),
-                          TargetPlatform.android ||
-                          TargetPlatform.fuchsia ||
-                          TargetPlatform.linux ||
-                          TargetPlatform.windows =>
-                            SizedBox.square(
-                              dimension: loadMoreCircularProgressIndicatorSize,
-                              child: CircularProgressIndicator(
-                                color: _loadMoreConfig.color,
-                              ),
-                            ),
-                        },
+                      AdaptiveProgressIndicator(
+                        color: _loadMoreConfig.color,
+                        size: loadMoreCircularProgressIndicatorSize * 0.5,
                       ),
                 ),
               );

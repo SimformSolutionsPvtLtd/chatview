@@ -54,6 +54,7 @@ final class ChatViewLocale {
     required this.pin,
     required this.unpin,
     required this.deleteChat,
+    required this.noChats,
   });
 
   /// Create from `Map<String, String>`
@@ -90,6 +91,7 @@ final class ChatViewLocale {
       pin: map['pin']?.toString() ?? '',
       unpin: map['unpin']?.toString() ?? '',
       deleteChat: map['deleteChat']?.toString() ?? '',
+      noChats: map['noChats']?.toString() ?? '',
     );
   }
 
@@ -124,6 +126,7 @@ final class ChatViewLocale {
   final String pin;
   final String unpin;
   final String deleteChat;
+  final String noChats;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -158,5 +161,6 @@ final class ChatViewLocale {
     pin: 'Pin',
     unpin: 'Unpin',
     deleteChat: 'Delete Chat',
+    noChats: 'No Chats',
   );
 }

@@ -101,3 +101,12 @@ enum UnreadCountStyle {
   /// Returns true if the unread count style is none.
   bool get isNone => this == none;
 }
+
+enum ChatViewStateType {
+  chatView,
+  chatViewList;
+
+  bool get isChatView => this == ChatViewStateType.chatView;
+
+  bool get isChatViewList => this == ChatViewStateType.chatViewList;
+}

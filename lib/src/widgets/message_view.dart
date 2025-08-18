@@ -32,6 +32,7 @@ import 'image_message_view.dart';
 import 'reaction_widget.dart';
 import 'text_message_view.dart';
 import 'voice_message_view.dart';
+import 'file_message_view.dart'; // ADD THIS IMPORT
 
 class MessageView extends StatefulWidget {
   const MessageView({
@@ -212,7 +213,18 @@ class _MessageViewState extends State<MessageView>
                     highlightImage: widget.shouldHighlight,
                     highlightScale: widget.highlightScale,
                   );
-                } else if (widget.message.messageType.isText) {
+                }
+                // ADDED THIS ELSE IF FOR MessageType.file
+                else if (widget.message.messageType == MessageType.file) {
+                  return FileMessageView(
+                    message: widget.message,
+                    isMessageBySender: widget.isMessageBySender,
+                    // You can add more configurations here if FileMessageView needs them
+                    // fileMessageConfig: messageConfig?.fileMessageConfig, // Uncomment if you add a fileMessageConfig to MessageConfiguration
+                  );
+                }
+                // END OF ADDED ELSE IF
+                else if (widget.message.messageType.isText) {
                   return TextMessageView(
                     inComingChatBubbleConfig: widget.inComingChatBubbleConfig,
                     outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
@@ -252,11 +264,11 @@ class _MessageViewState extends State<MessageView>
                         .lastSeenAgoBuilderVisibility ??
                     true) {
                   return widget.outgoingChatBubbleConfig?.receiptsWidgetConfig
-                          ?.lastSeenAgoBuilder
-                          ?.call(
-                              widget.message,
-                              applicationDateFormatter(
-                                  widget.message.createdAt)) ??
+                              ?.lastSeenAgoBuilder
+                              ?.call(
+                                  widget.message,
+                                  applicationDateFormatter(
+                                      widget.message.createdAt)) ??
                       lastSeenAgoBuilder(widget.message,
                           applicationDateFormatter(widget.message.createdAt));
                 }

@@ -62,7 +62,6 @@ class ChatViewListItemTile extends StatelessWidget {
     final hasTimeSubChild = isPinned || isMuted || showUnreadCount;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onLongPress: () => config.onLongPress?.call(chat),
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         config.onTap?.call(chat);

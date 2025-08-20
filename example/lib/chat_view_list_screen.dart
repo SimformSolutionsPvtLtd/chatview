@@ -51,6 +51,26 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                   ),
                 ],
               ),
+              menuConfig: ChatMenuConfig(
+                deleteCallback: (chat) =>
+                    _chatListController?.removeChat(chat.id),
+                muteStatusCallback: (result) => _chatListController?.updateChat(
+                  result.chat.id,
+                  (previousChat) => previousChat.copyWith(
+                    settings: previousChat.settings.copyWith(
+                      muteStatus: result.status,
+                    ),
+                  ),
+                ),
+                pinStatusCallback: (result) => _chatListController?.updateChat(
+                  result.chat.id,
+                  (previousChat) => previousChat.copyWith(
+                    settings: previousChat.settings.copyWith(
+                      pinStatus: result.status,
+                    ),
+                  ),
+                ),
+              ),
               config: ChatViewListConfig(
                 tileConfig: ListTileConfig(
                   pinIconConfig: const PinIconConfig(),
@@ -72,9 +92,6 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                         ),
                       ),
                     );
-                  },
-                  onLongPress: (chat) {
-                    debugPrint('Long pressed on chat: ${chat.name}');
                   },
                 ),
                 searchConfig: SearchConfig(

@@ -150,6 +150,16 @@ enum MuteStatus {
   /// Returns true if the chat is unmuted.
   bool get isUnmute => this == unmute;
 
+  /// Toggles the mute status.
+  /// If the current status is muted, it returns unmute.
+  /// If the current status is unmute, it returns muted.
+  MuteStatus get toggle {
+    return switch (this) {
+      muted => unmute,
+      unmute => muted,
+    };
+  }
+
   String get menuName => switch (this) {
         muted => PackageStrings.currentLocale.mute,
         unmute => PackageStrings.currentLocale.unmute,
@@ -174,6 +184,16 @@ enum PinStatus {
 
   /// Returns true if the chat is unpinned.
   bool get isNone => this == unpinned;
+
+  /// Toggles the pin status.
+  /// If the current status is pinned, it returns unpinned.
+  /// If the current status is unpinned, it returns pinned.
+  PinStatus get toggle {
+    return switch (this) {
+      pinned => unpinned,
+      unpinned => pinned,
+    };
+  }
 
   String get menuName => switch (this) {
         pinned => PackageStrings.currentLocale.pin,

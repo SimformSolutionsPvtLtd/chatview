@@ -115,6 +115,17 @@ class ChatViewListController {
     _chatListStreamController.add(chatListMap);
   }
 
+  /// Removes the chat with the given [chatId] from the chat list.
+  ///
+  /// If the chat with [chatId] does not exist, the method returns without
+  /// making changes.
+  void removeChat(String chatId) {
+    if (!chatListMap.containsKey(chatId)) return;
+    chatListMap.remove(chatId);
+    if (_chatListStreamController.isClosed) return;
+    _chatListStreamController.add(chatListMap);
+  }
+
   /// Adds the given chat search results to the stream after the current frame.
   void setSearchChats(List<ChatViewListItem> searchResults) {
     final searchResultLength = searchResults.length;

@@ -25,10 +25,12 @@ import 'package:flutter/material.dart';
 
 import '../../controller/chat_list_view_controller.dart';
 import '../../models/chat_view_list_item.dart';
+import '../../models/config_models/chat_view_list/chat_menu_config.dart';
 import '../../models/config_models/chat_view_list/chat_view_list_config.dart';
 import '../../models/config_models/chat_view_list/load_more_config.dart';
 import '../../values/typedefs.dart';
 import '../../utils/constants/constants.dart';
+import 'chat_list_tile_context_menu.dart';
 import 'chat_view_list_item_tile.dart';
 import 'search_text_field.dart';
 
@@ -36,6 +38,7 @@ class ChatViewList extends StatefulWidget {
   const ChatViewList({
     required this.controller,
     this.config = const ChatViewListConfig(),
+    this.menuConfig = const ChatMenuConfig(),
     this.scrollViewKeyboardDismissBehavior =
         ScrollViewKeyboardDismissBehavior.onDrag,
     this.chatBuilder,
@@ -74,6 +77,9 @@ class ChatViewList extends StatefulWidget {
   ///
   /// Defaults to `ScrollViewKeyboardDismissBehavior.onDrag`.
   final ScrollViewKeyboardDismissBehavior? scrollViewKeyboardDismissBehavior;
+
+  /// Provides configuration for the iOS context menu in the chat list.
+  final ChatMenuConfig menuConfig;
 
   @override
   State<ChatViewList> createState() => _ChatViewListState();
@@ -129,11 +135,21 @@ class _ChatViewListState extends State<ChatViewList> {
                   }
 
                   final chat = chats[itemIndex];
-                  return widget.chatBuilder?.call(context, chat) ??
+                  final child = widget.chatBuilder?.call(context, chat) ??
                       ChatViewListItemTile(
                         chat: chat,
                         config: widget.config.tileConfig,
                       );
+
+                  return widget.menuConfig.enabled
+                      ? ChatListTileContextMenu(
+                          key: ValueKey(chat.id),
+                          chat: chat,
+                          config: widget.menuConfig,
+                          chatTileColor: widget.config.backgroundColor,
+                          child: child,
+                        )
+                      : child;
                 },
               ),
             );

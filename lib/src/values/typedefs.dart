@@ -25,10 +25,6 @@ import 'dart:async';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chat_view_list_item.dart';
-
-typedef Defaulted<T> = FutureOr<T>;
-
 typedef StringMessageCallBack = void Function(
   String message,
   ReplyMessage replyMessage,
@@ -120,9 +116,6 @@ typedef ChatViewListLastMessageTileBuilder = Widget Function(
 );
 typedef ChatViewListTextBuilder = String? Function(ChatViewListItem chat);
 typedef ChatViewListWidgetBuilder = Widget? Function(ChatViewListItem chat);
-typedef UpdateChatCallback = ChatViewListItem Function(
-  ChatViewListItem previousChat,
-);
 typedef UnreadCountWidgetBuilder = Widget Function(int count);
 typedef ChatStatusCallback<T> = void Function(
   ({ChatViewListItem chat, T status}) result,
@@ -137,10 +130,6 @@ typedef ChatViewListTileBuilder = Widget Function(
 typedef UserAvatarBuilder = Widget Function(ChatViewListItem chat);
 typedef UserNameBuilder = Widget Function(ChatViewListItem chat);
 typedef TrailingBuilder = Widget Function(ChatViewListItem chat);
-typedef ChatSorter = int Function(
-  ChatViewListItem chat1,
-  ChatViewListItem chat2,
-);
 typedef MenuWidgetCallback = Widget Function(ChatViewListItem chat);
 typedef MenuBuilderCallback = Widget Function(
   BuildContext context,
@@ -154,5 +143,4 @@ typedef AutoAnimateItemBuilder<T> = Widget Function(
   bool isLastItem,
   T item,
 );
-typedef AutoAnimateItemExtractor<T> = String Function(T item);
 typedef ChatPinnedCallback<T> = bool Function(T chat);

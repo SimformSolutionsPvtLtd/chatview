@@ -1,6 +1,6 @@
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../../values/enumeration.dart';
 import '../../../values/typedefs.dart';
 
 class ChatMenuConfig {

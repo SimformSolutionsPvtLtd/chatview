@@ -19,10 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../../values/typedefs.dart';
-import '../../chat_view_list_item.dart';
 import 'last_message_time_config.dart';
 import 'list_type_indicator_config.dart';
 import 'mute_icon_config.dart';

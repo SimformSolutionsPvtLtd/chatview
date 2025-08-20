@@ -53,6 +53,8 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
               ),
               config: ChatViewListConfig(
                 tileConfig: ListTileConfig(
+                  pinIconConfig: const PinIconConfig(),
+                  muteIconConfig: const MuteIconConfig(),
                   typingStatusConfig: const TypingStatusConfig(
                     showUserNames: true,
                   ),

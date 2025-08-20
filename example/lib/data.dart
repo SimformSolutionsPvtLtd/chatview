@@ -17,6 +17,10 @@ class Data {
         createdAt: DateTime.now().toUtc(),
         status: MessageStatus.delivered,
       ),
+      settings: ChatSettings(
+        pinStatus: PinStatus.pinned,
+        pinTime: DateTime.now().toUtc(),
+      ),
     ),
     const ChatViewListItem(
       id: '1',

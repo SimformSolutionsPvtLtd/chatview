@@ -19,17 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../controller/chat_list_view_controller.dart';
-import '../../models/chat_view_list_item.dart';
 import '../../models/config_models/chat_view_list/chat_menu_config.dart';
-import '../../models/config_models/chat_view_list/chat_view_list_config.dart';
+import '../../models/config_models/chat_view_list/list_tile_config.dart';
 import '../../models/config_models/chat_view_list/load_more_config.dart';
-import '../../values/typedefs.dart';
+import '../../models/config_models/chat_view_list/search_config.dart';
 import '../../utils/constants/constants.dart';
+import '../../values/typedefs.dart';
 import 'auto_animate_sliver_list.dart';
 import 'chat_list_tile_context_menu.dart';
 import 'chat_view_list_item_tile.dart';
@@ -38,10 +38,15 @@ import 'search_text_field.dart';
 class ChatViewList extends StatefulWidget {
   const ChatViewList({
     required this.controller,
-    this.config = const ChatViewListConfig(),
     this.menuConfig = const ChatMenuConfig(),
     this.scrollViewKeyboardDismissBehavior =
         ScrollViewKeyboardDismissBehavior.onDrag,
+    this.extraSpaceAtLast = 32,
+    this.enablePagination = false,
+    this.backgroundColor = Colors.white,
+    this.loadMoreConfig = const LoadMoreConfig(),
+    this.tileConfig = const ListTileConfig(),
+    this.searchConfig,
     this.chatBuilder,
     this.appbar,
     this.loadMoreChats,
@@ -49,9 +54,6 @@ class ChatViewList extends StatefulWidget {
     this.isLastPage,
     super.key,
   });
-
-  /// Provides configuration for chat list UI.
-  final ChatViewListConfig config;
 
   /// Provides controller for managing the chat list.
   final ChatViewListController controller;
@@ -82,6 +84,28 @@ class ChatViewList extends StatefulWidget {
   /// Provides configuration for the iOS context menu in the chat list.
   final ChatMenuConfig menuConfig;
 
+  /// Configuration for the search text field in the chat list.
+  final SearchConfig? searchConfig;
+
+  /// Configuration for the chat tile widget in the chat list.
+  final ListTileConfig tileConfig;
+
+  /// Extra space at the last element of the chat list.
+  ///
+  /// Defaults to `32`.
+  final double extraSpaceAtLast;
+
+  /// Configuration for the load more chat list widget.
+  final LoadMoreConfig loadMoreConfig;
+
+  /// Flag to enable or disable pagination in the chat list.
+  ///
+  /// Defaults to `false`.
+  final bool enablePagination;
+
+  /// Background color for the chat list.
+  final Color backgroundColor;
+
   @override
   State<ChatViewList> createState() => _ChatViewListState();
 }
@@ -90,13 +114,13 @@ class _ChatViewListState extends State<ChatViewList> {
   /// ValueNotifier to track if the next page is currently loading.
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
 
-  LoadMoreConfig get _loadMoreConfig => widget.config.loadMoreConfig;
+  LoadMoreConfig get _loadMoreConfig => widget.loadMoreConfig;
 
   ScrollController get _scrollController => widget.controller.scrollController;
 
   @override
   void didChangeDependencies() {
-    if (widget.config.enablePagination) {
+    if (widget.enablePagination) {
       _scrollController.addListener(_pagination);
     }
     super.didChangeDependencies();
@@ -109,7 +133,7 @@ class _ChatViewListState extends State<ChatViewList> {
       keyboardDismissBehavior: widget.scrollViewKeyboardDismissBehavior,
       slivers: [
         if (widget.appbar case final appbar?) appbar,
-        if (widget.config.searchConfig case final config?)
+        if (widget.searchConfig case final config?)
           SliverToBoxAdapter(
             child: Padding(
               padding: config.padding,
@@ -123,29 +147,31 @@ class _ChatViewListState extends State<ChatViewList> {
         if (widget.header case final header?) SliverToBoxAdapter(child: header),
         StreamBuilder<List<ChatViewListItem>>(
           stream: widget.controller.chatListStream,
-          builder: (context, snapshot) =>
-              AutoAnimateSliverList<ChatViewListItem>(
-            key: widget.controller.animatedList,
-            items: snapshot.data ?? List.empty(),
-            itemKeyExtractor: (chat) => chat.id,
-            builder: (context, index, _, chat) {
-              final child = widget.chatBuilder?.call(context, chat) ??
-                  ChatViewListItemTile(
-                    chat: chat,
-                    config: widget.config.tileConfig,
-                  );
-
-              return widget.menuConfig.enabled
-                  ? ChatListTileContextMenu(
-                      key: ValueKey(chat.id),
+          builder: (context, snapshot) {
+            final chats = snapshot.data ?? List.empty();
+            return AutoAnimateSliverList<ChatViewListItem>(
+              items: chats,
+              controller: widget.controller.animatedListController
+                ..updateItems(chats),
+              builder: (context, _, __, chat) {
+                final child = widget.chatBuilder?.call(context, chat) ??
+                    ChatViewListItemTile(
                       chat: chat,
-                      config: widget.menuConfig,
-                      chatTileColor: widget.config.backgroundColor,
-                      child: child,
-                    )
-                  : child;
-            },
-          ),
+                      config: widget.tileConfig,
+                    );
+
+                return widget.menuConfig.enabled
+                    ? ChatListTileContextMenu(
+                        key: ValueKey(chat.id),
+                        chat: chat,
+                        config: widget.menuConfig,
+                        chatTileColor: widget.backgroundColor,
+                        child: child,
+                      )
+                    : child;
+              },
+            );
+          },
         ),
         // Show loading indicator at the bottom when loading next page
         SliverToBoxAdapter(
@@ -185,7 +211,7 @@ class _ChatViewListState extends State<ChatViewList> {
         ),
         // Add extra space at the bottom to avoid overlap with iOS home bar
         SliverToBoxAdapter(
-          child: SizedBox(height: widget.config.extraSpaceAtLast),
+          child: SizedBox(height: widget.extraSpaceAtLast),
         ),
       ],
     );
@@ -193,7 +219,7 @@ class _ChatViewListState extends State<ChatViewList> {
 
   @override
   void dispose() {
-    if (widget.config.enablePagination) {
+    if (widget.enablePagination) {
       _scrollController.removeListener(_pagination);
     }
     _isNextPageLoading.dispose();

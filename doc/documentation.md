@@ -9,10 +9,25 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 
 ## Features
 
-- One-on-one chat
-- Group chat
-- Message reactions
-- Reply messages
+### ChatViewList:
+
+- Smooth animations for adding, removing, and pinning chats
+- Pagination support for large chat histories
+- Search functionality by name or other criteria
+- Long press menu with options like pin and mute
+- User online status indicators
+- Typing indicators for active users
+- Unread message count badges
+- Connect ChatView to any backend
+  using [chatview_connect](https://pub.dev/packages/chatview_connect)
+- And a wide range of configuration options to customize your chat.
+- Internationalization support
+
+### ChatView:
+
+- One-on-one and group chat support
+- Message reactions with emoji
+- Reply to messages functionality
 - Link preview
 - Voice messages
 - Image sharing
@@ -96,7 +111,366 @@ minSdkVersion 21
 <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 ```
 
-# Basic Usage
+# Basic ChatViewList Usage
+
+Here's how to integrate ChatViewList into your Flutter application with minimal setup:
+
+## Step 1: Create a ChatView List Controller
+
+```dart
+ChatViewListController chatListController = ChatViewListController(
+  initialChatList: chatList,
+  scrollController: ScrollController(),
+);
+```
+
+## Step 2: Add the ChatViewList Widget
+
+```dart
+ChatViewList(
+  controller: chatListController,
+  appbar: const ChatViewListAppBar(
+    title: 'ChatViewList Demo',
+  ),
+  menuConfig: ChatMenuConfig( 
+    actions: (chat) => [
+      CupertinoContextMenuAction(
+        trailingIcon: Icons.delete_forever,
+        onPressed: () {
+          Future.delayed(
+            // Call this after the animation of menu is completed
+            // To show the pin status change animation
+            const Duration(milliseconds: 800),
+            () => chatListController.removeChat(chat.id),
+          );
+          Navigator.pop(context);
+        },
+        child: const Text('Delete Chat'),
+      ),
+    ],
+    pinStatusCallback: (result) {
+      Future.delayed(
+        // Call this after the animation of menu is completed
+        // To show the pin status change animation
+        const Duration(milliseconds: 800),
+        () => chatListController.updateChat(
+          result.chat.id,
+          (previousChat) => previousChat.copyWith(
+            settings: previousChat.settings.copyWith(
+              pinStatus: result.status,
+            ),
+          ),
+        ),
+      );
+      Navigator.of(context).pop();
+    },
+  ),
+  tileConfig: ChatViewListTileConfig(
+    onTap: (chat) {,
+      // Handle chat tile tap
+    },
+  ),
+)
+```
+
+## Step 3: Define Chat List
+
+Define your initial chat list:
+
+```dart
+
+List<ChatViewListItem> chatList = [
+  ChatViewListItem(
+    id: '2',
+    name: 'Simform',
+    unreadCount: 2,
+    lastMessage: Message(
+      id: '12',
+      sentBy: '2',
+      message: "🤩🤩",
+      createdAt: DateTime.now(),
+      status: MessageStatus.delivered,
+    ),
+    settings: ChatSettings(
+      pinTime: DateTime.now(),
+      pinStatus: PinStatus.pinned,
+    ),
+  ),
+  ChatViewListItem(
+    id: '1',
+    name: 'Flutter',
+    userActiveStatus: UserActiveStatus.online,
+    typingUsers: {const ChatUser(id: '1', name: 'Simform')},
+  ),
+];
+```
+
+# Advanced ChatViewList Usage
+
+ChatViewList offers extensive customization options to tailor the chat list UI to your specific needs.
+
+## Adding Custom Appbar
+
+```dart
+ChatViewList(
+  // ...
+  appbar: ChatViewListAppBar(
+    title: 'ChatViewList Demo',
+    centerTitle: false,
+    actions: [
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: () {
+          // Handle search action
+        },
+      ),
+    ],
+  ),
+  // ...
+)
+```
+
+## Adding Search Functionality
+
+```dart
+ChatViewList(
+  // ...
+  searchConfig: ChatViewListSearchConfig(
+     textEditingController: TextEditingController(),
+     debounceDuration: const Duration(milliseconds: 300),
+     onSearch: (value) async {
+       if (value.isEmpty) {
+         return null;
+       }
+       final list = chatListController?.chatListMap.values
+           .where((chat) =>
+               chat.name.toLowerCase().contains(value.toLowerCase()))
+           .toList();
+       return list;
+     },
+     border: const OutlineInputBorder(
+       borderRadius: BorderRadius.all(Radius.circular(10)),
+     )
+  ),
+  // ...
+)
+```
+
+## Adding Custom Header
+
+```dart
+ChatViewList(
+  /// ...
+  header: SizedBox(
+   height: 60,
+   child: ListView(
+     padding: const EdgeInsetsGeometry.all(12),
+     scrollDirection: Axis.horizontal,
+     children: [
+       FilterChip.elevated(
+         backgroundColor: Colors.grey.shade200,
+         label: Text(
+             'All Chats (${chatListController?.chatListMap.length ?? 0})'),
+         onSelected: (bool value) =>
+             chatListController?.clearSearch(),
+       ),
+       const SizedBox(width: 12),
+       FilterChip.elevated(
+         backgroundColor: Colors.grey.shade200,
+         label: const Text('Pinned Chats'),
+         onSelected: (bool value) {
+           chatListController?.setSearchChats(
+             chatListController?.chatListMap.values
+                     .where((e) => e.settings.pinStatus.isPinned)
+                     .toList() ??
+                 [],
+           );
+         },
+       ),
+       const SizedBox(width: 12),
+       FilterChip.elevated(
+         backgroundColor: Colors.grey.shade200,
+         label: const Text('Unread Chats'),
+         onSelected: (bool value) {
+           chatListController?.setSearchChats(
+             chatListController?.chatListMap.values
+                     .where((e) => (e.unreadCount ?? 0) > 0)
+                     .toList() ??
+                 [],
+           );
+         },
+       ),
+     ],
+   ),
+  // ...
+)
+```
+
+## Adding Custom Actions in Menu
+
+```dart
+ChatViewList(
+  // ...
+  menuConfig: ChatMenuConfig(
+    enabled: true,
+    actions: (chat) => [
+      CupertinoContextMenuAction(
+        trailingIcon: Icons.delete_forever,
+        onPressed: () {
+          Future.delayed(
+            // Call this after the animation of menu is completed
+            // To show the pin status change animation
+            const Duration(milliseconds: 800),
+            () => chatListController?.removeChat(chat.id),
+          );
+          Navigator.pop(context);
+        },
+        child: const Text('Delete Chat'),
+      ),
+    ],
+    pinStatusCallback: (result) {
+      Future.delayed(
+        // Call this after the animation of menu is completed
+        // To show the pin status change animation
+        const Duration(milliseconds: 800),
+        () => chatListController?.updateChat(
+          result.chat.id,
+          (previousChat) => previousChat.copyWith(
+            settings: previousChat.settings.copyWith(
+              pinStatus: result.status,
+            ),
+          ),
+        ),
+      );
+      Navigator.of(context).pop();
+    },
+    // ...
+  ),
+  // ...
+)
+```
+
+## Chat Tile Customization
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ChatViewListTileConfig(
+    // ...
+    onTap: (chat) {
+      // Handle chat tile tap
+    },
+    // Custom padding for chat tile
+    padding: const EdgeInsets.all(12),
+    middleWidgetPadding: const EdgeInsets.symmetric(horizontal: 12),
+    showOnlineStatus: true,
+    // Custom text styles for chat tile
+    lastMessageTextStyle: const TextStyle(color: Colors.red),
+    userNameTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+    // Custom builders for various parts of the chat tile
+    trailingBuilder: (chat) => const Placeholder(fallbackWidth: 40, fallbackHeight: 40),
+    userNameBuilder: (chat) => const Placeholder(fallbackHeight: 20),
+    lastMessageTileBuilder: (message) => const Placeholder(fallbackHeight: 20),
+    // ...
+  ),
+  // ...
+)
+```
+
+## Typing Indicator Configuration
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ChatViewListTileConfig(
+    // ...
+    listTypeIndicatorConfig: ListTypeIndicatorConfig(
+      // ...
+      suffix: '.....',
+      showUserNames: true,
+      textBuilder: (chat) => 'typing...',
+      widgetBuilder: (chat) => Placeholder(fallbackHeight: 12),
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+## Last Message Time Configuration
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ChatViewListTileConfig(
+    // ...
+    timeConfig: LastMessageTimeConfig(
+      // Specify to format dates older than yesterday
+      dateFormatPattern: 'MMM dd, yyyy',
+      spaceBetweenTimeAndUnreadCount: 8,
+      timeBuilder: (time) => Placeholder(fallbackHeight: 20, fallbackWidth: 20),
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+## Unread Count Configuration
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ChatViewListTileConfig(
+    // ...
+    unreadCountConfig: const UnreadCountConfig(
+      backgroundColor: Colors.green,
+      style: UnreadCountStyle.ninetyNinePlus,
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+## User Active Status Configuration
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ChatViewListTileConfig(
+    // ...
+    userActiveStatusConfig: const UserActiveStatusConfig(
+      color: Colors.blue,
+      shape: BoxShape.rectangle,
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+## User Avatar Configuration
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ChatViewListTileConfig(
+    // ...
+    userAvatarConfig: UserAvatarConfig(
+      backgroundColor: Colors.blue,
+      radius: 20,
+      onProfileTap: (value) {
+        // Your code here
+      },
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+# Basic ChatView Usage
 
 Here's how to integrate ChatView into your Flutter application with minimal setup:
 
@@ -167,7 +541,7 @@ void onSendTap(String message, ReplyMessage replyMessage, MessageType messageTyp
 
 > Note: You can evaluate message type from the 'messageType' parameter and perform operations accordingly.
 
-# Advanced Usage
+# Advanced ChatView Usage
 
 ChatView offers extensive customization options to tailor the chat UI to your specific needs.
 

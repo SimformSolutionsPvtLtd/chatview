@@ -52,6 +52,7 @@ class SearchConfig {
     this.border,
     this.suffixIcon,
     this.onSearch,
+    this.debounceDuration,
     this.decoration,
     this.maxLength,
   });
@@ -121,6 +122,9 @@ class SearchConfig {
 
   /// Callback function that is called when the search text changes.
   final SearchUserCallback? onSearch;
+
+  /// Duration to debounce the search callback.
+  final Duration? debounceDuration;
 
   /// Decoration for the search text field.
   final InputDecoration? decoration;

@@ -25,6 +25,8 @@ import '../../../values/typedefs.dart';
 import '../../chat_view_list_item.dart';
 import 'last_message_time_config.dart';
 import 'list_type_indicator_config.dart';
+import 'mute_icon_config.dart';
+import 'pin_icon_config.dart';
 import 'unread_count_config.dart';
 import 'user_active_status_config.dart';
 import 'user_avatar_config.dart';
@@ -34,6 +36,8 @@ class ListTileConfig {
   /// Creates a configuration object for the user widget in the chat list UI.
   const ListTileConfig({
     this.showOnlineStatus = true,
+    this.muteIconConfig = const MuteIconConfig(),
+    this.pinIconConfig = const PinIconConfig(),
     this.timeConfig = const LastMessageTimeConfig(),
     this.userAvatarConfig = const UserAvatarConfig(),
     this.unreadCountConfig = const UnreadCountConfig(),
@@ -50,12 +54,20 @@ class ListTileConfig {
     this.onTap,
     this.onLongPress,
     this.lastMessageTileBuilder,
+    this.userNameBuilder,
+    this.trailingBuilder,
   });
 
   /// Padding around the widget in the chat list.
   ///
   /// Defaults to `EdgeInsets.symmetric(vertical: 6, horizontal: 8)`.
   final EdgeInsets padding;
+
+  /// Custom widget builder for the user name in the chat list.
+  final UserNameBuilder? userNameBuilder;
+
+  /// Custom widget builder for the trailing widget in the chat list.
+  final TrailingBuilder? trailingBuilder;
 
   /// Text styles for various text elements in the user widget.
   final TextStyle? userNameTextStyle;
@@ -119,4 +131,10 @@ class ListTileConfig {
 
   /// Configuration for the typing status indicator in the chat list.
   final TypingStatusConfig typingStatusConfig;
+
+  /// Configuration for the mute icon in the chat list.
+  final MuteIconConfig muteIconConfig;
+
+  /// Configuration for the pin icon in the chat list.
+  final PinIconConfig pinIconConfig;
 }

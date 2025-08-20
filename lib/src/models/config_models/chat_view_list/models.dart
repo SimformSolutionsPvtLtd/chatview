@@ -19,11 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+export 'chat_settings.dart';
 export 'chat_view_list_config.dart';
 export 'list_tile_config.dart';
 export 'last_message_time_config.dart';
 export 'list_type_indicator_config.dart';
 export 'load_more_config.dart';
+export 'mute_icon_config.dart';
+export 'pin_icon_config.dart';
 export 'search_config.dart';
 export 'unread_count_config.dart';
 export 'user_active_status_config.dart';

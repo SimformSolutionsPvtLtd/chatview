@@ -12,6 +12,7 @@ class UserAvatarConfig {
     this.backgroundColor,
     this.onBackgroundImageError,
     this.onProfileTap,
+    this.avatarBuilder,
   });
 
   /// Radius for the circle avatar in the profile widget.
@@ -27,4 +28,7 @@ class UserAvatarConfig {
 
   /// Callback function that is called when the profile widget is tapped.
   final ValueSetter<ChatViewListItem>? onProfileTap;
+
+  /// Builder function to create a custom avatar widget.
+  final UserAvatarBuilder? avatarBuilder;
 }

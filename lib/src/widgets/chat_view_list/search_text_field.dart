@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 
 import '../../controller/chat_list_view_controller.dart';
 import '../../models/config_models/chat_view_list/search_config.dart';
+import '../../utils/debounce.dart';
 import '../../utils/package_strings.dart';
 
 class SearchTextField extends StatefulWidget {
@@ -49,6 +50,10 @@ class SearchTextField extends StatefulWidget {
 
 class _SearchTextFieldState extends State<SearchTextField> {
   final ValueNotifier<String> _inputText = ValueNotifier('');
+
+  late final _debouncer = _config.debounceDuration == null
+      ? null
+      : Debouncer(_config.debounceDuration!);
 
   SearchConfig get _config => widget.config;
 
@@ -121,6 +126,14 @@ class _SearchTextFieldState extends State<SearchTextField> {
 
   FutureOr<void> _onSearchChanged(String value) async {
     _inputText.value = value;
+    if (_debouncer != null) {
+      _debouncer.run(onComplete: () => _performSearch(value));
+    } else {
+      await _performSearch(value);
+    }
+  }
+
+  FutureOr<void> _performSearch(String value) async {
     final chatList = await _config.onSearch?.call(value);
     if (chatList != null) {
       widget.chatViewListController?.setSearchChats(chatList);

@@ -246,11 +246,19 @@ extension MuteStatusExtension on MuteStatus {
     };
   }
 
+  /// {@template chatview.extensions.MuteStatus.menuName}
+  /// - `MuteStatus.muted` -> `PackageStrings.currentLocale.mute`
+  /// - `MuteStatus.unmuted` -> `PackageStrings.currentLocale.unmute`
+  /// {@endtemplate}
   String get menuName => switch (this) {
         MuteStatus.muted => PackageStrings.currentLocale.mute,
         MuteStatus.unmuted => PackageStrings.currentLocale.unmute,
       };
 
+  /// {@template chatview.extensions.MuteStatus.iconData}
+  /// - `MuteStatus.muted` -> `Icons.notifications_off_outlined`
+  /// - `MuteStatus.unmuted` -> `Icons.notifications_outlined`
+  /// {@endtemplate}
   IconData get iconData => switch (this) {
         MuteStatus.muted => Icons.notifications_off_outlined,
         MuteStatus.unmuted => Icons.notifications_outlined,
@@ -270,11 +278,19 @@ extension PinStatusExtension on PinStatus {
     };
   }
 
+  /// {@template chatview.extensions.PinStatus.menuName}
+  /// - `PinStatus.pinned` -> `PackageStrings.currentLocale.pin`
+  /// - `PinStatus.unpinned` -> `PackageStrings.currentLocale.unpin`
+  /// {@endtemplate}
   String get menuName => switch (this) {
         PinStatus.pinned => PackageStrings.currentLocale.pin,
         PinStatus.unpinned => PackageStrings.currentLocale.unpin,
       };
 
+  /// {@template chatview.extensions.PinStatus.iconData}
+  /// - `PinStatus.pinned` -> `Icons.push_pin`
+  /// - `PinStatus.unpinned` -> `Icons.push_pin_outlined`
+  /// {@endtemplate}
   IconData get iconData => switch (this) {
         PinStatus.pinned => Icons.push_pin,
         PinStatus.unpinned => Icons.push_pin_outlined,
@@ -284,6 +300,10 @@ extension PinStatusExtension on PinStatus {
 /// Extension for [UserActiveStatus] providing utilities
 /// for displaying user active/inactive status colors.
 extension UserActiveStatusExtension on UserActiveStatus {
+  /// {@template chatview.extensions.UserActiveStatus.indicatorColor}
+  /// - `UserActiveStatus.online` -> `Colors.green`
+  /// - `UserActiveStatus.offline` -> `Colors.grey`
+  /// {@endtemplate}
   Color get indicatorColor => switch (this) {
         UserActiveStatus.online => Colors.green,
         UserActiveStatus.offline => Colors.grey,
@@ -332,4 +352,31 @@ extension AsyncSnapshotExtension<T> on AsyncSnapshot<List<T>> {
       return ChatViewState.noData;
     }
   }
+}
+
+extension MessageStatusExtension on MessageStatus {
+  /// {@template chatview.extensions.MessageStatus.icon}
+  /// - `MessageStatus.read` -> `Icons.done_all`
+  /// - `MessageStatus.delivered` -> `Icons.done_all`
+  /// - `MessageStatus.pending` -> `Icons.schedule`
+  /// - `MessageStatus.undelivered` -> `Icons.error_outline`
+  /// {@endtemplate}
+  IconData get icon => switch (this) {
+        MessageStatus.read => Icons.done_all,
+        MessageStatus.delivered => Icons.done_all,
+        MessageStatus.pending => Icons.schedule,
+        MessageStatus.undelivered => Icons.error_outline,
+      };
+
+  /// {@template chatview.extensions.MessageStatus.iconColor}
+  /// - `MessageStatus.read` -> `Colors.green`
+  /// - `MessageStatus.delivered` -> `Colors.grey`
+  /// - `MessageStatus.pending` -> `Colors.grey`
+  /// - `MessageStatus.undelivered` -> `Colors.red`
+  /// {@endtemplate}
+  Color get iconColor => switch (this) {
+        MessageStatus.read => Colors.green,
+        MessageStatus.undelivered => Colors.red,
+        MessageStatus.delivered || MessageStatus.pending => Colors.grey,
+      };
 }

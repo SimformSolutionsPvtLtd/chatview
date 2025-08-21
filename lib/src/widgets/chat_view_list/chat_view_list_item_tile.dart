@@ -138,8 +138,8 @@ class ChatViewListItemTile extends StatelessWidget {
                                       ? null
                                       : ValueKey(lastMessage?.id),
                                   unreadCount: unreadCount,
-                                  lastMessage: lastMessage,
-                                  lastMessageType: lastMessage?.messageType,
+                                  lastMessage: lastMessage!,
+                                  lastMessageType: lastMessage.messageType,
                                   lastMessageMaxLines:
                                       config.lastMessageMaxLines,
                                   lastMessageTextOverflow:
@@ -149,6 +149,13 @@ class ChatViewListItemTile extends StatelessWidget {
                                   lastMessageBuilder: config
                                       .lastMessageTileBuilder
                                       ?.call(lastMessage),
+                                  statusConfig: config.lastMessageStatusConfig,
+                                  showStatusIcon:
+                                      config.showLastMessageStatus &&
+                                          (config.lastMessageStatusConfig
+                                                  .showStatusFor
+                                                  ?.call(lastMessage) ??
+                                              true),
                                 ),
                         ),
                     ],

@@ -22,11 +22,19 @@ class Data {
         pinTime: DateTime.now().toUtc(),
       ),
     ),
-    const ChatViewListItem(
+    ChatViewListItem(
       id: '1',
       name: 'Flutter',
       imageUrl: Data.profileImage,
       userActiveStatus: UserActiveStatus.online,
+      lastMessage: Message(
+        id: '13',
+        sentBy: '1',
+        message: "https://example.com/image.png",
+        messageType: MessageType.image,
+        createdAt: DateTime.now().subtract(const Duration(hours: 2)).toUtc(),
+        status: MessageStatus.delivered,
+      ),
     ),
   ];
 

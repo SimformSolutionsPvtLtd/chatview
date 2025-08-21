@@ -351,7 +351,6 @@ ChatViewList(
     // Custom padding for chat tile
     padding: const EdgeInsets.all(12),
     middleWidgetPadding: const EdgeInsets.symmetric(horizontal: 12),
-    showUserActiveStatusIndicator: true,
     // Custom text styles for chat tile
     lastMessageTextStyle: const TextStyle(color: Colors.red),
     userNameTextStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -397,6 +396,35 @@ ChatViewList(
       dateFormatPattern: 'MMM dd, yyyy',
       spaceBetweenTimeAndUnreadCount: 8,
       timeBuilder: (time) => Placeholder(fallbackHeight: 20, fallbackWidth: 20),
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+## Last Message Status Configuration
+
+```dart
+ChatViewList(
+  // ...
+  tileConfig: ListTileConfig(
+    // ...
+    lastMessageStatusConfig: LastMessageStatusConfig(
+      showStatusFor: (message) => message.sentBy == '2',
+      color: (status) => switch (status) {
+        MessageStatus.read => Colors.blue,
+        MessageStatus.delivered ||
+        MessageStatus.undelivered ||
+        MessageStatus.pending =>
+          Colors.grey,
+      },
+      icon: (status) => switch (status) {
+        MessageStatus.read => Icons.done_all_rounded,
+        MessageStatus.delivered => Icons.done_rounded,
+        MessageStatus.undelivered => Icons.error_outline_rounded,
+        MessageStatus.pending => Icons.schedule_rounded,
+      },
     ),
     // ...
   ),

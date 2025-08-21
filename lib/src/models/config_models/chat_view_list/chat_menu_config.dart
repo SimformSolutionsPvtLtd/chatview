@@ -79,9 +79,15 @@ class ChatMenuConfig {
   final Duration? callbackDelayDuration;
 
   /// Custom icon for mute status menu item.
+  ///
+  /// Defaults to:
+  /// {@macro chatview.extensions.MuteStatus.iconData}
   final StatusTrailingIcon<MuteStatus>? muteStatusIcon;
 
   /// Custom icon for pin status menu item.
+  ///
+  /// Defaults to:
+  /// {@macro chatview.extensions.PinStatus.iconData}
   final StatusTrailingIcon<PinStatus>? pinStatusIcon;
 
   /// Custom icon for delete menu item.

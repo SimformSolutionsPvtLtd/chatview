@@ -158,3 +158,15 @@ typedef PaginationScrollUpdateResult = ({
   ChatPaginationDirection? direction,
   Message? message,
 });
+typedef MessageStatusIconEnableCallback = bool Function(
+  Message message,
+);
+typedef MessageStatusColorResolver = Color Function(
+  MessageStatus status,
+);
+typedef MessageStatusIconResolver = IconData Function(
+  MessageStatus status,
+);
+typedef MessageStatusBuilder = Widget Function(
+  MessageStatus status,
+);

@@ -248,14 +248,13 @@ class _ChatViewState extends State<ChatView>
                             if (chatViewState.isLoading)
                               ChatViewStateWidget(
                                 type: ChatViewStateType.chatView,
-                                chatViewStateWidgetConfig:
-                                    chatViewStateConfig.loadingWidgetConfig,
+                                config: chatViewStateConfig.loadingWidgetConfig,
                                 chatViewState: chatViewState,
                               )
                             else if (chatViewState.noMessages)
                               ChatViewStateWidget(
                                 type: ChatViewStateType.chatView,
-                                chatViewStateWidgetConfig:
+                                config:
                                     chatViewStateConfig.noMessageWidgetConfig,
                                 chatViewState: chatViewState,
                                 onReloadButtonTap:
@@ -264,8 +263,7 @@ class _ChatViewState extends State<ChatView>
                             else if (chatViewState.isError)
                               ChatViewStateWidget(
                                 type: ChatViewStateType.chatView,
-                                chatViewStateWidgetConfig:
-                                    chatViewStateConfig.errorWidgetConfig,
+                                config: chatViewStateConfig.errorWidgetConfig,
                                 chatViewState: chatViewState,
                                 onReloadButtonTap:
                                     chatViewStateConfig.onReloadButtonTap,

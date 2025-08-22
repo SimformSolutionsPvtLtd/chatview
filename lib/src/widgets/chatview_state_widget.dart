@@ -24,25 +24,29 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
-import '../models/config_models/chat_view_states_configuration.dart';
+import '../models/config_models/chat_view_state_widget_config.dart';
 import '../utils/package_strings.dart';
 import '../values/enumeration.dart';
+import 'chat_view_list/adaptive_progress_indicator.dart';
 
 class ChatViewStateWidget extends StatelessWidget {
   const ChatViewStateWidget({
     required this.type,
-    required this.chatViewStateWidgetConfig,
+    required this.config,
     required this.chatViewState,
+    this.title,
     this.onReloadButtonTap,
     super.key,
   });
+
+  final String? title;
 
   /// Creates a widget that displays different states of the chat view.
   final ChatViewStateType type;
 
   /// Provides configuration of chat view's different states such as text styles,
   /// widgets and etc.
-  final ChatViewStateWidgetConfiguration chatViewStateWidgetConfig;
+  final ChatViewStateWidgetConfiguration config;
 
   /// Provides current state of chat view.
   final ChatViewState chatViewState;
@@ -54,47 +58,41 @@ class ChatViewStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: chatViewStateWidgetConfig.widget ??
+      child: config.widget ??
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                switch (type) {
-                  ChatViewStateType.chatView => chatViewStateWidgetConfig.title
-                      .getChatViewStateTitle(chatViewState),
-                  ChatViewStateType.chatViewList => chatViewStateWidgetConfig
-                      .title
-                      .getChatViewStateListTitle(chatViewState),
-                },
-                style: chatViewStateWidgetConfig.titleTextStyle ??
-                    const TextStyle(
-                      fontSize: 22,
-                    ),
+                title ??
+                    switch (type) {
+                      ChatViewStateType.chatView =>
+                        config.title.getChatViewStateTitle(chatViewState),
+                      ChatViewStateType.chatViewList =>
+                        config.title.getChatViewListStateTitle(chatViewState),
+                    },
+                style: config.titleTextStyle,
               ),
-              if (chatViewStateWidgetConfig.subTitle != null)
+              if (config.subTitle case final subtitle?)
                 Text(
-                  (chatViewStateWidgetConfig.subTitle)!,
-                  style: chatViewStateWidgetConfig.subTitleTextStyle,
+                  subtitle,
+                  style: config.subTitleTextStyle,
                 ),
               if (chatViewState.isLoading)
-                CircularProgressIndicator(
-                  color: chatViewStateWidgetConfig.loadingIndicatorColor,
+                AdaptiveProgressIndicator(
+                  color: config.loadingIndicatorColor,
+                  size: config.loadingIndicatorSize,
                 ),
-              if (chatViewStateWidgetConfig.imageWidget != null)
-                (chatViewStateWidgetConfig.imageWidget)!,
-              if (chatViewStateWidgetConfig.reloadButton != null)
-                (chatViewStateWidgetConfig.reloadButton)!,
-              if (chatViewStateWidgetConfig.showDefaultReloadButton &&
-                  chatViewStateWidgetConfig.reloadButton == null &&
+              if (config.imageWidget case final image?) image,
+              if (config.reloadButton case final reload?)
+                reload
+              else if (config.showDefaultReloadButton &&
                   (chatViewState.isError || chatViewState.noMessages)) ...[
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: onReloadButtonTap,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        chatViewStateWidgetConfig.reloadButtonColor ??
-                            const Color(0xffEE5366),
+                    backgroundColor: config.reloadButtonColor,
                   ),
                   child: Text(PackageStrings.currentLocale.reload),
                 )

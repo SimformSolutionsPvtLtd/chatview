@@ -28,6 +28,7 @@ class LoadMoreConfig {
   /// Creates a configuration object for the load more chat list widget.
   const LoadMoreConfig({
     this.padding = const EdgeInsets.symmetric(vertical: 16),
+    this.size = loadMoreCircularProgressIndicatorSize,
     this.color = primaryColor,
     this.loadMoreBuilder,
   });
@@ -46,4 +47,9 @@ class LoadMoreConfig {
   ///
   /// Defaults to chatview `primaryColor`.
   final Color? color;
+
+  /// Size for the loading indicator.
+  ///
+  /// Defaults to `36.0`.
+  final double size;
 }

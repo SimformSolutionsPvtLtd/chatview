@@ -25,11 +25,11 @@ import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view_list/chat_menu_config.dart';
+import '../../models/config_models/chat_view_list/list_state_config.dart';
 import '../../models/config_models/chat_view_list/list_tile_config.dart';
 import '../../models/config_models/chat_view_list/load_more_config.dart';
 import '../../models/config_models/chat_view_list/search_config.dart';
-import '../../models/config_models/chat_view_states_configuration.dart';
-import '../../utils/constants/constants.dart';
+import '../../utils/package_strings.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../chatview_state_widget.dart';
@@ -50,7 +50,7 @@ class ChatViewList extends StatefulWidget {
     this.backgroundColor = Colors.white,
     this.loadMoreConfig = const LoadMoreConfig(),
     this.tileConfig = const ListTileConfig(),
-    this.stateConfig = const ChatViewStateConfiguration(),
+    this.stateConfig = const ListStateConfig(),
     this.searchConfig,
     this.chatBuilder,
     this.appbar,
@@ -115,9 +115,11 @@ class ChatViewList extends StatefulWidget {
   ///
   /// For example:
   /// - if the stream has no data, it will show a no data state.
-  /// if the stream is loading, it will show a loading state.
-  /// If there is an error in stream, it will show an error state.
-  final ChatViewStateConfiguration stateConfig;
+  /// - if the stream has no data, and user is searching, it will show
+  /// a no search data state.
+  /// - if the stream is loading, it will show a loading state.
+  /// - If there is an error in stream, it will show an error state.
+  final ListStateConfig stateConfig;
 
   @override
   State<ChatViewList> createState() => _ChatViewListState();
@@ -128,6 +130,8 @@ class _ChatViewListState extends State<ChatViewList> {
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
 
   LoadMoreConfig get _loadMoreConfig => widget.loadMoreConfig;
+
+  ChatViewListController get _controller => widget.controller;
 
   ScrollController get _scrollController => widget.controller.scrollController;
 
@@ -147,19 +151,19 @@ class _ChatViewListState extends State<ChatViewList> {
       slivers: [
         if (widget.appbar case final appbar?) appbar,
         if (widget.searchConfig case final config?)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: config.padding,
+          SliverPadding(
+            padding: config.padding,
+            sliver: SliverToBoxAdapter(
               child: SearchTextField(
                 config: config,
-                disposeResources: widget.controller.disposeOtherResources,
-                chatViewListController: widget.controller,
+                chatViewListController: _controller,
+                disposeResources: _controller.disposeOtherResources,
               ),
             ),
           ),
         if (widget.header case final header?) SliverToBoxAdapter(child: header),
         StreamBuilder<List<ChatViewListItem>>(
-          stream: widget.controller.chatListStream,
+          stream: _controller.chatListStream,
           builder: (context, snapshot) {
             final chats = snapshot.data ?? List.empty();
             final state = snapshot.chatViewState;
@@ -167,7 +171,9 @@ class _ChatViewListState extends State<ChatViewList> {
               ChatViewState.hasMessages =>
                 AutoAnimateSliverList<ChatViewListItem>(
                   items: chats,
-                  controller: widget.controller.animatedListController
+                  controller: _controller.animatedListController
+                    // Update the items in the animated list controller
+                    // whenever the chat list changes
                     ..updateItems(chats),
                   builder: (context, _, __, chat) {
                     final child = widget.chatBuilder?.call(context, chat) ??
@@ -187,28 +193,35 @@ class _ChatViewListState extends State<ChatViewList> {
                   },
                 ),
               ChatViewState.noData => SliverFillRemaining(
-                  child: ChatViewStateWidget(
-                    chatViewState: state,
-                    type: ChatViewStateType.chatViewList,
-                    chatViewStateWidgetConfig:
-                        widget.stateConfig.noMessageWidgetConfig,
-                    onReloadButtonTap: widget.stateConfig.onReloadButtonTap,
-                  ),
+                  child: _controller.isSearching
+                      ? ChatViewStateWidget(
+                          chatViewState: state,
+                          title: widget.stateConfig.noSearchChatsWidgetConfig
+                                  .title ??
+                              PackageStrings.currentLocale.noSearchResults,
+                          type: ChatViewStateType.chatViewList,
+                          config: widget.stateConfig.noSearchChatsWidgetConfig,
+                        )
+                      : ChatViewStateWidget(
+                          chatViewState: state,
+                          type: ChatViewStateType.chatViewList,
+                          config: widget.stateConfig.noChatsWidgetConfig,
+                          onReloadButtonTap:
+                              widget.stateConfig.onReloadButtonTap,
+                        ),
                 ),
               ChatViewState.loading => SliverFillRemaining(
                   child: ChatViewStateWidget(
                     chatViewState: state,
                     type: ChatViewStateType.chatViewList,
-                    chatViewStateWidgetConfig:
-                        widget.stateConfig.loadingWidgetConfig,
+                    config: widget.stateConfig.loadingWidgetConfig,
                   ),
                 ),
               ChatViewState.error => SliverFillRemaining(
                   child: ChatViewStateWidget(
                     chatViewState: state,
                     type: ChatViewStateType.chatViewList,
-                    chatViewStateWidgetConfig:
-                        widget.stateConfig.errorWidgetConfig,
+                    config: widget.stateConfig.errorWidgetConfig,
                     onReloadButtonTap: widget.stateConfig.onReloadButtonTap,
                   ),
                 ),
@@ -227,7 +240,7 @@ class _ChatViewListState extends State<ChatViewList> {
                   child: _loadMoreConfig.loadMoreBuilder ??
                       AdaptiveProgressIndicator(
                         color: _loadMoreConfig.color,
-                        size: loadMoreCircularProgressIndicatorSize * 0.5,
+                        size: _loadMoreConfig.size,
                       ),
                 ),
               );

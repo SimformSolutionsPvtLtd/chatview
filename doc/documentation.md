@@ -338,7 +338,7 @@ ChatViewList(
 )
 ```
 
-## Chat Tile Customization
+## Chat Tile Configuration
 
 ```dart
 ChatViewList(
@@ -458,6 +458,41 @@ ChatViewList(
       },
     ),
     // ...
+  ),
+  // ...
+)
+```
+
+## ChatViewList States Configuration 
+
+```
+ChatViewList(
+  // ...
+  stateConfig: const ListStateConfig(
+    noChatsWidgetConfig: ChatViewStateWidgetConfiguration(
+      title: 'No Chats',
+      subTitle: 'Start a new chat now!',
+      showDefaultReloadButton: false,
+    ),
+    noSearchChatsWidgetConfig: ChatViewStateWidgetConfiguration(
+      title: 'No Chats Found',
+      subTitle: 'Try searching with different keywords.',
+      showDefaultReloadButton: false,
+    ),
+    // ...
+  ),
+  // ...
+)
+```
+
+## Load More Chats Configuration
+
+```
+ChatViewList(
+  // ...
+  loadMoreConfig: LoadMoreConfig(
+    size: 30,
+    color: Colors.blue,
   ),
   // ...
 )

@@ -97,3 +97,8 @@ typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
   T value,
   Widget? child,
 );
+typedef TextFieldActionWidgetBuilder = List<Widget> Function(
+  BuildContext context,
+  TextEditingController controller,
+);
+

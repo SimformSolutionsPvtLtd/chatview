@@ -35,8 +35,7 @@ class UserActiveStatusConfig {
   /// Color of the online/offline status indicator.
   ///
   /// Defaults to:
-  /// `Colors.green` for `UserActiveStatus.online`,
-  /// `Colors.grey` for `UserActiveStatus.offline`,
+  /// {@macro chatview.extensions.UserActiveStatus.indicatorColor}
   final ActiveStatusIndicatorColorResolver? color;
 
   /// Size of the active status indicator.

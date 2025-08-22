@@ -23,6 +23,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../../values/typedefs.dart';
+import 'last_message_status_config.dart';
 import 'last_message_time_config.dart';
 import 'list_type_indicator_config.dart';
 import 'mute_icon_config.dart';
@@ -35,6 +36,7 @@ import 'user_avatar_config.dart';
 class ListTileConfig {
   /// Creates a configuration object for the user widget in the chat list UI.
   const ListTileConfig({
+    this.showLastMessageStatus = true,
     this.showUserActiveStatusIndicator = true,
     this.muteIconConfig = const MuteIconConfig(),
     this.pinIconConfig = const PinIconConfig(),
@@ -49,6 +51,7 @@ class ListTileConfig {
     this.lastMessageTextOverflow = TextOverflow.ellipsis,
     this.middleWidgetPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.padding = const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+    this.lastMessageStatusConfig = const LastMessageStatusConfig(),
     this.userNameTextStyle,
     this.lastMessageTextStyle,
     this.onTap,
@@ -122,6 +125,12 @@ class ListTileConfig {
   /// Note: This is only applicable for one-to-one chats.
   /// Group chats will not show online status.
   final bool showUserActiveStatusIndicator;
+
+  /// Configuration for last message status in the chat list.
+  final LastMessageStatusConfig lastMessageStatusConfig;
+
+  /// Whether to show the last message status (read/delivered/undelivered/pending)
+  final bool showLastMessageStatus;
 
   /// Custom builder for the last message view in the chat list.
   final ChatViewListLastMessageTileBuilder? lastMessageTileBuilder;

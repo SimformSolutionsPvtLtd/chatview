@@ -117,6 +117,9 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                 userActiveStatusConfig: const UserActiveStatusConfig(
                   alignment: UserActiveStatusAlignment.topRight,
                 ),
+                lastMessageStatusConfig: LastMessageStatusConfig(
+                  showStatusFor: (message) => message.sentBy == '2',
+                ),
                 typingStatusConfig: const TypingStatusConfig(
                   showUserNames: true,
                 ),

@@ -104,6 +104,8 @@ class ChatListTileContextMenu extends StatelessWidget {
     if (callbackDelayDuration == null) {
       callback.call();
     } else {
+      // Call this after the animation of menu is completed
+      // To show chatview list animation
       Future.delayed(callbackDelayDuration, callback);
     }
     Navigator.of(context).pop();

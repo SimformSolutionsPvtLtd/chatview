@@ -88,6 +88,7 @@ class _SuggestionListState extends State<SuggestionList>
     final suggestionsListConfig =
         suggestionsConfig?.listConfig ?? const SuggestionListConfig();
     return Container(
+      alignment: suggestionsListConfig.axisAlignment.alignment,
       decoration: suggestionsListConfig.decoration,
       padding:
           suggestionsListConfig.padding ?? const EdgeInsets.only(left: 8.0),
@@ -137,6 +138,8 @@ class _SuggestionListState extends State<SuggestionList>
             suggestionsItemConfig?.customItemBuilder?.call(index, suggestion) ??
             Padding(
               padding: EdgeInsets.only(
+                // To keep space between text field and suggestion list
+                bottom: 8,
                 right: index == suggestions.length
                     ? 0
                     : suggestionsListConfig.itemSeparatorWidth,

@@ -21,19 +21,19 @@
  */
 
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/feature_active_config.dart';
 import '../models/config_models/message_list_configuration.dart';
 import '../models/config_models/send_message_configuration.dart';
-import '../models/config_models/suggestion_list_config.dart';
 import '../values/enumeration.dart';
 import '../values/typedefs.dart';
 import 'chat_bubble_widget.dart';
 import 'chat_group_header.dart';
-import 'suggestions/suggestion_list.dart';
-import 'type_indicator_widget.dart';
+import 'end_message_footer.dart';
+import 'pagination_loader.dart';
 
 class ChatGroupedListWidget extends StatefulWidget {
   const ChatGroupedListWidget({
@@ -44,11 +44,10 @@ class ChatGroupedListWidget extends StatefulWidget {
     required this.onChatListTap,
     required this.onChatBubbleLongPress,
     required this.isEnableSwipeToSeeTime,
-    required this.prevPageLoadingNotifier,
-    required this.nextPageLoadingNotifier,
     this.textFieldConfig,
     this.loadMoreData,
     this.isLastPage,
+    this.loadingWidget,
   }) : super(key: key);
 
   /// Allow user to swipe to see time while reaction pop is not open.
@@ -73,12 +72,6 @@ class ChatGroupedListWidget extends StatefulWidget {
   /// Provides configuration for text field.
   final TextFieldConfiguration? textFieldConfig;
 
-  /// Provides notifier for previous page loading.
-  final ValueNotifier<bool> prevPageLoadingNotifier;
-
-  /// Provides notifier for next page loading.
-  final ValueNotifier<bool> nextPageLoadingNotifier;
-
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
   final PaginationCallback? loadMoreData;
@@ -86,12 +79,18 @@ class ChatGroupedListWidget extends StatefulWidget {
   /// Provides flag if there is no more next data left in list.
   final ValueGetter<bool>? isLastPage;
 
+  /// Provides widget for loading view while pagination is enabled.
+  final Widget? loadingWidget;
+
   @override
   State<ChatGroupedListWidget> createState() => _ChatGroupedListWidgetState();
 }
 
 class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     with TickerProviderStateMixin {
+  final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isPrevPageLoading = ValueNotifier<bool>(false);
+
   bool get showPopUp => widget.showPopUp;
 
   bool highlightMessage = false;
@@ -114,6 +113,9 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
   bool get isPaginationEnabled =>
       featureActiveConfig?.enablePagination ?? false;
+
+  ValueListenable<bool>? get typingIndicatorNotifier =>
+      chatController?.typingIndicatorNotifier;
 
   @override
   void initState() {
@@ -148,42 +150,19 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
   @override
   Widget build(BuildContext context) {
-    final suggestionsListConfig =
-        suggestionsConfig?.listConfig ?? const SuggestionListConfig();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onHorizontalDragUpdate:
-                isEnableSwipeToSeeTime && !showPopUp ? _onHorizontalDrag : null,
-            onHorizontalDragEnd: isEnableSwipeToSeeTime && !showPopUp
-                ? (_) => _animationController?.reverse()
-                : null,
-            onTap: widget.onChatListTap,
-            child: _animationController == null
-                ? _chatStreamBuilder
-                : AnimatedBuilder(
-                    animation: _animationController!,
-                    builder: (_, __) => _chatStreamBuilder,
-                  ),
-          ),
-        ),
-        if (chatController?.typingIndicatorNotifier case final notifier?)
-          ValueListenableBuilder(
-            valueListenable: notifier,
-            builder: (_, showIndicator, __) => TypingIndicator(
-              typeIndicatorConfig: chatListConfig.typeIndicatorConfig,
-              chatBubbleConfig:
-                  chatListConfig.chatBubbleConfig?.inComingChatBubbleConfig,
-              showIndicator: showIndicator,
+    return GestureDetector(
+      onHorizontalDragUpdate:
+          isEnableSwipeToSeeTime && !showPopUp ? _onHorizontalDrag : null,
+      onHorizontalDragEnd: isEnableSwipeToSeeTime && !showPopUp
+          ? (_) => _animationController?.reverse()
+          : null,
+      onTap: widget.onChatListTap,
+      child: _animationController == null
+          ? _chatStreamBuilder
+          : AnimatedBuilder(
+              animation: _animationController!,
+              builder: (_, __) => _chatStreamBuilder,
             ),
-          ),
-        Align(
-          alignment: suggestionsListConfig.axisAlignment.alignment,
-          child: const SuggestionList(),
-        ),
-      ],
     );
   }
 
@@ -298,6 +277,8 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
   void dispose() {
     _animationController?.dispose();
     _replyId.dispose();
+    _isNextPageLoading.dispose();
+    _isPrevPageLoading.dispose();
     super.dispose();
   }
 
@@ -331,27 +312,48 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
             _initMessageKeys(messages);
           }
 
-          return ValueListenableBuilder(
-            valueListenable: _listKey,
-            builder: (context, key, _) =>
-                NotificationListener<ScrollUpdateNotification>(
-              onNotification: (notification) => _onScrollUpdateNotification(
-                notification,
-                messages,
-              ),
-              child: ListView.builder(
-                key: key,
+          final messageLength = messages.length;
+
+          var itemCount = enableSeparator
+              ? messageLength + messageSeparator.length
+              : messageLength;
+
+          return NotificationListener<ScrollUpdateNotification>(
+            onNotification: (notification) => _onScrollUpdateNotification(
+              notification,
+              messages,
+            ),
+            child: ListenableBuilder(
+              listenable: Listenable.merge([
+                _listKey,
+                chatViewIW?.chatTextFieldHeight,
+                _isNextPageLoading,
+                _isPrevPageLoading,
+              ]),
+              builder: (context, child) => ListView.builder(
+                key: _listKey.value,
                 controller: widget.scrollController,
                 // When reaction popup is being appeared at that user should not
                 // scroll.
                 physics:
                     showPopUp ? const NeverScrollableScrollPhysics() : null,
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.only(
+                  // Adds bottom space to the message list, ensuring it is displayed
+                  // above the message text field.
+                  bottom: chatViewIW?.chatTextFieldHeight.value ?? 0,
+                ),
                 reverse: true,
-                itemCount: (enableSeparator
-                    ? messages.length + messageSeparator.length
-                    : messages.length),
+                itemCount: _isPrevPageLoading.value ? ++itemCount : itemCount,
                 itemBuilder: (context, index) {
+                  // Since the list is reversed, check if it's the last item
+                  // to display the loading widget at top.
+                  if (_isPrevPageLoading.value && index == itemCount - 1) {
+                    return PaginationLoader(
+                      listenable: _isPrevPageLoading,
+                      loader: widget.loadingWidget,
+                    );
+                  }
+
                   /// Check [messageSeparator] contains group separator for [index]
                   if (enableSeparator && messageSeparator.containsKey(index)) {
                     final separator = messageSeparator[index]!;
@@ -368,7 +370,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                   /// so that we'll get actual index to display message in chat
                   var newIndex = index - (separatorCounts[index] ?? 0);
 
-                  return ValueListenableBuilder<String?>(
+                  final messageChild = ValueListenableBuilder<String?>(
                     valueListenable: _replyId,
                     builder: (context, state, child) {
                       final message = messages[newIndex];
@@ -397,6 +399,18 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                       );
                     },
                   );
+
+                  return index != 0
+                      ? messageChild
+                      // Since the list is reversed, we need to check if
+                      // we are at the first item to display the typing indicator
+                      // , suggestions and loading widget.
+                      : EndMessageFooter(
+                          loadingWidget: widget.loadingWidget,
+                          isNextPageLoading: _isNextPageLoading,
+                          typingIndicatorNotifier: typingIndicatorNotifier,
+                          child: messageChild,
+                        );
                 },
               ),
             ),
@@ -527,17 +541,17 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
     switch (direction) {
       case ChatPaginationDirection.previous:
-        if (widget.prevPageLoadingNotifier.value) return;
-        widget.prevPageLoadingNotifier.value = true;
+        if (_isPrevPageLoading.value) return;
+        _isPrevPageLoading.value = true;
         widget.loadMoreData
             ?.call(direction, message)
-            .whenComplete(() => widget.prevPageLoadingNotifier.value = false);
+            .whenComplete(() => _isPrevPageLoading.value = false);
       case ChatPaginationDirection.next:
-        if (widget.nextPageLoadingNotifier.value) return;
-        widget.nextPageLoadingNotifier.value = true;
+        if (_isNextPageLoading.value) return;
+        _isNextPageLoading.value = true;
         widget.loadMoreData
             ?.call(direction, message)
-            .whenComplete(() => widget.nextPageLoadingNotifier.value = false);
+            .whenComplete(() => _isNextPageLoading.value = false);
     }
   }
 }

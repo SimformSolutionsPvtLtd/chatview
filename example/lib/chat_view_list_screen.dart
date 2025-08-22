@@ -114,12 +114,9 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                 ),
               ),
               tileConfig: ListTileConfig(
-                showUserActiveStatusIndicator: true,
                 userActiveStatusConfig: const UserActiveStatusConfig(
                   alignment: UserActiveStatusAlignment.topRight,
                 ),
-                pinIconConfig: const PinIconConfig(),
-                muteIconConfig: const MuteIconConfig(),
                 typingStatusConfig: const TypingStatusConfig(
                   showUserNames: true,
                 ),

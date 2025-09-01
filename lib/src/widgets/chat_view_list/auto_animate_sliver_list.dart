@@ -60,13 +60,21 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
         childCount: _controller.currentItems.length,
         (context, index) {
           final currentItemsLength = _controller.currentItems.length;
+
           if (index >= currentItemsLength) return const SizedBox.shrink();
 
           final item = _controller.currentItems[index];
           final key = _controller.getItemKey(item);
           final itemState = _controller.getState(key);
 
-          if (itemState == null) return const SizedBox.shrink();
+          if (itemState == null) {
+            return widget.builder(
+              context,
+              index,
+              index == _controller.currentItems.length - 1,
+              item,
+            );
+          }
 
           final isMoving = itemState.isMoving;
           final movingOffset = itemState.moveOffset;
@@ -143,7 +151,6 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
   void dispose() {
     _updateSubscription?.cancel();
     _updateSubscription = null;
-    _controller.dispose();
     super.dispose();
   }
 }

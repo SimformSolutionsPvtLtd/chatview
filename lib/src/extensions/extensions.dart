@@ -21,6 +21,8 @@
  */
 
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -352,6 +354,39 @@ extension AsyncSnapshotExtension<T> on AsyncSnapshot<List<T>> {
       return ChatViewState.noData;
     }
   }
+}
+
+extension PlatformExtension on TargetPlatform {
+  bool get isMobile =>
+      !kIsWeb && (this == TargetPlatform.iOS || this == TargetPlatform.android);
+}
+
+extension CupertinoContextMenuActionExtension on CupertinoContextMenuAction {
+  PopupMenuItem<T> toPopUpMenuItem<T>({T? value, Color? errorColor}) =>
+      PopupMenuItem<T>(
+        value: value,
+        onTap: onPressed,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (trailingIcon case final icon?) ...[
+              Icon(
+                icon,
+                size: 18,
+                color: isDestructiveAction ? errorColor : null,
+              ),
+              const SizedBox(width: 8),
+            ],
+            Flexible(
+              child: DefaultTextStyle.merge(
+                child: child,
+                style:
+                    isDestructiveAction ? TextStyle(color: errorColor) : null,
+              ),
+            ),
+          ],
+        ),
+      );
 }
 
 extension MessageStatusExtension on MessageStatus {

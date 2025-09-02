@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/config_models/send_message_configuration.dart';
@@ -73,10 +74,17 @@ class SelectedImageViewWidgetState extends State<SelectedImageViewWidget> {
                                     12,
                               ),
                             ),
-                            child: Image.file(
-                              File(imagePath),
-                              height: mqSize.height / 8,
-                            ),
+                            // Image.file is not supported on Flutter Web.
+                            // Consider using either Image.asset or Image.network instead.
+                            child: kIsWeb
+                                ? Image.network(
+                                    imagePath,
+                                    height: mqSize.height * 0.125,
+                                  )
+                                : Image.file(
+                                    File(imagePath),
+                                    height: mqSize.height * 0.125,
+                                  ),
                           ),
                           Positioned(
                             right: -10,

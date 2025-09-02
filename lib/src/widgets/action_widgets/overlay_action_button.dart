@@ -1,21 +1,25 @@
-import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 
-/// Custom action button that displays a plus icon and shows a horizontal row of options when pressed.
+import '../../models/overlay_action_widget.dart';
+import 'text_field_action_button.dart';
+
+/// Custom action button that displays a plus icon and
+/// shows a horizontal row of options when pressed.
 class OverlayActionButton extends TextFieldActionButton {
   const OverlayActionButton({
-    super.key,
     required super.icon,
-    super.onPressed,
-    super.color,
     required this.actions,
     this.isLeading = false,
+    super.key,
+    super.onPressed,
+    super.color,
   });
 
   /// List of actions to display in the overlay.
   final List<OverlayActionWidget> actions;
 
-  /// Whether the overlay should be anchored to the leading edge (left) or trailing edge (right).
+  /// Whether the overlay should be anchored to the leading edge (left)
+  /// or trailing edge (right).
   final bool isLeading;
 
   @override
@@ -75,9 +79,11 @@ class _OverlayActionButtonState
   }
 
   /// Shows a horizontal row of options above the plus icon.
-  /// - If all options fit, overlay width matches content exactly (no extra space)
+  /// - If all options fit, overlay width matches content exactly
+  /// (no extra space)
   /// - If too many options, overlay is scrollable and takes max width
-  /// - Overlay is always anchored above the plus icon and never overflows screen
+  /// - Overlay is always anchored above the plus icon and never overflows
+  /// screen
   void _showOverlay(
     List<OverlayActionWidget> plusOptions, {
     GlobalKey? plusIconKey,
@@ -99,8 +105,8 @@ class _OverlayActionButtonState
     if (plusIconKey?.currentContext case final context?) {
       final renderObject = context.findRenderObject();
       if (renderObject is RenderBox) {
-        final RenderBox iconBox = renderObject;
-        final Offset iconOffset = iconBox.localToGlobal(Offset.zero);
+        final iconBox = renderObject;
+        final iconOffset = iconBox.localToGlobal(Offset.zero);
         // Plus icon width
         optionButtonWidth = iconBox.size.width;
         // Left edge of the plus icon for leading
@@ -137,7 +143,8 @@ class _OverlayActionButtonState
                   child: SlideTransition(
                     position: _overlayOffsetAnimation,
                     child: Container(
-                      // Overlay container with animation, shadow, and rounded corners
+                      // Overlay container with animation, shadow,
+                      // and rounded corners
                       margin: const EdgeInsets.only(bottom: 4),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -183,7 +190,8 @@ class _OverlayActionButtonState
     _overlayAnimationController.forward();
   }
 
-  /// Calculates the size and position of the overlay based on the options and screen dimensions.
+  /// Calculates the size and position of the overlay based on
+  /// the options and screen dimensions.
   (double, double) _getOverlaySize({
     required List<OverlayActionWidget> plusOptions,
     required double iconLeft,
@@ -203,7 +211,8 @@ class _OverlayActionButtonState
     // So, overlay shown above of plus icon
     final maxOverlayWidth = screenWidth - horizontalPadding * 4;
 
-    // - If all options fit, overlay is just wide enough and right-aligned to plus icon
+    // - If all options fit, overlay is just wide enough and right-aligned
+    // to plus icon
     // - If leading icon, overlay is left-aligned to plus icon
     // - If not, overlay is scrollable and takes max width
     if (totalOptionsWidth < maxOverlayWidth) {
@@ -223,7 +232,8 @@ class _OverlayActionButtonState
         // Ensure overlay does not overflow right side
         overlayWidth -= overlayLeft - horizontalPadding * 2;
       } else {
-        // For trailing, keep plus icon at right edge of overlay, but don't overflow left
+        // For trailing, keep plus icon at right edge of overlay,
+        // but don't overflow left
         overlayLeft = iconRight - overlayWidth;
       }
     }
@@ -232,7 +242,7 @@ class _OverlayActionButtonState
   }
 
   // Dismisses the plus/attach overlay with animation and cleans up the entry.
-  void hideOverlay() async {
+  Future<void> hideOverlay() async {
     await _overlayAnimationController.reverse();
     _plusOverlayEntry.remove();
   }

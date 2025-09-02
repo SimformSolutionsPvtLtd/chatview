@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// A generic action button for text fields that can be used for various actions like opening the camera, or selecting images from the gallery.
+/// A generic action button for text fields that can be used for various actions
+/// like opening the camera, or selecting images from the gallery.
 class TextFieldActionButton extends StatefulWidget {
-  final Widget icon;
-  final Color? color;
-  final VoidCallback? onPressed;
-
   const TextFieldActionButton({
-    super.key,
     required this.icon,
     this.color,
     this.onPressed,
+    super.key,
   });
+
+  final Widget icon;
+  final Color? color;
+  final VoidCallback? onPressed;
 
   @override
   State<TextFieldActionButton> createState() => TextFieldActionButtonState();

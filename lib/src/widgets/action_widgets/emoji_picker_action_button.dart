@@ -7,13 +7,13 @@ import 'text_field_action_button.dart';
 /// Emoji picker action button implementation.
 class EmojiPickerActionButton extends TextFieldActionButton {
   EmojiPickerActionButton({
-    super.key,
     required super.icon,
-    super.color,
     required ValueSetter<String?>? onPressed,
-    this.emojiPickerSheetConfig,
     required BuildContext context,
+    this.emojiPickerSheetConfig,
     this.height,
+    super.key,
+    super.color,
   }) : super(
           onPressed: onPressed == null
               ? null
@@ -32,26 +32,22 @@ class EmojiPickerActionButton extends TextFieldActionButton {
   final Config? emojiPickerSheetConfig;
   final double? height;
 
-  /// Shows the emoji picker as a modal bottom sheet and returns the selected emoji.
+  /// Shows the emoji picker as a modal bottom sheet and
+  /// returns the selected emoji.
   static Future<String?> _pickEmoji({
     BuildContext? context,
     Config? config,
     double? height,
   }) async {
     if (context == null) return null;
-    String? selectedEmoji;
-    await showModalBottomSheet<void>(
+    return showModalBottomSheet<String?>(
       context: context,
       builder: (newContext) => EmojiPickerWidget(
         height: height,
         emojiPickerSheetConfig: config,
-        onSelected: (emoji) {
-          selectedEmoji = emoji;
-          Navigator.of(context).pop();
-        },
+        onSelected: (emoji) => Navigator.pop<String>(context, emoji),
       ),
     );
-    return selectedEmoji;
   }
 
   @override
@@ -59,5 +55,7 @@ class EmojiPickerActionButton extends TextFieldActionButton {
       _EmojiPickerActionButtonState();
 }
 
+// As no need to custom build method,
+// we are using the same state class as parent.
 class _EmojiPickerActionButtonState
     extends TextFieldActionButtonState<EmojiPickerActionButton> {}

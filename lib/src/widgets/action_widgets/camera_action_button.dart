@@ -8,11 +8,11 @@ import 'text_field_action_button.dart';
 /// Camera action button implementation.
 class CameraActionButton extends TextFieldActionButton {
   CameraActionButton({
-    super.key,
     required super.icon,
-    super.color,
     required ValueSetter<String?>? onPressed,
     this.imagePickerConfiguration,
+    super.key,
+    super.color,
   }) : super(
           onPressed: onPressed == null
               ? null
@@ -32,5 +32,7 @@ class CameraActionButton extends TextFieldActionButton {
   State<CameraActionButton> createState() => _CameraActionButtonState();
 }
 
+// As no need to custom build method,
+// we are using the same state class as parent.
 class _CameraActionButtonState
     extends TextFieldActionButtonState<CameraActionButton> {}

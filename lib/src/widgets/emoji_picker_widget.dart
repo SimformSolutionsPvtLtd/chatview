@@ -27,11 +27,11 @@ import 'package:flutter/material.dart';
 
 class EmojiPickerWidget extends StatelessWidget {
   const EmojiPickerWidget({
-    Key? key,
     required this.onSelected,
     this.emojiPickerSheetConfig,
     this.height,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// Provides callback when user selects emoji.
   final ValueSetter<String> onSelected;
@@ -75,14 +75,12 @@ class EmojiPickerWidget extends StatelessWidget {
                       columns: 7,
                       emojiSizeMax:
                           32 * ((!kIsWeb && Platform.isIOS) ? 1.30 : 1.0),
-                      recentsLimit: 28,
                       backgroundColor: Colors.white,
                     ),
                     searchViewConfig: const SearchViewConfig(
                       buttonIconColor: Colors.black,
                     ),
                     categoryViewConfig: const CategoryViewConfig(
-                      initCategory: Category.RECENT,
                       recentTabBehavior: RecentTabBehavior.NONE,
                     ),
                     bottomActionBarConfig: const BottomActionBarConfig(

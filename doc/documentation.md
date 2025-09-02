@@ -583,21 +583,18 @@ This guide will help you migrate your code from previous versions of ChatView to
 
 ## Key Changes
 
-### Add action item widgets list for text field
+### Text Field Action Items
 
-- In this version, we have introduced a new way to add action items to the text field.
-- There are two ways you can add action items at leading and trailing positions of the text field.
-  - `textFieldLeadingActionWidgetBuilder`: This builder allows you to add list of action widgets at the leading position of the text field.
-  - `textFieldTrailingActionWidgetBuilder`: This builder allows you to add list of action widgets at the trailing position of the text field.
-- Add `CameraActionButton` and `GalleryActionButton` widgets as list to leading and trailing builder fo the text field for camera and gallery actions.
-- Now, you can add overlay action button to show overlay action items in the text field. With multiple action items
+You can now add action buttons to the input field using two builders:
+- `leadingActions`: widgets shown before the text field.
+- `trailingActions`: widgets shown after the text field.
 
-To show camera and gallery action items in the text field at trailing position, you can use `textFieldTrailingActionWidgetBuilder`. Also, to show the action items in the text field at leading position, you can use `textFieldLeadingActionWidgetBuilder`.
-You can also add custom overlay action items in the text field. As shown in below example:
+Use built‑in `CameraActionButton`, `GalleryActionButton`, and optionally an `OverlayActionButton`
+that groups multiple `OverlayActionWidget`s. Place them on either side as needed. Example below:
 
 ```dart
 textFieldConfig: TextFieldConfiguration(
-  textFieldTrailingActionWidgetBuilder: (context, controller) {
+  trailingActions: (context, controller) {
     return [
       CameraActionButton(
         icon: const Icon(

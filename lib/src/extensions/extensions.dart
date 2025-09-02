@@ -77,9 +77,8 @@ extension ValidateString on String {
   bool get fromMemory => startsWith('data:image');
 
   bool get isAllEmoji {
-    final unEmojified = EmojiParser().unemojify(this);
-    final regex = RegExp(emojiRegex); // One or more emoji tags only
-    return regex.hasMatch(unEmojified);
+    final unEmojified = EmojiParser().parseEmojis(this);
+    return runes.length == unEmojified.length;
   }
 
   bool get isUrl => Uri.tryParse(this)?.isAbsolute ?? false;

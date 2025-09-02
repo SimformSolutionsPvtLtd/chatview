@@ -7,7 +7,7 @@ Future<String?> onMediaActionButtonPressed(
   ImagePickerConfiguration? config,
 }) async {
   try {
-    final XFile? image = await ImagePicker().pickImage(
+    final image = await ImagePicker().pickImage(
       source: source,
       maxHeight: config?.maxHeight,
       maxWidth: config?.maxWidth,

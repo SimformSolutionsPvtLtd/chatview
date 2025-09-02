@@ -23,24 +23,29 @@ import 'dart:async';
 import 'dart:io' show File, Platform;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:chatview/src/utils/constants/constants.dart';
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../chatview.dart';
+import '../models/config_models/send_message_configuration.dart';
+import '../utils/constants/constants.dart';
 import '../utils/debounce.dart';
+import '../utils/package_strings.dart';
+import '../values/typedefs.dart';
+import 'action_widgets/camera_action_button.dart';
+import 'action_widgets/gallery_action_button.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({
-    Key? key,
-    this.sendMessageConfig,
     required this.focusNode,
     required this.textEditingController,
     required this.onPressed,
     required this.onRecordingComplete,
     required this.onImageSelected,
-  }) : super(key: key);
+    this.sendMessageConfig,
+    super.key,
+  });
 
   /// Provides configuration of default text field in chat.
   final SendMessageConfiguration? sendMessageConfig;
@@ -55,7 +60,7 @@ class ChatUITextField extends StatefulWidget {
   final VoidCallback onPressed;
 
   /// Provides callback once voice is recorded.
-  final Function(String?) onRecordingComplete;
+  final ValueSetter<String?> onRecordingComplete;
 
   /// Provides callback when user select images from camera/gallery.
   final StringsCallBack onImageSelected;
@@ -65,7 +70,8 @@ class ChatUITextField extends StatefulWidget {
 }
 
 class _ChatUITextFieldState extends State<ChatUITextField> {
-  final ValueNotifier<String> _inputText = ValueNotifier('');
+  late final ValueNotifier<bool> _isTextNotEmptyNotifier =
+      ValueNotifier(widget.textEditingController.text.isNotEmpty);
 
   RecorderController? controller;
 
@@ -115,24 +121,18 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         HardwareKeyboard.instance.addHandler(handler);
       }
     }
-    widget.textEditingController.addListener(_handleTextChange);
   }
 
   @override
   void dispose() {
     debouncer.dispose();
     composingStatus.dispose();
-    widget.textEditingController.removeListener(_handleTextChange);
     isRecording.dispose();
-    _inputText.dispose();
+    _isTextNotEmptyNotifier.dispose();
     if (_keyboardHandler case final handler?) {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     super.dispose();
-  }
-
-  void _handleTextChange() {
-    _onChanged(widget.textEditingController.text);
   }
 
   void attachListeners() {
@@ -159,9 +159,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
           key == LogicalKeyboardKey.shiftRight);
       if (!isShiftPressed) {
         // Send message on Enter
-        if (_inputText.value.trim().isNotEmpty) {
-          widget.onPressed();
-          _inputText.value = '';
+        final text = widget.textEditingController.text;
+        if (text.trim().isNotEmpty) {
+          _onPressed();
         }
       } else {
         // Shift+Enter: insert new line
@@ -186,6 +186,10 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   @override
   Widget build(BuildContext context) {
     final outlineBorder = _outLineBorder;
+    final leadingActions = textFieldConfig?.leadingActions?.call(
+      context,
+      widget.textEditingController,
+    );
     return Container(
       padding:
           textFieldConfig?.padding ?? const EdgeInsets.symmetric(horizontal: 6),
@@ -213,7 +217,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                     decoration: voiceRecordingConfig?.decoration ??
                         BoxDecoration(
                           color: voiceRecordingConfig?.backgroundColor,
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                     waveStyle: voiceRecordingConfig?.waveStyle ??
                         WaveStyle(
@@ -231,27 +235,17 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                     children: [
                       if (textFieldConfig?.hideLeadingActionsOnType ?? false)
                         ValueListenableBuilder(
-                          valueListenable: _inputText,
-                          builder: (context, value, _) {
-                            final builder = textFieldConfig
-                                ?.textFieldLeadingActionWidgetBuilder;
-                            if (value.isNotEmpty || builder == null) {
+                          valueListenable: _isTextNotEmptyNotifier,
+                          builder: (context, isNotEmpty, _) {
+                            final actions = leadingActions;
+                            if (isNotEmpty || actions == null) {
                               return const SizedBox.shrink();
                             }
-                            return Row(
-                              children: builder.call(
-                                context,
-                                widget.textEditingController,
-                              ),
-                            );
+                            return Row(children: actions);
                           },
                         )
                       else
-                        ...?textFieldConfig?.textFieldLeadingActionWidgetBuilder
-                            ?.call(
-                          context,
-                          widget.textEditingController,
-                        ),
+                        ...?leadingActions,
                       Expanded(
                         child: TextField(
                           focusNode: widget.focusNode,
@@ -262,6 +256,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                           minLines: textFieldConfig?.minLines ?? 1,
                           keyboardType: textFieldConfig?.textInputType,
                           inputFormatters: textFieldConfig?.inputFormatters,
+                          onChanged: _onChanged,
                           enabled: textFieldConfig?.enabled,
                           textCapitalization:
                               textFieldConfig?.textCapitalization ??
@@ -294,18 +289,15 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                     ],
                   ),
                 ),
-              ValueListenableBuilder<String>(
-                valueListenable: _inputText,
-                builder: (_, inputTextValue, child) {
-                  if (inputTextValue.isNotEmpty) {
+              ValueListenableBuilder<bool>(
+                valueListenable: _isTextNotEmptyNotifier,
+                builder: (_, isNotEmpty, child) {
+                  if (isNotEmpty) {
                     return IconButton(
                       color: sendMessageConfig?.defaultSendButtonColor ??
                           Colors.green,
                       onPressed: (textFieldConfig?.enabled ?? true)
-                          ? () {
-                              widget.onPressed();
-                              _inputText.value = '';
-                            }
+                          ? _onPressed
                           : null,
                       icon: sendMessageConfig?.sendButtonIcon ??
                           const Icon(Icons.send),
@@ -314,9 +306,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                     return Row(
                       children: [
                         if (!isRecordingValue)
-                          ...textFieldConfig
-                                  ?.textFieldTrailingActionWidgetBuilder
-                                  ?.call(
+                          ...textFieldConfig?.trailingActions?.call(
                                 context,
                                 widget.textEditingController,
                               ) ??
@@ -397,11 +387,16 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     );
   }
 
+  void _onPressed() {
+    _isTextNotEmptyNotifier.value = false;
+    widget.onPressed();
+  }
+
   FutureOr<void> _cancelRecording() async {
     assert(
       defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.android,
-      "Voice messages are only supported with android and ios platform",
+      'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) return;
     final path = await controller?.stop();
@@ -422,7 +417,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     assert(
       defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.android,
-      "Voice messages are only supported with android and ios platform",
+      'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) {
       await controller?.record(
@@ -446,6 +441,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     }, () {
       composingStatus.value = TypeWriterStatus.typing;
     });
-    _inputText.value = inputText;
+    _isTextNotEmptyNotifier.value = inputText.trim().isNotEmpty;
   }
 }

@@ -63,6 +63,9 @@ class SearchConfig {
   final EdgeInsets padding;
 
   /// Text editing controller for the search text field.
+  ///
+  /// **Note**: The controller must be disposed of
+  /// by the user to avoid memory leaks.
   final TextEditingController textEditingController;
 
   /// Style for the text in the search text field.

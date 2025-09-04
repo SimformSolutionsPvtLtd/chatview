@@ -51,6 +51,7 @@ class ChatViewList extends StatefulWidget {
     this.loadMoreConfig = const LoadMoreConfig(),
     this.tileConfig = const ListTileConfig(),
     this.stateConfig = const ListStateConfig(),
+    this.separatorBuilder,
     this.searchConfig,
     this.chatBuilder,
     this.appbar,
@@ -65,6 +66,9 @@ class ChatViewList extends StatefulWidget {
 
   /// Provides widget builder for users in chat list.
   final ChatViewListTileBuilder? chatBuilder;
+
+  /// Provides separator builder for chat list items.
+  final AutoAnimateSeparatorBuilder? separatorBuilder;
 
   /// Provides custom app bar for chat list page.
   final Widget? appbar;
@@ -136,6 +140,10 @@ class _ChatViewListState extends State<ChatViewList> {
   /// ValueNotifier to track if the next page is currently loading.
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
 
+  /// ValueNotifier to highlight the chat tile when context menu is opened on web/desktop.
+  final ValueNotifier<String?> _highlightChatNotifier =
+      ValueNotifier<String?>(null);
+
   LoadMoreConfig get _loadMoreConfig => widget.loadMoreConfig;
 
   ChatViewListController get _controller => widget.controller;
@@ -177,6 +185,7 @@ class _ChatViewListState extends State<ChatViewList> {
               ChatViewState.hasMessages =>
                 AutoAnimateSliverList<ChatViewListItem>(
                   items: chats,
+                  separatorBuilder: widget.separatorBuilder,
                   controller: _controller.animatedListController
                     // Update the items in the animated list controller
                     // whenever the chat list changes
@@ -193,6 +202,7 @@ class _ChatViewListState extends State<ChatViewList> {
                             chat: chat,
                             config: widget.menuConfig,
                             chatTileColor: widget.backgroundColor,
+                            highlightNotifier: _highlightChatNotifier,
                             child: child,
                           )
                         : child;

@@ -24,12 +24,11 @@ import 'package:intl/intl.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/send_message_configuration.dart';
-import 'package_strings.dart';
 
 Future<String?> onMediaActionButtonPressed(
-    ImageSource source, {
-      ImagePickerConfiguration? config,
-    }) async {
+  ImageSource source, {
+  ImagePickerConfiguration? config,
+}) async {
   try {
     final image = await ImagePicker().pickImage(
       source: source,
@@ -45,7 +44,6 @@ Future<String?> onMediaActionButtonPressed(
   }
 }
 
-
 /// Returns a formatted string representing the time of the last message.
 /// - If the message was sent less than a minute ago, returns 'Now'.
 /// - If the message was sent less than an hour ago, returns 'X min ago'.
@@ -56,11 +54,11 @@ Future<String?> onMediaActionButtonPressed(
 /// [messageDateStr] is the date string of the message in UTC.
 /// [dateFormatPattern] is the pattern to format dates older than yesterday.
 String formatLastMessageTime(
-    String messageDateStr,
-    String dateFormatPattern,
-    ) {
+  String messageDateStr,
+  String dateFormatPattern,
+) {
   final messageDate =
-  DateTime.tryParse(messageDateStr)?.toLocal(); // Convert from UTC to local
+      DateTime.tryParse(messageDateStr)?.toLocal(); // Convert from UTC to local
   if (messageDate == null) return '';
   final now = DateTime.now();
   final isLast7Days = now

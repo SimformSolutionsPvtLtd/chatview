@@ -113,6 +113,11 @@ class _ChatViewListScreenState extends State<ChatViewListScreen> {
                   ),
                 ),
               ),
+              separatorBuilder: (_, __) => Divider(
+                height: 0,
+                thickness: 2,
+                color: Colors.grey.shade200,
+              ),
               tileConfig: ListTileConfig(
                 userActiveStatusConfig: const UserActiveStatusConfig(
                   alignment: UserActiveStatusAlignment.topRight,

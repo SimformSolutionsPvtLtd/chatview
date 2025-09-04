@@ -58,47 +58,59 @@ class LastMessageView extends StatelessWidget {
                   ),
                   const SizedBox(width: 5),
                 ],
-                switch (lastMessageType) {
-                  MessageType.image => Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.photo, size: 14),
-                        const SizedBox(width: 5),
-                        Text(
-                          PackageStrings.currentLocale.photo,
-                          style: TextStyle(
-                            fontWeight: unreadCount > 0
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                Expanded(
+                  child: switch (lastMessageType) {
+                    MessageType.image => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.photo, size: 14),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              PackageStrings.currentLocale.photo,
+                              maxLines: lastMessageMaxLines,
+                              overflow: lastMessageTextOverflow,
+                              style: TextStyle(
+                                fontWeight: unreadCount > 0
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  MessageType.text => Text(
-                      lastMessage.message,
-                      textAlign: TextAlign.left,
-                      maxLines: lastMessageMaxLines,
-                      overflow: lastMessageTextOverflow,
-                      style: lastMessageTextStyle ??
-                          TextStyle(
-                            fontSize: 14,
-                            fontWeight: unreadCount > 0
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                        ],
+                      ),
+                    MessageType.text => Text(
+                        lastMessage.message,
+                        textAlign: TextAlign.left,
+                        maxLines: lastMessageMaxLines,
+                        overflow: lastMessageTextOverflow,
+                        style: lastMessageTextStyle ??
+                            TextStyle(
+                              fontSize: 14,
+                              fontWeight: unreadCount > 0
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                      ),
+                    MessageType.voice => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.mic, size: 14),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              PackageStrings.currentLocale.voice,
+                              maxLines: lastMessageMaxLines,
+                              overflow: lastMessageTextOverflow,
+                            ),
                           ),
-                    ),
-                  MessageType.voice => Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.mic, size: 14),
-                        const SizedBox(width: 5),
-                        Text(PackageStrings.currentLocale.voice),
-                      ],
-                    ),
-                  // Provides the view for the custom message type in
-                  // `lastMessageTileBuilder`
-                  MessageType.custom || null => const SizedBox.shrink(),
-                },
+                        ],
+                      ),
+                    // Provides the view for the custom message type in
+                    // `lastMessageTileBuilder`
+                    MessageType.custom || null => const SizedBox.shrink(),
+                  },
+                ),
               ],
             ),
           ),

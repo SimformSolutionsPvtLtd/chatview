@@ -32,7 +32,6 @@ class SearchTextField extends StatefulWidget {
   const SearchTextField({
     required this.config,
     this.chatViewListController,
-    this.disposeResources = true,
     super.key,
   });
 
@@ -41,8 +40,6 @@ class SearchTextField extends StatefulWidget {
 
   /// Controller for managing the chat list.
   final ChatViewListController? chatViewListController;
-
-  final bool disposeResources;
 
   @override
   State<SearchTextField> createState() => _SearchTextFieldState();
@@ -109,12 +106,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
                 ),
           ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    if (widget.disposeResources) _config.textEditingController.dispose();
   }
 
   void _onTapClear() {

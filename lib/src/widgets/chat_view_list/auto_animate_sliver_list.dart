@@ -13,6 +13,7 @@ class AutoAnimateSliverList<T> extends StatefulWidget {
     required this.builder,
     required this.controller,
     this.animationCurve = Curves.easeInOut,
+    this.separatorBuilder,
     super.key,
   });
 
@@ -20,6 +21,7 @@ class AutoAnimateSliverList<T> extends StatefulWidget {
   final Curve animationCurve;
   final AutoAnimateItemBuilder<T> builder;
   final AutoAnimateSliverListController<T> controller;
+  final AutoAnimateSeparatorBuilder? separatorBuilder;
 
   @override
   State<AutoAnimateSliverList<T>> createState() =>
@@ -55,24 +57,43 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
 
   @override
   Widget build(BuildContext context) {
+    final itemCount = _controller.currentItems.length;
+
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        childCount: _controller.currentItems.length,
+        childCount: itemCount,
         (context, index) {
-          final currentItemsLength = _controller.currentItems.length;
-
-          if (index >= currentItemsLength) return const SizedBox.shrink();
+          if (index < 0 || index >= itemCount) return const SizedBox.shrink();
 
           final item = _controller.currentItems[index];
           final key = _controller.getItemKey(item);
           final itemState = _controller.getState(key);
+          final isLast = index == itemCount - 1;
+
+          final itemWidget = widget.builder(context, index, isLast, item);
+          final separatorBuilder =
+              widget.separatorBuilder?.call(context, index);
+
+          // Build combined child (item + optional separator) so they animate together.
+          final combinedChild = separatorBuilder == null
+              ? itemWidget
+              : Column(
+                  key: ValueKey('auto_animate_combined_${key}_$index'),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    widget.builder(context, index, isLast, item),
+                    // Give separator its own key for state retention within column
+                    KeyedSubtree(
+                      key: ValueKey('auto_animate_separator_${key}_$index'),
+                      child: separatorBuilder,
+                    ),
+                  ],
+                );
 
           if (itemState == null) {
-            return widget.builder(
-              context,
-              index,
-              index == _controller.currentItems.length - 1,
-              item,
+            return KeyedSubtree(
+              key: _controller.getItemGlobalKey(key),
+              child: combinedChild,
             );
           }
 
@@ -135,12 +156,7 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
                 ),
               );
             },
-            child: widget.builder(
-              context,
-              index,
-              index == _controller.currentItems.length - 1,
-              item,
-            ),
+            child: combinedChild,
           );
         },
       ),

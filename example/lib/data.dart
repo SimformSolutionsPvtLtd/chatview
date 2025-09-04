@@ -51,6 +51,21 @@ class Data {
         status: MessageStatus.delivered,
       ),
     ),
+    for (var i = 4; i < 10; i++)
+      ChatViewListItem(
+        id: i.toString(),
+        name: 'Chat $i',
+        imageUrl: Data.profileImage,
+        lastMessage: Message(
+          id: i.toString(),
+          sentBy: i % 2 == 0 ? '1' : '2',
+          message: "This is message number $i",
+          createdAt: DateTime.now()
+              .subtract(Duration(days: i, hours: i % 2 == 0 ? i : i * 2))
+              .toUtc(),
+          status: MessageStatus.delivered,
+        ),
+      ),
   ];
 
   static final messageList = [

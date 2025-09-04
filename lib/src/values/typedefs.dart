@@ -144,6 +144,10 @@ typedef AutoAnimateItemBuilder<T> = Widget Function(
   bool isLastItem,
   T item,
 );
+typedef AutoAnimateSeparatorBuilder = Widget Function(
+  BuildContext context,
+  int index,
+);
 typedef ChatPinnedCallback<T> = bool Function(T chat);
 typedef ShowUserActiveIndicatorCallback = bool Function(
   UserActiveStatus status,

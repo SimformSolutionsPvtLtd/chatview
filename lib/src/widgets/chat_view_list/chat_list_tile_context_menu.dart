@@ -14,6 +14,7 @@ class ChatListTileContextMenu extends StatelessWidget {
     required this.child,
     required this.config,
     required this.chatTileColor,
+    required this.highlightNotifier,
     super.key,
   });
 
@@ -21,6 +22,7 @@ class ChatListTileContextMenu extends StatelessWidget {
   final ChatViewListItem chat;
   final ChatMenuConfig config;
   final Color chatTileColor;
+  final ValueNotifier<String?> highlightNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,8 @@ class ChatListTileContextMenu extends StatelessWidget {
 
     return actions.isEmpty
         ? child
+        // Display Cupertino context menu only on mobile platforms.
+        // On web/desktop, the extra space causes the menu to appear horizontally.
         : defaultTargetPlatform.isMobile
             ? CupertinoContextMenu.builder(
                 builder: (_, __) => Material(
@@ -45,10 +49,12 @@ class ChatListTileContextMenu extends StatelessWidget {
                 actions: actions,
               )
             : ChatListTileContextMenuWeb(
+                chatId: chat.id,
                 actions: actions,
                 highlightColor: config.highlightColor,
                 // Used same color as destructive red of cupertino context menu
                 errorColor: CupertinoColors.destructiveRed,
+                highlightNotifier: highlightNotifier,
                 child: child,
               );
   }
@@ -72,7 +78,7 @@ class ChatListTileContextMenu extends StatelessWidget {
             maxLines: config.maxLines,
           ),
           onPressed: () => _menuCallback(
-            context: context,
+            navigator: Navigator.of(context),
             callbackDelayDuration: delayDuration,
             callback: () => callback.call(
               (chat: chat, status: newMuteStatus),
@@ -90,7 +96,7 @@ class ChatListTileContextMenu extends StatelessWidget {
             maxLines: config.maxLines,
           ),
           onPressed: () => _menuCallback(
-            context: context,
+            navigator: Navigator.of(context),
             callbackDelayDuration: delayDuration,
             callback: () => callback.call(
               (chat: chat, status: newPinStatus),
@@ -108,7 +114,7 @@ class ChatListTileContextMenu extends StatelessWidget {
             maxLines: config.maxLines,
           ),
           onPressed: () => _menuCallback(
-            context: context,
+            navigator: Navigator.of(context),
             callbackDelayDuration: delayDuration,
             callback: () => callback.call(chat),
           ),
@@ -117,10 +123,13 @@ class ChatListTileContextMenu extends StatelessWidget {
   }
 
   void _menuCallback({
-    required BuildContext context,
+    required NavigatorState navigator,
     required VoidCallback callback,
     Duration? callbackDelayDuration,
   }) {
+    // On web/desktop, Cupertino context menu isn’t used.
+    // The callback is called directly (no animation delay),
+    // and Navigator.pop is unnecessary since nothing is pushed.
     if (!defaultTargetPlatform.isMobile) {
       callback.call();
       return;
@@ -133,6 +142,6 @@ class ChatListTileContextMenu extends StatelessWidget {
       // To show chatview list animation
       Future.delayed(callbackDelayDuration, callback);
     }
-    Navigator.of(context).pop();
+    navigator.pop();
   }
 }

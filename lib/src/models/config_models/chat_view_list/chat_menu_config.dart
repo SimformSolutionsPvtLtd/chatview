@@ -8,6 +8,7 @@ class ChatMenuConfig {
     this.enabled = true,
     this.maxLines = 1,
     this.overflow = TextOverflow.ellipsis,
+    this.highlightColor = const Color(0x1AEE5366),
     this.callbackDelayDuration = const Duration(milliseconds: 800),
     this.actions,
     this.textStyle,
@@ -76,6 +77,8 @@ class ChatMenuConfig {
   /// If null, no extra delay is applied.
   ///
   /// Defaults to `const Duration(milliseconds: 800)`.
+  ///
+  /// **Note** This delay is not applied on web and desktop platforms.
   final Duration? callbackDelayDuration;
 
   /// Custom icon for mute status menu item.
@@ -92,4 +95,9 @@ class ChatMenuConfig {
 
   /// Custom icon for delete menu item.
   final IconData? deleteIcon;
+
+  /// The highlight color for the menu item when pressed.
+  ///
+  /// Applicable only for web platform.
+  final Color highlightColor;
 }

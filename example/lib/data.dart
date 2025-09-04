@@ -32,7 +32,22 @@ class Data {
         sentBy: '1',
         message: "https://example.com/image.png",
         messageType: MessageType.image,
-        createdAt: DateTime.now().subtract(const Duration(hours: 2)).toUtc(),
+        createdAt: DateTime.now().subtract(const Duration(days: 2)).toUtc(),
+        status: MessageStatus.delivered,
+      ),
+    ),
+    ChatViewListItem(
+      id: '3',
+      name: 'Flutter Dev Group',
+      imageUrl: Data.profileImage,
+      chatRoomType: ChatRoomType.group,
+      userActiveStatus: UserActiveStatus.online,
+      lastMessage: Message(
+        id: '13',
+        sentBy: '2',
+        message: "https://example.com/image.png",
+        messageType: MessageType.image,
+        createdAt: DateTime.now().subtract(const Duration(days: 7)).toUtc(),
         status: MessageStatus.delivered,
       ),
     ),
@@ -166,7 +181,8 @@ class Data {
       Message(
         id: i.toString(),
         message: "This is message number $i",
-        createdAt: DateTime.now().subtract(Duration(hours: i % 2 == 0 ? i : i *2)),
+        createdAt:
+            DateTime.now().subtract(Duration(hours: i % 2 == 0 ? i : i * 2)),
         sentBy: (i % 2 == 0) ? '1' : '2',
         status: MessageStatus.read,
       ),

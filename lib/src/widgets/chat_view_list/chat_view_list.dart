@@ -86,7 +86,14 @@ class ChatViewList extends StatefulWidget {
   /// Defaults to `ScrollViewKeyboardDismissBehavior.onDrag`.
   final ScrollViewKeyboardDismissBehavior? scrollViewKeyboardDismissBehavior;
 
-  /// Provides configuration for the iOS context menu in the chat list.
+  /// Provides configuration for the context menu in the chat list.
+  ///
+  /// For Android & iOS, it uses iOS style context menu.
+  /// For Web & Desktop, it uses Material style context menu.
+  ///
+  /// Behaviour:
+  /// Android, iOS & Web: Long press on chat tile to open context menu.
+  /// Desktop: Right click on chat tile to open context menu.
   final ChatMenuConfig menuConfig;
 
   /// Configuration for the search text field in the chat list.
@@ -157,7 +164,6 @@ class _ChatViewListState extends State<ChatViewList> {
               child: SearchTextField(
                 config: config,
                 chatViewListController: _controller,
-                disposeResources: _controller.disposeOtherResources,
               ),
             ),
           ),

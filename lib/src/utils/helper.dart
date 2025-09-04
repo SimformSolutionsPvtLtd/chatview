@@ -63,23 +63,17 @@ String formatLastMessageTime(
   DateTime.tryParse(messageDateStr)?.toLocal(); // Convert from UTC to local
   if (messageDate == null) return '';
   final now = DateTime.now();
-  final diff = now.difference(messageDate);
+  final isLast7Days = now
+          .difference(
+              DateTime(messageDate.year, messageDate.month, messageDate.day))
+          .inDays <
+      7;
 
-  if (diff.inMinutes < 1) {
-    return PackageStrings.currentLocale.now;
-  } else if (diff.inMinutes < 60) {
-    return '${diff.inMinutes} ${PackageStrings.currentLocale.minAgo}';
-  } else if (now.isSameCalendarDay(messageDate)) {
+  if (now.isSameCalendarDay(messageDate)) {
     return DateFormat('hh:mm a').format(messageDate); // Today
-  } else if (_isYesterday(messageDate, now)) {
-    return PackageStrings.currentLocale.yesterday;
+  } else if (isLast7Days) {
+    return DateFormat('EEEE').format(messageDate);
   } else {
     return DateFormat(dateFormatPattern).format(messageDate);
   }
-}
-
-/// Checks if the given date is yesterday relative to the reference date.
-bool _isYesterday(DateTime date, DateTime reference) {
-  final yesterday = reference.subtract(const Duration(days: 1));
-  return date.isSameCalendarDay(yesterday);
 }

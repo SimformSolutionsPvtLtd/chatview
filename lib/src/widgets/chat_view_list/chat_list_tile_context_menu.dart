@@ -1,10 +1,12 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
 import '../../models/models.dart';
 import '../../utils/package_strings.dart';
+import 'chat_list_tile_context_menu_web.dart';
 
 class ChatListTileContextMenu extends StatelessWidget {
   const ChatListTileContextMenu({
@@ -25,11 +27,39 @@ class ChatListTileContextMenu extends StatelessWidget {
     final menu = config.builder?.call(context, chat, child);
     if (menu != null) return menu;
 
-    final newMuteStatus = chat.settings.muteStatus.toggle;
-    final newPinStatus = chat.settings.pinStatus.toggle;
-    final delayDuration = config.callbackDelayDuration;
+    final actions = _getActions(
+      context: context,
+      newMuteStatus: chat.settings.muteStatus.toggle,
+      newPinStatus: chat.settings.pinStatus.toggle,
+      delayDuration: config.callbackDelayDuration,
+    );
 
-    final actions = <Widget>[
+    return actions.isEmpty
+        ? child
+        : defaultTargetPlatform.isMobile
+            ? CupertinoContextMenu.builder(
+                builder: (_, __) => Material(
+                  color: chatTileColor,
+                  child: child,
+                ),
+                actions: actions,
+              )
+            : ChatListTileContextMenuWeb(
+                actions: actions,
+                highlightColor: config.highlightColor,
+                // Used same color as destructive red of cupertino context menu
+                errorColor: CupertinoColors.destructiveRed,
+                child: child,
+              );
+  }
+
+  List<Widget> _getActions({
+    required BuildContext context,
+    required MuteStatus newMuteStatus,
+    required PinStatus newPinStatus,
+    Duration? delayDuration,
+  }) {
+    return <Widget>[
       ...?config.actions?.call(chat),
       if (config.muteStatusCallback case final callback?)
         CupertinoContextMenuAction(
@@ -84,16 +114,6 @@ class ChatListTileContextMenu extends StatelessWidget {
           ),
         ),
     ];
-
-    return actions.isEmpty
-        ? child
-        : CupertinoContextMenu.builder(
-            builder: (_, __) => Material(
-              color: chatTileColor,
-              child: child,
-            ),
-            actions: actions,
-          );
   }
 
   void _menuCallback({
@@ -101,6 +121,11 @@ class ChatListTileContextMenu extends StatelessWidget {
     required VoidCallback callback,
     Duration? callbackDelayDuration,
   }) {
+    if (!defaultTargetPlatform.isMobile) {
+      callback.call();
+      return;
+    }
+
     if (callbackDelayDuration == null) {
       callback.call();
     } else {

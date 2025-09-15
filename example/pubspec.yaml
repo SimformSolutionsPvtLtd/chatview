@@ -1,24 +1,21 @@
 name: example
-description: Flutter ChatView Showcasing Example.
-
+description: "Flutter ChatView Showcasing Example."
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.0 <4.0.0'
+  sdk: ^3.9.2
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.5
   chatview:
     path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.1
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true

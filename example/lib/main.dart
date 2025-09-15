@@ -4,11 +4,11 @@ import 'package:example/models/theme.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const Example());
+  runApp(const MainApp());
 }
 
-class Example extends StatelessWidget {
-  const Example({Key? key}) : super(key: key);
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +17,9 @@ class Example extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color(0xffEE5366),
-        colorScheme:
-            ColorScheme.fromSwatch(accentColor: const Color(0xffEE5366)),
+        colorScheme: ColorScheme.fromSwatch(
+          accentColor: const Color(0xffEE5366),
+        ),
       ),
       home: const ChatScreen(),
     );
@@ -26,7 +27,7 @@ class Example extends StatelessWidget {
 }
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({super.key});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -49,26 +50,10 @@ class _ChatScreenState extends State<ChatScreen> {
         profilePhoto: Data.profileImage,
       ),
       otherUsers: const [
-        ChatUser(
-          id: '2',
-          name: 'Simform',
-          profilePhoto: Data.profileImage,
-        ),
-        ChatUser(
-          id: '3',
-          name: 'Jhon',
-          profilePhoto: Data.profileImage,
-        ),
-        ChatUser(
-          id: '4',
-          name: 'Mike',
-          profilePhoto: Data.profileImage,
-        ),
-        ChatUser(
-          id: '5',
-          name: 'Rich',
-          profilePhoto: Data.profileImage,
-        ),
+        ChatUser(id: '2', name: 'Simform', profilePhoto: Data.profileImage),
+        ChatUser(id: '3', name: 'Jhon', profilePhoto: Data.profileImage),
+        ChatUser(id: '4', name: 'Mike', profilePhoto: Data.profileImage),
+        ChatUser(id: '5', name: 'Rich', profilePhoto: Data.profileImage),
       ],
     );
   }
@@ -97,7 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatController.addReplySuggestions([
       const SuggestionItemData(text: 'Thanks.'),
       const SuggestionItemData(text: 'Thank you very much.'),
-      const SuggestionItemData(text: 'Great.')
+      const SuggestionItemData(text: 'Great.'),
     ]);
   }
 
@@ -162,10 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
             IconButton(
               tooltip: 'Toggle TypingIndicator',
               onPressed: _showHideTypingIndicator,
-              icon: Icon(
-                Icons.keyboard,
-                color: theme.themeIconColor,
-              ),
+              icon: Icon(Icons.keyboard, color: theme.themeIconColor),
             ),
             IconButton(
               tooltip: 'Simulate Message receive',
@@ -181,10 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
           messageTimeIconColor: theme.messageTimeIconColor,
           messageTimeTextStyle: TextStyle(color: theme.messageTimeTextColor),
           defaultGroupSeparatorConfig: DefaultGroupSeparatorConfiguration(
-            textStyle: TextStyle(
-              color: theme.chatHeaderColor,
-              fontSize: 17,
-            ),
+            textStyle: TextStyle(color: theme.chatHeaderColor, fontSize: 17),
           ),
           backgroundColor: theme.backgroundColor,
         ),
@@ -225,8 +204,9 @@ class _ChatScreenState extends State<ChatScreen> {
               bodyStyle: theme.outgoingChatLinkBodyStyle,
               titleStyle: theme.outgoingChatLinkTitleStyle,
             ),
-            receiptsWidgetConfig:
-                const ReceiptsWidgetConfig(showReceiptsIn: ShowReceiptsIn.all),
+            receiptsWidgetConfig: const ReceiptsWidgetConfig(
+              showReceiptsIn: ShowReceiptsIn.all,
+            ),
             color: theme.outgoingChatBubbleColor,
           ),
           inComingChatBubbleConfig: ChatBubble(
@@ -244,8 +224,9 @@ class _ChatScreenState extends State<ChatScreen> {
               /// send your message reciepts to the other client
               debugPrint('Message Read');
             },
-            senderNameTextStyle:
-                TextStyle(color: theme.inComingChatBubbleTextColor),
+            senderNameTextStyle: TextStyle(
+              color: theme.inComingChatBubbleTextColor,
+            ),
             color: theme.inComingChatBubbleColor,
           ),
         ),
@@ -265,10 +246,12 @@ class _ChatScreenState extends State<ChatScreen> {
           messageReactionConfig: MessageReactionConfiguration(
             backgroundColor: theme.messageReactionBackGroundColor,
             borderColor: theme.messageReactionBackGroundColor,
-            reactedUserCountTextStyle:
-                TextStyle(color: theme.inComingChatBubbleTextColor),
-            reactionCountTextStyle:
-                TextStyle(color: theme.inComingChatBubbleTextColor),
+            reactedUserCountTextStyle: TextStyle(
+              color: theme.inComingChatBubbleTextColor,
+            ),
+            reactionCountTextStyle: TextStyle(
+              color: theme.inComingChatBubbleTextColor,
+            ),
             reactionsBottomSheetConfig: ReactionsBottomSheetConfiguration(
               backgroundColor: theme.backgroundColor,
               reactedUserTextStyle: TextStyle(
@@ -281,7 +264,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: isDarkTheme ? Colors.black12 : Colors.grey.shade200,
                     offset: const Offset(0, 20),
                     blurRadius: 40,
-                  )
+                  ),
                 ],
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -349,9 +332,7 @@ class _ChatScreenState extends State<ChatScreen> {
       replyMessage: replyMessage,
       messageType: messageType,
     );
-    _chatController.addMessage(
-      messageObj,
-    );
+    _chatController.addMessage(messageObj);
 
     Future.delayed(const Duration(milliseconds: 300), () {
       final index = _chatController.initialMessageList.indexOf(messageObj);

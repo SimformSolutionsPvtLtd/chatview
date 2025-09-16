@@ -73,3 +73,55 @@ enum SuggestionItemsType {
 
   bool get isMultilineType => this == SuggestionItemsType.multiline;
 }
+
+/// An enumeration of unread count styles.
+enum UnreadCountStyle {
+  /// Represents unread count as a dot.
+  dot,
+
+  /// Represents unread count as a number.
+  count,
+
+  /// Represents unread count as 99+ when the count exceeds 99.
+  /// Otherwise, it will show the actual count.
+  ninetyNinePlus,
+
+  /// Represents no unread count.
+  none;
+
+  /// Returns true if the unread count style is dot.
+  bool get isDot => this == dot;
+
+  /// Returns true if the unread count style is count.
+  bool get isCount => this == count;
+
+  /// Returns true if the unread count style is ninety-nine plus.
+  bool get isNinetyNinePlus => this == ninetyNinePlus;
+
+  /// Returns true if the unread count style is none.
+  bool get isNone => this == none;
+}
+
+enum ChatViewStateType {
+  chatView,
+  chatViewList;
+
+  bool get isChatView => this == ChatViewStateType.chatView;
+
+  bool get isChatViewList => this == ChatViewStateType.chatViewList;
+}
+
+enum UserActiveStatusAlignment {
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight;
+
+  bool get isTopLeft => this == topLeft;
+
+  bool get isTopRight => this == topRight;
+
+  bool get isBottomLeft => this == bottomLeft;
+
+  bool get isBottomRight => this == bottomRight;
+}

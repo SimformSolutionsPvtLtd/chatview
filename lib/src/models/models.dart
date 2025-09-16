@@ -21,6 +21,8 @@
  */
 export 'chat_bubble.dart';
 export 'config_models/chat_bubble_configuration.dart';
+export 'config_models/chat_view_list/models.dart';
+export 'config_models/chat_view_state_widget_config.dart';
 export 'config_models/chat_view_states_configuration.dart';
 export 'config_models/emoji_message_configuration.dart';
 export 'config_models/feature_active_config.dart';
@@ -31,6 +33,7 @@ export 'config_models/message_list_configuration.dart';
 export 'config_models/message_reaction_configuration.dart';
 export 'config_models/profile_circle_configuration.dart';
 export 'config_models/reaction_popup_configuration.dart';
+export 'config_models/receipts_widget_config.dart';
 export 'config_models/replied_message_configuration.dart';
 export 'config_models/replied_msg_auto_scroll_config.dart';
 export 'config_models/reply_popup_configuration.dart';

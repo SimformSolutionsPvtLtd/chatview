@@ -40,9 +40,25 @@ final class ChatViewLocale {
     required this.noMessage,
     required this.somethingWentWrong,
     required this.reload,
+    required this.search,
+    required this.now,
+    required this.minAgo,
+    required this.voice,
+    required this.typing,
+    required this.isVerb,
+    required this.areVerb,
+    required this.other,
+    required this.others,
+    required this.mute,
+    required this.unmute,
+    required this.pin,
+    required this.unpin,
+    required this.deleteChat,
+    required this.noChats,
+    required this.noSearchResults,
   });
 
-  /// Create from Map
+  /// Create from `Map<String, String>`
   factory ChatViewLocale.fromMap(Map<String, String> map) {
     return ChatViewLocale(
       today: map['today']?.toString() ?? '',
@@ -62,6 +78,22 @@ final class ChatViewLocale {
       noMessage: map['noMessage']?.toString() ?? '',
       somethingWentWrong: map['somethingWentWrong']?.toString() ?? '',
       reload: map['reload']?.toString() ?? '',
+      search: map['search']?.toString() ?? '',
+      now: map['now']?.toString() ?? '',
+      minAgo: map['minAgo']?.toString() ?? '',
+      voice: map['voice']?.toString() ?? '',
+      typing: map['typing']?.toString() ?? '',
+      isVerb: map['isVerb']?.toString() ?? '',
+      areVerb: map['areVerb']?.toString() ?? '',
+      other: map['other']?.toString() ?? '',
+      others: map['others']?.toString() ?? '',
+      mute: map['mute']?.toString() ?? '',
+      unmute: map['unmute']?.toString() ?? '',
+      pin: map['pin']?.toString() ?? '',
+      unpin: map['unpin']?.toString() ?? '',
+      deleteChat: map['deleteChat']?.toString() ?? '',
+      noChats: map['noChats']?.toString() ?? '',
+      noSearchResults: map['noSearchResults']?.toString() ?? '',
     );
   }
 
@@ -82,6 +114,22 @@ final class ChatViewLocale {
   final String noMessage;
   final String somethingWentWrong;
   final String reload;
+  final String search;
+  final String now;
+  final String minAgo;
+  final String voice;
+  final String typing;
+  final String isVerb;
+  final String areVerb;
+  final String other;
+  final String others;
+  final String mute;
+  final String unmute;
+  final String pin;
+  final String unpin;
+  final String deleteChat;
+  final String noChats;
+  final String noSearchResults;
 
   /// English defaults
   static const en = ChatViewLocale(
@@ -102,5 +150,21 @@ final class ChatViewLocale {
     noMessage: 'No message',
     somethingWentWrong: 'Something went wrong !!',
     reload: 'Reload',
+    search: 'Search',
+    now: 'Now',
+    minAgo: 'min ago',
+    voice: 'Voice',
+    typing: 'typing',
+    areVerb: 'are',
+    isVerb: 'is',
+    other: 'other',
+    others: 'others',
+    mute: 'Mute',
+    unmute: 'Unmute',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    deleteChat: 'Delete Chat',
+    noChats: 'No Chats',
+    noSearchResults: 'No search results',
   );
 }

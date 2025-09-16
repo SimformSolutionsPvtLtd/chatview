@@ -1,4 +1,5 @@
 import 'package:chatview/chatview.dart';
+import 'package:example/chat_view_list_screen.dart';
 import 'package:example/data.dart';
 import 'package:example/models/theme.dart';
 import 'package:flutter/material.dart';
@@ -20,13 +21,15 @@ class Example extends StatelessWidget {
         colorScheme:
             ColorScheme.fromSwatch(accentColor: const Color(0xffEE5366)),
       ),
-      home: const ChatScreen(),
+      home: const ChatViewListScreen(),
     );
   }
 }
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({required this.chat, super.key});
+
+  final ChatViewListItem chat;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -107,10 +110,38 @@ class _ChatScreenState extends State<ChatScreen> {
       body: ChatView(
         chatController: _chatController,
         onSendTap: _onSendTap,
+        loadMoreData: (direction, message) async {
+          await Future.delayed(const Duration(seconds: 1));
+          _chatController.loadMoreData(
+            [
+              Message(
+                id: (_chatController.initialMessageList.length + 1).toString(),
+                message: '${direction.name} meeting 1.',
+                createdAt: direction.isPrevious
+                    ? DateTime(2015, 21, 00)
+                    : DateTime.now(),
+                sentBy: '2',
+              ),
+              Message(
+                id: (_chatController.initialMessageList.length + 2).toString(),
+                message: '${direction.name} meeting 2.',
+                createdAt: direction.isPrevious
+                    ? DateTime(2015, 21, 00)
+                    : DateTime.now(),
+                sentBy: '2',
+              ),
+              if (direction.isNext &&
+                  _chatController.canRevertToInitialMessageList)
+                Data.messageList.first,
+            ],
+            direction: direction,
+          );
+        },
         featureActiveConfig: const FeatureActiveConfig(
           lastSeenAgoBuilderVisibility: true,
           receiptsBuilderVisibility: true,
           enableScrollToBottomButton: true,
+          enablePagination: true,
         ),
         scrollToBottomButtonConfig: ScrollToBottomButtonConfig(
           backgroundColor: theme.textFieldBackgroundColor,
@@ -138,16 +169,17 @@ class _ChatScreenState extends State<ChatScreen> {
         appBar: ChatViewAppBar(
           elevation: theme.elevation,
           backGroundColor: theme.appBarColor,
-          profilePicture: Data.profileImage,
+          profilePicture: widget.chat.imageUrl,
           backArrowColor: theme.backArrowColor,
-          chatTitle: "Chat view",
+          chatTitle: widget.chat.name,
           chatTitleTextStyle: TextStyle(
             color: theme.appBarTitleTextStyle,
             fontWeight: FontWeight.bold,
             fontSize: 18,
             letterSpacing: 0.25,
           ),
-          userStatus: "online",
+          userStatus:
+              widget.chat.userActiveStatus.isOnline ? 'Online' : 'Offline',
           userStatusTextStyle: const TextStyle(color: Colors.grey),
           actions: [
             IconButton(
@@ -299,6 +331,72 @@ class _ChatScreenState extends State<ChatScreen> {
           profileImageUrl: Data.profileImage,
         ),
         repliedMessageConfig: RepliedMessageConfiguration(
+          loadOldReplyMessage: (id) async {
+            _chatController.replaceMessageList(
+              [
+                Message(
+                  id: '123',
+                  message: 'What about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '1',
+                ),
+                Message(
+                  id: '124',
+                  message: 'I will ignore the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '2',
+                ),
+                Message(
+                  id: '125',
+                  message: 'I will join the meeting.',
+                  createdAt: DateTime(2015, 6, 20),
+                  sentBy: '3',
+                ),
+                Message(
+                  id: '126',
+                  message: 'Such a boring meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '1',
+                ),
+                Message(
+                  id: '127',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '140',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '128',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '129',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '130',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+                Message(
+                  id: '131',
+                  message: 'Stop talking about the meeting.',
+                  createdAt: DateTime(2015, 6, 21),
+                  sentBy: '4',
+                ),
+              ],
+            );
+          },
           backgroundColor: theme.repliedMessageColor,
           verticalBarColor: theme.verticalBarColor,
           repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(

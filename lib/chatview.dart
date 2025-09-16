@@ -24,20 +24,28 @@ library chatview;
 
 export 'package:audio_waveforms/audio_waveforms.dart'
     show
-        WaveStyle,
-        PlayerWaveStyle,
         AndroidEncoder,
+        AndroidOutputFormat,
         IosEncoder,
-        AndroidOutputFormat;
-export 'package:chatview_utils/chatview_utils.dart';
+        PlayerWaveStyle,
+        WaveStyle;
+export 'package:chatview_utils/chatview_utils.dart'
+    hide
+        AutoAnimateItemExtractor,
+        AutoAnimateSliverListController,
+        ChatRoomTypeExtension,
+        Defaulted,
+        MuteStatusExtension,
+        Omit,
+        PinStatusExtension,
+        UserActiveStatusExtension;
 export 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 export 'src/extensions/extensions.dart' show MessageTypes;
-export 'src/models/config_models/receipts_widget_config.dart';
 export 'src/models/models.dart';
 export 'src/utils/chat_view_locale.dart';
 export 'src/utils/package_strings.dart';
-export 'src/values/enumeration.dart';
+export 'src/values/enumeration.dart' hide ChatViewStateType;
 export 'src/values/typedefs.dart';
 export 'src/widgets/action_widgets/camera_action_button.dart';
 export 'src/widgets/action_widgets/emoji_picker_action_button.dart';
@@ -46,3 +54,4 @@ export 'src/widgets/action_widgets/overlay_action_button.dart';
 export 'src/widgets/action_widgets/text_field_action_button.dart';
 export 'src/widgets/chat_view.dart';
 export 'src/widgets/chat_view_appbar.dart';
+export 'src/widgets/chat_view_list/chatview_list.dart';

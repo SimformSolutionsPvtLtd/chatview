@@ -3,12 +3,78 @@ import 'package:chatview/chatview.dart';
 class Data {
   static const profileImage =
       "https://github.com/SimformSolutionsPvtLtd/chatview/blob/main/example/assets/images/simform.png?raw=true";
+
+  static final chatList = [
+    ChatViewListItem(
+      id: '2',
+      name: 'Simform',
+      unreadCount: 2,
+      imageUrl: Data.profileImage,
+      lastMessage: Message(
+        id: '12',
+        sentBy: '2',
+        message: "🤩🤩",
+        createdAt: DateTime.now().toUtc(),
+        status: MessageStatus.delivered,
+      ),
+      settings: ChatSettings(
+        pinStatus: PinStatus.pinned,
+        pinTime: DateTime.now().toUtc(),
+      ),
+    ),
+    ChatViewListItem(
+      id: '1',
+      name: 'Flutter',
+      imageUrl: Data.profileImage,
+      userActiveStatus: UserActiveStatus.online,
+      lastMessage: Message(
+        id: '13',
+        sentBy: '1',
+        message: "https://example.com/image.png",
+        messageType: MessageType.image,
+        createdAt: DateTime.now().subtract(const Duration(days: 2)).toUtc(),
+        status: MessageStatus.delivered,
+      ),
+    ),
+    ChatViewListItem(
+      id: '3',
+      name: 'Flutter Dev Group',
+      imageUrl: Data.profileImage,
+      chatRoomType: ChatRoomType.group,
+      userActiveStatus: UserActiveStatus.online,
+      lastMessage: Message(
+        id: '13',
+        sentBy: '2',
+        message: "https://example.com/image.png",
+        messageType: MessageType.image,
+        createdAt: DateTime.now().subtract(const Duration(days: 7)).toUtc(),
+        status: MessageStatus.delivered,
+      ),
+    ),
+    for (var i = 4; i < 10; i++)
+      ChatViewListItem(
+        id: i.toString(),
+        name: 'Chat $i',
+        imageUrl: Data.profileImage,
+        lastMessage: Message(
+          id: i.toString(),
+          sentBy: i % 2 == 0 ? '1' : '2',
+          message: "This is message number $i",
+          createdAt: DateTime.now()
+              .subtract(Duration(days: i, hours: i % 2 == 0 ? i : i * 2))
+              .toUtc(),
+          status: MessageStatus.delivered,
+        ),
+      ),
+  ];
+
   static final messageList = [
     Message(
       id: '1',
       message: "Hi!",
       createdAt: DateTime.now(),
-      sentBy: '1', // userId of who sends the message
+      // userId of who sends the message
+      sentBy: '1',
       status: MessageStatus.read,
     ),
     Message(
@@ -113,5 +179,27 @@ class Data {
       sentBy: '2',
       status: MessageStatus.read,
     ),
+    Message(
+      id: '13',
+      message: "Check this out",
+      createdAt: DateTime.now(),
+      replyMessage: const ReplyMessage(
+        messageId: '140',
+        replyTo: '2',
+        replyBy: '1',
+        message: "This",
+      ),
+      sentBy: '1',
+      status: MessageStatus.read,
+    ),
+    for (int i = 14; i <= 19; i++)
+      Message(
+        id: i.toString(),
+        message: "This is message number $i",
+        createdAt:
+            DateTime.now().subtract(Duration(hours: i % 2 == 0 ? i : i * 2)),
+        sentBy: (i % 2 == 0) ? '1' : '2',
+        status: MessageStatus.read,
+      ),
   ];
 }

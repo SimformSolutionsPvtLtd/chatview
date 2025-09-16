@@ -44,6 +44,9 @@ class RepliedMsgAutoScrollConfig {
   /// Animation curve for auto scroll. Defaults to Curves.easeIn.
   final Curve highlightScrollCurve;
 
+  /// Alignment of the replied message when scrolled to.
+  final double alignment;
+
   /// Configuration for auto scrolling and highlighting a message when
   /// tapping on the original message above the replied message.
   const RepliedMsgAutoScrollConfig({
@@ -53,5 +56,6 @@ class RepliedMsgAutoScrollConfig {
     this.highlightDuration = const Duration(milliseconds: 500),
     this.highlightScale = 1.1,
     this.highlightScrollCurve = Curves.easeIn,
+    this.alignment = 0.5,
   });
 }

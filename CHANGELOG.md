@@ -1,10 +1,43 @@
 ## [3.0.0] (unreleased)
 
-* **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/flutter_chatview/issues/318)
-  Provide support for action item widgets on the chat text field with position options leading and trailing.
-  Also, provide a way to add plus/attach button to open the overlay for action items.
+* **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/chatview/issues/318)
+  Provide support for action item widgets on the chat text field with position options
+  `leadingActions` and `trailingActions` in `TextFieldConfiguration`. Also, provide a way to add
+  plus/attach button to open the overlay for action items.
+* **Breaking**: [340](https://github.com/SimformSolutionsPvtLtd/chatview/pull/340) Added
+  `hintMaxLines` and `hideLeadingActionsOnType` params to `TextFieldConfiguration`.
 * **Breaking**: [330](https://github.com/SimformSolutionsPvtLtd/chatview/issues/330)
-    Memory usage optimization.
+  Optimized memory usage in chat message handling for smoother performance.
+* **Feat**: [386](https://github.com/SimformSolutionsPvtLtd/chatview/pull/386) Introduced
+  `ChatViewList` to provide a support for listing chats with options like search, pagination, online
+  status, unread message count, typing indicator, long press menu and more.
+* **Feat**: [356](https://github.com/SimformSolutionsPvtLtd/chatview/pull/356) Add
+  `loadOldReplyMessage` property to `RepliedMessageConfiguration` callback to load the original
+  message being replied to when it is not present in the current message list.
+* **Feat**: [356](https://github.com/SimformSolutionsPvtLtd/chatview/pull/356) Add `alignment`
+  property to `RepliedMsgAutoScrollConfig` to set the alignment of the replied message when auto
+  scrolled to it.
+* **Feat**: [350](https://github.com/SimformSolutionsPvtLtd/chatview/pull/350) ChatView loading
+  states now displays platform-wise progress indicator.
+* **Fix**: [380](https://github.com/SimformSolutionsPvtLtd/chatview/pull/380) Fix issue of
+  `ChatViewStateWidgetConfiguration` accepting null values and causing exceptions.
+* **Breaking**: [356](https://github.com/SimformSolutionsPvtLtd/chatview/pull/356) Add two way
+  pagination support in ChatView & `loadMoreData` callback now provides `direction` and `message`
+  parameters to indicate the direction of pagination and the message from which to load more
+  messages.
+* **Feat**: [301](https://github.com/SimformSolutionsPvtLtd/chatview/issues/301) Add
+  `CameraActionButton`, `GalleryActionButton` and `OverlayActionButton` ready to use widgets for
+  action items in chat text field.
+* **Feat**: [222](https://github.com/SimformSolutionsPvtLtd/chatview/issues/222) Add
+  `EmojiPickerActionButton` ready to use widgets for action items in chat text field.
+* **Breaking**: [340](https://github.com/SimformSolutionsPvtLtd/chatview/issues/340) Removed
+  `enableGalleryImagePicker` and `enableCameraImagePicker` from `SendMessageConfiguration`.
+* **Fix**: [340](https://github.com/SimformSolutionsPvtLtd/chatview/pull/340) Fix issue of
+  selected image not being displayed above text field in web platform.
+* **Feat**: [18](https://github.com/SimformSolutionsPvtLtd/chatview_utils/pull/18) Add
+  `updateMessage` method in `ChatController` to update an existing message in the chat.
+* **Breaking**: [19](https://github.com/SimformSolutionsPvtLtd/chatview_utils/pull/19) Removed `key`
+  param from `Message` model to avoid rebuild when same object with same values provided.
 
 ## [2.5.0]
 

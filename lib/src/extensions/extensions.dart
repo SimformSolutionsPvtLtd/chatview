@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'dart:convert';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -87,6 +89,12 @@ extension ValidateString on String {
   }
 
   bool get fromMemory => startsWith('data:image');
+
+  MemoryImage? toMemoryImage() {
+    return fromMemory
+        ? MemoryImage(base64Decode(substring(indexOf('base64') + 7)))
+        : null;
+  }
 
   bool get isAllEmoji {
     final unEmojified = EmojiParser().parseEmojis(this);
@@ -213,6 +221,16 @@ extension StatefulWidgetExtension on State {
 
 /// Extension on State for accessing inherited widget.
 extension BuildContextExtension on BuildContext {
+  void calculateAndUpdateTextFieldHeight() {
+    if (!mounted) return;
+    // Update the chat text field height based on the current context size.
+    chatViewIW?.chatTextFieldHeight.value = textFieldHeight;
+  }
+
+  double get textFieldHeight =>
+      chatViewIW?.chatTextFieldViewKey.currentContext?.size?.height ??
+      defaultChatTextFieldHeight;
+
   ChatViewInheritedWidget? get chatViewIW =>
       mounted ? ChatViewInheritedWidget.of(this) : null;
 

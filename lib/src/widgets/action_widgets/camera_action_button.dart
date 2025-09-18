@@ -13,6 +13,7 @@ class CameraActionButton extends TextFieldActionButton {
     this.imagePickerConfiguration,
     super.key,
     super.color,
+    super.style,
   }) : super(
           onPressed: onPressed == null
               ? null

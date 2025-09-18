@@ -146,9 +146,8 @@ class ChatViewListItemTile extends StatelessWidget {
                                       config.lastMessageTextOverflow,
                                   lastMessageTextStyle:
                                       config.lastMessageTextStyle,
-                                  lastMessageBuilder: config
-                                      .lastMessageTileBuilder
-                                      ?.call(lastMessage),
+                                  lastMessageBuilder:
+                                      config.lastMessageTileBuilder?.call(chat),
                                   statusConfig: config.lastMessageStatusConfig,
                                   showStatusIcon:
                                       config.showLastMessageStatus &&
@@ -187,6 +186,7 @@ class ChatViewListItemTile extends StatelessWidget {
                         ),
                     ],
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconScaleAnimation(
                           enable: isPinned,

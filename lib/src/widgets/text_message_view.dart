@@ -88,6 +88,7 @@ class TextMessageView extends StatelessWidget {
                   5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
           decoration: BoxDecoration(
             color: highlightMessage ? highlightColor : _color,
+            border: _border,
             borderRadius: _borderRadius(textMessage),
           ),
           child: textMessage.isUrl
@@ -114,6 +115,10 @@ class TextMessageView extends StatelessWidget {
       ],
     );
   }
+
+  Border? get _border => isMessageBySender
+      ? outgoingChatBubbleConfig?.border
+      : inComingChatBubbleConfig?.border;
 
   EdgeInsetsGeometry? get _padding => isMessageBySender
       ? outgoingChatBubbleConfig?.padding

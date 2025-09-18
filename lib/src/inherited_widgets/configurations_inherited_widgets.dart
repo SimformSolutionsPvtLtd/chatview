@@ -8,13 +8,13 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
     Key? key,
     required Widget child,
     required this.chatBackgroundConfig,
+    this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.reactionPopupConfig,
     this.messageConfig,
     this.chatBubbleConfig,
     this.profileCircleConfig,
     this.swipeToReplyConfig,
     this.repliedMessageConfig,
-    this.typeIndicatorConfig,
     this.replyPopupConfig,
     this.emojiPickerSheetConfig,
     this.scrollToBottomButtonConfig,
@@ -44,7 +44,7 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
   final RepliedMessageConfiguration? repliedMessageConfig;
 
   /// Provides configuration of typing indicator's appearance.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypeIndicatorConfiguration typeIndicatorConfig;
 
   /// Provides configuration for reply snack bar's appearance and options.
   final ReplyPopupConfiguration? replyPopupConfig;

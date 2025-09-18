@@ -23,21 +23,29 @@ import 'package:flutter/material.dart';
 
 class TypeIndicatorConfiguration {
   const TypeIndicatorConfiguration({
-    this.indicatorSize,
-    this.indicatorSpacing,
-    this.flashingCircleDarkColor,
-    this.flashingCircleBrightColor,
+    this.indicatorSize = 10,
+    this.indicatorSpacing = 4,
+    this.flashingCircleDarkColor = const Color(0xFF939497),
+    this.flashingCircleBrightColor = const Color(0xFFadacb0),
+    this.padding = const EdgeInsets.only(left: 5, bottom: 12),
+    this.customIndicator,
   });
 
   /// Used for giving typing indicator size.
-  final double? indicatorSize;
+  final double indicatorSize;
 
   /// Used for giving spacing between indicator dots.
-  final double? indicatorSpacing;
+  final double indicatorSpacing;
 
   /// Used to give color of dark circle dots.
   final Color? flashingCircleDarkColor;
 
   /// Used to give color of light circle dots.
   final Color? flashingCircleBrightColor;
+
+  /// Used for giving padding to typing indicator.
+  final EdgeInsets padding;
+
+  /// Used to provide custom indicator widget.
+  final Widget? customIndicator;
 }

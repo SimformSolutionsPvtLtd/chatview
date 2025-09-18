@@ -13,6 +13,7 @@ class OverlayActionButton extends TextFieldActionButton {
     super.key,
     super.onPressed,
     super.color,
+    super.style,
   });
 
   /// List of actions to display in the overlay.
@@ -60,6 +61,7 @@ class _OverlayActionButtonState
       key: _plusIconKey,
       icon: widget.icon,
       color: widget.color,
+      style: widget.style,
       onPressed: () {
         widget.onPressed != null
             ? widget.onPressed?.call()

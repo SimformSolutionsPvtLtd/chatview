@@ -88,111 +88,127 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final customTextField = widget.sendMessageBuilder?.call(_replyMessage);
+    final isCustomTextField = customTextField != null;
     final scrollToBottomButtonConfig =
         chatListConfig.scrollToBottomButtonConfig;
     return Align(
       alignment: Alignment.bottomCenter,
-      child: widget.sendMessageBuilder != null
-          ? widget.sendMessageBuilder!(_replyMessage)
-          : SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
-                children: [
-                  // This has been added to prevent messages from being
-                  // displayed below the text field
-                  // when the user scrolls the message list.
-                  Positioned(
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height /
-                          ((!kIsWeb && Platform.isIOS) ? 24 : 28),
-                      color:
-                          chatListConfig.chatBackgroundConfig.backgroundColor ??
-                              Colors.white,
+      child: SizedBox(
+        // Assign the key only when using a custom text field to measure its height,
+        // to preventing overlap with the message list.
+        key: isCustomTextField ? chatViewIW?.chatTextFieldViewKey : null,
+        child: isCustomTextField
+            ? Builder(
+                builder: (context) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => context.calculateAndUpdateTextFieldHeight(),
+                  );
+                  return customTextField;
+                },
+              )
+            : SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Stack(
+                  children: [
+                    // This has been added to prevent messages from being
+                    // displayed below the text field
+                    // when the user scrolls the message list.
+                    Positioned(
+                      right: 0,
+                      left: 0,
+                      bottom: 0,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height /
+                            ((!kIsWeb && Platform.isIOS) ? 24 : 28),
+                        color: chatListConfig
+                                .chatBackgroundConfig.backgroundColor ??
+                            Colors.white,
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (chatViewIW?.featureActiveConfig
-                                .enableScrollToBottomButton ??
-                            true)
-                          Align(
-                            alignment: scrollToBottomButtonConfig
-                                    ?.alignment?.alignment ??
-                                Alignment.bottomCenter,
-                            child: Padding(
-                              padding: scrollToBottomButtonConfig?.padding ??
-                                  EdgeInsets.zero,
-                              child: const ScrollToBottomButton(),
+                    Positioned(
+                      right: 0,
+                      left: 0,
+                      bottom: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (chatViewIW?.featureActiveConfig
+                                  .enableScrollToBottomButton ??
+                              true)
+                            Align(
+                              alignment: scrollToBottomButtonConfig
+                                      ?.alignment?.alignment ??
+                                  Alignment.bottomCenter,
+                              child: Padding(
+                                padding: scrollToBottomButtonConfig?.padding ??
+                                    EdgeInsets.zero,
+                                child: const ScrollToBottomButton(),
+                              ),
+                            ),
+                          Padding(
+                            key: chatViewIW?.chatTextFieldViewKey,
+                            padding: EdgeInsets.fromLTRB(
+                              bottomPadding4,
+                              bottomPadding4,
+                              bottomPadding4,
+                              _bottomPadding,
+                            ),
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                ReplyMessageView(
+                                  key: _replyMessageTextFieldViewKey,
+                                  sendMessageConfig: widget.sendMessageConfig,
+                                  messageConfig: widget.messageConfig,
+                                  builder: widget.replyMessageBuilder,
+                                  onChange: (value) => _replyMessage = value,
+                                ),
+                                if (widget.sendMessageConfig
+                                        ?.shouldSendImageWithText ??
+                                    false)
+                                  SelectedImageViewWidget(
+                                    key: _selectedImageViewWidgetKey,
+                                    sendMessageConfig: widget.sendMessageConfig,
+                                  ),
+                                ChatUITextField(
+                                  focusNode: _focusNode,
+                                  textEditingController: _textEditingController,
+                                  onPressed: _onPressed,
+                                  sendMessageConfig: widget.sendMessageConfig,
+                                  onRecordingComplete: _onRecordingComplete,
+                                  onImageSelected: (images, messageId) {
+                                    if (widget.sendMessageConfig
+                                            ?.shouldSendImageWithText ??
+                                        false) {
+                                      if (images.isNotEmpty) {
+                                        _selectedImageViewWidgetKey.currentState
+                                            ?.selectedImages.value = [
+                                          ...?_selectedImageViewWidgetKey
+                                              .currentState
+                                              ?.selectedImages
+                                              .value,
+                                          images
+                                        ];
+
+                                        FocusScope.of(context)
+                                            .requestFocus(_focusNode);
+                                      }
+                                    } else {
+                                      _onImageSelected(images, '');
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                        Padding(
-                          key: chatViewIW?.chatTextFieldViewKey,
-                          padding: EdgeInsets.fromLTRB(
-                            bottomPadding4,
-                            bottomPadding4,
-                            bottomPadding4,
-                            _bottomPadding,
-                          ),
-                          child: Stack(
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              ReplyMessageView(
-                                key: _replyMessageTextFieldViewKey,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                messageConfig: widget.messageConfig,
-                                builder: widget.replyMessageBuilder,
-                                onChange: (value) => _replyMessage = value,
-                              ),
-                              if (widget.sendMessageConfig
-                                      ?.shouldSendImageWithText ??
-                                  false)
-                                SelectedImageViewWidget(
-                                  key: _selectedImageViewWidgetKey,
-                                  sendMessageConfig: widget.sendMessageConfig,
-                                ),
-                              ChatUITextField(
-                                focusNode: _focusNode,
-                                textEditingController: _textEditingController,
-                                onPressed: _onPressed,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                onRecordingComplete: _onRecordingComplete,
-                                onImageSelected: (images, messageId) {
-                                  if (widget.sendMessageConfig
-                                          ?.shouldSendImageWithText ??
-                                      false) {
-                                    if (images.isNotEmpty) {
-                                      _selectedImageViewWidgetKey.currentState
-                                          ?.selectedImages.value = [
-                                        ...?_selectedImageViewWidgetKey
-                                            .currentState?.selectedImages.value,
-                                        images
-                                      ];
-
-                                      FocusScope.of(context)
-                                          .requestFocus(_focusNode);
-                                    }
-                                  } else {
-                                    _onImageSelected(images, '');
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 

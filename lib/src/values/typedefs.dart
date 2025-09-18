@@ -113,7 +113,9 @@ typedef SearchUserCallback = FutureOr<List<ChatViewListItem>?> Function(
   String value,
 );
 typedef ChatViewListLastMessageTileBuilder = Widget Function(
-  Message? message,
+  // Using chat item instead of message allows for greater customization
+  // based on additional chat item properties if required
+  ChatViewListItem chat,
 );
 typedef ChatViewListTextBuilder = String? Function(ChatViewListItem chat);
 typedef ChatViewListWidgetBuilder = Widget? Function(ChatViewListItem chat);

@@ -7,12 +7,14 @@ class TextFieldActionButton extends StatefulWidget {
     required this.icon,
     this.color,
     this.onPressed,
+    this.style,
     super.key,
   });
 
   final Widget icon;
   final Color? color;
   final VoidCallback? onPressed;
+  final ButtonStyle? style;
 
   @override
   State<TextFieldActionButton> createState() => TextFieldActionButtonState();
@@ -26,6 +28,7 @@ class TextFieldActionButtonState<T extends TextFieldActionButton>
       onPressed: widget.onPressed,
       icon: widget.icon,
       color: widget.color,
+      style: widget.style,
     );
   }
 }

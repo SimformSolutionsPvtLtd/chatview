@@ -41,6 +41,7 @@ class ChatView extends StatefulWidget {
   const ChatView({
     Key? key,
     required this.chatController,
+    this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.onSendTap,
     this.profileCircleConfig,
     this.chatBubbleConfig,
@@ -54,7 +55,6 @@ class ChatView extends StatefulWidget {
     this.isLastPage,
     this.appBar,
     ChatBackgroundConfiguration? chatBackgroundConfig,
-    this.typeIndicatorConfig,
     this.sendMessageBuilder,
     this.sendMessageConfig,
     this.onChatListTap,
@@ -117,7 +117,7 @@ class ChatView extends StatefulWidget {
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
 
   /// Allow user to giving customisation typing indicator.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypeIndicatorConfiguration typeIndicatorConfig;
 
   /// Provides controller for accessing few function for running chat.
   final ChatController chatController;
@@ -199,6 +199,7 @@ class _ChatViewState extends State<ChatView>
         chatViewState.hasMessages) {
       chatController.scrollToLastMessage();
     }
+    final imageUrl = chatBackgroundConfig.backgroundImage;
     return ChatViewInheritedWidget(
       chatController: chatController,
       featureActiveConfig: featureActiveConfig,
@@ -228,13 +229,14 @@ class _ChatViewState extends State<ChatView>
                       MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: chatBackgroundConfig.backgroundColor ?? Colors.white,
-                    image: chatBackgroundConfig.backgroundImage == null
+                    image: imageUrl == null
                         ? null
                         : DecorationImage(
                             fit: BoxFit.fill,
-                            image: NetworkImage(
-                              chatBackgroundConfig.backgroundImage!,
-                            ),
+                            image: imageUrl.isUrl
+                                ? NetworkImage(imageUrl)
+                                : imageUrl.toMemoryImage() ??
+                                    AssetImage(imageUrl),
                           ),
                   ),
                   padding: chatBackgroundConfig.padding,

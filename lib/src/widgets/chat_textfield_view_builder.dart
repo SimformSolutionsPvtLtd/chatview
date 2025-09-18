@@ -24,7 +24,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
-import '../utils/constants/constants.dart';
 import '../values/typedefs.dart';
 
 /// A widget builder that contains the logic to calculate the height of the chat text field
@@ -49,14 +48,9 @@ class ChatTextFieldViewBuilder<T> extends StatelessWidget {
     return ValueListenableBuilder<T>(
       valueListenable: valueListenable,
       builder: (context, value, child) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) return;
-          final chatViewIW = context.chatViewIW;
-          // Update the chat text field height based on the current context size.
-          chatViewIW?.chatTextFieldHeight.value =
-              chatViewIW.chatTextFieldViewKey.currentContext?.size?.height ??
-                  defaultChatTextFieldHeight;
-        });
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => context.calculateAndUpdateTextFieldHeight(),
+        );
         return builder.call(context, value, child);
       },
     );

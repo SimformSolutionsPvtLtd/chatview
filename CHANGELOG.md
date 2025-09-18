@@ -38,6 +38,11 @@
   `updateMessage` method in `ChatController` to update an existing message in the chat.
 * **Breaking**: [19](https://github.com/SimformSolutionsPvtLtd/chatview_utils/pull/19) Removed `key`
   param from `Message` model to avoid rebuild when same object with same values provided.
+* **Fix**: [382](https://github.com/SimformSolutionsPvtLtd/chatview/issues/382) Fix
+  `sendMessageBuilder` overlaps last message.
+* **Feat**: [387](https://github.com/SimformSolutionsPvtLtd/chatview/pull/387) Added support for
+  `Asset` and `Memory` type images in `backgroundImage` in `ChatBackgroundConfiguration` and
+  `customIndicator` in `TypeIndicatorConfiguration`.
 
 ## [2.5.0]
 

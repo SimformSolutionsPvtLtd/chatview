@@ -40,6 +40,7 @@ class LastMessageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final highlightText = unreadCount > 0;
     return lastMessageBuilder ??
         AnimatedSwitcher(
           switchOutCurve: Curves.easeOut,
@@ -71,7 +72,7 @@ class LastMessageView extends StatelessWidget {
                               maxLines: lastMessageMaxLines,
                               overflow: lastMessageTextOverflow,
                               style: TextStyle(
-                                fontWeight: unreadCount > 0
+                                fontWeight: highlightText
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                               ),
@@ -87,7 +88,7 @@ class LastMessageView extends StatelessWidget {
                         style: lastMessageTextStyle ??
                             TextStyle(
                               fontSize: 14,
-                              fontWeight: unreadCount > 0
+                              fontWeight: highlightText
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                             ),

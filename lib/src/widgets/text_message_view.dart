@@ -71,6 +71,9 @@ class TextMessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final textMessage = message.message;
+    final border = isMessageBySender
+        ? outgoingChatBubbleConfig?.border
+        : inComingChatBubbleConfig?.border;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -88,6 +91,7 @@ class TextMessageView extends StatelessWidget {
                   5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
           decoration: BoxDecoration(
             color: highlightMessage ? highlightColor : _color,
+            border: border,
             borderRadius: _borderRadius(textMessage),
           ),
           child: textMessage.isUrl

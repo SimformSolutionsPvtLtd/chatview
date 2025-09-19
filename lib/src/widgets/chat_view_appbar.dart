@@ -21,10 +21,10 @@
  */
 import 'dart:io' if (kIsWeb) 'dart:html';
 
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
-import '../../chatview.dart';
 import 'profile_image_widget.dart';
 
 class ChatViewAppBar extends StatelessWidget {
@@ -145,24 +145,28 @@ class ChatViewAppBar extends StatelessWidget {
                             networkImageProgressIndicatorBuilder,
                       ),
                     ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        chatTitle,
-                        style: chatTitleTextStyle ??
-                            const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.25,
-                            ),
-                      ),
-                      if (userStatus != null)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          userStatus!,
-                          style: userStatusTextStyle,
+                          chatTitle,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: chatTitleTextStyle ??
+                              const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.25,
+                              ),
                         ),
-                    ],
+                        if (userStatus != null)
+                          Text(
+                            userStatus!,
+                            style: userStatusTextStyle,
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),

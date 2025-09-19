@@ -32,6 +32,7 @@ import '../extensions/extensions.dart';
 import '../inherited_widgets/configurations_inherited_widgets.dart';
 import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
+import '../values/enumeration.dart';
 import 'chat_view_inherited_widget.dart';
 import 'send_message_widget.dart';
 import 'suggestions/suggestions_config_inherited_widget.dart';
@@ -40,6 +41,7 @@ class ChatView extends StatefulWidget {
   const ChatView({
     Key? key,
     required this.chatController,
+    this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.onSendTap,
     this.profileCircleConfig,
     this.chatBubbleConfig,
@@ -53,7 +55,6 @@ class ChatView extends StatefulWidget {
     this.isLastPage,
     this.appBar,
     ChatBackgroundConfiguration? chatBackgroundConfig,
-    this.typeIndicatorConfig,
     this.sendMessageBuilder,
     this.sendMessageConfig,
     this.onChatListTap,
@@ -100,13 +101,13 @@ class ChatView extends StatefulWidget {
 
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
-  final AsyncCallback? loadMoreData;
+  final PaginationCallback? loadMoreData;
 
   /// Provides widget for loading view while pagination is enabled.
   final Widget? loadingWidget;
 
   /// Provides flag if there is no more next data left in list.
-  final bool? isLastPage;
+  final ValueGetter<bool>? isLastPage;
 
   /// Provides call back when user tap on send button in text field. It returns
   /// message, reply message and message type.
@@ -116,7 +117,7 @@ class ChatView extends StatefulWidget {
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
 
   /// Allow user to giving customisation typing indicator.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypeIndicatorConfiguration typeIndicatorConfig;
 
   /// Provides controller for accessing few function for running chat.
   final ChatController chatController;
@@ -128,7 +129,7 @@ class ChatView extends StatefulWidget {
   final ChatViewState chatViewState;
 
   /// Provides configuration for chat view state appearance and functionality.
-  final ChatViewStateConfiguration? chatViewStateConfig;
+  final ChatViewStateConfiguration chatViewStateConfig;
 
   /// Provides configuration for turn on/off specific features.
   final FeatureActiveConfig featureActiveConfig;
@@ -177,7 +178,7 @@ class _ChatViewState extends State<ChatView>
 
   ChatViewState get chatViewState => widget.chatViewState;
 
-  ChatViewStateConfiguration? get chatViewStateConfig =>
+  ChatViewStateConfiguration get chatViewStateConfig =>
       widget.chatViewStateConfig;
 
   FeatureActiveConfig get featureActiveConfig => widget.featureActiveConfig;
@@ -198,6 +199,7 @@ class _ChatViewState extends State<ChatView>
         chatViewState.hasMessages) {
       chatController.scrollToLastMessage();
     }
+    final imageUrl = chatBackgroundConfig.backgroundImage;
     return ChatViewInheritedWidget(
       chatController: chatController,
       featureActiveConfig: featureActiveConfig,
@@ -205,20 +207,20 @@ class _ChatViewState extends State<ChatView>
       chatTextFieldViewKey: chatTextFieldViewKey,
       child: SuggestionsConfigIW(
         suggestionsConfig: widget.replySuggestionsConfig,
-        child: Builder(builder: (context) {
-          return ConfigurationsInheritedWidget(
-            chatBackgroundConfig: widget.chatBackgroundConfig,
-            reactionPopupConfig: widget.reactionPopupConfig,
-            typeIndicatorConfig: widget.typeIndicatorConfig,
-            chatBubbleConfig: widget.chatBubbleConfig,
-            replyPopupConfig: widget.replyPopupConfig,
-            messageConfig: widget.messageConfig,
-            profileCircleConfig: widget.profileCircleConfig,
-            repliedMessageConfig: widget.repliedMessageConfig,
-            swipeToReplyConfig: widget.swipeToReplyConfig,
-            emojiPickerSheetConfig: widget.emojiPickerSheetConfig,
-            scrollToBottomButtonConfig: widget.scrollToBottomButtonConfig,
-            child: Stack(
+        child: ConfigurationsInheritedWidget(
+          chatBackgroundConfig: widget.chatBackgroundConfig,
+          reactionPopupConfig: widget.reactionPopupConfig,
+          typeIndicatorConfig: widget.typeIndicatorConfig,
+          chatBubbleConfig: widget.chatBubbleConfig,
+          replyPopupConfig: widget.replyPopupConfig,
+          messageConfig: widget.messageConfig,
+          profileCircleConfig: widget.profileCircleConfig,
+          repliedMessageConfig: widget.repliedMessageConfig,
+          swipeToReplyConfig: widget.swipeToReplyConfig,
+          emojiPickerSheetConfig: widget.emojiPickerSheetConfig,
+          scrollToBottomButtonConfig: widget.scrollToBottomButtonConfig,
+          child: Builder(
+            builder: (context) => Stack(
               children: [
                 Container(
                   height: chatBackgroundConfig.height ??
@@ -227,13 +229,15 @@ class _ChatViewState extends State<ChatView>
                       MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: chatBackgroundConfig.backgroundColor ?? Colors.white,
-                    image: chatBackgroundConfig.backgroundImage != null
-                        ? DecorationImage(
+                    image: imageUrl == null
+                        ? null
+                        : DecorationImage(
                             fit: BoxFit.fill,
-                            image: NetworkImage(
-                                chatBackgroundConfig.backgroundImage!),
-                          )
-                        : null,
+                            image: imageUrl.isUrl
+                                ? NetworkImage(imageUrl)
+                                : imageUrl.toMemoryImage() ??
+                                    AssetImage(imageUrl),
+                          ),
                   ),
                   padding: chatBackgroundConfig.padding,
                   margin: chatBackgroundConfig.margin,
@@ -245,25 +249,26 @@ class _ChatViewState extends State<ChatView>
                           children: [
                             if (chatViewState.isLoading)
                               ChatViewStateWidget(
-                                chatViewStateWidgetConfig:
-                                    chatViewStateConfig?.loadingWidgetConfig,
+                                type: ChatViewStateType.chatView,
+                                config: chatViewStateConfig.loadingWidgetConfig,
                                 chatViewState: chatViewState,
                               )
                             else if (chatViewState.noMessages)
                               ChatViewStateWidget(
-                                chatViewStateWidgetConfig:
-                                    chatViewStateConfig?.noMessageWidgetConfig,
+                                type: ChatViewStateType.chatView,
+                                config:
+                                    chatViewStateConfig.noMessageWidgetConfig,
                                 chatViewState: chatViewState,
                                 onReloadButtonTap:
-                                    chatViewStateConfig?.onReloadButtonTap,
+                                    chatViewStateConfig.onReloadButtonTap,
                               )
                             else if (chatViewState.isError)
                               ChatViewStateWidget(
-                                chatViewStateWidgetConfig:
-                                    chatViewStateConfig?.errorWidgetConfig,
+                                type: ChatViewStateType.chatView,
+                                config: chatViewStateConfig.errorWidgetConfig,
                                 chatViewState: chatViewState,
                                 onReloadButtonTap:
-                                    chatViewStateConfig?.onReloadButtonTap,
+                                    chatViewStateConfig.onReloadButtonTap,
                               )
                             else if (chatViewState.hasMessages)
                               GestureDetector(
@@ -320,8 +325,8 @@ class _ChatViewState extends State<ChatView>
                   ),
               ],
             ),
-          );
-        }),
+          ),
+        ),
       ),
     );
   }

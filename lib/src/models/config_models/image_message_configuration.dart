@@ -26,6 +26,7 @@ class ImageMessageConfiguration {
   const ImageMessageConfiguration({
     this.hideShareIcon = false,
     this.shareIconConfig,
+    this.border,
     this.onTap,
     this.height,
     this.width,
@@ -57,6 +58,9 @@ class ImageMessageConfiguration {
 
   /// Used for giving border radius of image message.
   final BorderRadius? borderRadius;
+
+  /// Used for giving border of image message.
+  final Border? border;
 }
 
 class ShareIconConfiguration {

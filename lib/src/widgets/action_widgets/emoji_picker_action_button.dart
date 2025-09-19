@@ -14,6 +14,7 @@ class EmojiPickerActionButton extends TextFieldActionButton {
     this.height,
     super.key,
     super.color,
+    super.style,
   }) : super(
           onPressed: onPressed == null
               ? null

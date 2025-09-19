@@ -19,6 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -64,9 +67,10 @@ typedef CustomViewForReplyMessage = Widget Function(
   BuildContext context,
   ReplyMessage state,
 );
-typedef GetMessageSeparator = (
-  Map<int, DateTime> messageSeparator,
-  DateTime dateTime,
+typedef GetMessageSeparatorWithCounts = (
+  Map<int, DateTime> separators,
+  DateTime lastMatchedDate,
+  Map<int, int> separatorCounts
 );
 typedef SelectedImageViewBuilder = Widget Function(
   List<String> images,
@@ -101,4 +105,78 @@ typedef TextFieldActionWidgetBuilder = List<Widget> Function(
   BuildContext context,
   TextEditingController controller,
 );
-
+typedef BackgroundImageLoadError = void Function(
+  Object exception,
+  StackTrace? stackTrace,
+)?;
+typedef SearchUserCallback = FutureOr<List<ChatViewListItem>?> Function(
+  String value,
+);
+typedef ChatViewListLastMessageTileBuilder = Widget Function(
+  // Using chat item instead of message allows for greater customization
+  // based on additional chat item properties if required
+  ChatViewListItem chat,
+);
+typedef ChatViewListTextBuilder = String? Function(ChatViewListItem chat);
+typedef ChatViewListWidgetBuilder = Widget? Function(ChatViewListItem chat);
+typedef UnreadCountWidgetBuilder = Widget Function(int count);
+typedef ChatStatusCallback<T> = void Function(
+  ({ChatViewListItem chat, T status}) result,
+);
+typedef DeleteChatCallback = void Function(ChatViewListItem chat);
+typedef StatusTrailingIcon<T> = IconData Function(T status);
+typedef LastMessageTimeBuilder = Widget Function(DateTime time);
+typedef ChatViewListTileBuilder = Widget Function(
+  BuildContext context,
+  ChatViewListItem chat,
+);
+typedef UserAvatarBuilder = Widget Function(ChatViewListItem chat);
+typedef UserNameBuilder = Widget Function(ChatViewListItem chat);
+typedef TrailingBuilder = Widget Function(ChatViewListItem chat);
+typedef MenuWidgetCallback = Widget Function(ChatViewListItem chat);
+typedef MenuBuilderCallback = Widget Function(
+  BuildContext context,
+  ChatViewListItem chat,
+  Widget child,
+);
+typedef MenuActionBuilder = List<Widget> Function(ChatViewListItem chat);
+typedef AutoAnimateItemBuilder<T> = Widget Function(
+  BuildContext context,
+  int index,
+  bool isLastItem,
+  T item,
+);
+typedef AutoAnimateSeparatorBuilder = Widget Function(
+  BuildContext context,
+  int index,
+);
+typedef ChatPinnedCallback<T> = bool Function(T chat);
+typedef ShowUserActiveIndicatorCallback = bool Function(
+  UserActiveStatus status,
+);
+typedef ActiveStatusIndicatorColorResolver = Color Function(
+  UserActiveStatus status,
+);
+typedef PaginationCallback = Future<void> Function(
+  ChatPaginationDirection direction,
+  Message message,
+);
+typedef OldReplyMessageFetchCallback = Future<void> Function(
+  String messageId,
+);
+typedef PaginationScrollUpdateResult = ({
+  ChatPaginationDirection? direction,
+  Message? message,
+});
+typedef MessageStatusIconEnableCallback = bool Function(
+  Message message,
+);
+typedef MessageStatusColorResolver = Color Function(
+  MessageStatus status,
+);
+typedef MessageStatusIconResolver = IconData Function(
+  MessageStatus status,
+);
+typedef MessageStatusBuilder = Widget Function(
+  MessageStatus status,
+);

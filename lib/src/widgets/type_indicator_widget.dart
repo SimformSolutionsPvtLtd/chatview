@@ -33,11 +33,11 @@ import 'profile_circle.dart';
 
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({
-    Key? key,
+    required this.typeIndicatorConfig,
     this.showIndicator = false,
     this.chatBubbleConfig,
-    this.typeIndicatorConfig,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// Allow user to turn on/off typing indicator.
   final bool showIndicator;
@@ -47,7 +47,7 @@ class TypingIndicator extends StatefulWidget {
   final ChatBubble? chatBubbleConfig;
 
   /// Provides configurations related to typing indicator appearance.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypeIndicatorConfiguration typeIndicatorConfig;
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -75,18 +75,17 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   ChatBubble? get chatBubbleConfig => widget.chatBubbleConfig;
 
-  double get indicatorSize => widget.typeIndicatorConfig?.indicatorSize ?? 10;
+  double get indicatorSize => widget.typeIndicatorConfig.indicatorSize;
 
-  double get indicatorSpacing =>
-      widget.typeIndicatorConfig?.indicatorSpacing ?? 4;
+  double get indicatorSpacing => widget.typeIndicatorConfig.indicatorSpacing;
 
   Color? get flashingCircleDarkColor =>
-      widget.typeIndicatorConfig?.flashingCircleDarkColor ??
-      const Color(0xFF939497);
+      widget.typeIndicatorConfig.flashingCircleDarkColor;
 
   Color? get flashingCircleBrightColor =>
-      widget.typeIndicatorConfig?.flashingCircleBrightColor ??
-      const Color(0xFFadacb0);
+      widget.typeIndicatorConfig.flashingCircleBrightColor;
+
+  EdgeInsets get typeIndicatorPadding => widget.typeIndicatorConfig.padding;
 
   @override
   void initState() {
@@ -203,6 +202,22 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
+    final isCustomIndicator =
+        widget.typeIndicatorConfig.customIndicator != null;
+
+    if (isCustomIndicator && widget.showIndicator) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: typeIndicatorPadding,
+          child: _buildAnimatedBubble(
+            animation: _largeBubbleAnimation,
+            bubble: widget.typeIndicatorConfig.customIndicator!,
+          ),
+        ),
+      );
+    }
+
     return AnimatedBuilder(
       animation: _indicatorSpaceAnimation,
       builder: (context, child) {
@@ -213,11 +228,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
       },
       child: Stack(
         children: [
-          _buildAnimatedBubble(
-            animation: _largeBubbleAnimation,
-            left: 5,
-            bottom: 12,
-            bubble: _buildStatusBubble(),
+          Positioned(
+            left: typeIndicatorPadding.left,
+            bottom: typeIndicatorPadding.bottom,
+            child: _buildAnimatedBubble(
+              animation: _largeBubbleAnimation,
+              bubble: _buildStatusBubble(),
+            ),
           ),
         ],
       ),
@@ -226,41 +243,35 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   Widget _buildAnimatedBubble({
     required Animation<double> animation,
-    required double left,
-    required double bottom,
     required Widget bubble,
   }) {
-    return Positioned(
-      left: left,
-      bottom: bottom,
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: animation.value,
-            alignment: Alignment.centerLeft,
-            child: child,
-          );
-        },
-        child: Row(
-          children: [
-            ProfileCircle(
-              bottomPadding: 0,
-              imageUrl: profileCircleConfiguration?.profileImageUrl,
-              imageType: profileCircleConfiguration?.imageType,
-              assetImageErrorBuilder:
-                  profileCircleConfiguration?.assetImageErrorBuilder,
-              networkImageErrorBuilder:
-                  profileCircleConfiguration?.networkImageErrorBuilder,
-              defaultAvatarImage:
-                  profileCircleConfiguration?.defaultAvatarImage ??
-                      Constants.profileImage,
-              networkImageProgressIndicatorBuilder: profileCircleConfiguration
-                  ?.networkImageProgressIndicatorBuilder,
-            ),
-            bubble,
-          ],
-        ),
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (_, child) => Transform.scale(
+        scale: animation.value,
+        alignment: Alignment.centerLeft,
+        child: child,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ProfileCircle(
+            bottomPadding: 0,
+            profileCirclePadding: EdgeInsets.zero,
+            imageUrl: profileCircleConfiguration?.profileImageUrl,
+            imageType: profileCircleConfiguration?.imageType,
+            assetImageErrorBuilder:
+                profileCircleConfiguration?.assetImageErrorBuilder,
+            networkImageErrorBuilder:
+                profileCircleConfiguration?.networkImageErrorBuilder,
+            defaultAvatarImage:
+                profileCircleConfiguration?.defaultAvatarImage ??
+                    Constants.profileImage,
+            networkImageProgressIndicatorBuilder: profileCircleConfiguration
+                ?.networkImageProgressIndicatorBuilder,
+          ),
+          bubble,
+        ],
       ),
     );
   }

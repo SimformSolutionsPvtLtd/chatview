@@ -20,9 +20,11 @@
  * SOFTWARE.
  */
 
+import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
+import '../models/config_models/scroll_to_bottom_button_config.dart';
 
 class ScrollToBottomButton extends StatefulWidget {
   const ScrollToBottomButton({super.key});
@@ -33,38 +35,13 @@ class ScrollToBottomButton extends StatefulWidget {
 
 class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
   bool isButtonVisible = false;
-  ScrollController? scrollController;
 
   @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollController = chatViewIW?.chatController.scrollController;
-      scrollController?.addListener(_updateScrollButtonVisibility);
-    });
-  }
-
-  void _updateScrollButtonVisibility() {
-    if (!mounted) return;
-
-    final double currentOffset = scrollController?.offset ?? 0;
-    final double buttonDisplayOffset =
-        chatListConfig.scrollToBottomButtonConfig?.buttonDisplayOffset ?? 300;
-    final bool isOffsetCrossedLimit = currentOffset > buttonDisplayOffset;
-    if (isOffsetCrossedLimit) {
-      if (!isButtonVisible) {
-        setState(() {
-          isButtonVisible = true;
-        });
-      }
-    } else {
-      if (isButtonVisible) {
-        setState(() {
-          isButtonVisible = false;
-        });
-      }
-    }
+  void didChangeDependencies() {
+    chatViewIW?.chatController.scrollController
+      ?..removeListener(_updateScrollButtonVisibility)
+      ..addListener(_updateScrollButtonVisibility);
+    super.didChangeDependencies();
   }
 
   @override
@@ -79,17 +56,10 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
         return Transform.scale(
           scale: scale,
           child: InkWell(
-            onTap: () {
-              scrollToBottomButtonConfig?.onClick?.call();
-              final scrollController =
-                  chatViewIW?.chatController.scrollController;
-              scrollController?.animateTo(
-                0,
-                duration: scrollToBottomButtonConfig?.scrollAnimationDuration ??
-                    const Duration(milliseconds: 200),
-                curve: Curves.linear,
-              );
-            },
+            onTap: () => _onScrollTap(
+              config: scrollToBottomButtonConfig,
+              chatController: chatViewIW?.chatController,
+            ),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: scrollToBottomButtonConfig?.borderRadius ??
@@ -116,7 +86,45 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
 
   @override
   void dispose() {
-    scrollController?.removeListener(_updateScrollButtonVisibility);
+    chatViewIW?.chatController.scrollController
+        .removeListener(_updateScrollButtonVisibility);
     super.dispose();
+  }
+
+  void _updateScrollButtonVisibility() {
+    if (!mounted) return;
+
+    final currentOffset =
+        chatViewIW?.chatController.scrollController.offset ?? 0;
+    final buttonDisplayOffset =
+        chatListConfig.scrollToBottomButtonConfig?.buttonDisplayOffset ?? 300;
+
+    if (currentOffset > buttonDisplayOffset) {
+      if (!isButtonVisible) setState(() => isButtonVisible = true);
+    } else if (isButtonVisible) {
+      setState(() => isButtonVisible = false);
+    }
+  }
+
+  void _onScrollTap({
+    required ChatController? chatController,
+    required ScrollToBottomButtonConfig? config,
+  }) {
+    config?.onClick?.call();
+    final scrollDuration =
+        config?.scrollAnimationDuration ?? Constants.scrollToAnimateDuration;
+    chatController?.scrollToLastMessage(
+      waitFor: Duration.zero,
+      scrollFor: scrollDuration,
+    );
+    // Need to manually update for the cases when the list view's state is
+    // reset which would not cause scroll listener to be triggered.
+    Future.delayed(
+      scrollDuration,
+      () {
+        if (!mounted || !isButtonVisible) return;
+        setState(() => isButtonVisible = false);
+      },
+    );
   }
 }

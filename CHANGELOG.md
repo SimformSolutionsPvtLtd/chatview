@@ -43,6 +43,15 @@
 * **Feat**: [387](https://github.com/SimformSolutionsPvtLtd/chatview/pull/387) Added support for
   `Asset` and `Memory` type images in `backgroundImage` in `ChatBackgroundConfiguration` and
   `customIndicator` in `TypeIndicatorConfiguration`.
+* **Feat**: [390](https://github.com/SimformSolutionsPvtLtd/chatview/pull/390) Added support for
+  customizing send message button style and introduced `outgoingPlayerWaveStyle`,
+  `inComingPlayerWaveStyle` in `VoiceMessageConfiguration` to customize the audio wave style for
+  outgoing and incoming messages separately.
+* **Breaking**: [390](https://github.com/SimformSolutionsPvtLtd/chatview/pull/390) Reacted emojis
+  are now shown in custom messages as well.
+* **Breaking**: [390](https://github.com/SimformSolutionsPvtLtd/chatview/pull/390) `playIcon` and
+  `pauseIcon` Now accepts a callback that provides different icons based on whether the message is
+  by the sender or not. accept `Widget`.
 
 ## [2.5.0]
 

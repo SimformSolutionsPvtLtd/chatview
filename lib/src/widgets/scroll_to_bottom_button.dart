@@ -68,8 +68,10 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
                     Border.all(color: Colors.grey),
                 color:
                     scrollToBottomButtonConfig?.backgroundColor ?? Colors.white,
+                boxShadow: scrollToBottomButtonConfig?.boxShadow,
               ),
-              padding: const EdgeInsets.all(4),
+              padding: scrollToBottomButtonConfig?.insidePadding ??
+                  const EdgeInsets.all(4),
               child: scrollToBottomButtonConfig?.icon ??
                   const Icon(
                     Icons.keyboard_arrow_down_rounded,

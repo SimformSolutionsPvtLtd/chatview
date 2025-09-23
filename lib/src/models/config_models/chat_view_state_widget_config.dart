@@ -15,6 +15,7 @@ class ChatViewStateWidgetConfiguration {
     this.subTitleTextStyle,
     this.loadingIndicatorColor,
     this.reloadButton,
+    this.loadingWidget,
   });
 
   /// Used to give title of state.
@@ -55,4 +56,7 @@ class ChatViewStateWidgetConfiguration {
 
   /// Gives ability to pass custom widget in any state.
   final Widget? widget;
+
+  /// Provides parameter to pass custom loading widget in any state.
+  final Widget? loadingWidget;
 }

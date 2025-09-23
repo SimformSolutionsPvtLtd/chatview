@@ -82,15 +82,20 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
 
   PlayerWaveStyle playerWaveStyle = const PlayerWaveStyle(scaleFactor: 70);
 
+  PlayerWaveStyle get _waveStyle =>
+      (widget.isMessageBySender
+          ? widget.config?.outgoingPlayerWaveStyle
+          : widget.config?.inComingPlayerWaveStyle) ??
+      widget.config?.playerWaveStyle ??
+      playerWaveStyle;
+
   @override
   void initState() {
     super.initState();
     controller = PlayerController()
       ..preparePlayer(
         path: widget.message.message,
-        noOfSamples: widget.config?.playerWaveStyle
-                ?.getSamplesForWidth(widget.screenWidth * 0.5) ??
-            playerWaveStyle.getSamplesForWidth(widget.screenWidth * 0.5),
+        noOfSamples: _waveStyle.getSamplesForWidth(widget.screenWidth * 0.5),
       ).whenComplete(() => widget.onMaxDuration?.call(controller.maxDuration));
     playerStateSubscription = controller.onPlayerStateChanged
         .listen((state) => _playerState.value = state);
@@ -136,12 +141,14 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                     onPressed: _playOrPause,
                     icon:
                         state.isStopped || state.isPaused || state.isInitialised
-                            ? widget.config?.playIcon ??
+                            ? widget.config?.playIcon
+                                    ?.call(widget.isMessageBySender) ??
                                 const Icon(
                                   Icons.play_arrow,
                                   color: Colors.white,
                                 )
-                            : widget.config?.pauseIcon ??
+                            : widget.config?.pauseIcon
+                                    ?.call(widget.isMessageBySender) ??
                                 const Icon(
                                   Icons.stop,
                                   color: Colors.white,
@@ -154,8 +161,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                 size: Size(widget.screenWidth * 0.50, 60),
                 playerController: controller,
                 waveformType: WaveformType.fitWidth,
-                playerWaveStyle:
-                    widget.config?.playerWaveStyle ?? playerWaveStyle,
+                playerWaveStyle: _waveStyle,
                 padding: widget.config?.waveformPadding ??
                     const EdgeInsets.only(right: 10),
                 margin: widget.config?.waveformMargin,

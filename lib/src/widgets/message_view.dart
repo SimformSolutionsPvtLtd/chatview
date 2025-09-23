@@ -238,7 +238,24 @@ class _MessageViewState extends State<MessageView>
                   );
                 } else if (widget.message.messageType.isCustom &&
                     messageConfig?.customMessageBuilder != null) {
-                  return messageConfig?.customMessageBuilder!(widget.message);
+                  final customWidget =
+                      messageConfig!.customMessageBuilder!.call(widget.message);
+                  final showReactions =
+                      messageConfig?.showReactionsOnCustomMessages ?? true;
+                  return showReactions
+                      ? Stack(
+                          children: [
+                            customWidget,
+                            if (widget.message.reaction.reactions.isNotEmpty)
+                              ReactionWidget(
+                                reaction: widget.message.reaction,
+                                messageReactionConfig:
+                                    messageConfig?.messageReactionConfig,
+                                isMessageBySender: widget.isMessageBySender,
+                              ),
+                          ],
+                        )
+                      : customWidget;
                 }
               }()) ??
               const SizedBox(),

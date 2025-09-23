@@ -187,10 +187,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   @override
   Widget build(BuildContext context) {
     final outlineBorder = _outLineBorder;
-    final leadingActions = textFieldConfig?.leadingActions?.call(
-      context,
-      widget.textEditingController,
-    );
     return Container(
       padding:
           textFieldConfig?.padding ?? const EdgeInsets.symmetric(horizontal: 6),
@@ -234,19 +230,25 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                 Expanded(
                   child: Row(
                     children: [
-                      if (textFieldConfig?.hideLeadingActionsOnType ?? false)
-                        ValueListenableBuilder(
-                          valueListenable: _isTextNotEmptyNotifier,
-                          builder: (context, isNotEmpty, _) {
-                            final actions = leadingActions;
-                            if (isNotEmpty || actions == null) {
-                              return const SizedBox.shrink();
-                            }
-                            return Row(children: actions);
-                          },
-                        )
-                      else
-                        ...?leadingActions,
+                      ValueListenableBuilder(
+                        valueListenable: _isTextNotEmptyNotifier,
+                        builder: (context, isNotEmpty, _) {
+                          final hideLeadingActions =
+                              (textFieldConfig?.hideLeadingActionsOnType ??
+                                      false) &&
+                                  isNotEmpty;
+                          if (hideLeadingActions) {
+                            return const SizedBox.shrink();
+                          }
+                          final actions = textFieldConfig?.leadingActions?.call(
+                            context,
+                            widget.textEditingController,
+                          );
+                          return actions == null
+                              ? const SizedBox.shrink()
+                              : Row(children: actions);
+                        },
+                      ),
                       Expanded(
                         child: TextField(
                           focusNode: widget.focusNode,
@@ -297,6 +299,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                     return IconButton(
                       color: sendMessageConfig?.defaultSendButtonColor ??
                           Colors.green,
+                      style: sendMessageConfig?.sendButtonStyle,
                       onPressed: (textFieldConfig?.enabled ?? true)
                           ? _onPressed
                           : null,

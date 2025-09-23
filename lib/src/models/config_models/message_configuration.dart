@@ -25,6 +25,7 @@ import '../models.dart';
 
 class MessageConfiguration {
   const MessageConfiguration({
+    this.showReactionsOnCustomMessages = true,
     this.imageMessageConfig,
     this.messageReactionConfig,
     this.emojiMessageConfig,
@@ -50,4 +51,9 @@ class MessageConfiguration {
 
   /// To customize reply view for custom message type
   final CustomMessageReplyViewBuilder? customMessageReplyViewBuilder;
+
+  /// To show or hide reactions on custom message types
+  ///
+  /// Default is `true`.
+  final bool showReactionsOnCustomMessages;
 }

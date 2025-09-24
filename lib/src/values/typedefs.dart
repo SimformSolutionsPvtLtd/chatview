@@ -180,3 +180,6 @@ typedef MessageStatusIconResolver = IconData Function(
 typedef MessageStatusBuilder = Widget Function(
   MessageStatus status,
 );
+typedef CustomVoiceActionIconCallback = Icon Function(
+  bool isMessageBySender,
+);

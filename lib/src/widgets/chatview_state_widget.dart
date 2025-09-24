@@ -79,10 +79,11 @@ class ChatViewStateWidget extends StatelessWidget {
                   style: config.subTitleTextStyle,
                 ),
               if (chatViewState.isLoading)
-                AdaptiveProgressIndicator(
-                  color: config.loadingIndicatorColor,
-                  size: config.loadingIndicatorSize,
-                ),
+                config.loadingWidget ??
+                    AdaptiveProgressIndicator(
+                      color: config.loadingIndicatorColor,
+                      size: config.loadingIndicatorSize,
+                    ),
               if (config.imageWidget case final image?) image,
               if (config.reloadButton case final reload?)
                 reload

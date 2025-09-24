@@ -500,7 +500,7 @@ ChatViewList(
 
 ## ChatViewList States Configuration 
 
-```
+```dart
 ChatViewList(
   // ...
   stateConfig: const ListStateConfig(
@@ -522,7 +522,7 @@ ChatViewList(
 
 ## Load More Chats Configuration
 
-```
+```dart
 ChatViewList(
   // ...
   loadMoreConfig: LoadMoreConfig(
@@ -974,6 +974,8 @@ _chatController.setTypingIndicator = false; // Hide indicator
 ChatView(
   // ...
   messageConfig: MessageConfiguration(
+    // by default, true
+    showReactionsOnCustomMessages: false,
     customMessageBuilder: (ReplyMessage state) {
       return Text(
         state.message,

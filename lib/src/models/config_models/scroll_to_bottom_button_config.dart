@@ -26,7 +26,7 @@ import '../../values/enumeration.dart';
 
 /// Configuration for the "Scroll to Bottom" button.
 class ScrollToBottomButtonConfig {
-  ScrollToBottomButtonConfig({
+  const ScrollToBottomButtonConfig({
     this.backgroundColor,
     this.border,
     this.borderRadius,
@@ -36,6 +36,8 @@ class ScrollToBottomButtonConfig {
     this.padding,
     this.onClick,
     this.buttonDisplayOffset,
+    this.boxShadow,
+    this.insidePadding,
   });
 
   /// The background color of the button.
@@ -65,4 +67,10 @@ class ScrollToBottomButtonConfig {
   /// The scroll offset after which the button is displayed.
   /// The button appears when the scroll position is greater than or equal to this value.
   final double? buttonDisplayOffset;
+
+  /// The box shadow of the button.
+  final List<BoxShadow>? boxShadow;
+
+  /// The padding around the Icon inside the button.
+  final EdgeInsets? insidePadding;
 }

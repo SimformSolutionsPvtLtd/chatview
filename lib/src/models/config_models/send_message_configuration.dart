@@ -52,6 +52,7 @@ class SendMessageConfiguration {
     this.selectedImageViewHeight,
     this.imageBorderRadius,
     this.selectedImageViewBuilder,
+    this.sendButtonStyle,
   });
 
   /// Used to give background color to text field.
@@ -119,6 +120,9 @@ class SendMessageConfiguration {
 
   /// Provides ability to build custom view for selected images in text field.
   final SelectedImageViewBuilder? selectedImageViewBuilder;
+
+  /// Used to give style to send button.
+  final ButtonStyle? sendButtonStyle;
 }
 
 class ImagePickerIconsConfiguration {

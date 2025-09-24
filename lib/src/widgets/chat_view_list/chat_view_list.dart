@@ -57,6 +57,7 @@ class ChatViewList extends StatefulWidget {
     this.appbar,
     this.loadMoreChats,
     this.header,
+    this.footer,
     this.isLastPage,
     super.key,
   });
@@ -84,6 +85,9 @@ class ChatViewList extends StatefulWidget {
 
   /// Header widget to be displayed at the top of the chat list.
   final Widget? header;
+
+  /// Footer widget to be displayed at the bottom of the chat list.
+  final Widget? footer;
 
   /// Behavior for dismissing the keyboard when scrolling.
   ///
@@ -263,6 +267,7 @@ class _ChatViewListState extends State<ChatViewList> {
             },
           ),
         ),
+        if (widget.footer case final footer?) SliverToBoxAdapter(child: footer),
         // Add extra space at the bottom to avoid overlap with iOS home bar
         SliverToBoxAdapter(
           child: SizedBox(height: widget.extraSpaceAtLast),

@@ -88,12 +88,24 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isCustomTextField = widget.sendMessageBuilder != null;
     final scrollToBottomButtonConfig =
         chatListConfig.scrollToBottomButtonConfig;
     return Align(
       alignment: Alignment.bottomCenter,
-      child: widget.sendMessageBuilder != null
-          ? widget.sendMessageBuilder!(_replyMessage)
+      child: isCustomTextField
+          ? Builder(
+              // Assign the key only when using a custom text field to measure its height,
+              // to preventing overlap with the message list.
+              key: chatViewIW?.chatTextFieldViewKey,
+              builder: (context) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => context.calculateAndUpdateTextFieldHeight(),
+                );
+                return widget.sendMessageBuilder?.call(_replyMessage) ??
+                    const SizedBox.shrink();
+              },
+            )
           : SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Stack(

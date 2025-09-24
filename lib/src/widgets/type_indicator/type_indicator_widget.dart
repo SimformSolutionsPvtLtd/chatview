@@ -19,25 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:math';
 
-import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../extensions/extensions.dart';
-import '../models/chat_bubble.dart';
-import '../models/config_models/profile_circle_configuration.dart';
-import '../models/config_models/type_indicator_configuration.dart';
-import '../utils/constants/constants.dart';
-import 'profile_circle.dart';
+import '../../extensions/extensions.dart';
+import '../../models/chat_bubble.dart';
+import '../../models/config_models/profile_circle_configuration.dart';
+import '../../models/config_models/type_indicator_configuration.dart';
+import 'typing_dots_bubble.dart';
+import 'user_typing_builder.dart';
 
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({
-    Key? key,
+    required this.typeIndicatorConfig,
     this.showIndicator = false,
     this.chatBubbleConfig,
-    this.typeIndicatorConfig,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// Allow user to turn on/off typing indicator.
   final bool showIndicator;
@@ -47,7 +45,7 @@ class TypingIndicator extends StatefulWidget {
   final ChatBubble? chatBubbleConfig;
 
   /// Provides configurations related to typing indicator appearance.
-  final TypeIndicatorConfiguration? typeIndicatorConfig;
+  final TypeIndicatorConfiguration typeIndicatorConfig;
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -73,20 +71,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   ProfileCircleConfiguration? profileCircleConfiguration;
 
-  ChatBubble? get chatBubbleConfig => widget.chatBubbleConfig;
-
-  double get indicatorSize => widget.typeIndicatorConfig?.indicatorSize ?? 10;
-
-  double get indicatorSpacing =>
-      widget.typeIndicatorConfig?.indicatorSpacing ?? 4;
-
-  Color? get flashingCircleDarkColor =>
-      widget.typeIndicatorConfig?.flashingCircleDarkColor ??
-      const Color(0xFF939497);
-
-  Color? get flashingCircleBrightColor =>
-      widget.typeIndicatorConfig?.flashingCircleBrightColor ??
-      const Color(0xFFadacb0);
+  EdgeInsets get typeIndicatorPadding => widget.typeIndicatorConfig.padding;
 
   @override
   void initState() {
@@ -203,6 +188,23 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
+    final isCustomIndicator =
+        widget.typeIndicatorConfig.customIndicator != null;
+
+    if (isCustomIndicator && widget.showIndicator) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: typeIndicatorPadding,
+          child: UserTypingBuilder(
+            animation: _largeBubbleAnimation,
+            profileConfig: profileCircleConfiguration,
+            bubble: widget.typeIndicatorConfig.customIndicator!,
+          ),
+        ),
+      );
+    }
+
     return AnimatedBuilder(
       animation: _indicatorSpaceAnimation,
       builder: (context, child) {
@@ -213,103 +215,23 @@ class _TypingIndicatorState extends State<TypingIndicator>
       },
       child: Stack(
         children: [
-          _buildAnimatedBubble(
-            animation: _largeBubbleAnimation,
-            left: 5,
-            bottom: 12,
-            bubble: _buildStatusBubble(),
+          Positioned(
+            left: typeIndicatorPadding.left,
+            bottom: typeIndicatorPadding.bottom,
+            child: UserTypingBuilder(
+              animation: _largeBubbleAnimation,
+              profileConfig: profileCircleConfiguration,
+              bubble: TypingDotsBubble(
+                dotIntervals: _dotIntervals,
+                jumpAnimations: _jumpAnimations,
+                chatBubbleConfig: widget.chatBubbleConfig,
+                repeatAnimationController: _repeatingController,
+                typeIndicatorConfig: widget.typeIndicatorConfig,
+              ),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildAnimatedBubble({
-    required Animation<double> animation,
-    required double left,
-    required double bottom,
-    required Widget bubble,
-  }) {
-    return Positioned(
-      left: left,
-      bottom: bottom,
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: animation.value,
-            alignment: Alignment.centerLeft,
-            child: child,
-          );
-        },
-        child: Row(
-          children: [
-            ProfileCircle(
-              bottomPadding: 0,
-              imageUrl: profileCircleConfiguration?.profileImageUrl,
-              imageType: profileCircleConfiguration?.imageType,
-              assetImageErrorBuilder:
-                  profileCircleConfiguration?.assetImageErrorBuilder,
-              networkImageErrorBuilder:
-                  profileCircleConfiguration?.networkImageErrorBuilder,
-              defaultAvatarImage:
-                  profileCircleConfiguration?.defaultAvatarImage ??
-                      Constants.profileImage,
-              networkImageProgressIndicatorBuilder: profileCircleConfiguration
-                  ?.networkImageProgressIndicatorBuilder,
-            ),
-            bubble,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusBubble() {
-    return Container(
-      padding: chatBubbleConfig?.padding ??
-          const EdgeInsets.fromLTRB(
-              leftPadding3, 0, leftPadding3, leftPadding3),
-      margin: chatBubbleConfig?.margin ?? const EdgeInsets.fromLTRB(5, 0, 6, 2),
-      decoration: BoxDecoration(
-        borderRadius: chatBubbleConfig?.borderRadius ??
-            BorderRadius.circular(replyBorderRadius2),
-        color: chatBubbleConfig?.color ?? Colors.grey.shade500,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Row(
-          children: [
-            _bubbleJumpAnimation(2, 0),
-            _bubbleJumpAnimation(1, 1),
-            _bubbleJumpAnimation(0, 2),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _bubbleJumpAnimation(int value, int index) {
-    return AnimatedBuilder(
-      animation: _jumpAnimations[value],
-      builder: (context, child) {
-        final circleFlashPercent =
-            _dotIntervals[index].transform(_repeatingController.value);
-        final circleColorPercent = sin(pi * circleFlashPercent);
-        return Transform.translate(
-          offset: Offset(0, _jumpAnimations[value].value),
-          child: Container(
-            width: indicatorSize,
-            height: indicatorSize,
-            margin: EdgeInsets.symmetric(horizontal: indicatorSpacing),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color.lerp(flashingCircleDarkColor,
-                  flashingCircleBrightColor, circleColorPercent),
-            ),
-          ),
-        );
-      },
     );
   }
 }

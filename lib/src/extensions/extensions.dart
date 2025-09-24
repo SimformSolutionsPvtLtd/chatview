@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'dart:convert';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -87,6 +89,21 @@ extension ValidateString on String {
   }
 
   bool get fromMemory => startsWith('data:image');
+
+  MemoryImage? toMemoryImage() {
+    if (!fromMemory) return null;
+
+    Uint8List? bytes;
+    try {
+      // Extract only the base64 part after `base64,`
+      final startIndex = indexOf('base64,');
+      if (startIndex == -1) return null;
+      final base64String = substring(startIndex + 7);
+      bytes = base64Decode(base64String);
+    } catch (_) {}
+
+    return bytes == null ? null : MemoryImage(bytes);
+  }
 
   bool get isAllEmoji {
     final unEmojified = EmojiParser().parseEmojis(this);
@@ -213,6 +230,25 @@ extension StatefulWidgetExtension on State {
 
 /// Extension on State for accessing inherited widget.
 extension BuildContextExtension on BuildContext {
+  /// This method calculates and updates the height of the chat text field.
+  /// It retrieves the height from the current context and updates the
+  /// `chatTextFieldHeight` in the `ChatViewInheritedWidget`.
+  void calculateAndUpdateTextFieldHeight() {
+    if (!mounted) return;
+    // Update the chat text field height based on the current context size.
+    chatViewIW?.chatTextFieldHeight.value = textFieldHeight;
+  }
+
+  /// This getter will provide the height of the text field from the
+  /// current context if available, otherwise it will return the
+  /// default height of the text field.
+  ///
+  /// **Note**: Make sure the `chatTextFieldViewKey` is assigned to retrieve
+  /// actual height of text field.
+  double get textFieldHeight =>
+      chatViewIW?.chatTextFieldViewKey.currentContext?.size?.height ??
+      defaultChatTextFieldHeight;
+
   ChatViewInheritedWidget? get chatViewIW =>
       mounted ? ChatViewInheritedWidget.of(this) : null;
 

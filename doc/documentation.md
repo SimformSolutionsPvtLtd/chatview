@@ -42,9 +42,9 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 
 For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.github.io/chatview/).
 
-## Compatibility with [`chatview_connect`][https://pub.dev/packages/chatview_connect]
+## Compatibility with [`chatview_connect`](https://pub.dev/packages/chatview_connect)
 
-| `chatview` version | [`chatview_connect`][https://pub.dev/packages/chatview_connect] version |
+| `chatview` version | [`chatview_connect`](https://pub.dev/packages/chatview_connect) version |
 |--------------------|-------------------------------------------------------------------------|
 | `>=2.4.1 <3.0.0`   | `0.0.1`                                                                 |
 | `>= 3.0.0`         | `0.0.2`                                                                 |
@@ -948,6 +948,17 @@ ChatView(
   typeIndicatorConfig: TypeIndicatorConfiguration(
     flashingCircleBrightColor: Colors.grey,
     flashingCircleDarkColor: Colors.black,
+    // For custom indicator
+    // padding: const EdgeInsets.only(left: 12), 
+    // customIndicator: Container(
+    //   margin: const EdgeInsets.only(left: 8),
+    //   decoration: const BoxDecoration(
+    //     color: Colors.white,
+    //     borderRadius: BorderRadius.all(Radius.circular(30)),
+    //   ),
+    //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    //   child: const Text('Typing...'),
+    // ),
   ),
   // ...
 )

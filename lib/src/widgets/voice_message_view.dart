@@ -116,6 +116,9 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                 color: widget.isMessageBySender
                     ? widget.outgoingChatBubbleConfig?.color
                     : widget.inComingChatBubbleConfig?.color,
+                border: widget.isMessageBySender
+                    ? widget.outgoingChatBubbleConfig?.border
+                    : widget.inComingChatBubbleConfig?.border,
               ),
           padding: widget.config?.padding ??
               const EdgeInsets.symmetric(horizontal: 8),

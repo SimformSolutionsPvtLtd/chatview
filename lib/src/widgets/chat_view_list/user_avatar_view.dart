@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -74,15 +73,7 @@ class UserAvatarView extends StatelessWidget {
                 ? null
                 : imageUrl.isUrl
                     ? CachedNetworkImageProvider(imageUrl)
-                    : imageUrl.fromMemory
-                        ? MemoryImage(
-                            base64Decode(
-                              imageUrl.substring(
-                                imageUrl.indexOf('base64') + 7,
-                              ),
-                            ),
-                          )
-                        : FileImage(File(imageUrl)),
+                    : imageUrl.toMemoryImage() ?? FileImage(File(imageUrl)),
           ),
           if (showStatus)
             Positioned(

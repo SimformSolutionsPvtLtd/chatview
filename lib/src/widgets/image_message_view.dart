@@ -26,6 +26,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
+import '../models/chat_bubble.dart';
 import '../models/config_models/image_message_configuration.dart';
 import '../models/config_models/message_reaction_configuration.dart';
 import 'reaction_widget.dart';
@@ -38,9 +39,17 @@ class ImageMessageView extends StatelessWidget {
     required this.isMessageBySender,
     this.imageMessageConfig,
     this.messageReactionConfig,
+    this.inComingChatBubbleConfig,
+    this.outgoingChatBubbleConfig,
     this.highlightImage = false,
     this.highlightScale = 1.2,
   }) : super(key: key);
+
+  /// Provides configuration of chat bubble appearance from other user of chat.
+  final ChatBubble? inComingChatBubbleConfig;
+
+  /// Provides configuration of chat bubble appearance from current user of chat.
+  final ChatBubble? outgoingChatBubbleConfig;
 
   /// Provides message instance of chat.
   final Message message;
@@ -69,6 +78,11 @@ class ImageMessageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderRadius = imageMessageConfig?.borderRadius ??
+        const BorderRadius.all(Radius.circular(14));
+    final backgroundColor = isMessageBySender
+        ? outgoingChatBubbleConfig?.color ?? Colors.purple
+        : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment:
@@ -88,6 +102,11 @@ class ImageMessageView extends StatelessWidget {
                     ? Alignment.centerRight
                     : Alignment.centerLeft,
                 child: Container(
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: borderRadius,
+                    border: imageMessageConfig?.border,
+                  ),
                   padding: imageMessageConfig?.padding ?? EdgeInsets.zero,
                   margin: imageMessageConfig?.margin ??
                       EdgeInsets.only(
@@ -99,8 +118,7 @@ class ImageMessageView extends StatelessWidget {
                   height: imageMessageConfig?.height ?? 200,
                   width: imageMessageConfig?.width ?? 150,
                   child: ClipRRect(
-                    borderRadius: imageMessageConfig?.borderRadius ??
-                        BorderRadius.circular(14),
+                    borderRadius: borderRadius,
                     child: (() {
                       if (imageUrl.isUrl) {
                         return Image.network(

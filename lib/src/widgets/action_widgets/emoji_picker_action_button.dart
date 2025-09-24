@@ -1,6 +1,8 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 
+import '../../../chatview.dart' show ChatView;
+import '../../values/typedefs.dart';
 import '../emoji_picker_widget.dart';
 import 'text_field_action_button.dart';
 
@@ -8,7 +10,7 @@ import 'text_field_action_button.dart';
 class EmojiPickerActionButton extends TextFieldActionButton {
   EmojiPickerActionButton({
     required super.icon,
-    required ValueSetter<String?>? onPressed,
+    required EmojiPickerActionCallback? onPressed,
     required BuildContext context,
     this.emojiPickerSheetConfig,
     this.height,
@@ -18,14 +20,17 @@ class EmojiPickerActionButton extends TextFieldActionButton {
   }) : super(
           onPressed: onPressed == null
               ? null
-              : () async {
+              : (_) async {
                   final emoji = await _pickEmoji(
                     context: context,
                     config: emojiPickerSheetConfig,
                     height: height,
                   );
                   if (emoji != null) {
-                    onPressed.call(emoji);
+                    final replyMessage = context.mounted
+                        ? ChatView.getReplyMessage(context)
+                        : null;
+                    onPressed.call(emoji, replyMessage);
                   }
                 },
         );

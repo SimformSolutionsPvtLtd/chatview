@@ -183,3 +183,11 @@ typedef MessageStatusBuilder = Widget Function(
 typedef CustomVoiceActionIconCallback = Icon Function(
   bool isMessageBySender,
 );
+typedef CameraActionCallback = void Function(
+  String? path,
+  ReplyMessage? replyMessage,
+);
+typedef EmojiPickerActionCallback = void Function(
+  String? emoji,
+  ReplyMessage? replyMessage,
+);

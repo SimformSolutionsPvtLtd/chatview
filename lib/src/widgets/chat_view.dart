@@ -163,6 +163,17 @@ class ChatView extends StatefulWidget {
     state?.replyMessageViewClose();
   }
 
+  static ReplyMessage? getReplyMessage(BuildContext context) {
+    final state = context.findAncestorStateOfType<_ChatViewState>();
+
+    assert(
+      state != null,
+      'ChatViewState not found. Make sure to use correct context that contains the ChatViewState',
+    );
+
+    return state?._sendMessageKey.currentState?.replyMessage;
+  }
+
   @override
   State<ChatView> createState() => _ChatViewState();
 }

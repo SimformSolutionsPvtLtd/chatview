@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../chatview.dart' show ChatView;
 import '../../models/config_models/send_message_configuration.dart';
 import '../../utils/helper.dart';
+import '../../values/typedefs.dart';
 import 'text_field_action_button.dart';
 
 /// Camera action button implementation.
 class CameraActionButton extends TextFieldActionButton {
   CameraActionButton({
     required super.icon,
-    required ValueSetter<String?>? onPressed,
+    required CameraActionCallback? onPressed,
     this.imagePickerConfiguration,
     super.key,
     super.color,
@@ -17,13 +19,16 @@ class CameraActionButton extends TextFieldActionButton {
   }) : super(
           onPressed: onPressed == null
               ? null
-              : () async {
+              : (context) async {
                   FocusManager.instance.primaryFocus?.unfocus();
                   final path = await onMediaActionButtonPressed(
                     ImageSource.camera,
                     config: imagePickerConfiguration,
                   );
-                  onPressed.call(path);
+                  final replyMessage = context.mounted
+                      ? ChatView.getReplyMessage(context)
+                      : null;
+                  onPressed.call(path, replyMessage);
                 },
         );
 

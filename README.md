@@ -53,6 +53,13 @@ dependencies:
   chatview: <latest-version>
 ```
 
+## Compatibility with [`chatview_connect`][chatViewConnect]
+
+| `chatview` version | [`chatview_connect`][chatViewConnect] version |
+|--------------------|-----------------------------------------------|
+| `>=2.4.1 <3.0.0`   | `0.0.1`                                       |
+| `>= 3.0.0`         | `0.0.2`                                       |
+
 ## ChatView with Backend Support
 
 Make `ChatView` backend-ready with [chatview_connect][chatViewConnect]

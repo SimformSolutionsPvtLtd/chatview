@@ -1,3 +1,4 @@
+import 'package:chatview_utils/chatview_utils.dart' show ReplyMessage;
 import 'package:flutter/widgets.dart';
 
 /// Represents a widget that can be used in the plus/attach modal sheet.
@@ -10,5 +11,5 @@ class OverlayActionWidget {
 
   final Widget icon;
   final String label;
-  final VoidCallback onTap;
+  final ValueSetter<ReplyMessage?> onTap;
 }

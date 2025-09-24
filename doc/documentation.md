@@ -1161,9 +1161,9 @@ textFieldConfig: TextFieldConfiguration(
         icon: const Icon(
           Icons.camera_alt,
         ),
-        onPressed: (path) {
+        onPressed: (path, replyMessage) {
           if (path != null) {
-            _onSendTap(path, const ReplyMessage(), MessageType.image);
+            _onSendTap(path, replyMessage ?? const ReplyMessage(), MessageType.image);
           }
         },
       ),
@@ -1171,9 +1171,9 @@ textFieldConfig: TextFieldConfiguration(
         icon: const Icon(
           Icons.photo_library,
         ),
-        onPressed: (path) {
+        onPressed: (path, replyMessage) {
           if (path != null) {
-            _onSendTap(path, const ReplyMessage(), MessageType.image);
+            _onSendTap(path, replyMessage ?? const ReplyMessage(), MessageType.image);
           }
         },
       ),
@@ -1183,12 +1183,12 @@ textFieldConfig: TextFieldConfiguration(
           OverlayActionWidget(
             icon: const Icon(Icons.location_pin),
             label: 'Location',
-            onTap: () {},
+            onTap: (replyMessage) {},
           ),
           OverlayActionWidget(
             icon: const Icon(Icons.person),
             label: 'Contact',
-            onTap: () {},
+            onTap: (replyMessage) {},
          ),
         ],
       ),

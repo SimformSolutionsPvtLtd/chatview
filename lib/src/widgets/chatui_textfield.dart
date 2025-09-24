@@ -326,8 +326,8 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                   onPressed:
                                       !(textFieldConfig?.enabled ?? false)
                                           ? null
-                                          : (value) => widget.onImageSelected(
-                                                value ?? '',
+                                          : (path, _) => widget.onImageSelected(
+                                                path ?? '',
                                                 '',
                                               ),
                                 ),
@@ -342,8 +342,8 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                   onPressed:
                                       !(textFieldConfig?.enabled ?? false)
                                           ? null
-                                          : (value) => widget.onImageSelected(
-                                                value ?? '',
+                                          : (path, _) => widget.onImageSelected(
+                                                path ?? '',
                                                 '',
                                               ),
                                 ),

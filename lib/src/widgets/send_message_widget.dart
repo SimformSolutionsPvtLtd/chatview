@@ -76,6 +76,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       GlobalKey();
   ReplyMessage _replyMessage = const ReplyMessage();
 
+  ReplyMessage get replyMessage => _replyMessage;
+
   ChatUser? currentUser;
 
   @override

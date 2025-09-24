@@ -1,5 +1,7 @@
+import 'package:chatview_utils/chatview_utils.dart' show ReplyMessage;
 import 'package:flutter/material.dart';
 
+import '../../../chatview.dart' show ChatView;
 import '../../models/overlay_action_widget.dart';
 import 'text_field_action_button.dart';
 
@@ -64,11 +66,12 @@ class _OverlayActionButtonState
       style: widget.style,
       onPressed: () {
         widget.onPressed != null
-            ? widget.onPressed?.call()
+            ? widget.onPressed?.call(context)
             : _showOverlay(
                 widget.actions,
                 plusIconKey: _plusIconKey,
                 isLeading: widget.isLeading, // Pass isLeading
+                replyMessage: ChatView.getReplyMessage(context),
               );
       },
     );
@@ -90,6 +93,7 @@ class _OverlayActionButtonState
     List<OverlayActionWidget> plusOptions, {
     GlobalKey? plusIconKey,
     bool isLeading = false,
+    ReplyMessage? replyMessage,
   }) {
     _overlayAnimationController.reset();
 
@@ -173,7 +177,7 @@ class _OverlayActionButtonState
                               tooltip: option.label,
                               onPressed: () {
                                 hideOverlay();
-                                option.onTap.call();
+                                option.onTap.call(replyMessage);
                               },
                             );
                           },

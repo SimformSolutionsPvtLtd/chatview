@@ -4,15 +4,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../chatview.dart' show ChatView;
 import '../../models/config_models/send_message_configuration.dart';
 import '../../utils/helper.dart';
+import '../../values/typedefs.dart';
 import 'text_field_action_button.dart';
 
 /// Gallery action button implementation.
 class GalleryActionButton extends TextFieldActionButton {
   GalleryActionButton({
     required super.icon,
-    required ValueSetter<String?>? onPressed,
+    required CameraActionCallback? onPressed,
     this.imagePickerConfiguration,
     super.key,
     super.color,
@@ -20,7 +22,7 @@ class GalleryActionButton extends TextFieldActionButton {
   }) : super(
           onPressed: onPressed == null
               ? null
-              : () async {
+              : (context) async {
                   final primaryFocus = FocusManager.instance.primaryFocus;
                   final hasFocus = primaryFocus?.hasFocus ?? false;
                   primaryFocus?.unfocus();
@@ -40,7 +42,10 @@ class GalleryActionButton extends TextFieldActionButton {
                   if (!kIsWeb && Platform.isIOS && hasFocus) {
                     primaryFocus?.requestFocus();
                   }
-                  onPressed.call(path);
+                  final replyMessage = context.mounted
+                      ? ChatView.getReplyMessage(context)
+                      : null;
+                  onPressed.call(path, replyMessage);
                 },
         );
 

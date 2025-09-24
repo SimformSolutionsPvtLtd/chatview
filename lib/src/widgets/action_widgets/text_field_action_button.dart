@@ -13,7 +13,7 @@ class TextFieldActionButton extends StatefulWidget {
 
   final Widget icon;
   final Color? color;
-  final VoidCallback? onPressed;
+  final ValueSetter<BuildContext>? onPressed;
   final ButtonStyle? style;
 
   @override
@@ -25,7 +25,7 @@ class TextFieldActionButtonState<T extends TextFieldActionButton>
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: widget.onPressed,
+      onPressed: () => widget.onPressed?.call(context),
       icon: widget.icon,
       color: widget.color,
       style: widget.style,

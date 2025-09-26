@@ -9,6 +9,14 @@ class AppColors {
   static const Color white = Color(0xffffffff);
   static const Color white20 = Color(0x33ffffff);
 
+  // Whatsapp Colors
+  static const Color wpGreen = Color(0xff1DAB61);
+  static const Color wpGrey = Color(0xff767779);
+  static const Color wpDividerGrey = Color(0x33000000);
+  static const Color wpBackground = Color(0xFFF5F2EB);
+  static const Color wpReplyColor = Color(0xffD42A66);
+  static const Color wpSenderColor = Color(0xffD0FECF);
+
   // Instagram Colors
   static const Color instaDarkGrey = Color(0xff767779);
   static const Color instaGrey = Color(0xff71767E);

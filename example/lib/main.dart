@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import 'data.dart';
+import 'example_two/example_two_list_screen.dart';
 import 'models/theme.dart';
 import 'values/colors.dart';
 import 'values/icons.dart';
@@ -55,6 +56,16 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
           scrolledUnderElevation: 0,
           titleText: 'ChatViewList',
           actions: [
+            TextButton(
+              onPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ExampleTwoListScreen(),
+                ),
+              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.wpGreen),
+              child: const Text('WhatsApp'),
+            ),
             SvgPicture.asset(
               AppIcons.instaDiscoveryAi,
               colorFilter: const ColorFilter.mode(

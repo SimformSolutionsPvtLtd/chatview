@@ -197,6 +197,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
         child: Padding(
           padding: typeIndicatorPadding,
           child: UserTypingBuilder(
+            showProfileCircle: false,
             animation: _largeBubbleAnimation,
             profileConfig: profileCircleConfiguration,
             bubble: widget.typeIndicatorConfig.customIndicator!,

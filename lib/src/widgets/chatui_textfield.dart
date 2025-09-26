@@ -108,6 +108,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   @override
   void initState() {
     attachListeners();
+    // Used to notify instead of onChanged of text field because
+    // onChanged is not called when text is set programmatically.
+    widget.textEditingController.addListener(_listenTextEditingController);
     debouncer = Debouncer(
         sendMessageConfig?.textFieldConfig?.compositionThresholdTime ??
             const Duration(seconds: 1));
@@ -133,6 +136,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     if (_keyboardHandler case final handler?) {
       HardwareKeyboard.instance.removeHandler(handler);
     }
+    widget.textEditingController.removeListener(_listenTextEditingController);
     super.dispose();
   }
 
@@ -259,7 +263,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                           minLines: textFieldConfig?.minLines ?? 1,
                           keyboardType: textFieldConfig?.textInputType,
                           inputFormatters: textFieldConfig?.inputFormatters,
-                          onChanged: _onChanged,
                           enabled: textFieldConfig?.enabled,
                           textCapitalization:
                               textFieldConfig?.textCapitalization ??
@@ -437,6 +440,12 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       isRecording.value = false;
       widget.onRecordingComplete(path);
     }
+  }
+
+  void _listenTextEditingController() {
+    widget.textEditingController.addListener(() {
+      _onChanged(widget.textEditingController.text);
+    });
   }
 
   void _onChanged(String inputText) {

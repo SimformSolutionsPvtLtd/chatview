@@ -5,7 +5,9 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 
 ## Preview
 
-![Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif)
+| ChatViewList                                                                                                             | ChatView                                                                                                         |
+|--------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| ![ChatViewList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatviewlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif) |
 
 ## Features
 
@@ -42,12 +44,12 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 
 For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.github.io/chatview/).
 
-## Compatibility with [`chatview_connect`](https://pub.dev/packages/chatview_connect)
+## Compatibility with [chatview_connect](https://pub.dev/packages/chatview_connect)
 
-| `chatview` version | [`chatview_connect`](https://pub.dev/packages/chatview_connect) version |
-|--------------------|-------------------------------------------------------------------------|
-| `>=2.4.1 <3.0.0`   | `0.0.1`                                                                 |
-| `>= 3.0.0`         | `0.0.2`                                                                 |
+| `chatview` version | [chatview_connect](https://pub.dev/packages/chatview_connect) version |
+|--------------------|-----------------------------------------------------------------------|
+| `>=2.4.1 <3.0.0`   | `0.0.1`                                                               |
+| `>= 3.0.0`         | `0.0.2`                                                               |
 
 ## Compatible Message Types
 

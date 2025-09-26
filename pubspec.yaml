@@ -21,6 +21,7 @@ dependencies:
   cached_network_image: ^3.4.1
   chatview_utils: ^0.0.1
   emoji_picker_flutter: ^4.3.0
+  file_picker: ^10.3.3
   flutter:
     sdk: flutter
   image_picker: '>=0.8.9 <2.0.0'

@@ -257,6 +257,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 valueListenable: _replyMessage,
                               ),
                               ChatUITextField(
+                                onFileSelected: _onFileSelected,
                                 focusNode: _focusNode,
                                 textEditingController: _textEditingController,
                                 onPressed: _onPressed,
@@ -289,6 +290,13 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       widget.onSendTap.call(imagePath, replyMessage, MessageType.image);
       _assignRepliedMessage();
     }
+  }
+
+  void _onFileSelected(String filePath, String error) {
+    if (filePath.isEmpty) return;
+
+    widget.onSendTap.call(filePath, replyMessage, MessageType.custom);
+    _assignRepliedMessage();
   }
 
   void _assignRepliedMessage() {

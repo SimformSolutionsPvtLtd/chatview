@@ -27,6 +27,7 @@ import 'package:chatview/src/utils/constants/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../../chatview.dart';
 import '../utils/debounce.dart';
@@ -41,6 +42,7 @@ class ChatUITextField extends StatefulWidget {
     required this.onPressed,
     required this.onRecordingComplete,
     required this.onImageSelected,
+    required this.onFileSelected,
   }) : super(key: key);
 
   /// Provides configuration of default text field in chat.
@@ -60,6 +62,7 @@ class ChatUITextField extends StatefulWidget {
 
   /// Provides callback when user select images from camera/gallery.
   final StringsCallBack onImageSelected;
+  final StringsCallBack onFileSelected;
 
   @override
   State<ChatUITextField> createState() => _ChatUITextFieldState();
@@ -226,6 +229,19 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                   } else {
                     return Row(
                       children: [
+                             IconButton(
+                          onPressed: () async {
+                            final path = await pickPdf();
+                            widget.onFileSelected(
+                              path ?? '',
+                              '',
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.attach_file,
+                            color: Colors.black,
+                          ),
+                        ),
                         if (!isRecordingValue) ...[
                           if (sendMessageConfig?.enableCameraImagePicker ??
                               true)
@@ -372,7 +388,24 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       widget.onImageSelected('', e.toString());
     }
   }
+Future<String?> pickPdf() async {
+  try {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
 
+    if (result != null && result.files.single.path != null) {
+      final filePath = result.files.single.path!;
+
+      return filePath ?? "";
+    } else {
+      return "";
+    }
+  } catch (e) {
+    return null;
+  }
+}
   void _onChanged(String inputText) {
     debouncer.run(() {
       composingStatus.value = TypeWriterStatus.typed;

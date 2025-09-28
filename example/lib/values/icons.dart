@@ -11,4 +11,5 @@ class AppIcons {
   static const String wpVideo = "assets/vectors/whatsapp/video.svg";
   static const String wpPhone = "assets/vectors/whatsapp/phone.svg";
   static const String wpSticker = "assets/vectors/whatsapp/sticker.svg";
+  static const String wpMetaAI = "assets/vectors/whatsapp/Meta-AI-logo.svg";
 }

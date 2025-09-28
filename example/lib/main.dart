@@ -1,11 +1,11 @@
 import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import 'data.dart';
-import 'models/theme.dart';
+import 'models/chatview_list_theme.dart';
+import 'models/chatview_theme.dart';
 import 'values/colors.dart';
 import 'values/icons.dart';
 
@@ -25,6 +25,10 @@ class Example extends StatelessWidget {
         primaryColor: AppColors.instaPurple,
         colorScheme: ColorScheme.fromSwatch(accentColor: AppColors.instaPurple),
       ),
+      darkTheme: ThemeData(
+        primaryColor: AppColors.instaPurple,
+        colorScheme: ColorScheme.fromSwatch(accentColor: AppColors.instaPurple),
+      ),
       home: const ExampleOneListScreen(),
     );
   }
@@ -38,315 +42,328 @@ class ExampleOneListScreen extends StatefulWidget {
 }
 
 class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
+  ChatViewListTheme _theme = ChatViewListTheme.light;
+  bool _isDarkTheme = false;
+
+  void _onThemeIconTap() {
+    setState(() {
+      if (_isDarkTheme) {
+        _theme = ChatViewListTheme.light;
+        _isDarkTheme = false;
+      } else {
+        _theme = ChatViewListTheme.dark;
+        _isDarkTheme = true;
+      }
+    });
+  }
+
+  final _searchController = TextEditingController();
+
   final _chatListController = ChatViewListController(
     initialChatList: Data.getChatList(),
     scrollController: ScrollController(),
   );
 
   @override
+  void dispose() {
+    _chatListController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ChatViewList(
-        controller: _chatListController,
-        appbar: ChatViewListAppBar(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          leading: const Icon(Icons.arrow_back_ios_rounded),
-          centerTitle: false,
-          scrolledUnderElevation: 0,
-          titleText: 'ChatViewList',
-          actions: [
-            SvgPicture.asset(
-              AppIcons.instaDiscoveryAi,
-              colorFilter: const ColorFilter.mode(
-                Colors.black,
-                BlendMode.srcIn,
-              ),
+      backgroundColor: _theme.backgroundColor,
+      body: SafeArea(
+        child: ChatViewList(
+          controller: _chatListController,
+          backgroundColor: _theme.backgroundColor,
+          appbar: ChatViewListAppBar(
+            backgroundColor: _theme.backgroundColor,
+            leading: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: _theme.iconColor,
             ),
-            const SizedBox(width: 16),
-            SvgPicture.asset(
-              AppIcons.instaAdd,
-              colorFilter: const ColorFilter.mode(
-                Colors.black,
-                BlendMode.srcIn,
-              ),
+            centerTitle: false,
+            scrolledUnderElevation: 0,
+            titleText: 'ChatViewList',
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              color: _theme.textColor,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(width: 16),
-          ],
-        ),
-        searchConfig: SearchConfig(
-          textEditingController: TextEditingController(),
-          hintText: 'Ask Meta AI or Search',
-          hintStyle: const TextStyle(
-            fontSize: 16.4,
-            color: AppColors.instaGrey,
-            fontWeight: FontWeight.w400,
+            actions: [
+              SvgPicture.asset(
+                AppIcons.instaDiscoveryAi,
+                colorFilter: ColorFilter.mode(
+                  _theme.iconColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(width: 16),
+              SvgPicture.asset(
+                AppIcons.instaAdd,
+                colorFilter: ColorFilter.mode(
+                  _theme.iconColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+              IconButton(
+                onPressed: _onThemeIconTap,
+                icon: _isDarkTheme
+                    ? Icon(Icons.light_mode, color: _theme.iconColor)
+                    : Icon(Icons.dark_mode, color: _theme.iconColor),
+              ),
+            ],
           ),
-          textFieldBackgroundColor: AppColors.instaTextFieldBackground,
-          prefixIcon: const Icon(
-            Icons.search,
-            size: 24,
-            color: AppColors.instaGrey,
-          ),
-          borderRadius: BorderRadius.circular(10),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 0,
-            horizontal: 16,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          onSearch: (value) {
-            if (value.isEmpty) {
-              _chatListController.clearSearch();
-              return null;
-            }
+          searchConfig: SearchConfig(
+            textEditingController: _searchController,
+            hintText: 'Ask Meta AI or search',
+            hintStyle: TextStyle(
+              fontSize: 16.4,
+              color: _theme.searchText,
+              fontWeight: FontWeight.w400,
+            ),
+            textStyle: TextStyle(
+              fontSize: 16.4,
+              color: _theme.textColor,
+              fontWeight: FontWeight.w400,
+            ),
+            textFieldBackgroundColor: _theme.searchBg,
+            borderRadius: const BorderRadius.all(Radius.circular(30)),
+            prefixIcon: SizedBox.square(
+              dimension: 48,
+              child:
+                  Align(child: SvgPicture.asset(AppIcons.wpMetaAI, width: 24)),
+            ),
+            clearIcon: Icon(Icons.clear, color: _theme.iconColor),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 0,
+              horizontal: 16,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            onSearch: (value) {
+              if (value.isEmpty) {
+                _chatListController.clearSearch();
+                return null;
+              }
 
-            List<ChatViewListItem> chats =
-                _chatListController.chatListMap.values.toList();
+              List<ChatViewListItem> chats =
+                  _chatListController.chatListMap.values.toList();
 
-            final list = chats
-                .where((chat) =>
-                    chat.name.toLowerCase().contains(value.toLowerCase()))
-                .toList();
-            return list;
-          },
-        ),
-        menuConfig: ChatMenuConfig(
-          deleteCallback: (chat) => _chatListController.removeChat(chat.id),
-          muteStatusCallback: (result) => _chatListController.updateChat(
-            result.chat.id,
-            (previousChat) => previousChat.copyWith(
-              settings: previousChat.settings.copyWith(
-                muteStatus: result.status,
-              ),
-            ),
-          ),
-          pinStatusCallback: (result) => _chatListController.updateChat(
-            result.chat.id,
-            (previousChat) => previousChat.copyWith(
-              settings: previousChat.settings.copyWith(
-                pinStatus: result.status,
-              ),
-            ),
-          ),
-        ),
-        tileConfig: ListTileConfig(
-          onTap: (chat) => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ExampleOneChatScreen(chat: chat),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          showUserActiveStatusIndicator: false,
-          userAvatarConfig: const UserAvatarConfig(
-            radius: 26,
-            backgroundColor: AppColors.instaLightGrey,
-          ),
-          trailingBuilder: (chat) {
-            final highlight = (chat.unreadCount ?? 0) > 0;
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (highlight) ...[
-                  const CircleAvatar(
-                    radius: 4,
-                    backgroundColor: AppColors.instaUnreadCountDot,
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                SvgPicture.asset(
-                  AppIcons.instaCamera,
-                  colorFilter: ColorFilter.mode(
-                    highlight ? Colors.black : AppColors.instaDarkGrey,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ],
-            );
-          },
-          lastMessageStatusConfig: LastMessageStatusConfig(
-            statusBuilder: (status) => switch (status) {
-              MessageStatus.read =>
-                SvgPicture.asset(AppIcons.wpCheckMark, width: 19, height: 19),
-              MessageStatus.delivered => SvgPicture.asset(
-                  AppIcons.wpCheckMark,
-                  width: 19,
-                  height: 19,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.instaDarkGrey,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              MessageStatus.pending => const Icon(
-                  Icons.schedule,
-                  size: 16,
-                  color: AppColors.instaDarkGrey,
-                ),
-              MessageStatus.undelivered => const Icon(
-                  Icons.error_rounded,
-                  size: 16,
-                  color: Colors.red,
-                ),
+              final list = chats
+                  .where((chat) =>
+                      chat.name.toLowerCase().contains(value.toLowerCase()))
+                  .toList();
+              return list;
             },
           ),
-          pinIconConfig: PinIconConfig(
-            widget: SvgPicture.asset(AppIcons.wpChatPinned),
-          ),
-          typingStatusConfig: TypingStatusConfig(
-            textBuilder: (chat) => 'Typing...',
-            textStyle: const TextStyle(
-              fontSize: 13,
-              color: AppColors.instaGrey,
-              fontStyle: FontStyle.italic,
+          menuConfig: ChatMenuConfig(
+            deleteCallback: (chat) => _chatListController.removeChat(chat.id),
+            muteStatusCallback: (result) => _chatListController.updateChat(
+              result.chat.id,
+              (previousChat) => previousChat.copyWith(
+                settings: previousChat.settings.copyWith(
+                  muteStatus: result.status,
+                ),
+              ),
+            ),
+            pinStatusCallback: (result) => _chatListController.updateChat(
+              result.chat.id,
+              (previousChat) => previousChat.copyWith(
+                settings: previousChat.settings.copyWith(
+                  pinStatus: result.status,
+                ),
+              ),
             ),
           ),
-          timeConfig: const LastMessageTimeConfig(
-            textStyle: TextStyle(color: AppColors.instaGrey, fontSize: 14),
-          ),
-          userNameBuilder: (chat) {
-            final highlightText = (chat.unreadCount ?? 0) > 0;
-            return Row(
-              children: [
-                Flexible(
-                  child: Text(
-                    chat.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: highlightText ? Colors.black : AppColors.instaGrey,
-                      fontWeight:
-                          highlightText ? FontWeight.w500 : FontWeight.normal,
+          tileConfig: ListTileConfig(
+            onTap: (chat) => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ExampleOneChatScreen(chat: chat),
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            showUserActiveStatusIndicator: false,
+            userAvatarConfig: UserAvatarConfig(
+              radius: 26,
+              backgroundColor: _theme.secondaryBg,
+            ),
+            trailingBuilder: (chat) {
+              final highlight = (chat.unreadCount ?? 0) > 0;
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (highlight) ...[
+                    const CircleAvatar(
+                      radius: 4,
+                      backgroundColor: AppColors.instaUnreadCountDot,
                     ),
-                  ),
-                ),
-                if (chat.settings.pinStatus.isPinned) ...[
-                  const SizedBox(width: 6),
+                    const SizedBox(width: 12),
+                  ],
                   SvgPicture.asset(
-                    AppIcons.wpChatPinned,
-                    width: 16,
-                    height: 16,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.instaGrey,
+                    AppIcons.instaCamera,
+                    colorFilter: ColorFilter.mode(
+                      highlight ? _theme.iconColor : AppColors.instaDarkGrey,
                       BlendMode.srcIn,
                     ),
                   ),
                 ],
-              ],
-            );
-          },
-          lastMessageTileBuilder: (chat) {
-            final message = chat.lastMessage;
-            final unreadCount = chat.unreadCount ?? 0;
-            final highlightText = unreadCount > 0;
-            if (message == null) {
-              return const SizedBox.shrink();
-            }
+              );
+            },
+            typingStatusConfig: TypingStatusConfig(
+              textBuilder: (chat) => 'Typing...',
+              textStyle: TextStyle(
+                fontSize: 13,
+                color: _theme.lastMessageText,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            userNameBuilder: (chat) {
+              final highlightText = (chat.unreadCount ?? 0) > 0;
+              return Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      chat.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: highlightText
+                            ? _theme.textColor
+                            : _theme.lastMessageText,
+                        fontWeight:
+                            highlightText ? FontWeight.w500 : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  if (chat.settings.pinStatus.isPinned) ...[
+                    const SizedBox(width: 6),
+                    SvgPicture.asset(
+                      AppIcons.wpChatPinned,
+                      width: 16,
+                      height: 16,
+                      colorFilter: ColorFilter.mode(
+                        _theme.lastMessageText,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+            lastMessageTileBuilder: (chat) {
+              final message = chat.lastMessage;
+              final unreadCount = chat.unreadCount ?? 0;
+              final highlightText = unreadCount > 0;
+              if (message == null) {
+                return const SizedBox.shrink();
+              }
 
-            String prefix = switch (message.status) {
-              MessageStatus.read => 'Seen',
-              MessageStatus.delivered => 'Sent',
-              MessageStatus.undelivered => 'Failed to send.',
-              MessageStatus.pending => 'Sending...',
-            };
-
-            final showDisplayMessage = prefix == 'Seen' || prefix == 'Sent';
-
-            final String display;
-            if (highlightText && unreadCount != 1) {
-              display = '$unreadCount new messages';
-            } else if (!showDisplayMessage) {
-              display = prefix;
-            } else if (message.sentBy == 'me') {
-              display = message.createdAt.getTimestamp(prefix: prefix);
-            } else {
-              display = switch (message.messageType) {
-                MessageType.image => '$prefix a Photo',
-                MessageType.text => message.message,
-                MessageType.voice => '$prefix a Audio',
-                MessageType.custom => '$prefix a Message',
+              String prefix = switch (message.status) {
+                MessageStatus.read => 'Seen',
+                MessageStatus.delivered => 'Sent',
+                MessageStatus.undelivered => 'Failed to send.',
+                MessageStatus.pending => 'Sending...',
               };
-            }
 
-            return Row(
+              final showDisplayMessage = prefix == 'Seen' || prefix == 'Sent';
+
+              final String display;
+              if (highlightText && unreadCount != 1) {
+                display = '$unreadCount new messages';
+              } else if (!showDisplayMessage) {
+                display = prefix;
+              } else if (message.sentBy == 'me') {
+                display = message.createdAt.getTimestamp(prefix: prefix);
+              } else {
+                display = switch (message.messageType) {
+                  MessageType.image => '$prefix a Photo',
+                  MessageType.text => message.message,
+                  MessageType.voice => '$prefix a Audio',
+                  MessageType.custom => '$prefix a Message',
+                };
+              }
+
+              return Row(
+                children: [
+                  if (showDisplayMessage &&
+                      message.messageType != MessageType.text) ...[
+                    switch (message.messageType) {
+                      MessageType.image => const Icon(Icons.photo, size: 14),
+                      MessageType.voice => const Icon(Icons.mic, size: 14),
+                      MessageType.text ||
+                      MessageType.custom =>
+                        const SizedBox.shrink(),
+                    },
+                    const SizedBox(width: 5),
+                  ],
+                  Flexible(
+                    child: Text(
+                      display,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: message.status.isUndelivered
+                            ? Colors.red
+                            : highlightText
+                                ? _theme.textColor
+                                : _theme.lastMessageText,
+                        fontWeight:
+                            highlightText ? FontWeight.w500 : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  if (showDisplayMessage) ...[
+                    Text(
+                      ' · ${message.createdAt.getTimeAgo}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: _theme.lastMessageText,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                  if (chat.settings.muteStatus.isMuted) ...[
+                    const SizedBox(width: 6),
+                    Icon(
+                      Icons.notifications_off_outlined,
+                      size: 16,
+                      color: _theme.lastMessageText,
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+          header: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
               children: [
-                if (showDisplayMessage &&
-                    message.messageType != MessageType.text) ...[
-                  switch (message.messageType) {
-                    MessageType.image => const Icon(Icons.photo, size: 14),
-                    MessageType.voice => const Icon(Icons.mic, size: 14),
-                    MessageType.text ||
-                    MessageType.custom =>
-                      const SizedBox.shrink(),
-                  },
-                  const SizedBox(width: 5),
-                ],
-                Flexible(
+                Expanded(
                   child: Text(
-                    display,
+                    'Messages',
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 14,
-                      color: message.status.isUndelivered
-                          ? Colors.red
-                          : highlightText
-                              ? Colors.black
-                              : AppColors.instaGrey,
-                      fontWeight:
-                          highlightText ? FontWeight.w500 : FontWeight.normal,
+                      fontSize: 16,
+                      color: _theme.textColor,
+                      fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (showDisplayMessage) ...[
-                  Text(
-                    ' · ${message.createdAt.getTimeAgo}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.instaGrey,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
-                if (chat.settings.muteStatus.isMuted) ...[
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.notifications_off_outlined,
-                    size: 16,
-                    color: AppColors.instaGrey,
-                  ),
-                ],
-              ],
-            );
-          },
-          unreadCountConfig: const UnreadCountConfig(
-            backgroundColor: AppColors.instaPurple,
-            style: UnreadCountStyle.ninetyNinePlus,
-            textStyle: TextStyle(color: Colors.white),
-          ),
-          userNameTextStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 15,
-          ),
-        ),
-        header: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Messages',
+                Text(
+                  'Requests',
                   maxLines: 1,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: _theme.searchText),
                 ),
-              ),
-              Text(
-                'Requests',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -364,8 +381,8 @@ class ExampleOneChatScreen extends StatefulWidget {
 }
 
 class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
-  AppTheme theme = LightTheme();
-  bool isDarkTheme = false;
+  ChatViewTheme _theme = ChatViewTheme.light;
+  bool _isDarkTheme = false;
   bool _isTopPaginationCalled = false;
   bool _isBottomPaginationCalled = false;
   final ChatController _chatController = ChatController(
@@ -374,20 +391,6 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
     currentUser: Data.currentUser,
     otherUsers: Data.otherUsers,
   );
-
-  @override
-  void initState() {
-    super.initState();
-    // Set system UI overlay style
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          statusBarColor: AppColors.instaBackground,
-          statusBarBrightness: Brightness.dark,
-        ),
-      );
-    });
-  }
 
   @override
   void dispose() {
@@ -420,486 +423,537 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ChatView(
-        chatController: _chatController,
-        onSendTap: _onSendTap,
-        isLastPage: () => _isTopPaginationCalled && _isBottomPaginationCalled,
-        loadMoreData: (direction, message) async {
-          if (direction.isNext) {
-            if (_isBottomPaginationCalled) {
-              return;
+      body: SafeArea(
+        child: ChatView(
+          chatController: _chatController,
+          onSendTap: _onSendTap,
+          isLastPage: () => _isTopPaginationCalled && _isBottomPaginationCalled,
+          loadMoreData: (direction, message) async {
+            if (direction.isNext) {
+              if (_isBottomPaginationCalled) {
+                return;
+              }
+              _isBottomPaginationCalled = true;
+            } else if (direction.isPrevious) {
+              if (_isTopPaginationCalled) {
+                return;
+              }
+              _isTopPaginationCalled = true;
             }
-            _isBottomPaginationCalled = true;
-          } else if (direction.isPrevious) {
-            if (_isTopPaginationCalled) {
-              return;
-            }
-            _isTopPaginationCalled = true;
-          }
-          await Future.delayed(const Duration(seconds: 1));
-          _chatController.loadMoreData(
-            direction.isPrevious
-                ? [
-                    Message(
-                      id: DateTime.timestamp()
-                          .subtract(const Duration(days: 30, minutes: 10))
-                          .toIso8601String(),
-                      message: "Long time no see!",
-                      createdAt: DateTime.now()
-                          .subtract(const Duration(days: 30, minutes: 10)),
-                      sentBy: '2',
-                      status: MessageStatus.read,
+            await Future.delayed(const Duration(seconds: 1));
+            _chatController.loadMoreData(
+              direction.isPrevious
+                  ? [
+                      Message(
+                        id: DateTime.timestamp()
+                            .subtract(const Duration(days: 30, minutes: 10))
+                            .toIso8601String(),
+                        message: "Long time no see!",
+                        createdAt: DateTime.now()
+                            .subtract(const Duration(days: 30, minutes: 10)),
+                        sentBy: '2',
+                        status: MessageStatus.read,
+                      ),
+                      Message(
+                        id: DateTime.timestamp()
+                            .subtract(const Duration(days: 30, minutes: 5))
+                            .toIso8601String(),
+                        message: "Indeed! I was about to ping you.",
+                        createdAt: DateTime.now()
+                            .subtract(const Duration(days: 30, minutes: 5)),
+                        sentBy: '1',
+                        status: MessageStatus.read,
+                      ),
+                    ]
+                  : [
+                      Message(
+                        id: '14',
+                        message: "How about a movie marathon?",
+                        createdAt:
+                            DateTime.now().subtract(const Duration(minutes: 1)),
+                        sentBy: '2',
+                        status: MessageStatus.read,
+                      ),
+                      Message(
+                        id: '15',
+                        message: "Sounds great! I'm in. 🎬",
+                        createdAt: DateTime.now(),
+                        sentBy: '1',
+                        status: MessageStatus.read,
+                      ),
+                    ],
+              direction: direction,
+            );
+          },
+          featureActiveConfig: const FeatureActiveConfig(
+            lastSeenAgoBuilderVisibility: true,
+            receiptsBuilderVisibility: true,
+            enableOtherUserName: false,
+            enableScrollToBottomButton: true,
+            enableOtherUserProfileAvatar: true,
+            enablePagination: true,
+          ),
+          scrollToBottomButtonConfig: const ScrollToBottomButtonConfig(
+            padding: EdgeInsets.only(bottom: 8, right: 12),
+            insidePadding: EdgeInsets.all(10),
+            alignment: ScrollButtonAlignment.right,
+            icon: Icon(Icons.arrow_downward_rounded),
+            border: Border.fromBorderSide(BorderSide.none),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 8,
+                offset: Offset(0, 4),
+                color: Colors.black26,
+              ),
+            ],
+          ),
+          chatViewState: ChatViewState.hasMessages,
+          typeIndicatorConfig: TypeIndicatorConfiguration(
+            customIndicator: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_chatController.otherUsers.firstOrNull?.profilePhoto
+                    case final image?) ...[
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundImage: NetworkImage(image),
+                    backgroundColor: _theme.incomingBubble,
+                  ),
+                ],
+                Container(
+                  margin: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                    color: _theme.incomingBubble,
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 18,
+                    horizontal: 14,
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 2.75,
+                        backgroundColor: AppColors.instaDarkGrey,
+                      ),
+                      SizedBox(width: 3),
+                      CircleAvatar(
+                        radius: 2.75,
+                        backgroundColor: AppColors.instaDarkGrey,
+                      ),
+                      SizedBox(width: 3),
+                      CircleAvatar(
+                        radius: 2.75,
+                        backgroundColor: AppColors.instaDarkGrey,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          appBar: ChatViewAppBar(
+            elevation: 0,
+            chatTitle: widget.chat.name,
+            leading: IconButton(
+              onPressed: Navigator.of(context).maybePop,
+              icon: Icon(Icons.arrow_back_ios, color: _theme.iconColor),
+            ),
+            chatTitleTextStyle: TextStyle(
+              fontSize: 18,
+              color: _theme.titleColor,
+              fontWeight: FontWeight.w600,
+            ),
+            profilePicture: widget.chat.imageUrl,
+            backGroundColor: _theme.backgroundColor,
+            userStatus: '@${widget.chat.name}',
+            userStatusTextStyle: TextStyle(
+              fontSize: 13,
+              color: _theme.titleColor,
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset(
+                  AppIcons.instaDiscoveryAi,
+                  colorFilter: ColorFilter.mode(
+                    _theme.iconColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset(
+                  AppIcons.wpPhone,
+                  colorFilter: ColorFilter.mode(
+                    _theme.iconColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+              IconButton(
+                // Handle video call
+                onPressed: () {},
+                icon: SvgPicture.asset(
+                  AppIcons.wpVideo,
+                  colorFilter: ColorFilter.mode(
+                    _theme.iconColor,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+              PopupMenuButton(
+                icon: Icon(
+                  Icons.more_vert_rounded,
+                  color: _theme.iconColor,
+                ),
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'toggle_typing_indicator',
+                    child: Text('Toggle TypingIndicator'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'simulate_message_receive',
+                    child: Text('Simulate Message receive'),
+                  ),
+                  PopupMenuItem(
+                    value: 'dark_theme',
+                    child: Text(' ${_isDarkTheme ? 'Light' : 'Dark'} Mode'),
+                  ),
+                ],
+                onSelected: (value) {
+                  switch (value) {
+                    case 'toggle_typing_indicator':
+                      _showHideTypingIndicator();
+                    case 'simulate_message_receive':
+                      receiveMessage();
+                    case 'dark_theme':
+                      _onThemeIconTap();
+                  }
+                },
+              ),
+              const SizedBox(width: 12),
+            ],
+          ),
+          chatBackgroundConfig: ChatBackgroundConfiguration(
+            backgroundColor: _theme.backgroundColor,
+            groupSeparatorBuilder: (separator) {
+              final date = DateTime.tryParse(separator);
+              if (date == null) {
+                return const SizedBox.shrink();
+              }
+              String separatorDate;
+              final now = DateTime.now();
+              if (date.day == now.day &&
+                  date.month == now.month &&
+                  date.year == now.year) {
+                separatorDate = DateFormat('h:mm a').format(date);
+              } else if (date.day == now.day - 1 &&
+                  date.month == now.month &&
+                  date.year == now.year) {
+                separatorDate =
+                    'Yesterday at ${DateFormat('h:mm a').format(date)}';
+              } else if (date.isAfter(now.subtract(const Duration(days: 7)))) {
+                separatorDate = DateFormat('EEE h:mm a').format(date);
+              } else {
+                separatorDate = DateFormat('d MMM AT h:mm a').format(date);
+              }
+              return Align(
+                heightFactor: 2,
+                child: Text(
+                  separatorDate.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: _theme.titleColor,
+                  ),
+                ),
+              );
+            },
+          ),
+          sendMessageConfig: SendMessageConfiguration(
+            closeIconColor: _theme.iconColor,
+            replyTitleColor: _theme.textColor,
+            replyMessageColor: _theme.textColor,
+            replyDialogColor: _theme.backgroundColor,
+            defaultSendButtonColor: Colors.white,
+            textFieldBackgroundColor: _theme.textField,
+            voiceRecordingConfiguration: VoiceRecordingConfiguration(
+              recorderIconColor: _theme.iconColor,
+              waveStyle: WaveStyle(
+                extendWaveform: true,
+                showMiddleLine: false,
+                waveColor: _theme.iconColor,
+                durationLinesColor: AppColors.black20,
+                backgroundColor: Colors.transparent,
+                scaleFactor: 60,
+                waveThickness: 3,
+                spacing: 4,
+              ),
+            ),
+            sendButtonStyle: IconButton.styleFrom(
+              backgroundColor: AppColors.instaPurple,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            textFieldConfig: TextFieldConfiguration(
+              hintText: 'Message...',
+              hideLeadingActionsOnType: false,
+              onMessageTyping: (status) {
+                /// Do with status
+                debugPrint(status.toString());
+              },
+              compositionThresholdTime: const Duration(seconds: 1),
+              textStyle: TextStyle(color: _theme.textColor),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              leadingActions: (context, controller) =>
+                  controller.text.trim().isEmpty
+                      ? [
+                          CameraActionButton(
+                            icon: const Icon(
+                              Icons.camera_alt_rounded,
+                              color: Colors.white,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.instaPurple,
+                            ),
+                            onPressed: (path, replyMessage) {
+                              if (path?.isEmpty ?? true) return;
+                              _chatController.addMessage(
+                                Message(
+                                  id: DateTime.now()
+                                      .millisecondsSinceEpoch
+                                      .toString(),
+                                  message: path!,
+                                  createdAt: DateTime.now(),
+                                  messageType: MessageType.image,
+                                  sentBy: _chatController.currentUser.id,
+                                  replyMessage:
+                                      replyMessage ?? const ReplyMessage(),
+                                ),
+                              );
+                              _chatController.addMessage(
+                                Message(
+                                  message: controller.text,
+                                  id: DateTime.now()
+                                      .millisecondsSinceEpoch
+                                      .toString(),
+                                  createdAt: DateTime.now(),
+                                  sentBy: _chatController.currentUser.id,
+                                  replyMessage:
+                                      replyMessage ?? const ReplyMessage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ]
+                      : [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.search_rounded,
+                              color: Colors.white,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.instaPurple,
+                            ),
+                            onPressed: () =>
+                                ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Search button pressed')),
+                            ),
+                          ),
+                        ],
+              trailingActions: (context, controller) => [
+                GalleryActionButton(
+                  icon: Icon(
+                    Icons.photo_rounded,
+                    size: 30,
+                    color: _theme.iconColor,
+                  ),
+                  onPressed: (path, replyMessage) {
+                    if (path?.isEmpty ?? true) return;
+                    _chatController.addMessage(
+                      Message(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        message: path!,
+                        createdAt: DateTime.now(),
+                        messageType: MessageType.image,
+                        sentBy: _chatController.currentUser.id,
+                        replyMessage: replyMessage ?? const ReplyMessage(),
+                      ),
+                    );
+                  },
+                ),
+                EmojiPickerActionButton(
+                  context: context,
+                  onPressed: (emoji, replyMessage) {
+                    if (emoji?.isEmpty ?? true) return;
+                    controller.text = controller.text += emoji!;
+                    _chatController.addMessage(
+                      Message(
+                        message: controller.text,
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        createdAt: DateTime.now(),
+                        sentBy: _chatController.currentUser.id,
+                        replyMessage: replyMessage ?? const ReplyMessage(),
+                      ),
+                    );
+                  },
+                  icon: SvgPicture.asset(
+                    AppIcons.wpSticker,
+                    width: 30,
+                    height: 30,
+                    colorFilter: ColorFilter.mode(
+                      _theme.iconColor,
+                      BlendMode.srcIn,
                     ),
-                    Message(
-                      id: DateTime.timestamp()
-                          .subtract(const Duration(days: 30, minutes: 5))
-                          .toIso8601String(),
-                      message: "Indeed! I was about to ping you.",
-                      createdAt: DateTime.now()
-                          .subtract(const Duration(days: 30, minutes: 5)),
-                      sentBy: '1',
-                      status: MessageStatus.read,
-                    ),
-                  ]
-                : [
-                    Message(
-                      id: '14',
-                      message: "How about a movie marathon?",
-                      createdAt:
-                          DateTime.now().subtract(const Duration(minutes: 1)),
-                      sentBy: '2',
-                      status: MessageStatus.read,
-                    ),
-                    Message(
-                      id: '15',
-                      message: "Sounds great! I'm in. 🎬",
-                      createdAt: DateTime.now(),
-                      sentBy: '1',
-                      status: MessageStatus.read,
-                    ),
-                  ],
-            direction: direction,
-          );
-        },
-        featureActiveConfig: const FeatureActiveConfig(
-          lastSeenAgoBuilderVisibility: true,
-          receiptsBuilderVisibility: true,
-          enableOtherUserName: false,
-          enableScrollToBottomButton: true,
-          enableOtherUserProfileAvatar: true,
-          enablePagination: true,
-        ),
-        scrollToBottomButtonConfig: const ScrollToBottomButtonConfig(
-          padding: EdgeInsets.only(bottom: 8, right: 12),
-          insidePadding: EdgeInsets.all(10),
-          alignment: ScrollButtonAlignment.right,
-          icon: Icon(Icons.arrow_downward_rounded),
-          border: Border.fromBorderSide(BorderSide.none),
-          boxShadow: [
-            BoxShadow(
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Add attachment')),
+                  ),
+                  icon: Icon(
+                    Icons.add_circle_outline_rounded,
+                    size: 30,
+                    color: _theme.iconColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          chatBubbleConfig: ChatBubbleConfiguration(
+            outgoingChatBubbleConfig: const ChatBubble(
+              linkPreviewConfig: LinkPreviewConfiguration(
+                backgroundColor: Colors.white12,
+                linkStyle: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+              color: AppColors.instaPurple,
+              textStyle: TextStyle(color: Colors.white, fontSize: 16),
+              receiptsWidgetConfig: ReceiptsWidgetConfig(
+                showReceiptsIn: ShowReceiptsIn.lastMessage,
+              ),
+            ),
+            inComingChatBubbleConfig: ChatBubble(
+              linkPreviewConfig: LinkPreviewConfiguration(
+                backgroundColor: Colors.white12,
+                linkStyle: TextStyle(
+                  fontSize: 16,
+                  color: _theme.textColor,
+                ),
+              ),
+              color: _theme.incomingBubble,
+              textStyle: TextStyle(color: _theme.textColor, fontSize: 16),
+              onMessageRead: (message) {
+                /// send your message reciepts to the other client
+                debugPrint('Message Read');
+              },
+            ),
+          ),
+          reactionPopupConfig: const ReactionPopupConfiguration(
+            backgroundColor: Colors.white,
+            shadow: BoxShadow(
               blurRadius: 8,
               offset: Offset(0, 4),
               color: Colors.black26,
             ),
-          ],
-        ),
-        chatViewState: ChatViewState.hasMessages,
-        typeIndicatorConfig: TypeIndicatorConfiguration(
-          customIndicator: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_chatController.otherUsers.firstOrNull?.profilePhoto
-                  case final image?) ...[
-                const SizedBox(width: 6),
-                CircleAvatar(
-                  radius: 16,
-                  backgroundImage: NetworkImage(image),
-                  backgroundColor: AppColors.instaLightGrey,
-                ),
-              ],
-              Container(
-                margin: const EdgeInsets.only(left: 6),
-                decoration: const BoxDecoration(
-                  color: AppColors.instaLightGrey,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 18,
-                  horizontal: 14,
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      radius: 2.75,
-                      backgroundColor: AppColors.instaDarkGrey,
-                    ),
-                    SizedBox(width: 3),
-                    CircleAvatar(
-                      radius: 2.75,
-                      backgroundColor: AppColors.instaDarkGrey,
-                    ),
-                    SizedBox(width: 3),
-                    CircleAvatar(
-                      radius: 2.75,
-                      backgroundColor: AppColors.instaDarkGrey,
-                    ),
-                  ],
-                ),
+          ),
+          messageConfig: MessageConfiguration(
+            voiceMessageConfig: VoiceMessageConfiguration(
+              margin: EdgeInsets.zero,
+              padding: EdgeInsets.zero,
+              playIcon: (isMessageBySender) => Icon(
+                Icons.play_arrow_rounded,
+                size: 24,
+                color: isMessageBySender ? Colors.white : _theme.iconColor,
               ),
-            ],
-          ),
-        ),
-        appBar: ChatViewAppBar(
-          elevation: 0,
-          chatTitle: widget.chat.name,
-          leading: IconButton(
-            onPressed: Navigator.of(context).maybePop,
-            icon: const Icon(Icons.arrow_back_ios),
-          ),
-          chatTitleTextStyle: const TextStyle(
-            fontSize: 18,
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-          ),
-          profilePicture: widget.chat.imageUrl,
-          backGroundColor: AppColors.instaBackground,
-          userStatus: '@${widget.chat.name}',
-          userStatusTextStyle: const TextStyle(
-            fontSize: 13,
-            color: Colors.black87,
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: SvgPicture.asset(
-                AppIcons.instaDiscoveryAi,
-                colorFilter: const ColorFilter.mode(
-                  Colors.black,
-                  BlendMode.srcIn,
+              pauseIcon: (isMessageBySender) => Icon(
+                Icons.pause_rounded,
+                size: 24,
+                color: isMessageBySender ? Colors.white : _theme.iconColor,
+              ),
+              inComingPlayerWaveStyle: PlayerWaveStyle(
+                liveWaveColor: _theme.iconColor,
+                fixedWaveColor: AppColors.black20,
+                backgroundColor: Colors.transparent,
+                scaleFactor: 60,
+                waveThickness: 3,
+                spacing: 4,
+              ),
+              outgoingPlayerWaveStyle: PlayerWaveStyle(
+                liveWaveColor: _theme.iconColor,
+                fixedWaveColor: AppColors.white20,
+                backgroundColor: Colors.transparent,
+                scaleFactor: 60,
+                waveThickness: 3,
+                spacing: 4,
+              ),
+            ),
+            messageReactionConfig: MessageReactionConfiguration(
+              backgroundColor: _theme.incomingBubble,
+              borderColor: _theme.backgroundColor,
+              borderWidth: 2,
+              reactionsBottomSheetConfig: ReactionsBottomSheetConfiguration(
+                backgroundColor: _theme.backgroundColor,
+                reactedUserTextStyle: TextStyle(
+                  color: _theme.textColor,
+                ),
+                reactionWidgetDecoration: BoxDecoration(
+                  color: _theme.incomingBubble,
+                  borderRadius: const BorderRadius.all(Radius.circular(12)),
                 ),
               ),
             ),
-            IconButton(
-              onPressed: () {},
-              icon: SvgPicture.asset(AppIcons.wpPhone),
-            ),
-            IconButton(
-              // Handle video call
-              onPressed: () {},
-              icon: SvgPicture.asset(AppIcons.wpVideo),
-            ),
-            PopupMenuButton(
-              icon: const Icon(Icons.more_vert_rounded),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'toggle_typing_indicator',
-                  child: Text('Toggle TypingIndicator'),
-                ),
-                const PopupMenuItem(
-                  value: 'simulate_message_receive',
-                  child: Text('Simulate Message receive'),
-                ),
-                // PopupMenuItem(
-                //   value: 'dark_theme',
-                //   child: Text(' ${isDarkTheme ? 'Light' : 'Dark'} Mode'),
-                // ),
-              ],
-              onSelected: (value) {
-                switch (value) {
-                  case 'toggle_typing_indicator':
-                    _showHideTypingIndicator();
-                  case 'simulate_message_receive':
-                    receiveMessage();
-                  case 'dark_theme':
-                    _onThemeIconTap();
-                }
-              },
-            ),
-            const SizedBox(width: 12),
-          ],
-        ),
-        chatBackgroundConfig: ChatBackgroundConfiguration(
-          backgroundColor: AppColors.instaBackground,
-          groupSeparatorBuilder: (separator) {
-            final date = DateTime.tryParse(separator);
-            if (date == null) {
+            customMessageBuilder: (message) {
+              if (message.message == 'Message unavailable') {
+                return _buildUnavailableMessage(message);
+              }
               return const SizedBox.shrink();
-            }
-            String separatorDate;
-            final now = DateTime.now();
-            if (date.day == now.day &&
-                date.month == now.month &&
-                date.year == now.year) {
-              separatorDate = DateFormat('h:mm a').format(date);
-            } else if (date.day == now.day - 1 &&
-                date.month == now.month &&
-                date.year == now.year) {
-              separatorDate =
-                  'Yesterday at ${DateFormat('h:mm a').format(date)}';
-            } else if (date.isAfter(now.subtract(const Duration(days: 7)))) {
-              separatorDate = DateFormat('EEE h:mm a').format(date);
-            } else {
-              separatorDate = DateFormat('d MMM AT h:mm a').format(date);
-            }
-            return Align(
-              heightFactor: 2,
-              child: Text(
-                separatorDate.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.instaSeparatorText,
-                ),
-              ),
-            );
-          },
-        ),
-        sendMessageConfig: SendMessageConfiguration(
-          replyTitleColor: Colors.black,
-          replyDialogColor: Colors.white,
-          defaultSendButtonColor: Colors.white,
-          textFieldBackgroundColor: AppColors.instaTextFieldBackground,
-          sendButtonStyle: IconButton.styleFrom(
-            backgroundColor: AppColors.instaPurple,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-          ),
-          textFieldConfig: TextFieldConfiguration(
-            hintText: 'Message...',
-            hideLeadingActionsOnType: false,
-            onMessageTyping: (status) {
-              /// Do with status
-              debugPrint(status.toString());
-            },
-            compositionThresholdTime: const Duration(seconds: 1),
-            textStyle: const TextStyle(color: Colors.black),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            leadingActions: (context, controller) => controller.text
-                    .trim()
-                    .isEmpty
-                ? [
-                    CameraActionButton(
-                      icon: const Icon(
-                        Icons.camera_alt_rounded,
-                        color: Colors.white,
-                      ),
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.instaPurple,
-                      ),
-                      onPressed: (path, replyMessage) {
-                        if (path?.isEmpty ?? true) return;
-                        _chatController.addMessage(
-                          Message(
-                            id: DateTime.now()
-                                .millisecondsSinceEpoch
-                                .toString(),
-                            message: path!,
-                            createdAt: DateTime.now(),
-                            messageType: MessageType.image,
-                            sentBy: _chatController.currentUser.id,
-                            replyMessage: replyMessage ?? const ReplyMessage(),
-                          ),
-                        );
-                        _chatController.addMessage(
-                          Message(
-                            message: controller.text,
-                            id: DateTime.now()
-                                .millisecondsSinceEpoch
-                                .toString(),
-                            createdAt: DateTime.now(),
-                            sentBy: _chatController.currentUser.id,
-                            replyMessage: replyMessage ?? const ReplyMessage(),
-                          ),
-                        );
-                      },
-                    ),
-                  ]
-                : [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.search_rounded,
-                        color: Colors.white,
-                      ),
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.instaPurple,
-                      ),
-                      onPressed: () =>
-                          ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Search button pressed')),
-                      ),
-                    ),
-                  ],
-            trailingActions: (context, controller) => [
-              GalleryActionButton(
-                icon: const Icon(Icons.photo_rounded, size: 30),
-                onPressed: (path, replyMessage) {
-                  if (path?.isEmpty ?? true) return;
-                  _chatController.addMessage(
-                    Message(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      message: path!,
-                      createdAt: DateTime.now(),
-                      messageType: MessageType.image,
-                      sentBy: _chatController.currentUser.id,
-                      replyMessage: replyMessage ?? const ReplyMessage(),
-                    ),
-                  );
-                },
-              ),
-              EmojiPickerActionButton(
-                context: context,
-                onPressed: (emoji, replyMessage) {
-                  if (emoji?.isEmpty ?? true) return;
-                  controller.text = controller.text += emoji!;
-                  _chatController.addMessage(
-                    Message(
-                      message: controller.text,
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      createdAt: DateTime.now(),
-                      sentBy: _chatController.currentUser.id,
-                      replyMessage: replyMessage ?? const ReplyMessage(),
-                    ),
-                  );
-                },
-                icon: SvgPicture.asset(
-                  AppIcons.wpSticker,
-                  width: 30,
-                  height: 30,
-                ),
-              ),
-              IconButton(
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Add attachment')),
-                ),
-                icon: const Icon(
-                  Icons.add_circle_outline_rounded,
-                  size: 30,
-                ),
-              ),
-            ],
-          ),
-        ),
-        chatBubbleConfig: ChatBubbleConfiguration(
-          outgoingChatBubbleConfig: const ChatBubble(
-            linkPreviewConfig: LinkPreviewConfiguration(
-              linkStyle: TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
-            ),
-            color: AppColors.instaPurple,
-            textStyle: TextStyle(color: Colors.white, fontSize: 16),
-            receiptsWidgetConfig: ReceiptsWidgetConfig(
-              showReceiptsIn: ShowReceiptsIn.lastMessage,
-            ),
-          ),
-          inComingChatBubbleConfig: ChatBubble(
-            linkPreviewConfig: const LinkPreviewConfiguration(
-              linkStyle: TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
-            ),
-            color: AppColors.instaLightGrey,
-            textStyle: const TextStyle(color: Colors.black87, fontSize: 16),
-            onMessageRead: (message) {
-              /// send your message reciepts to the other client
-              debugPrint('Message Read');
             },
           ),
-        ),
-        reactionPopupConfig: const ReactionPopupConfiguration(
-          backgroundColor: Colors.white,
-          shadow: BoxShadow(
-            blurRadius: 8,
-            offset: Offset(0, 4),
-            color: Colors.black26,
+          profileCircleConfig: const ProfileCircleConfiguration(
+            padding: EdgeInsets.only(right: 4),
+            profileImageUrl: Data.profileImage,
           ),
-        ),
-        messageConfig: MessageConfiguration(
-          voiceMessageConfig: VoiceMessageConfiguration(
-            margin: EdgeInsets.zero,
-            padding: EdgeInsets.zero,
-            playIcon: (isMessageBySender) => Icon(
-              Icons.play_arrow_rounded,
-              size: 24,
-              color: isMessageBySender ? Colors.white : Colors.black,
+          repliedMessageConfig: RepliedMessageConfiguration(
+            backgroundColor: _theme.replyBg,
+            verticalBarColor: _theme.verticalDivider,
+            textStyle: TextStyle(color: _theme.replyText),
+            replyTitleTextStyle: TextStyle(
+              fontSize: 12,
+              color: _theme.titleColor,
             ),
-            pauseIcon: (isMessageBySender) => Icon(
-              Icons.pause_rounded,
-              size: 24,
-              color: isMessageBySender ? Colors.white : Colors.black,
-            ),
-            inComingPlayerWaveStyle: const PlayerWaveStyle(
-              liveWaveColor: AppColors.black,
-              fixedWaveColor: AppColors.black20,
-              backgroundColor: Colors.transparent,
-              scaleFactor: 60,
-              waveThickness: 3,
-              spacing: 4,
-            ),
-            outgoingPlayerWaveStyle: const PlayerWaveStyle(
-              liveWaveColor: AppColors.white,
-              fixedWaveColor: AppColors.white20,
-              backgroundColor: Colors.transparent,
-              scaleFactor: 60,
-              waveThickness: 3,
-              spacing: 4,
+            loadOldReplyMessage: (id) async => {},
+            repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
+              enableHighlightRepliedMsg: true,
+              highlightScale: 1.1,
+              highlightColor: Colors.grey.shade300,
             ),
           ),
-          messageReactionConfig: MessageReactionConfiguration(
-            backgroundColor: Colors.white,
-            borderColor: Colors.grey.shade300,
-            reactionsBottomSheetConfig: const ReactionsBottomSheetConfiguration(
-              backgroundColor: Colors.white,
-            ),
+          swipeToReplyConfig: SwipeToReplyConfiguration(
+            replyIconColor: _theme.iconColor,
+            replyIconBackgroundColor: _theme.backgroundColor,
+            replyIconProgressRingColor: _theme.incomingBubble,
           ),
-          customMessageBuilder: (message) {
-            if (message.message == 'Message unavailable') {
-              return _buildUnavailableMessage(message);
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-        profileCircleConfig: const ProfileCircleConfiguration(
-          padding: EdgeInsets.only(right: 4),
-          profileImageUrl: Data.profileImage,
-        ),
-        repliedMessageConfig: RepliedMessageConfiguration(
-          backgroundColor: AppColors.instaReplyBackground,
-          verticalBarColor: AppColors.instaLightGrey,
-          textStyle: const TextStyle(color: AppColors.instaReplyText),
-          replyTitleTextStyle: const TextStyle(
-            fontSize: 12,
-            color: AppColors.instaReplyTitleText,
-          ),
-          loadOldReplyMessage: (id) async => {},
-          repliedMsgAutoScrollConfig: RepliedMsgAutoScrollConfig(
-            enableHighlightRepliedMsg: true,
-            highlightScale: 1.1,
-            highlightColor: Colors.grey.shade300,
-          ),
-        ),
-        swipeToReplyConfig: SwipeToReplyConfiguration(
-          replyIconColor: theme.swipeToReplyIconColor,
-        ),
-        replySuggestionsConfig: ReplySuggestionsConfig(
-          itemConfig: SuggestionItemConfig(
-            decoration: BoxDecoration(
-              color: theme.textFieldBackgroundColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: theme.outgoingChatBubbleColor ?? Colors.white,
+          replySuggestionsConfig: ReplySuggestionsConfig(
+            itemConfig: SuggestionItemConfig(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: _theme.incomingBubble,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: _theme.incomingBubble),
               ),
+              textStyle: TextStyle(color: _theme.textColor),
             ),
-            textStyle: TextStyle(
-              color: isDarkTheme ? Colors.white : Colors.black,
+            onTap: (item) => _onSendTap(
+              item.text,
+              const ReplyMessage(),
+              MessageType.text,
             ),
-          ),
-          onTap: (item) => _onSendTap(
-            item.text,
-            const ReplyMessage(),
-            MessageType.text,
           ),
         ),
       ),
@@ -915,7 +969,8 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
       id: DateTime.now().toString(),
       createdAt: DateTime.now(),
       message: message,
-      sentBy: _chatController.currentUser.id,
+      // sentBy: _chatController.currentUser.id,
+      sentBy: '2',
       replyMessage: replyMessage,
       messageType: messageType,
     );
@@ -936,12 +991,12 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
 
   void _onThemeIconTap() {
     setState(() {
-      if (isDarkTheme) {
-        theme = LightTheme();
-        isDarkTheme = false;
+      if (_isDarkTheme) {
+        _theme = ChatViewTheme.light;
+        _isDarkTheme = false;
       } else {
-        theme = DarkTheme();
-        isDarkTheme = true;
+        _theme = ChatViewTheme.dark;
+        _isDarkTheme = true;
       }
     });
   }
@@ -953,25 +1008,25 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       margin: EdgeInsets.fromLTRB(
           5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
-      decoration: const BoxDecoration(
-        color: AppColors.instaLightGrey,
-        borderRadius: BorderRadius.all(Radius.circular(18)),
+      decoration: BoxDecoration(
+        color: _theme.incomingBubble,
+        borderRadius: const BorderRadius.all(Radius.circular(18)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             message.message,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.black87,
+              color: _theme.textColor,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'This content may have been deleted by its owner or hidden by their privacy settings.',
-            style: TextStyle(color: Colors.black87, fontSize: 15),
+            style: TextStyle(color: _theme.textColor, fontSize: 15),
           ),
         ],
       ),

@@ -27,6 +27,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/images/whatsapp/
     - assets/vectors/
-    - assets/vectors/whatsapp/
+    - assets/vectors/instagram/

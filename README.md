@@ -2,29 +2,16 @@
 
 # ChatView
 
-[![Build](https://github.com/SimformSolutionsPvtLtd/chatview/actions/workflows/flutter.yaml/badge.svg?branch=main)](https://github.com/SimformSolutionsPvtLtd/chatview/actions) 
+[![Build](https://github.com/SimformSolutionsPvtLtd/chatview/actions/workflows/flutter.yaml/badge.svg?branch=main)](https://github.com/SimformSolutionsPvtLtd/chatview/actions)
 [![chatview](https://img.shields.io/pub/v/chatview?label=chatview)](https://pub.dev/packages/chatview)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/SimformSolutionsPvtLtd/chatview/blob/main/LICENSE)
 
 ChatView is a Flutter package that allows you to integrate a highly customizable chat UI in your
 Flutter applications with [Flexible Backend Integration][chatViewConnect].
 
-<table style="border-collapse: collapse; margin: auto; text-align: center;">
-  <tr>
-    <th style="border: 1px solid #ccc; padding: 10px;">ChatViewList</th>
-    <th style="border: 1px solid #ccc; padding: 10px;">ChatView</th>
-  </tr>
-  <tr>
-    <td style="border: 1px solid #ccc; padding: 10px;">
-      <img src="https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/feat/add_example_one/preview/chatviewlist.gif" 
-           alt="ChatViewList" width="352" />
-    </td>
-    <td style="border: 1px solid #ccc; padding: 10px;">
-      <img src="https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif" 
-           alt="ChatView" width="400" />
-    </td>
-  </tr>
-</table>
+| ChatViewList                                                                                                                                  | ChatView                                                                                                                              |
+|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| ![ChatViewList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/feat/add_example_one-test/preview/chatviewlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/feat/add_example_one-test/preview/chatview.gif) |
 
 ## Features
 

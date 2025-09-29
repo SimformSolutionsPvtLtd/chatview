@@ -5,7 +5,9 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 
 ## Preview
 
-![Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif)
+| ChatViewList                                                                                                                                  | ChatView                                                                                                                              |
+|-----------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| ![ChatViewList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/feat/add_example_one-test/preview/chatviewlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/feat/add_example_one-test/preview/chatview.gif) |
 
 ## Features
 

@@ -40,6 +40,7 @@ class SearchConfig {
     this.borderRadius = const BorderRadius.all(
       Radius.circular(textFieldBorderRadius),
     ),
+    this.clearIcon = const Icon(Icons.clear),
     this.onTapOutside,
     this.textStyle,
     this.maxLines,
@@ -131,6 +132,13 @@ class SearchConfig {
 
   /// Decoration for the search text field.
   final InputDecoration? decoration;
+
+  /// Icon to clear the search text field.
+  ///
+  /// Defaults to an clear icon `Icons.clear`.
+  ///
+  /// **Note**: if suffixIcon is provided, this will be ignored.
+  final Widget clearIcon;
 
   /// Callback function that is called when the user taps outside the search
   /// text field.

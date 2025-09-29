@@ -52,8 +52,12 @@ class ListTileConfig {
     this.middleWidgetPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.padding = const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
     this.lastMessageStatusConfig = const LastMessageStatusConfig(),
+    this.lastMessageTextStyle = const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+    ),
+    this.highlightTextStyle = const TextStyle(fontWeight: FontWeight.bold),
     this.userNameTextStyle,
-    this.lastMessageTextStyle,
     this.onTap,
     this.lastMessageTileBuilder,
     this.userNameBuilder,
@@ -69,6 +73,9 @@ class ListTileConfig {
   final UserNameBuilder? userNameBuilder;
 
   /// Custom widget builder for the trailing widget in the chat list.
+  ///
+  /// Defaults it will show last message createAtTime, unread count,
+  /// mute icon and pin icon.
   final TrailingBuilder? trailingBuilder;
 
   /// Text styles for various text elements in the user widget.
@@ -86,6 +93,14 @@ class ListTileConfig {
 
   /// Text styles for the last message text in the user widget.
   final TextStyle? lastMessageTextStyle;
+
+  /// Text style for highlighting the last message text,
+  /// typically used for unread messages.
+  ///
+  /// Defaults to a bold font weight.
+  ///
+  /// If null, no special highlighting is applied.
+  final TextStyle? highlightTextStyle;
 
   /// Text overflow behavior for the last message text.
   ///

@@ -146,6 +146,7 @@ class ChatViewListItemTile extends StatelessWidget {
                                       config.lastMessageTextOverflow,
                                   lastMessageTextStyle:
                                       config.lastMessageTextStyle,
+                                  highlightTextStyle: config.highlightTextStyle,
                                   lastMessageBuilder:
                                       config.lastMessageTileBuilder?.call(chat),
                                   statusConfig: config.lastMessageStatusConfig,

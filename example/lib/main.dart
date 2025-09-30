@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import 'data.dart';
+import 'example_two/example_two_list_screen.dart';
 import 'models/chatview_list_theme.dart';
 import 'models/chatview_theme.dart';
 import 'values/colors.dart';
@@ -22,12 +23,12 @@ class Example extends StatelessWidget {
       title: 'Flutter Chat UI Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: AppColors.instaPurple,
-        colorScheme: ColorScheme.fromSwatch(accentColor: AppColors.instaPurple),
+        primaryColor: AppColors.uiOnePurple,
+        colorScheme: ColorScheme.fromSwatch(accentColor: AppColors.uiOnePurple),
       ),
       darkTheme: ThemeData(
-        primaryColor: AppColors.instaPurple,
-        colorScheme: ColorScheme.fromSwatch(accentColor: AppColors.instaPurple),
+        primaryColor: AppColors.uiOnePurple,
+        colorScheme: ColorScheme.fromSwatch(accentColor: AppColors.uiOnePurple),
       ),
       home: const ExampleOneListScreen(),
     );
@@ -63,10 +64,6 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
           header: _headerWidget(),
           appbar: ChatViewListAppBar(
             backgroundColor: _theme.backgroundColor,
-            leading: Icon(
-              Icons.arrow_back_ios_rounded,
-              color: _theme.iconColor,
-            ),
             centerTitle: false,
             scrolledUnderElevation: 0,
             titleText: 'ChatViewList',
@@ -203,7 +200,7 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
         _theme = ChatViewListTheme.uiOneLight;
         _isDarkTheme = false;
       } else {
-        _theme = ChatViewListTheme.uiOneDart;
+        _theme = ChatViewListTheme.uiOneDark;
         _isDarkTheme = true;
       }
     });
@@ -217,14 +214,14 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
         if (highlight) ...[
           const CircleAvatar(
             radius: 4,
-            backgroundColor: AppColors.instaUnreadCountDot,
+            backgroundColor: AppColors.uiOneUnreadCountDot,
           ),
           const SizedBox(width: 12),
         ],
         SvgPicture.asset(
           AppIcons.camera2,
           colorFilter: ColorFilter.mode(
-            highlight ? _theme.iconColor : AppColors.instaDarkGrey,
+            highlight ? _theme.iconColor : AppColors.uiOneDarkGrey,
             BlendMode.srcIn,
           ),
         ),
@@ -233,30 +230,58 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
   }
 
   Widget _headerWidget() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              'Messages',
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: 16,
-                color: _theme.textColor,
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        GestureDetector(
+          onTap: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ExampleTwoListScreen(),
             ),
           ),
-          Text(
-            'Requests',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: _theme.searchText),
+          child: Text(
+            '✨ Check out another UI',
+            style: TextStyle(
+              color: _theme.textColor,
+              shadows: [
+                Shadow(
+                  color: _isDarkTheme ? Colors.white54 : Colors.black54,
+                  offset: const Offset(0, -1),
+                  blurRadius: 1,
+                ),
+              ],
+              decorationColor: _theme.textColor,
+              decoration: TextDecoration.underline,
+            ),
           ),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Messages',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: _theme.textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                'Requests',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: _theme.searchText),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -597,7 +622,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               ),
             ),
             sendButtonStyle: IconButton.styleFrom(
-              backgroundColor: AppColors.instaPurple,
+              backgroundColor: AppColors.uiOnePurple,
               padding: const EdgeInsets.symmetric(horizontal: 16),
             ),
             textFieldConfig: TextFieldConfiguration(
@@ -619,7 +644,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                               color: Colors.white,
                             ),
                             style: IconButton.styleFrom(
-                              backgroundColor: AppColors.instaPurple,
+                              backgroundColor: AppColors.uiOnePurple,
                             ),
                             onPressed: (path, replyMessage) {
                               if (path?.isEmpty ?? true) return;
@@ -658,7 +683,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                               color: Colors.white,
                             ),
                             style: IconButton.styleFrom(
-                              backgroundColor: AppColors.instaPurple,
+                              backgroundColor: AppColors.uiOnePurple,
                             ),
                             onPressed: () =>
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -735,7 +760,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                   color: Colors.white,
                 ),
               ),
-              color: AppColors.instaPurple,
+              color: AppColors.uiOnePurple,
               textStyle: TextStyle(color: Colors.white, fontSize: 16),
               receiptsWidgetConfig: ReceiptsWidgetConfig(
                 showReceiptsIn: ShowReceiptsIn.lastMessage,
@@ -1025,17 +1050,17 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
             children: [
               CircleAvatar(
                 radius: 2.75,
-                backgroundColor: AppColors.instaDarkGrey,
+                backgroundColor: AppColors.uiOneDarkGrey,
               ),
               SizedBox(width: 3),
               CircleAvatar(
                 radius: 2.75,
-                backgroundColor: AppColors.instaDarkGrey,
+                backgroundColor: AppColors.uiOneDarkGrey,
               ),
               SizedBox(width: 3),
               CircleAvatar(
                 radius: 2.75,
-                backgroundColor: AppColors.instaDarkGrey,
+                backgroundColor: AppColors.uiOneDarkGrey,
               ),
             ],
           ),

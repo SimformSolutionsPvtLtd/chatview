@@ -317,21 +317,18 @@ class Data {
           status: MessageStatus.read,
         ),
         Message(
-          id: '200',
-          message:
-              "/data/user/0/com.simform.example/cache/28-09-25-11-07-421922108777129930344.m4a",
-          createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
-          sentBy: '1',
-          messageType: MessageType.voice,
+          id: '19',
+          message: 'https://bit.ly/3JHS2Wl',
+          createdAt: DateTime.now().subtract(const Duration(minutes: 3)),
+          sentBy: '2',
           status: MessageStatus.read,
+          messageType: MessageType.text,
         ),
         Message(
-          id: '201',
-          message:
-              "/data/user/0/com.simform.example/cache/28-09-25-11-07-421922108777129930344.m4a",
-          createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
+          id: '20',
+          message: "Check this out! We can meet here.",
+          createdAt: DateTime.now().subtract(const Duration(minutes: 1)),
           sentBy: '2',
-          messageType: MessageType.voice,
           status: MessageStatus.read,
         ),
       ];

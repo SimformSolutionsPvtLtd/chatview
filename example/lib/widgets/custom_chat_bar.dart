@@ -9,8 +9,8 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import '../../values/colors.dart';
 import '../../values/icons.dart';
 
-class WpCustomChatBar extends StatefulWidget {
-  const WpCustomChatBar({
+class CustomChatBar extends StatefulWidget {
+  const CustomChatBar({
     required this.chatController,
     required this.replyMessage,
     this.onAttachPressed,
@@ -22,10 +22,10 @@ class WpCustomChatBar extends StatefulWidget {
   final VoidCallback? onAttachPressed;
 
   @override
-  State<WpCustomChatBar> createState() => _WpCustomChatBarState();
+  State<CustomChatBar> createState() => _CustomChatBarState();
 }
 
-class _WpCustomChatBarState extends State<WpCustomChatBar> {
+class _CustomChatBarState extends State<CustomChatBar> {
   RecorderController? controller;
   late ReplyMessage? _replyMessage = widget.replyMessage;
   final voiceRecordingConfig = const VoiceRecordingConfiguration();
@@ -67,7 +67,10 @@ class _WpCustomChatBarState extends State<WpCustomChatBar> {
                 padding: const EdgeInsets.fromLTRB(8, 8, 7.5, 7.5),
                 decoration: const BoxDecoration(
                   border: Border(
-                    left: BorderSide(color: AppColors.uiTwoReplyLineColor, width: 4),
+                    left: BorderSide(
+                      color: AppColors.uiTwoReplyLineColor,
+                      width: 4,
+                    ),
                   ),
                 ),
                 child: Row(
@@ -258,10 +261,10 @@ class _WpCustomChatBarState extends State<WpCustomChatBar> {
                                           onPressed: _sendMessage,
                                           padding: EdgeInsets.zero,
                                           style: IconButton.styleFrom(
-                                            backgroundColor: AppColors.uiTwoGreen,
+                                            backgroundColor:
+                                                AppColors.uiTwoGreen,
                                           ),
-                                          icon:
-                                              SvgPicture.asset(AppIcons.send),
+                                          icon: SvgPicture.asset(AppIcons.send),
                                         ),
                                       ),
                                     ]
@@ -303,8 +306,8 @@ class _WpCustomChatBarState extends State<WpCustomChatBar> {
                                           child: IconButton(
                                             onPressed: _recordOrStop,
                                             padding: EdgeInsets.zero,
-                                            icon: SvgPicture.asset(
-                                                AppIcons.mic),
+                                            icon:
+                                                SvgPicture.asset(AppIcons.mic),
                                           ),
                                         ),
                                       ],

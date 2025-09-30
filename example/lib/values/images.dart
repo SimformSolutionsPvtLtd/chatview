@@ -1,3 +1,3 @@
 class AppImages {
-  static const String wpChatBackground = "assets/images/chat_background.png";
+  static const String uiTwoChatBackground = "assets/images/chat_background.png";
 }

@@ -9,8 +9,8 @@ import '../values/colors.dart';
 import '../values/borders.dart';
 import '../values/icons.dart';
 import '../values/images.dart';
+import '../widgets/custom_chat_bar.dart';
 import '../widgets/reply_message_tile.dart';
-import '../widgets/wp_custom_chat_bar.dart';
 
 class ExampleTwoChatScreen extends StatefulWidget {
   const ExampleTwoChatScreen({required this.chat, super.key});
@@ -175,7 +175,7 @@ class _ExampleTwoChatScreenState extends State<ExampleTwoChatScreen> {
         ),
         chatBackgroundConfig: ChatBackgroundConfiguration(
           backgroundColor: AppColors.uiTwoBackground,
-          backgroundImage: AppImages.wpChatBackground,
+          backgroundImage: AppImages.uiTwoChatBackground,
           groupSeparatorBuilder: (separator) => _customSeparator(separator),
         ),
         chatBubbleConfig: ChatBubbleConfiguration(
@@ -282,7 +282,7 @@ class _ExampleTwoChatScreenState extends State<ExampleTwoChatScreen> {
           onLeftSwipe: null,
           onRightSwipe: null,
         ),
-        sendMessageBuilder: (replyMessage) => WpCustomChatBar(
+        sendMessageBuilder: (replyMessage) => CustomChatBar(
           chatController: _chatController,
           replyMessage: replyMessage ?? const ReplyMessage(),
           onAttachPressed: () => ScaffoldMessenger.of(context).showSnackBar(

@@ -167,6 +167,7 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
   void dispose() {
     _updateSubscription?.cancel();
     _updateSubscription = null;
+    _controller.disposeAnimations();
     super.dispose();
   }
 }

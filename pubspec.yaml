@@ -23,7 +23,6 @@ dependencies:
   chatview_utils:
     git:
       url: https://github.com/SimformSolutionsPvtLtd/chatview_utils
-      ref: feature/update_changelog
 
   emoji_picker_flutter: ^4.3.0
   flutter:

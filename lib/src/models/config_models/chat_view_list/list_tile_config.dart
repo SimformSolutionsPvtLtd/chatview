@@ -57,6 +57,7 @@ class ListTileConfig {
       fontWeight: FontWeight.normal,
     ),
     this.highlightTextStyle = const TextStyle(fontWeight: FontWeight.bold),
+    this.lastMessageIconColor = Colors.black,
     this.userNameTextStyle,
     this.onTap,
     this.lastMessageTileBuilder,
@@ -90,6 +91,12 @@ class ListTileConfig {
   ///
   /// Defaults to `1`.
   final int? userNameMaxLines;
+
+  /// Color for icons used in the last message for message types
+  /// like image, voice.
+  ///
+  /// Defaults to `Colors.black`.
+  final Color lastMessageIconColor;
 
   /// Text styles for the last message text in the user widget.
   final TextStyle? lastMessageTextStyle;

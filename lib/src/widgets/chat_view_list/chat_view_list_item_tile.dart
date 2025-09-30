@@ -139,6 +139,7 @@ class ChatViewListItemTile extends StatelessWidget {
                                       : ValueKey(lastMessage?.id),
                                   unreadCount: unreadCount,
                                   lastMessage: lastMessage!,
+                                  iconColor: config.lastMessageIconColor,
                                   lastMessageType: lastMessage.messageType,
                                   lastMessageMaxLines:
                                       config.lastMessageMaxLines,

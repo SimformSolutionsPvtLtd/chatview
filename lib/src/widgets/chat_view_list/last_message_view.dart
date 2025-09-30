@@ -11,6 +11,7 @@ class LastMessageView extends StatelessWidget {
     required this.lastMessage,
     required this.showStatusIcon,
     required this.statusConfig,
+    required this.iconColor,
     this.highlightTextStyle,
     this.lastMessageType,
     this.lastMessageBuilder,
@@ -39,6 +40,7 @@ class LastMessageView extends StatelessWidget {
   final bool showStatusIcon;
   final TextStyle? highlightTextStyle;
   final LastMessageStatusConfig statusConfig;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,7 @@ class LastMessageView extends StatelessWidget {
                     MessageType.image => Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.photo, size: 14),
+                          Icon(Icons.photo, size: 14, color: iconColor),
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(
@@ -92,7 +94,7 @@ class LastMessageView extends StatelessWidget {
                     MessageType.voice => Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.mic, size: 14),
+                          Icon(Icons.mic, size: 14, color: iconColor),
                           const SizedBox(width: 5),
                           Flexible(
                             child: Text(

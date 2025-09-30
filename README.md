@@ -9,8 +9,9 @@
 ChatView is a Flutter package that allows you to integrate a highly customizable chat UI in your
 Flutter applications with [Flexible Backend Integration][chatViewConnect].
 
-[//]: # (TODO-YASH: USE MAIN BRANCH TO DISPLAY PREVIEW GIF)
-![Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/feat/use_data_models_from_chatview_utils/preview/chatview.gif)
+| ChatViewList                                                                                                             | ChatView                                                                                                         |
+|--------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| ![ChatViewList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatviewlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif) |
 
 ## Features
 
@@ -23,6 +24,7 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 - User online status indicators
 - Typing indicators for active users
 - Unread message count badges
+- Header and Footer support for additional widgets
 - Highly customizable UI components
 - Plug-and-play backend support using [chatview_connect][chatViewConnect]
 

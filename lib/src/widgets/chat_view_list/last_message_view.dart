@@ -11,6 +11,7 @@ class LastMessageView extends StatelessWidget {
     required this.lastMessage,
     required this.showStatusIcon,
     required this.statusConfig,
+    this.highlightTextStyle,
     this.lastMessageType,
     this.lastMessageBuilder,
     this.lastMessageMaxLines,
@@ -36,11 +37,12 @@ class LastMessageView extends StatelessWidget {
   final MessageType? lastMessageType;
   final Widget? lastMessageBuilder;
   final bool showStatusIcon;
+  final TextStyle? highlightTextStyle;
   final LastMessageStatusConfig statusConfig;
 
   @override
   Widget build(BuildContext context) {
-    final highlightText = unreadCount > 0;
+    final highlightText = highlightTextStyle != null && unreadCount > 0;
     return lastMessageBuilder ??
         AnimatedSwitcher(
           switchOutCurve: Curves.easeOut,
@@ -71,10 +73,8 @@ class LastMessageView extends StatelessWidget {
                               PackageStrings.currentLocale.photo,
                               maxLines: lastMessageMaxLines,
                               overflow: lastMessageTextOverflow,
-                              style: TextStyle(
-                                fontWeight: highlightText
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
+                              style: lastMessageTextStyle?.merge(
+                                highlightText ? highlightTextStyle : null,
                               ),
                             ),
                           ),
@@ -85,13 +85,9 @@ class LastMessageView extends StatelessWidget {
                         textAlign: TextAlign.left,
                         maxLines: lastMessageMaxLines,
                         overflow: lastMessageTextOverflow,
-                        style: lastMessageTextStyle ??
-                            TextStyle(
-                              fontSize: 14,
-                              fontWeight: highlightText
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
+                        style: lastMessageTextStyle?.merge(
+                          highlightText ? highlightTextStyle : null,
+                        ),
                       ),
                     MessageType.voice => Row(
                         mainAxisSize: MainAxisSize.min,
@@ -103,6 +99,9 @@ class LastMessageView extends StatelessWidget {
                               PackageStrings.currentLocale.voice,
                               maxLines: lastMessageMaxLines,
                               overflow: lastMessageTextOverflow,
+                              style: lastMessageTextStyle?.merge(
+                                highlightText ? highlightTextStyle : null,
+                              ),
                             ),
                           ),
                         ],

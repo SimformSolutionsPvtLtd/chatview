@@ -8,6 +8,7 @@ class UserTypingBuilder extends StatelessWidget {
   const UserTypingBuilder({
     required this.animation,
     required this.bubble,
+    this.showProfileCircle = true,
     this.profileConfig,
     super.key,
   });
@@ -15,6 +16,7 @@ class UserTypingBuilder extends StatelessWidget {
   final Widget bubble;
   final Animation<double> animation;
   final ProfileCircleConfiguration? profileConfig;
+  final bool showProfileCircle;
 
   @override
   Widget build(BuildContext context) {
@@ -25,24 +27,27 @@ class UserTypingBuilder extends StatelessWidget {
         alignment: Alignment.centerLeft,
         child: child,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ProfileCircle(
-            bottomPadding: 0,
-            profileCirclePadding: EdgeInsets.zero,
-            imageUrl: profileConfig?.profileImageUrl,
-            imageType: profileConfig?.imageType,
-            assetImageErrorBuilder: profileConfig?.assetImageErrorBuilder,
-            networkImageErrorBuilder: profileConfig?.networkImageErrorBuilder,
-            defaultAvatarImage:
-                profileConfig?.defaultAvatarImage ?? Constants.profileImage,
-            networkImageProgressIndicatorBuilder:
-                profileConfig?.networkImageProgressIndicatorBuilder,
-          ),
-          bubble,
-        ],
-      ),
+      child: !showProfileCircle
+          ? bubble
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ProfileCircle(
+                  bottomPadding: 0,
+                  profileCirclePadding: EdgeInsets.zero,
+                  imageUrl: profileConfig?.profileImageUrl,
+                  imageType: profileConfig?.imageType,
+                  assetImageErrorBuilder: profileConfig?.assetImageErrorBuilder,
+                  networkImageErrorBuilder:
+                      profileConfig?.networkImageErrorBuilder,
+                  defaultAvatarImage: profileConfig?.defaultAvatarImage ??
+                      Constants.profileImage,
+                  networkImageProgressIndicatorBuilder:
+                      profileConfig?.networkImageProgressIndicatorBuilder,
+                ),
+                bubble,
+              ],
+            ),
     );
   }
 }

@@ -93,7 +93,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
                   builder: (context, value, _) => value.isEmpty
                       ? const SizedBox.shrink()
                       : IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: _config.clearIcon,
                           onPressed: _onTapClear,
                         ),
                 ),

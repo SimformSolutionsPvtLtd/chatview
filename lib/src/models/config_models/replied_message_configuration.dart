@@ -44,6 +44,8 @@ class RepliedMessageConfiguration {
     this.micIconColor,
   });
 
+  /// Used to fetch old replied message when original message is not present
+  /// in the current list of messages.
   final OldReplyMessageFetchCallback loadOldReplyMessage;
 
   /// Used to give color to vertical bar.

@@ -20,10 +20,9 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 - User online status indicators
 - Typing indicators for active users
 - Unread message count badges
-- Connect ChatView to any backend
-  using [chatview_connect](https://pub.dev/packages/chatview_connect)
-- And a wide range of configuration options to customize your chat.
-- Internationalization support
+- Header and Footer support for additional widgets
+- Highly customizable UI components with Internationalization support
+- Plug-and-play backend support using [chatview_connect](https://pub.dev/packages/chatview_connect)
 
 ### ChatView:
 
@@ -46,10 +45,10 @@ For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.gi
 
 ## Compatibility with [chatview_connect](https://pub.dev/packages/chatview_connect)
 
-| `chatview` version | [chatview_connect](https://pub.dev/packages/chatview_connect) version |
-|--------------------|-----------------------------------------------------------------------|
-| `>=2.4.1 <3.0.0`   | `0.0.1`                                                               |
-| `>= 3.0.0`         | `0.0.2`                                                               |
+| chatview version | [chatview_connect](https://pub.dev/packages/chatview_connect) version |
+|------------------|-----------------------------------------------------------------------|
+| `>=2.4.1 <3.0.0` | `0.0.1`                                                               |
+| `>= 3.0.0`       | `0.0.2`                                                               |
 
 ## Compatible Message Types
 
@@ -121,7 +120,7 @@ minSdkVersion 21
 <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 ```
 
-# Basic ChatViewList Usage
+# ChatViewList - Basic Usage
 
 Here's how to integrate ChatViewList into your Flutter application with minimal setup:
 
@@ -201,7 +200,7 @@ List<ChatViewListItem> chatList = [
 ];
 ```
 
-# Advanced ChatViewList Usage
+# ChatViewList - Advanced Usage
 
 ChatViewList offers extensive customization options to tailor the chat list UI to your specific needs.
 
@@ -535,7 +534,7 @@ ChatViewList(
 )
 ```
 
-# Basic ChatView Usage
+# ChatView - Basic Usage
 
 Here's how to integrate ChatView into your Flutter application with minimal setup:
 
@@ -606,7 +605,7 @@ void onSendTap(String message, ReplyMessage replyMessage, MessageType messageTyp
 
 > Note: You can evaluate message type from the 'messageType' parameter and perform operations accordingly.
 
-# Advanced ChatView Usage
+# ChatView - Advanced Usage
 
 ChatView offers extensive customization options to tailor the chat UI to your specific needs.
 

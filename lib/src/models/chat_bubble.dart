@@ -36,6 +36,7 @@ class ChatBubble {
     this.senderNameTextStyle,
     this.receiptsWidgetConfig,
     this.onMessageRead,
+    this.isSelectable = true,
     this.border,
   });
 
@@ -70,4 +71,7 @@ class ChatBubble {
 
   /// Used for giving border of chat bubble.
   final Border? border;
+
+  /// Used to determine whether the text can be selected.
+  final bool isSelectable;
 }

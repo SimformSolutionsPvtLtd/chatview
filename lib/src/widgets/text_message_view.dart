@@ -74,6 +74,17 @@ class TextMessageView extends StatelessWidget {
     final border = isMessageBySender
         ? outgoingChatBubbleConfig?.border
         : inComingChatBubbleConfig?.border;
+    final isSelectable = isMessageBySender
+        ? outgoingChatBubbleConfig?.isSelectable ?? false
+        : inComingChatBubbleConfig?.isSelectable ?? false;
+    final baseWidget = Text(
+      textMessage,
+      style: _textStyle ??
+          textTheme.bodyMedium!.copyWith(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+    );
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -99,14 +110,12 @@ class TextMessageView extends StatelessWidget {
                   linkPreviewConfig: _linkPreviewConfig,
                   url: textMessage,
                 )
-              : Text(
-                  textMessage,
-                  style: _textStyle ??
-                      textTheme.bodyMedium!.copyWith(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                ),
+              : isSelectable
+                  ? SelectableRegion(
+                      selectionControls: MaterialTextSelectionControls(),
+                      child: baseWidget,
+                    )
+                  : baseWidget,
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(

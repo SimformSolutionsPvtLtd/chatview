@@ -1,5 +1,6 @@
 ## [3.0.0] (unreleased)
-
+* **Feat**: [401](https://github.com/SimformSolutionsPvtLtd/chatview/pull/401)
+  Add selection and copy options for text view.
 * **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/chatview/issues/318)
   Provide support for action item widgets on the chat text field with position options
   `leadingActions` and `trailingActions` in `TextFieldConfiguration`. Also, provide a way to add

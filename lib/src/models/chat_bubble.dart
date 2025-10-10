@@ -36,7 +36,10 @@ class ChatBubble {
     this.senderNameTextStyle,
     this.receiptsWidgetConfig,
     this.onMessageRead,
+    this.isSelectable = true,
     this.border,
+    this.selectionHighlightColor,
+    this.selectionCursorColor,
   });
 
   /// Used for giving color of chat bubble.
@@ -70,4 +73,13 @@ class ChatBubble {
 
   /// Used for giving border of chat bubble.
   final Border? border;
+
+  /// Used to determine whether the text can be selected.
+  final bool isSelectable;
+
+  /// Color used to paint the selected text highlight background.  If null, falls back to theme.
+  final Color? selectionHighlightColor;
+
+  /// Color for the drag handles. If null, falls back to theme.
+  final Color? selectionCursorColor;
 }

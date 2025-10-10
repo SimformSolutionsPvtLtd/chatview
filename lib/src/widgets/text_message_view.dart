@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview/src/widgets/custom_selection_area.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -74,6 +75,23 @@ class TextMessageView extends StatelessWidget {
     final border = isMessageBySender
         ? outgoingChatBubbleConfig?.border
         : inComingChatBubbleConfig?.border;
+    final isSelectable = isMessageBySender
+        ? outgoingChatBubbleConfig?.isSelectable ?? false
+        : inComingChatBubbleConfig?.isSelectable ?? false;
+    final selectionHighlightColor = isMessageBySender
+        ? outgoingChatBubbleConfig?.selectionHighlightColor
+        : inComingChatBubbleConfig?.selectionHighlightColor;
+    final selectionCursorColor = isMessageBySender
+        ? outgoingChatBubbleConfig?.selectionCursorColor
+        : inComingChatBubbleConfig?.selectionCursorColor;
+    final baseWidget = Text(
+      textMessage,
+      style: _textStyle ??
+          textTheme.bodyMedium!.copyWith(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+    );
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -99,14 +117,15 @@ class TextMessageView extends StatelessWidget {
                   linkPreviewConfig: _linkPreviewConfig,
                   url: textMessage,
                 )
-              : Text(
-                  textMessage,
-                  style: _textStyle ??
-                      textTheme.bodyMedium!.copyWith(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                ),
+              : isSelectable
+                  ? CustomSelectionArea(
+                      selectionColor: selectionHighlightColor,
+                      selectionHandleColor: selectionCursorColor,
+                      selectionControls: ColoredTextSelectionControls(
+                          selectionCursorColor ?? Colors.black),
+                      child: baseWidget,
+                    )
+                  : baseWidget,
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(

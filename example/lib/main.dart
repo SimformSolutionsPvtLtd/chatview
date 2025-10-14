@@ -468,7 +468,9 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                     ]
                   : [
                       Message(
-                        id: '14',
+                        id: DateTime.now()
+                            .subtract(const Duration(minutes: 1))
+                            .toIso8601String(),
                         message: "How about a movie marathon?",
                         createdAt:
                             DateTime.now().subtract(const Duration(minutes: 1)),
@@ -476,7 +478,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                         status: MessageStatus.read,
                       ),
                       Message(
-                        id: '15',
+                        id: DateTime.now().toIso8601String(),
                         message: "Sounds great! I'm in. 🎬",
                         createdAt: DateTime.now(),
                         sentBy: '1',

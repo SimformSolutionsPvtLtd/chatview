@@ -7,7 +7,7 @@ import '../../../values/typedefs.dart';
 class TypingStatusConfig {
   /// Creates a [TypingStatusConfig].
   ///
-  /// Configuration options for the chat view list type indicator:
+  /// Configuration options for the chat list type indicator:
   ///
   /// - [suffix]: Appends a string to the indicator text.
   /// Default is `null`.
@@ -81,8 +81,8 @@ class TypingStatusConfig {
   final TextOverflow? overflow;
 
   /// Custom builder for indicator text.
-  final ChatViewListTextBuilder? textBuilder;
+  final ChatListTextBuilder? textBuilder;
 
   /// Custom builder for indicator widget.
-  final ChatViewListWidgetBuilder? widgetBuilder;
+  final ChatListWidgetBuilder? widgetBuilder;
 }

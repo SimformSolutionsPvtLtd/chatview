@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'data.dart';
 import 'example_two/example_two_list_screen.dart';
-import 'models/chatview_list_theme.dart';
+import 'models/chat_list_theme.dart';
 import 'models/chatview_theme.dart';
 import 'values/colors.dart';
 import 'values/icons.dart';
@@ -43,12 +43,12 @@ class ExampleOneListScreen extends StatefulWidget {
 }
 
 class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
-  ChatViewListTheme _theme = ChatViewListTheme.uiOneLight;
+  ChatListTheme _theme = ChatListTheme.uiOneLight;
   bool _isDarkTheme = false;
 
   final _searchController = TextEditingController();
 
-  final _chatListController = ChatViewListController(
+  final _chatListController = ChatListController(
     initialChatList: Data.getChatList(),
     scrollController: ScrollController(),
   );
@@ -58,15 +58,15 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
     return Scaffold(
       backgroundColor: _theme.backgroundColor,
       body: SafeArea(
-        child: ChatViewList(
+        child: ChatList(
           controller: _chatListController,
           backgroundColor: _theme.backgroundColor,
           header: _headerWidget(),
-          appbar: ChatViewListAppBar(
+          appbar: ChatListAppBar(
             backgroundColor: _theme.backgroundColor,
             centerTitle: false,
             scrolledUnderElevation: 0,
-            titleText: 'ChatViewList',
+            titleText: 'ChatList',
             titleTextStyle: TextStyle(
               fontSize: 20,
               color: _theme.textColor,
@@ -128,7 +128,7 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
                 return null;
               }
 
-              List<ChatViewListItem> chats =
+              List<ChatListItem> chats =
                   _chatListController.chatListMap.values.toList();
 
               final list = chats
@@ -197,16 +197,16 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
   void _onThemeIconTap() {
     setState(() {
       if (_isDarkTheme) {
-        _theme = ChatViewListTheme.uiOneLight;
+        _theme = ChatListTheme.uiOneLight;
         _isDarkTheme = false;
       } else {
-        _theme = ChatViewListTheme.uiOneDark;
+        _theme = ChatListTheme.uiOneDark;
         _isDarkTheme = true;
       }
     });
   }
 
-  Widget _customTrailingWidget(ChatViewListItem chat) {
+  Widget _customTrailingWidget(ChatListItem chat) {
     final highlight = (chat.unreadCount ?? 0) > 0;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -285,7 +285,7 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
     );
   }
 
-  Widget _customUserNameWidget(ChatViewListItem chat) {
+  Widget _customUserNameWidget(ChatListItem chat) {
     final highlightText = (chat.unreadCount ?? 0) > 0;
     return Row(
       children: [
@@ -317,7 +317,7 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
     );
   }
 
-  Widget _customLastMessageTile(ChatViewListItem chat) {
+  Widget _customLastMessageTile(ChatListItem chat) {
     final message = chat.lastMessage;
     final unreadCount = chat.unreadCount ?? 0;
     final highlightText = unreadCount > 0;
@@ -402,7 +402,7 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
 class ExampleOneChatScreen extends StatefulWidget {
   const ExampleOneChatScreen({required this.chat, super.key});
 
-  final ChatViewListItem chat;
+  final ChatListItem chat;
 
   @override
   State<ExampleOneChatScreen> createState() => _ExampleOneChatScreenState();

@@ -1,7 +1,7 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/chat_view_list/last_message_status_config.dart';
+import '../../models/config_models/chat_list/last_message_status_config.dart';
 import '../../utils/package_strings.dart';
 import 'message_status_icon.dart';
 

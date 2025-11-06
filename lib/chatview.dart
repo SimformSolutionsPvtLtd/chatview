@@ -52,6 +52,6 @@ export 'src/widgets/action_widgets/emoji_picker_action_button.dart';
 export 'src/widgets/action_widgets/gallery_action_button.dart';
 export 'src/widgets/action_widgets/overlay_action_button.dart';
 export 'src/widgets/action_widgets/text_field_action_button.dart';
+export 'src/widgets/chat_list/chatlist.dart';
 export 'src/widgets/chat_view.dart';
 export 'src/widgets/chat_view_appbar.dart';
-export 'src/widgets/chat_view_list/chatview_list.dart';

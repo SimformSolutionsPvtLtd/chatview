@@ -24,23 +24,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/chat_view_list/chat_menu_config.dart';
-import '../../models/config_models/chat_view_list/list_state_config.dart';
-import '../../models/config_models/chat_view_list/list_tile_config.dart';
-import '../../models/config_models/chat_view_list/load_more_config.dart';
-import '../../models/config_models/chat_view_list/search_config.dart';
+import '../../models/config_models/chat_list/chat_menu_config.dart';
+import '../../models/config_models/chat_list/list_state_config.dart';
+import '../../models/config_models/chat_list/list_tile_config.dart';
+import '../../models/config_models/chat_list/load_more_config.dart';
+import '../../models/config_models/chat_list/search_config.dart';
 import '../../utils/package_strings.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../chatview_state_widget.dart';
 import 'adaptive_progress_indicator.dart';
 import 'auto_animate_sliver_list.dart';
+import 'chat_list_item_tile.dart';
 import 'chat_list_tile_context_menu.dart';
-import 'chat_view_list_item_tile.dart';
 import 'search_text_field.dart';
 
-class ChatViewList extends StatefulWidget {
-  const ChatViewList({
+class ChatList extends StatefulWidget {
+  const ChatList({
     required this.controller,
     this.menuConfig = const ChatMenuConfig(),
     this.scrollViewKeyboardDismissBehavior =
@@ -63,10 +63,10 @@ class ChatViewList extends StatefulWidget {
   });
 
   /// Provides controller for managing the chat list.
-  final ChatViewListController controller;
+  final ChatListController controller;
 
   /// Provides widget builder for users in chat list.
-  final ChatViewListTileBuilder? chatBuilder;
+  final ChatListTileBuilder? chatBuilder;
 
   /// Provides separator builder for chat list items.
   final AutoAnimateSeparatorBuilder? separatorBuilder;
@@ -126,7 +126,7 @@ class ChatViewList extends StatefulWidget {
   /// Background color for the chat list.
   final Color backgroundColor;
 
-  /// Provides configuration for chat view list state appearance.
+  /// Provides configuration for chat list state appearance.
   ///
   /// For example:
   /// - if the stream has no data, it will show a no data state.
@@ -137,10 +137,10 @@ class ChatViewList extends StatefulWidget {
   final ListStateConfig stateConfig;
 
   @override
-  State<ChatViewList> createState() => _ChatViewListState();
+  State<ChatList> createState() => _ChatListState();
 }
 
-class _ChatViewListState extends State<ChatViewList> {
+class _ChatListState extends State<ChatList> {
   /// ValueNotifier to track if the next page is currently loading.
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
 
@@ -150,7 +150,7 @@ class _ChatViewListState extends State<ChatViewList> {
 
   LoadMoreConfig get _loadMoreConfig => widget.loadMoreConfig;
 
-  ChatViewListController get _controller => widget.controller;
+  ChatListController get _controller => widget.controller;
 
   ScrollController get _scrollController => widget.controller.scrollController;
 
@@ -175,19 +175,18 @@ class _ChatViewListState extends State<ChatViewList> {
             sliver: SliverToBoxAdapter(
               child: SearchTextField(
                 config: config,
-                chatViewListController: _controller,
+                chatListController: _controller,
               ),
             ),
           ),
         if (widget.header case final header?) SliverToBoxAdapter(child: header),
-        StreamBuilder<List<ChatViewListItem>>(
+        StreamBuilder<List<ChatListItem>>(
           stream: _controller.chatListStream,
           builder: (context, snapshot) {
             final chats = snapshot.data ?? List.empty();
             final state = snapshot.chatViewState;
             return switch (state) {
-              ChatViewState.hasMessages =>
-                AutoAnimateSliverList<ChatViewListItem>(
+              ChatViewState.hasMessages => AutoAnimateSliverList<ChatListItem>(
                   items: chats,
                   separatorBuilder: widget.separatorBuilder,
                   controller: _controller.animatedListController
@@ -196,7 +195,7 @@ class _ChatViewListState extends State<ChatViewList> {
                     ..updateItems(chats),
                   builder: (context, _, __, chat) {
                     final child = widget.chatBuilder?.call(context, chat) ??
-                        ChatViewListItemTile(
+                        ChatListItemTile(
                           chat: chat,
                           config: widget.tileConfig,
                         );
@@ -219,12 +218,12 @@ class _ChatViewListState extends State<ChatViewList> {
                           title: widget.stateConfig.noSearchChatsWidgetConfig
                                   .title ??
                               PackageStrings.currentLocale.noSearchResults,
-                          type: ChatViewStateType.chatViewList,
+                          type: ChatViewStateType.chatList,
                           config: widget.stateConfig.noSearchChatsWidgetConfig,
                         )
                       : ChatViewStateWidget(
                           chatViewState: state,
-                          type: ChatViewStateType.chatViewList,
+                          type: ChatViewStateType.chatList,
                           config: widget.stateConfig.noChatsWidgetConfig,
                           onReloadButtonTap:
                               widget.stateConfig.onReloadButtonTap,
@@ -233,14 +232,14 @@ class _ChatViewListState extends State<ChatViewList> {
               ChatViewState.loading => SliverFillRemaining(
                   child: ChatViewStateWidget(
                     chatViewState: state,
-                    type: ChatViewStateType.chatViewList,
+                    type: ChatViewStateType.chatList,
                     config: widget.stateConfig.loadingWidgetConfig,
                   ),
                 ),
               ChatViewState.error => SliverFillRemaining(
                   child: ChatViewStateWidget(
                     chatViewState: state,
-                    type: ChatViewStateType.chatViewList,
+                    type: ChatViewStateType.chatList,
                     config: widget.stateConfig.errorWidgetConfig,
                     onReloadButtonTap: widget.stateConfig.onReloadButtonTap,
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/chat_view_list/unread_count_config.dart';
+import '../../models/config_models/chat_list/unread_count_config.dart';
 import '../../values/enumeration.dart';
 
 class UnreadCountView extends StatelessWidget {

@@ -5,13 +5,13 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 
 ## Preview
 
-| ChatViewList                                                                                                             | ChatView                                                                                                         |
-|--------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| ![ChatViewList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatviewlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif) |
+| ChatList                                                                                                         | ChatView                                                                                                         |
+|------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| ![ChatList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif) |
 
 ## Features
 
-### ChatViewList:
+### ChatList:
 
 - Smooth animations for adding, removing, and pinning chats
 - Pagination support for large chat histories
@@ -120,26 +120,26 @@ minSdkVersion 21
 <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 ```
 
-# ChatViewList - Basic Usage
+# ChatList - Basic Usage
 
-Here's how to integrate ChatViewList into your Flutter application with minimal setup:
+Here's how to integrate ChatList into your Flutter application with minimal setup:
 
-## Step 1: Create a ChatView List Controller
+## Step 1: Create a ChatList Controller
 
 ```dart
-ChatViewListController chatListController = ChatViewListController(
+ChatListController chatListController = ChatListController(
   initialChatList: chatList,
   scrollController: ScrollController(),
 );
 ```
 
-## Step 2: Add the ChatViewList Widget
+## Step 2: Add the ChatList Widget
 
 ```dart
-ChatViewList(
+ChatList(
   controller: chatListController,
-  appbar: const ChatViewListAppBar(
-    title: 'ChatViewList Demo',
+  appbar: const ChatListAppBar(
+    title: 'ChatList Demo',
   ),
   menuConfig: ChatMenuConfig(
     deleteCallback: (chat) => chatListController.removeChat(chat.id),
@@ -174,8 +174,8 @@ Define your initial chat list:
 
 ```dart
 
-List<ChatViewListItem> chatList = [
-  ChatViewListItem(
+List<ChatListItem> chatList = [
+  ChatListItem(
     id: '2',
     name: 'Simform',
     unreadCount: 2,
@@ -191,7 +191,7 @@ List<ChatViewListItem> chatList = [
       pinStatus: PinStatus.pinned,
     ),
   ),
-  ChatViewListItem(
+  ChatListItem(
     id: '1',
     name: 'Flutter',
     userActiveStatus: UserActiveStatus.online,
@@ -200,17 +200,17 @@ List<ChatViewListItem> chatList = [
 ];
 ```
 
-# ChatViewList - Advanced Usage
+# ChatList - Advanced Usage
 
-ChatViewList offers extensive customization options to tailor the chat list UI to your specific needs.
+ChatList offers extensive customization options to tailor the chat list UI to your specific needs.
 
 ## Adding Custom Appbar
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
-  appbar: ChatViewListAppBar(
-    title: 'ChatViewList Demo',
+  appbar: ChatListAppBar(
+    title: 'ChatList Demo',
     centerTitle: false,
     actions: [
       IconButton(
@@ -228,7 +228,7 @@ ChatViewList(
 ## Adding Search Functionality
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   searchConfig: SearchConfig(
      textEditingController: TextEditingController(),
@@ -254,7 +254,7 @@ ChatViewList(
 ## Adding Custom Header
 
 ```dart
-ChatViewList(
+ChatList(
   /// ...
   header: SizedBox(
    height: 60,
@@ -301,7 +301,7 @@ ChatViewList(
 ## Adding Custom Actions in Menu
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   menuConfig: ChatMenuConfig(
     actions: (chat) => [
@@ -349,7 +349,7 @@ ChatViewList(
 ## Chat Tile Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -375,7 +375,7 @@ ChatViewList(
 ## Typing Indicator Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -395,7 +395,7 @@ ChatViewList(
 ## Last Message Time Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -414,7 +414,7 @@ ChatViewList(
 ## Last Message Status Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -443,7 +443,7 @@ ChatViewList(
 ## Unread Count Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -460,7 +460,7 @@ ChatViewList(
 ## User Active Status Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -482,7 +482,7 @@ ChatViewList(
 ## User Avatar Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   tileConfig: ListTileConfig(
     // ...
@@ -499,10 +499,10 @@ ChatViewList(
 )
 ```
 
-## ChatViewList States Configuration 
+## ChatList States Configuration 
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   stateConfig: const ListStateConfig(
     noChatsWidgetConfig: ChatViewStateWidgetConfiguration(
@@ -524,7 +524,7 @@ ChatViewList(
 ## Load More Chats Configuration
 
 ```dart
-ChatViewList(
+ChatList(
   // ...
   loadMoreConfig: LoadMoreConfig(
     size: 30,

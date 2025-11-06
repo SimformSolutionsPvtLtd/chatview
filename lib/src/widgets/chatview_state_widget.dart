@@ -27,7 +27,7 @@ import '../extensions/extensions.dart';
 import '../models/config_models/chat_view_state_widget_config.dart';
 import '../utils/package_strings.dart';
 import '../values/enumeration.dart';
-import 'chat_view_list/adaptive_progress_indicator.dart';
+import 'chat_list/adaptive_progress_indicator.dart';
 
 class ChatViewStateWidget extends StatelessWidget {
   const ChatViewStateWidget({
@@ -68,8 +68,8 @@ class ChatViewStateWidget extends StatelessWidget {
                     switch (type) {
                       ChatViewStateType.chatView =>
                         config.title.getChatViewStateTitle(chatViewState),
-                      ChatViewStateType.chatViewList =>
-                        config.title.getChatViewListStateTitle(chatViewState),
+                      ChatViewStateType.chatList =>
+                        config.title.getChatListStateTitle(chatViewState),
                     },
                 style: config.titleTextStyle,
               ),

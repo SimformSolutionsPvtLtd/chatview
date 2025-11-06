@@ -131,7 +131,7 @@ class ListTileConfig {
   final EdgeInsets middleWidgetPadding;
 
   /// Callback function that is called when a user taps on a chat item.
-  final ValueSetter<ChatViewListItem>? onTap;
+  final ValueSetter<ChatListItem>? onTap;
 
   /// Configuration for the user avatar in the chat list.
   final UserAvatarConfig userAvatarConfig;
@@ -155,7 +155,7 @@ class ListTileConfig {
   final bool showLastMessageStatus;
 
   /// Custom builder for the last message view in the chat list.
-  final ChatViewListLastMessageTileBuilder? lastMessageTileBuilder;
+  final ChatListLastMessageTileBuilder? lastMessageTileBuilder;
 
   /// Configuration for the typing status indicator in the chat list.
   final TypingStatusConfig typingStatusConfig;

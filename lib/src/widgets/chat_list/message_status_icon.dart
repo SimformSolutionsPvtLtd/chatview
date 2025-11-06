@@ -2,7 +2,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/chat_view_list/last_message_status_config.dart';
+import '../../models/config_models/chat_list/last_message_status_config.dart';
 
 class MessageStatusIcon extends StatelessWidget {
   const MessageStatusIcon({

@@ -9,7 +9,7 @@
 * **Breaking**: [330](https://github.com/SimformSolutionsPvtLtd/chatview/issues/330)
   Optimized memory usage in chat message handling for smoother performance.
 * **Feat**: [386](https://github.com/SimformSolutionsPvtLtd/chatview/pull/386) Introduced
-  `ChatViewList` to provide a support for listing chats with options like search, pagination, online
+  `ChatList` to provide a support for listing chats with options like search, pagination, online
   status, unread message count, typing indicator, long press menu and more.
 * **Feat**: [356](https://github.com/SimformSolutionsPvtLtd/chatview/pull/356) Add
   `loadOldReplyMessage` property to `RepliedMessageConfiguration` callback to load the original

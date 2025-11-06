@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ChatViewListTheme {
-  const ChatViewListTheme({
+class ChatListTheme {
+  const ChatListTheme({
     required this.textColor,
     required this.iconColor,
     required this.searchBg,
@@ -33,7 +33,7 @@ class ChatViewListTheme {
   final Color chipBg;
   final Color chipText;
 
-  static const ChatViewListTheme uiOneDark = ChatViewListTheme(
+  static const ChatListTheme uiOneDark = ChatListTheme(
     iconColor: Colors.white,
     divider: Colors.white,
     iconButton: Colors.white,
@@ -48,7 +48,7 @@ class ChatViewListTheme {
     selectedChipBg: Colors.white,
   );
 
-  static const ChatViewListTheme uiTwoDark = ChatViewListTheme(
+  static const ChatListTheme uiTwoDark = ChatListTheme(
     iconColor: Colors.white,
     iconButton: Color(0xff222222),
     textColor: Colors.white,
@@ -65,7 +65,7 @@ class ChatViewListTheme {
     chipText: Color(0xFF969595),
   );
 
-  static const ChatViewListTheme uiTwoLight = ChatViewListTheme(
+  static const ChatListTheme uiTwoLight = ChatListTheme(
     iconColor: Colors.black,
     iconButton: Color(0x080A0A0A),
     textColor: Colors.black,
@@ -82,7 +82,7 @@ class ChatViewListTheme {
     chipText: Color(0xFF767779),
   );
 
-  static const ChatViewListTheme uiOneLight = ChatViewListTheme(
+  static const ChatListTheme uiOneLight = ChatListTheme(
     iconColor: Colors.black,
     divider: Colors.black,
     iconButton: Colors.black,

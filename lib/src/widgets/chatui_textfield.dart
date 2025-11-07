@@ -44,12 +44,12 @@ class ChatUITextField extends StatefulWidget {
     required this.onPressed,
     required this.onRecordingComplete,
     required this.onImageSelected,
-    this.sendMessageConfig,
+    required this.sendMessageConfig,
     super.key,
   });
 
   /// Provides configuration of default text field in chat.
-  final SendMessageConfiguration? sendMessageConfig;
+  final SendMessageConfiguration sendMessageConfig;
 
   /// Provides focusNode for focusing text field.
   final FocusNode focusNode;
@@ -80,23 +80,23 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   bool Function(KeyEvent)? _keyboardHandler;
 
-  SendMessageConfiguration? get sendMessageConfig => widget.sendMessageConfig;
+  SendMessageConfiguration get sendMessageConfig => widget.sendMessageConfig;
 
-  VoiceRecordingConfiguration? get voiceRecordingConfig =>
-      widget.sendMessageConfig?.voiceRecordingConfiguration;
+  VoiceRecordingConfiguration get voiceRecordingConfig =>
+      widget.sendMessageConfig.voiceRecordingConfiguration;
 
   ImagePickerIconsConfiguration? get imagePickerIconsConfig =>
-      sendMessageConfig?.imagePickerIconsConfig;
+      sendMessageConfig.imagePickerIconsConfig;
 
   TextFieldConfiguration? get textFieldConfig =>
-      sendMessageConfig?.textFieldConfig;
+      sendMessageConfig.textFieldConfig;
 
   CancelRecordConfiguration? get cancelRecordConfiguration =>
-      sendMessageConfig?.cancelRecordConfiguration;
+      sendMessageConfig.cancelRecordConfiguration;
 
   OutlineInputBorder get _outLineBorder => OutlineInputBorder(
         borderSide: const BorderSide(color: Colors.transparent),
-        borderRadius: widget.sendMessageConfig?.textFieldConfig?.borderRadius ??
+        borderRadius: widget.sendMessageConfig.textFieldConfig?.borderRadius ??
             BorderRadius.circular(textFieldBorderRadius),
       );
 
@@ -112,7 +112,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     // onChanged is not called when text is set programmatically.
     widget.textEditingController.addListener(_listenTextEditingController);
     debouncer = Debouncer(
-        sendMessageConfig?.textFieldConfig?.compositionThresholdTime ??
+        sendMessageConfig.textFieldConfig?.compositionThresholdTime ??
             const Duration(seconds: 1));
     super.initState();
 
@@ -142,7 +142,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   void attachListeners() {
     composingStatus.addListener(() {
-      widget.sendMessageConfig?.textFieldConfig?.onMessageTyping
+      widget.sendMessageConfig.textFieldConfig?.onMessageTyping
           ?.call(composingStatus.value);
     });
   }
@@ -198,7 +198,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       decoration: BoxDecoration(
         borderRadius: textFieldConfig?.borderRadius ??
             BorderRadius.circular(textFieldBorderRadius),
-        color: sendMessageConfig?.textFieldBackgroundColor ?? Colors.white,
+        color: sendMessageConfig.textFieldBackgroundColor ?? Colors.white,
       ),
       child: ChatTextFieldViewBuilder<bool>(
         valueListenable: isRecording,
@@ -210,22 +210,22 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                   child: AudioWaveforms(
                     size: const Size(double.maxFinite, 50),
                     recorderController: controller!,
-                    margin: voiceRecordingConfig?.margin,
-                    padding: voiceRecordingConfig?.padding ??
+                    margin: voiceRecordingConfig.margin,
+                    padding: voiceRecordingConfig.padding ??
                         EdgeInsets.symmetric(
                           horizontal: cancelRecordConfiguration == null ? 8 : 5,
                         ),
-                    decoration: voiceRecordingConfig?.decoration ??
+                    decoration: voiceRecordingConfig.decoration ??
                         BoxDecoration(
-                          color: voiceRecordingConfig?.backgroundColor,
+                          color: voiceRecordingConfig.backgroundColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                    waveStyle: voiceRecordingConfig?.waveStyle ??
+                    waveStyle: voiceRecordingConfig.waveStyle ??
                         WaveStyle(
                           extendWaveform: true,
                           showMiddleLine: false,
                           waveColor:
-                              voiceRecordingConfig?.waveStyle?.waveColor ??
+                              voiceRecordingConfig.waveStyle?.waveColor ??
                                   Colors.black,
                         ),
                   ),
@@ -271,7 +271,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                             hintText: textFieldConfig?.hintText ??
                                 PackageStrings.currentLocale.message,
                             fillColor:
-                                sendMessageConfig?.textFieldBackgroundColor ??
+                                sendMessageConfig.textFieldBackgroundColor ??
                                     Colors.white,
                             filled: true,
                             hintMaxLines: textFieldConfig?.hintMaxLines ?? 1,
@@ -300,13 +300,13 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                 builder: (_, isNotEmpty, child) {
                   if (isNotEmpty) {
                     return IconButton(
-                      color: sendMessageConfig?.defaultSendButtonColor ??
+                      color: sendMessageConfig.defaultSendButtonColor ??
                           Colors.green,
-                      style: sendMessageConfig?.sendButtonStyle,
+                      style: sendMessageConfig.sendButtonStyle,
                       onPressed: (textFieldConfig?.enabled ?? true)
                           ? _onPressed
                           : null,
-                      icon: sendMessageConfig?.sendButtonIcon ??
+                      icon: sendMessageConfig.sendButtonIcon ??
                           const Icon(Icons.send),
                     );
                   } else {
@@ -353,7 +353,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                               ],
 
                         // Always add the voice button at the end if allowed
-                        if ((sendMessageConfig?.allowRecordingVoice ?? false) &&
+                        if ((sendMessageConfig.allowRecordingVoice) &&
                             !kIsWeb &&
                             (Platform.isIOS || Platform.isAndroid))
                           IconButton(
@@ -361,12 +361,11 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                 ? _recordOrStop
                                 : null,
                             icon: (isRecordingValue
-                                    ? voiceRecordingConfig?.stopIcon
-                                    : voiceRecordingConfig?.micIcon) ??
+                                    ? voiceRecordingConfig.stopIcon
+                                    : voiceRecordingConfig.micIcon) ??
                                 Icon(
                                   isRecordingValue ? Icons.stop : Icons.mic,
-                                  color:
-                                      voiceRecordingConfig?.recorderIconColor,
+                                  color: voiceRecordingConfig.recorderIconColor,
                                 ),
                           ),
 
@@ -380,7 +379,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                             icon: cancelRecordConfiguration?.icon ??
                                 const Icon(Icons.cancel_outlined),
                             color: cancelRecordConfiguration?.iconColor ??
-                                voiceRecordingConfig?.recorderIconColor,
+                                voiceRecordingConfig.recorderIconColor,
                           ),
                       ],
                     );
@@ -428,8 +427,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     );
     if (!isRecording.value) {
       await controller?.record(
-        recorderSettings:
-            voiceRecordingConfig?.recorderSettings ?? const RecorderSettings(),
+        recorderSettings: voiceRecordingConfig.recorderSettings,
       );
       isRecording.value = true;
     } else {

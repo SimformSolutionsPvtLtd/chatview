@@ -375,8 +375,7 @@ class _CustomChatBarState extends State<CustomChatBar> {
   Future<void> _recordOrStop() async {
     if (!isRecording.value) {
       await controller?.record(
-        recorderSettings:
-            voiceRecordingConfig.recorderSettings ?? const RecorderSettings(),
+        recorderSettings: voiceRecordingConfig.recorderSettings,
       );
       isRecording.value = true;
     } else {

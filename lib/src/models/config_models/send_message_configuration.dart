@@ -30,6 +30,7 @@ import '../../values/typedefs.dart';
 
 class SendMessageConfiguration {
   const SendMessageConfiguration({
+    this.voiceRecordingConfiguration = const VoiceRecordingConfiguration(),
     this.shouldSendImageWithText = false,
     this.allowRecordingVoice = true,
     this.textFieldConfig,
@@ -42,7 +43,6 @@ class SendMessageConfiguration {
     this.replyTitleColor,
     this.replyMessageColor,
     this.closeIconColor,
-    this.voiceRecordingConfiguration,
     this.micIconColor,
     this.cancelRecordConfiguration,
     this.removeImageIcon,
@@ -92,7 +92,7 @@ class SendMessageConfiguration {
   final Color? micIconColor;
 
   /// Styling configuration for recorder widget.
-  final VoiceRecordingConfiguration? voiceRecordingConfiguration;
+  final VoiceRecordingConfiguration voiceRecordingConfiguration;
 
   /// Configuration for cancel voice recording
   final CancelRecordConfiguration? cancelRecordConfiguration;
@@ -271,7 +271,7 @@ class VoiceRecordingConfiguration {
   /// Styling configuration for the recorder widget as well as
   /// configuring the audio recording quality.
   const VoiceRecordingConfiguration({
-    this.recorderSettings,
+    this.recorderSettings = const RecorderSettings(),
     this.waveStyle,
     this.padding,
     this.margin,
@@ -309,8 +309,8 @@ class VoiceRecordingConfiguration {
 
   /// Configures audio recording settings for Android and iOS.
   ///
-  /// if null, default settings will be used.
-  final RecorderSettings? recorderSettings;
+  /// Default is [RecorderSettings] with default values.
+  final RecorderSettings recorderSettings;
 }
 
 class CancelRecordConfiguration {

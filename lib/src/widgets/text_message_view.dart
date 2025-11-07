@@ -76,14 +76,11 @@ class TextMessageView extends StatelessWidget {
         ? outgoingChatBubbleConfig?.border
         : inComingChatBubbleConfig?.border;
     final isSelectable = isMessageBySender
-        ? outgoingChatBubbleConfig?.isSelectable ?? false
-        : inComingChatBubbleConfig?.isSelectable ?? false;
-    final selectionHighlightColor = isMessageBySender
-        ? outgoingChatBubbleConfig?.selectionHighlightColor
-        : inComingChatBubbleConfig?.selectionHighlightColor;
-    final selectionCursorColor = isMessageBySender
-        ? outgoingChatBubbleConfig?.selectionCursorColor
-        : inComingChatBubbleConfig?.selectionCursorColor;
+        ? outgoingChatBubbleConfig?.enableTextSelection ?? false
+        : inComingChatBubbleConfig?.enableTextSelection ?? false;
+    final textSelectionConfig = isMessageBySender
+        ? outgoingChatBubbleConfig?.textSelectionConfig
+        : inComingChatBubbleConfig?.textSelectionConfig;
     final baseWidget = Text(
       textMessage,
       style: _textStyle ??
@@ -119,10 +116,7 @@ class TextMessageView extends StatelessWidget {
                 )
               : isSelectable
                   ? CustomSelectionArea(
-                      selectionColor: selectionHighlightColor,
-                      selectionHandleColor: selectionCursorColor,
-                      selectionControls: ColoredTextSelectionControls(
-                          selectionCursorColor ?? Colors.black),
+                      config: textSelectionConfig,
                       child: baseWidget,
                     )
                   : baseWidget,

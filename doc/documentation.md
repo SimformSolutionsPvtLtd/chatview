@@ -1145,6 +1145,45 @@ This guide will help you migrate your code from previous versions of ChatView to
 
 ## Key Changes
 
+### Voice Recording Configuration
+
+The `VoiceRecordingConfiguration` class has been updated to utilize `RecorderSettings`, which now
+encapsulates the recorder settings for both iOS and Android platforms. The `androidOutputFormat`
+property has been removed so whatever format will be given by the encoder that will be used.
+
+Previous Usage:
+```dart
+ChatView(
+  sendMessageConfig: SendMessageConfiguration(
+    voiceRecordingConfiguration: VoiceRecordingConfiguration(
+      sampleRate: 44100,
+      bitRate: 128000,
+      iosEncoder: IosEncoder.kAudioFormatMPEG4AAC,
+      androidEncoder: AndroidEncoder.aacLc,
+      androidOutputFormat: AndroidOutputFormat.mpeg4,
+    ),
+),
+```
+
+New Usage:
+```dart
+ChatView(
+  sendMessageConfig: SendMessageConfiguration(
+    voiceRecordingConfiguration: VoiceRecordingConfiguration(
+        recorderSettings: RecorderSettings(
+          bitRate: 128000,
+          sampleRate: 44100,
+          androidEncoderSettings: AndroidEncoderSettings(
+            androidEncoder: AndroidEncoder.aacLc,
+          ),
+          iosEncoderSettings: IosEncoderSetting(
+            iosEncoder: IosEncoder.kAudioFormatMPEG4AAC,
+          ),
+        ),
+    ),
+),
+```
+
 ### Text Field Action Items
 
 You can now add action buttons to the input field using two builders:

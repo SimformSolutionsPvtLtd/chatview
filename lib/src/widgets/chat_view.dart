@@ -56,11 +56,11 @@ class ChatView extends StatefulWidget {
     this.appBar,
     ChatBackgroundConfiguration? chatBackgroundConfig,
     this.sendMessageBuilder,
-    this.sendMessageConfig,
     this.onChatListTap,
     required this.chatViewState,
     ChatViewStateConfiguration? chatViewStateConfig,
     this.featureActiveConfig = const FeatureActiveConfig(),
+    this.sendMessageConfig = const SendMessageConfiguration(),
     this.emojiPickerSheetConfig,
     this.replyMessageBuilder,
     this.replySuggestionsConfig,
@@ -123,7 +123,7 @@ class ChatView extends StatefulWidget {
   final ChatController chatController;
 
   /// Provides configuration of default text field in chat.
-  final SendMessageConfiguration? sendMessageConfig;
+  final SendMessageConfiguration sendMessageConfig;
 
   /// Provides current state of chat.
   final ChatViewState chatViewState;
@@ -296,7 +296,7 @@ class _ChatViewState extends State<ChatView>
                                       _sendMessageKey.currentState
                                           ?.assignReplyMessage(message),
                                   textFieldConfig:
-                                      widget.sendMessageConfig?.textFieldConfig,
+                                      widget.sendMessageConfig.textFieldConfig,
                                 ),
                               ),
                             if (featureActiveConfig.enableTextField)

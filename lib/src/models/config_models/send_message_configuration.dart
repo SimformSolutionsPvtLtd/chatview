@@ -30,6 +30,7 @@ import '../../values/typedefs.dart';
 
 class SendMessageConfiguration {
   const SendMessageConfiguration({
+    this.voiceRecordingConfiguration = const VoiceRecordingConfiguration(),
     this.shouldSendImageWithText = false,
     this.allowRecordingVoice = true,
     this.textFieldConfig,
@@ -42,7 +43,6 @@ class SendMessageConfiguration {
     this.replyTitleColor,
     this.replyMessageColor,
     this.closeIconColor,
-    this.voiceRecordingConfiguration,
     this.micIconColor,
     this.cancelRecordConfiguration,
     this.removeImageIcon,
@@ -92,7 +92,7 @@ class SendMessageConfiguration {
   final Color? micIconColor;
 
   /// Styling configuration for recorder widget.
-  final VoiceRecordingConfiguration? voiceRecordingConfiguration;
+  final VoiceRecordingConfiguration voiceRecordingConfiguration;
 
   /// Configuration for cancel voice recording
   final CancelRecordConfiguration? cancelRecordConfiguration;
@@ -271,6 +271,7 @@ class VoiceRecordingConfiguration {
   /// Styling configuration for the recorder widget as well as
   /// configuring the audio recording quality.
   const VoiceRecordingConfiguration({
+    this.recorderSettings = const RecorderSettings(),
     this.waveStyle,
     this.padding,
     this.margin,
@@ -279,11 +280,6 @@ class VoiceRecordingConfiguration {
     this.micIcon,
     this.recorderIconColor,
     this.stopIcon,
-    this.sampleRate,
-    this.bitRate,
-    this.androidEncoder,
-    this.iosEncoder,
-    this.androidOutputFormat,
   });
 
   /// Applies styles to waveform.
@@ -311,24 +307,8 @@ class VoiceRecordingConfiguration {
   /// Applies color to mic and stop icon.
   final Color? recorderIconColor;
 
-  /// The sample rate for audio is measured in samples per second.
-  /// A higher sample rate generates more samples per second,
-  /// resulting in better audio quality but also larger file sizes.
-  final int? sampleRate;
-
-  /// Bitrate is the amount of data per second that the codec uses to
-  /// encode the audio. A higher bitrate results in better quality
-  /// but also larger file sizes.
-  final int? bitRate;
-
-  /// Audio encoder to be used for recording for IOS.
-  final IosEncoder? iosEncoder;
-
-  /// Audio encoder to be used for recording for Android.
-  final AndroidEncoder? androidEncoder;
-
-  /// The audio output format to be used for recorded audio files on Android.
-  final AndroidOutputFormat? androidOutputFormat;
+  /// Configures audio recording settings for Android and iOS.
+  final RecorderSettings recorderSettings;
 }
 
 class CancelRecordConfiguration {

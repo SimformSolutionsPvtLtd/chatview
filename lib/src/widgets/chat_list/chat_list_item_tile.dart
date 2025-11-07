@@ -23,22 +23,22 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/chat_view_list/list_tile_config.dart';
+import '../../models/config_models/chat_list/list_tile_config.dart';
 import '../../utils/helper.dart';
 import 'icon_scale_animation.dart';
 import 'last_message_view.dart';
 import 'unread_count_view.dart';
 import 'user_avatar_view.dart';
 
-class ChatViewListItemTile extends StatelessWidget {
-  const ChatViewListItemTile({
+class ChatListItemTile extends StatelessWidget {
+  const ChatListItemTile({
     required this.chat,
     required this.config,
     super.key,
   });
 
   /// User object to display in the chat list.
-  final ChatViewListItem chat;
+  final ChatListItem chat;
 
   /// Provides configuration for the user widget in chat list.
   final ListTileConfig config;

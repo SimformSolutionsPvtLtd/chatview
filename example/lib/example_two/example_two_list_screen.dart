@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data.dart';
 import '../main.dart';
-import '../models/chatview_list_theme.dart';
+import '../models/chat_list_theme.dart';
 import '../values/colors.dart';
 import '../values/icons.dart';
 import 'example_two_chat_screen.dart';
@@ -19,12 +19,12 @@ class ExampleTwoListScreen extends StatefulWidget {
 }
 
 class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
-  ChatViewListTheme _theme = ChatViewListTheme.uiTwoLight;
+  ChatListTheme _theme = ChatListTheme.uiTwoLight;
   bool _isDarkTheme = false;
 
   final _searchController = TextEditingController();
 
-  ChatViewListController? _chatListController;
+  ChatListController? _chatListController;
 
   ScrollController? _scrollController;
 
@@ -46,7 +46,7 @@ class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _scrollController = PrimaryScrollController.of(context);
-    _chatListController ??= ChatViewListController(
+    _chatListController ??= ChatListController(
       initialChatList: Data.getChatList(),
       scrollController: _scrollController!,
       disposeOtherResources: false,
@@ -65,7 +65,7 @@ class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
           backgroundColor: _theme.backgroundColor,
           body: _chatListController == null
               ? const Center(child: CircularProgressIndicator())
-              : ChatViewList(
+              : ChatList(
                   backgroundColor: _theme.backgroundColor,
                   controller: _chatListController!,
                   header: _buildHeader(),
@@ -282,7 +282,7 @@ class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
                         return null;
                       }
 
-                      List<ChatViewListItem> chats =
+                      List<ChatListItem> chats =
                           _chatListController?.chatListMap.values.toList() ??
                               [];
 
@@ -325,10 +325,10 @@ class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
   void _onThemeIconTap() {
     setState(() {
       if (_isDarkTheme) {
-        _theme = ChatViewListTheme.uiTwoLight;
+        _theme = ChatListTheme.uiTwoLight;
         _isDarkTheme = false;
       } else {
-        _theme = ChatViewListTheme.uiTwoDark;
+        _theme = ChatListTheme.uiTwoDark;
         _isDarkTheme = true;
       }
     });
@@ -574,7 +574,7 @@ class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
       return;
     }
 
-    final List<ChatViewListItem> filteredList;
+    final List<ChatListItem> filteredList;
     switch (filter) {
       case 'Unread':
         filteredList = _chatListController?.chatListMap.values

@@ -21,7 +21,7 @@
  */
 export 'chat_bubble.dart';
 export 'config_models/chat_bubble_configuration.dart';
-export 'config_models/chat_view_list/models.dart';
+export 'config_models/chat_list/models.dart';
 export 'config_models/chat_view_state_widget_config.dart';
 export 'config_models/chat_view_states_configuration.dart';
 export 'config_models/emoji_message_configuration.dart';

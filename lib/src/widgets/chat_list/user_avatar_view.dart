@@ -26,8 +26,8 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/chat_view_list/user_active_status_config.dart';
-import '../../models/config_models/chat_view_list/user_avatar_config.dart';
+import '../../models/config_models/chat_list/user_active_status_config.dart';
+import '../../models/config_models/chat_list/user_avatar_config.dart';
 
 class UserAvatarView extends StatelessWidget {
   const UserAvatarView({

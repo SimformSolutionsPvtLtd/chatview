@@ -19,7 +19,7 @@ class ChatListTileContextMenu extends StatelessWidget {
   });
 
   final Widget child;
-  final ChatViewListItem chat;
+  final ChatListItem chat;
   final ChatMenuConfig config;
   final Color chatTileColor;
   final ValueNotifier<String?> highlightNotifier;
@@ -139,7 +139,7 @@ class ChatListTileContextMenu extends StatelessWidget {
       callback.call();
     } else {
       // Call this after the animation of menu is completed
-      // To show chatview list animation
+      // To show chat list animation
       Future.delayed(callbackDelayDuration, callback);
     }
     navigator.pop();

@@ -5,8 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import '../data.dart';
-import '../values/colors.dart';
 import '../values/borders.dart';
+import '../values/colors.dart';
 import '../values/icons.dart';
 import '../values/images.dart';
 import '../widgets/custom_chat_bar.dart';
@@ -15,7 +15,7 @@ import '../widgets/reply_message_tile.dart';
 class ExampleTwoChatScreen extends StatefulWidget {
   const ExampleTwoChatScreen({required this.chat, super.key});
 
-  final ChatViewListItem chat;
+  final ChatListItem chat;
 
   @override
   State<ExampleTwoChatScreen> createState() => _ExampleTwoChatScreenState();

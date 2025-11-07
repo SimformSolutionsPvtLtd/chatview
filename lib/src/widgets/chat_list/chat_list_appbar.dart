@@ -21,8 +21,8 @@
  */
 import 'package:flutter/material.dart';
 
-class ChatViewListAppBar extends StatelessWidget {
-  const ChatViewListAppBar({
+class ChatListAppBar extends StatelessWidget {
+  const ChatListAppBar({
     this.titleText,
     this.title,
     this.titleMaxLines = 1,

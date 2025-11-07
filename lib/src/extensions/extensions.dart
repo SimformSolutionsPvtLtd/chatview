@@ -30,7 +30,7 @@ import 'package:intl/intl.dart';
 
 import '../inherited_widgets/configurations_inherited_widgets.dart';
 import '../models/config_models/chat_bubble_configuration.dart';
-import '../models/config_models/chat_view_list/list_type_indicator_config.dart';
+import '../models/config_models/chat_list/list_type_indicator_config.dart';
 import '../models/config_models/message_list_configuration.dart';
 import '../models/config_models/reply_suggestions_config.dart';
 import '../utils/constants/constants.dart';
@@ -167,7 +167,7 @@ extension ChatViewStateTitleExtension on String? {
     }
   }
 
-  String getChatViewListStateTitle(ChatViewState state) {
+  String getChatListStateTitle(ChatViewState state) {
     return this ??
         switch (state) {
           ChatViewState.noData => PackageStrings.currentLocale.noChats,

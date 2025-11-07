@@ -4,10 +4,10 @@ class Data {
   static const profileImage =
       "https://github.com/SimformSolutionsPvtLtd/chatview/blob/main/example/assets/images/simform.png?raw=true";
 
-  static List<ChatViewListItem> getChatList() {
+  static List<ChatListItem> getChatList() {
     final now = DateTime.now();
     return [
-      ChatViewListItem(
+      ChatListItem(
         id: '1',
         name: 'Weekend',
         imageUrl:
@@ -22,7 +22,7 @@ class Data {
         ),
         settings: const ChatSettings(pinStatus: PinStatus.pinned),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '2',
         name: 'Andrius Schneider',
         imageUrl:
@@ -37,7 +37,7 @@ class Data {
           status: MessageStatus.delivered,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '3',
         name: 'Anna Payet',
         imageUrl:
@@ -51,7 +51,7 @@ class Data {
           status: MessageStatus.undelivered,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '4',
         name: 'Family',
         unreadCount: 4,
@@ -66,7 +66,7 @@ class Data {
           status: MessageStatus.pending,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '5',
         name: 'Maria',
         imageUrl:
@@ -79,7 +79,7 @@ class Data {
           status: MessageStatus.read,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '6',
         name: 'Lunch club!',
         chatRoomType: ChatRoomType.group,
@@ -94,7 +94,7 @@ class Data {
         ),
         settings: const ChatSettings(muteStatus: MuteStatus.muted),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '7',
         name: "Jasper's market",
         imageUrl:
@@ -108,7 +108,7 @@ class Data {
           status: MessageStatus.read,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '8',
         name: 'Work',
         chatRoomType: ChatRoomType.group,
@@ -122,7 +122,7 @@ class Data {
           status: MessageStatus.read,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '9',
         name: 'Evelyn Harper',
         imageUrl:
@@ -135,7 +135,7 @@ class Data {
           status: MessageStatus.read,
         ),
       ),
-      ChatViewListItem(
+      ChatListItem(
         id: '10',
         name: 'Book club',
         chatRoomType: ChatRoomType.group,

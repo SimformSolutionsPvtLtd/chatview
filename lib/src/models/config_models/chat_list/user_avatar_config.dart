@@ -27,7 +27,7 @@ class UserAvatarConfig {
   final BackgroundImageLoadError onBackgroundImageError;
 
   /// Callback function that is called when the profile widget is tapped.
-  final ValueSetter<ChatViewListItem>? onProfileTap;
+  final ValueSetter<ChatListItem>? onProfileTap;
 
   /// Builder function to create a custom avatar widget.
   final UserAvatarBuilder? avatarBuilder;

@@ -24,14 +24,14 @@ import 'dart:async';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/chat_view_list/search_config.dart';
+import '../../models/config_models/chat_list/search_config.dart';
 import '../../utils/debounce.dart';
 import '../../utils/package_strings.dart';
 
 class SearchTextField extends StatefulWidget {
   const SearchTextField({
     required this.config,
-    this.chatViewListController,
+    this.chatListController,
     super.key,
   });
 
@@ -39,7 +39,7 @@ class SearchTextField extends StatefulWidget {
   final SearchConfig config;
 
   /// Controller for managing the chat list.
-  final ChatViewListController? chatViewListController;
+  final ChatListController? chatListController;
 
   @override
   State<SearchTextField> createState() => _SearchTextFieldState();
@@ -112,7 +112,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
     _inputText.value = '';
     _config.textEditingController.clear();
     FocusManager.instance.primaryFocus?.unfocus();
-    widget.chatViewListController?.clearSearch();
+    widget.chatListController?.clearSearch();
   }
 
   FutureOr<void> _onSearchChanged(String value) async {
@@ -127,9 +127,9 @@ class _SearchTextFieldState extends State<SearchTextField> {
   FutureOr<void> _performSearch(String value) async {
     final chatList = await _config.onSearch?.call(value);
     if (chatList != null) {
-      widget.chatViewListController?.setSearchChats(chatList);
+      widget.chatListController?.setSearchChats(chatList);
     } else if (value.isEmpty) {
-      widget.chatViewListController?.clearSearch();
+      widget.chatListController?.clearSearch();
     }
   }
 }

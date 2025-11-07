@@ -104,11 +104,11 @@ enum UnreadCountStyle {
 
 enum ChatViewStateType {
   chatView,
-  chatViewList;
+  chatList;
 
   bool get isChatView => this == ChatViewStateType.chatView;
 
-  bool get isChatViewList => this == ChatViewStateType.chatViewList;
+  bool get isChatList => this == ChatViewStateType.chatList;
 }
 
 enum UserActiveStatusAlignment {

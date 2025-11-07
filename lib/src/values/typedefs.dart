@@ -109,37 +109,37 @@ typedef BackgroundImageLoadError = void Function(
   Object exception,
   StackTrace? stackTrace,
 )?;
-typedef SearchUserCallback = FutureOr<List<ChatViewListItem>?> Function(
+typedef SearchUserCallback = FutureOr<List<ChatListItem>?> Function(
   String value,
 );
-typedef ChatViewListLastMessageTileBuilder = Widget Function(
+typedef ChatListLastMessageTileBuilder = Widget Function(
   // Using chat item instead of message allows for greater customization
   // based on additional chat item properties if required
-  ChatViewListItem chat,
+  ChatListItem chat,
 );
-typedef ChatViewListTextBuilder = String? Function(ChatViewListItem chat);
-typedef ChatViewListWidgetBuilder = Widget? Function(ChatViewListItem chat);
+typedef ChatListTextBuilder = String? Function(ChatListItem chat);
+typedef ChatListWidgetBuilder = Widget? Function(ChatListItem chat);
 typedef UnreadCountWidgetBuilder = Widget Function(int count);
 typedef ChatStatusCallback<T> = void Function(
-  ({ChatViewListItem chat, T status}) result,
+  ({ChatListItem chat, T status}) result,
 );
-typedef DeleteChatCallback = void Function(ChatViewListItem chat);
+typedef DeleteChatCallback = void Function(ChatListItem chat);
 typedef StatusTrailingIcon<T> = IconData Function(T status);
 typedef LastMessageTimeBuilder = Widget Function(DateTime time);
-typedef ChatViewListTileBuilder = Widget Function(
+typedef ChatListTileBuilder = Widget Function(
   BuildContext context,
-  ChatViewListItem chat,
+  ChatListItem chat,
 );
-typedef UserAvatarBuilder = Widget Function(ChatViewListItem chat);
-typedef UserNameBuilder = Widget Function(ChatViewListItem chat);
-typedef TrailingBuilder = Widget Function(ChatViewListItem chat);
-typedef MenuWidgetCallback = Widget Function(ChatViewListItem chat);
+typedef UserAvatarBuilder = Widget Function(ChatListItem chat);
+typedef UserNameBuilder = Widget Function(ChatListItem chat);
+typedef TrailingBuilder = Widget Function(ChatListItem chat);
+typedef MenuWidgetCallback = Widget Function(ChatListItem chat);
 typedef MenuBuilderCallback = Widget Function(
   BuildContext context,
-  ChatViewListItem chat,
+  ChatListItem chat,
   Widget child,
 );
-typedef MenuActionBuilder = List<Widget> Function(ChatViewListItem chat);
+typedef MenuActionBuilder = List<Widget> Function(ChatListItem chat);
 typedef AutoAnimateItemBuilder<T> = Widget Function(
   BuildContext context,
   int index,

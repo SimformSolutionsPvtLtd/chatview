@@ -37,19 +37,19 @@ import 'selected_image_view_widget.dart';
 
 class SendMessageWidget extends StatefulWidget {
   const SendMessageWidget({
-    Key? key,
     required this.onSendTap,
-    this.sendMessageConfig,
+    required this.sendMessageConfig,
     this.sendMessageBuilder,
     this.messageConfig,
     this.replyMessageBuilder,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// Provides call back when user tap on send button on text field.
   final StringMessageCallBack onSendTap;
 
   /// Provides configuration for text field appearance.
-  final SendMessageConfiguration? sendMessageConfig;
+  final SendMessageConfiguration sendMessageConfig;
 
   /// Allow user to set custom text field.
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
@@ -165,9 +165,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 builder: widget.replyMessageBuilder,
                                 onChange: (value) => _replyMessage = value,
                               ),
-                              if (widget.sendMessageConfig
-                                      ?.shouldSendImageWithText ??
-                                  false)
+                              if (widget
+                                  .sendMessageConfig.shouldSendImageWithText)
                                 SelectedImageViewWidget(
                                   key: _selectedImageViewWidgetKey,
                                   sendMessageConfig: widget.sendMessageConfig,
@@ -180,8 +179,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 onRecordingComplete: _onRecordingComplete,
                                 onImageSelected: (images, messageId) {
                                   if (widget.sendMessageConfig
-                                          ?.shouldSendImageWithText ??
-                                      false) {
+                                      .shouldSendImageWithText) {
                                     if (images.isNotEmpty) {
                                       _selectedImageViewWidgetKey.currentState
                                           ?.selectedImages.value = [

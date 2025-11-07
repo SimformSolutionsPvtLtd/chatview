@@ -25,9 +25,11 @@ library chatview;
 export 'package:audio_waveforms/audio_waveforms.dart'
     show
         AndroidEncoder,
-        AndroidOutputFormat,
+        AndroidEncoderSettings,
         IosEncoder,
+        IosEncoderSetting,
         PlayerWaveStyle,
+        RecorderSettings,
         WaveStyle;
 export 'package:chatview_utils/chatview_utils.dart'
     hide

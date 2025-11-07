@@ -24,9 +24,11 @@ import 'package:flutter/material.dart';
 
 import 'config_models/link_preview_configuration.dart';
 import 'config_models/receipts_widget_config.dart';
+import 'config_models/text_selection_config.dart';
 
 class ChatBubble {
   const ChatBubble({
+    this.enableTextSelection = true,
     this.color,
     this.borderRadius,
     this.textStyle,
@@ -36,10 +38,8 @@ class ChatBubble {
     this.senderNameTextStyle,
     this.receiptsWidgetConfig,
     this.onMessageRead,
-    this.isSelectable = true,
     this.border,
-    this.selectionHighlightColor,
-    this.selectionCursorColor,
+    this.textSelectionConfig,
   });
 
   /// Used for giving color of chat bubble.
@@ -75,11 +75,10 @@ class ChatBubble {
   final Border? border;
 
   /// Used to determine whether the text can be selected.
-  final bool isSelectable;
+  ///
+  /// Defaults to `true`.
+  final bool enableTextSelection;
 
-  /// Color used to paint the selected text highlight background.  If null, falls back to theme.
-  final Color? selectionHighlightColor;
-
-  /// Color for the drag handles. If null, falls back to theme.
-  final Color? selectionCursorColor;
+  /// Configuration for text selection behavior and appearance.
+  final TextSelectionConfig? textSelectionConfig;
 }

@@ -42,6 +42,7 @@ export 'config_models/scroll_to_bottom_button_config.dart';
 export 'config_models/send_message_configuration.dart';
 export 'config_models/suggestion_list_config.dart';
 export 'config_models/swipe_to_reply_configuration.dart';
+export 'config_models/text_selection_config.dart';
 export 'config_models/type_indicator_configuration.dart';
 export 'config_models/voice_message_configuration.dart';
 export 'overlay_action_widget.dart';

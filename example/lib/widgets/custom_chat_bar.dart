@@ -375,11 +375,8 @@ class _CustomChatBarState extends State<CustomChatBar> {
   Future<void> _recordOrStop() async {
     if (!isRecording.value) {
       await controller?.record(
-        sampleRate: voiceRecordingConfig.sampleRate,
-        bitRate: voiceRecordingConfig.bitRate,
-        androidEncoder: voiceRecordingConfig.androidEncoder,
-        iosEncoder: voiceRecordingConfig.iosEncoder,
-        androidOutputFormat: voiceRecordingConfig.androidOutputFormat,
+        recorderSettings:
+            voiceRecordingConfig.recorderSettings ?? const RecorderSettings(),
       );
       isRecording.value = true;
     } else {

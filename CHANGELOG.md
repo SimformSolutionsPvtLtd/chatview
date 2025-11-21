@@ -1,4 +1,5 @@
-## [3.0.0] (unreleased)
+## [3.0.0]
+
 * **Feat**: [401](https://github.com/SimformSolutionsPvtLtd/chatview/pull/401)
   Add selection and copy options for text view.
 * **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/chatview/issues/318)
@@ -53,6 +54,11 @@
 * **Breaking**: [390](https://github.com/SimformSolutionsPvtLtd/chatview/pull/390) `playIcon` and
   `pauseIcon` Now accepts a callback that provides different icons based on whether the message is
   by the sender or not. accept `Widget`.
+* **Feat**: [390](https://github.com/SimformSolutionsPvtLtd/chatview/pull/406) Updated
+  audio_waveforms version to `2.0.0`
+* **Breaking**: [390](https://github.com/SimformSolutionsPvtLtd/chatview/pull/406) Moved recording
+  audio settings from `VoiceRecordingConfiguration` to `RecorderSettings`. Check out the migration
+  guide [here](https://simform-flutter-packages.web.app/chatView/migration-guide).
 
 ## [2.5.0]
 

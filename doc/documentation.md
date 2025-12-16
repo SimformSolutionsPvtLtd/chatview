@@ -104,9 +104,9 @@ Add the following keys to your _Info.plist_ file, located in `<project root>/ios
 <string>This app requires Mic permission.</string>
 ```
 
-* This plugin requires iOS 10.0 or higher. Add this line in `Podfile`:
+* This plugin requires iOS 13.0 or higher. Add this line in `Podfile`:
 ```ruby
-platform :ios, '10.0'
+platform :ios, '13.0'
 ```
 
 #### Android

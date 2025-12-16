@@ -1,5 +1,7 @@
 ## [3.0.0]
 
+* **Breaking**: [411](https://github.com/SimformSolutionsPvtLtd/chatview/pull/411)
+  Update the example iOS deployment target to 13, as the example depends on `audiowaveform`, which requires iOS 13 or later.
 * **Feat**: [401](https://github.com/SimformSolutionsPvtLtd/chatview/pull/401)
   Added text selection and copy functionality to chat bubbles.
   Introduced the `onTextSelection` parameter in `FeatureActiveConfig` (default: false). When enabled, users can select and copy text with a long press.

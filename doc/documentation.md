@@ -839,6 +839,61 @@ ChatView(
     enableOtherUserName: false,
     lastSeenAgoBuilderVisibility: false,
     receiptsBuilderVisibility: false,
+    enableTextSelection: true,
+  ),
+  // ...
+)
+```
+
+
+## Text Selection Config
+
+```dart
+ChatView(
+  // ...
+  textSelectionConfig: TextSelectionConfig(
+    // Use platform-specific text selection controls (default is null for platform default)
+    selectionControls: null,
+    
+    // Focus node for managing text selection focus
+    focusNode: FocusNode(),
+    
+    // Callback triggered when text selection changes
+    onSelectionChanged: (SelectedContent? content) {
+      if (content != null) {
+        debugPrint('Selected text: ${content.plainText}');
+      }
+    },
+    
+    // Customize the context menu shown during text selection
+    contextMenuBuilder: (context, selectableRegionState) {
+      return AdaptiveTextSelectionToolbar(
+        anchors: selectableRegionState.contextMenuAnchors,
+        children: [
+          // Add custom actions to the selection toolbar
+          TextSelectionToolbarTextButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              // Handle custom action (e.g., translate, search, etc.)
+              final selectedText = selectableRegionState.selectableRegion.getSelectedContent()?.plainText;
+              debugPrint('Custom action on: $selectedText');
+            },
+            child: const Text('Custom Action'),
+          ),
+          // Add more custom buttons as needed
+        ],
+      );
+    },
+    
+    // Configure the magnifier shown during text selection
+    magnifierConfiguration: const TextMagnifierConfiguration(),
+    
+    // Customize text selection theme (colors, handle size, etc.)
+    themeData: const TextSelectionThemeData(
+      cursorColor: Colors.blue,
+      selectionColor: Colors.blue,
+      selectionHandleColor: Colors.blue,
+    ),
   ),
   // ...
 )

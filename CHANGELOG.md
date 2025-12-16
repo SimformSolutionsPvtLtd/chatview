@@ -1,7 +1,8 @@
 ## [3.0.0]
 
 * **Feat**: [401](https://github.com/SimformSolutionsPvtLtd/chatview/pull/401)
-  Add selection and copy options for text view.
+  Added text selection and copy functionality to chat bubbles.
+  Introduced the `onTextSelection` parameter in `FeatureActiveConfig` (default: false). When enabled, users can select and copy text with a long press.
 * **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/chatview/issues/318)
   Provide support for action item widgets on the chat text field with position options
   `leadingActions` and `trailingActions` in `TextFieldConfiguration`. Also, provide a way to add

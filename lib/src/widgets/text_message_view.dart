@@ -19,14 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview/chatview.dart';
 import 'package:chatview/src/widgets/custom_selection_area.dart';
-import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
-
 import '../extensions/extensions.dart';
-import '../models/chat_bubble.dart';
-import '../models/config_models/link_preview_configuration.dart';
-import '../models/config_models/message_reaction_configuration.dart';
 import '../utils/constants/constants.dart';
 import 'link_preview.dart';
 import 'reaction_widget.dart';
@@ -42,6 +38,7 @@ class TextMessageView extends StatelessWidget {
     this.messageReactionConfig,
     this.highlightMessage = false,
     this.highlightColor,
+    this.featureActiveConfig,
   }) : super(key: key);
 
   /// Represents current message is sent by current user.
@@ -68,6 +65,8 @@ class TextMessageView extends StatelessWidget {
   /// Allow user to set color of highlighted message.
   final Color? highlightColor;
 
+  final FeatureActiveConfig? featureActiveConfig;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -75,9 +74,7 @@ class TextMessageView extends StatelessWidget {
     final border = isMessageBySender
         ? outgoingChatBubbleConfig?.border
         : inComingChatBubbleConfig?.border;
-    final isSelectable = isMessageBySender
-        ? outgoingChatBubbleConfig?.enableTextSelection ?? false
-        : inComingChatBubbleConfig?.enableTextSelection ?? false;
+    final isSelectable = featureActiveConfig?.enableTextSelection ?? false;
     final textSelectionConfig = isMessageBySender
         ? outgoingChatBubbleConfig?.textSelectionConfig
         : inComingChatBubbleConfig?.textSelectionConfig;

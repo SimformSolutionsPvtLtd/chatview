@@ -60,7 +60,7 @@ dependencies:
 | `chatview` version | [`chatview_connect`][chatViewConnect] version |
 |--------------------|-----------------------------------------------|
 | `>=2.4.1 <3.0.0`   | `0.0.1`                                       |
-| `>= 3.0.0`         | `0.0.2`                                       |
+| `>= 3.0.0`         | `3.0.0`                                       |
 
 ## ChatView with Backend Support
 

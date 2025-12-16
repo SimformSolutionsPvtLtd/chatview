@@ -19,7 +19,7 @@ dependencies:
   any_link_preview: ^3.0.2
   audio_waveforms: ^2.0.0
   cached_network_image: ^3.4.1
-  chatview_utils: ^0.0.2
+  chatview_utils: ^3.0.0
 
   emoji_picker_flutter: ^4.3.0
   flutter:

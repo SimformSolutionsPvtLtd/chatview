@@ -224,6 +224,7 @@ class _MessageViewState extends State<MessageView>
                     messageReactionConfig: messageConfig?.messageReactionConfig,
                     highlightColor: widget.highlightColor,
                     highlightMessage: widget.shouldHighlight,
+                    featureActiveConfig: chatViewIW?.featureActiveConfig,
                   );
                 } else if (widget.message.messageType.isVoice) {
                   return VoiceMessageView(

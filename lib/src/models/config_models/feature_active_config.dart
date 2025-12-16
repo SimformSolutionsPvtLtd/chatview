@@ -36,6 +36,7 @@ class FeatureActiveConfig {
     this.receiptsBuilderVisibility = true,
     this.enableOtherUserName = true,
     this.enableScrollToBottomButton = false,
+    this.enableTextSelection = false,
   });
 
   /// Used for enable/disable swipe to reply.
@@ -79,4 +80,9 @@ class FeatureActiveConfig {
 
   /// Used for enable/disable Scroll To Bottom Button.
   final bool enableScrollToBottomButton;
+
+  /// Used to determine whether the text can be selected.
+  ///
+  /// Defaults to `false`.
+  final bool enableTextSelection;
 }

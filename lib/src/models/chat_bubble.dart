@@ -28,7 +28,6 @@ import 'config_models/text_selection_config.dart';
 
 class ChatBubble {
   const ChatBubble({
-    this.enableTextSelection = true,
     this.color,
     this.borderRadius,
     this.textStyle,
@@ -73,11 +72,6 @@ class ChatBubble {
 
   /// Used for giving border of chat bubble.
   final Border? border;
-
-  /// Used to determine whether the text can be selected.
-  ///
-  /// Defaults to `true`.
-  final bool enableTextSelection;
 
   /// Configuration for text selection behavior and appearance.
   final TextSelectionConfig? textSelectionConfig;

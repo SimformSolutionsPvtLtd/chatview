@@ -112,6 +112,12 @@ extension ValidateString on String {
 
   bool get isUrl => Uri.tryParse(this)?.isAbsolute ?? false;
 
+  /// Regular expression pattern to match URLs.
+  static final _urlRegex = RegExp(urlRegex, caseSensitive: false);
+
+  /// Extracts the first URL found in the string.
+  String? get extractedUrl => _urlRegex.firstMatch(this)?.group(0);
+
   Widget getUserProfilePicture({
     required ChatUser? Function(String) getChatUser,
     double? profileCircleRadius,

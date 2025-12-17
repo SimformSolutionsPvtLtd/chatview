@@ -1,5 +1,7 @@
 ## [3.0.0]
 
+* **Feat**: [374](https://github.com/SimformSolutionsPvtLtd/chatview/issues/374)
+  Add support for displaying and selecting text and links in a single message view.
 * **Breaking**: [411](https://github.com/SimformSolutionsPvtLtd/chatview/pull/411)
   Update the example iOS deployment target to 13, as the example depends on `audiowaveform`, which requires iOS 13 or later.
 * **Feat**: [401](https://github.com/SimformSolutionsPvtLtd/chatview/pull/401)

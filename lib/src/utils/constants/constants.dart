@@ -57,7 +57,7 @@ const String defaultDateFormat = 'dd/MM/yyyy';
 const double userAvatarRadius = 24;
 const double loadMoreCircularProgressIndicatorSize = 36;
 
-applicationDateFormatter(DateTime inputTime) {
+String applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
     return timeago.format(inputTime);
   } else {

@@ -42,7 +42,7 @@ class _SendingMessageAnimatingWidgetState
 
   bool isVisible = false;
 
-  _attachOnStatusChangeListeners() {
+  void _attachOnStatusChangeListeners() {
     if (isSent) {
       Future.delayed(const Duration(milliseconds: 400), () {
         isVisible = true;

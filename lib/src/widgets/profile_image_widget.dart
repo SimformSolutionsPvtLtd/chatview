@@ -23,8 +23,8 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
 
 class ProfileImageWidget extends StatelessWidget {
   const ProfileImageWidget({
@@ -106,7 +106,11 @@ class ProfileImageWidget extends StatelessWidget {
     );
   }
 
-  Widget _networkImageErrorWidget(context, url, error) {
+  Widget _networkImageErrorWidget(
+    BuildContext context,
+    String url,
+    Object error,
+  ) {
     return const Center(
       child: Icon(
         Icons.error_outline,
@@ -115,7 +119,11 @@ class ProfileImageWidget extends StatelessWidget {
     );
   }
 
-  Widget _errorWidget(context, error, stackTrace) {
+  Widget _errorWidget(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  ) {
     return const Center(
       child: Icon(
         Icons.error_outline,

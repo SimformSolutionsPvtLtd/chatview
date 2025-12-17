@@ -30,12 +30,16 @@ import '../utils/constants/constants.dart';
 class LinkPreview extends StatelessWidget {
   const LinkPreview({
     Key? key,
-    required this.url,
+    required this.textMessage,
+    required this.extractedUrl,
     this.linkPreviewConfig,
   }) : super(key: key);
 
+  /// Provides the whole text message to show.
+  final String textMessage;
+
   /// Provides url which is passed in message.
-  final String url;
+  final String extractedUrl;
 
   /// Provides configuration of chat bubble appearance when link/URL is passed
   /// in message.
@@ -43,18 +47,19 @@ class LinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isImageUrl = extractedUrl.isImageUrl;
     return Padding(
       padding: linkPreviewConfig?.padding ??
           const EdgeInsets.symmetric(horizontal: 6, vertical: verticalPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!url.isImageUrl &&
+          if (!isImageUrl &&
               !(context.chatBubbleConfig?.disableLinkPreview ?? false)) ...{
             Padding(
               padding: const EdgeInsets.symmetric(vertical: verticalPadding),
               child: AnyLinkPreview(
-                link: url,
+                link: extractedUrl,
                 removeElevation: true,
                 errorBody: linkPreviewConfig?.errorBody,
                 proxyUrl: linkPreviewConfig?.proxyUrl,
@@ -77,13 +82,13 @@ class LinkPreview extends StatelessWidget {
                 titleStyle: linkPreviewConfig?.titleStyle,
               ),
             ),
-          } else if (url.isImageUrl) ...{
+          } else if (isImageUrl) ...{
             Padding(
               padding: const EdgeInsets.symmetric(vertical: verticalPadding),
               child: InkWell(
                 onTap: _onLinkTap,
                 child: Image.network(
-                  url,
+                  extractedUrl,
                   height: 120,
                   width: double.infinity,
                   fit: BoxFit.fitWidth,
@@ -95,7 +100,7 @@ class LinkPreview extends StatelessWidget {
           InkWell(
             onTap: _onLinkTap,
             child: Text(
-              url,
+              textMessage,
               style: linkPreviewConfig?.linkStyle ??
                   const TextStyle(
                     color: Colors.white,
@@ -109,15 +114,15 @@ class LinkPreview extends StatelessWidget {
   }
 
   void _onLinkTap() {
-    if (linkPreviewConfig?.onUrlDetect != null) {
-      linkPreviewConfig?.onUrlDetect!(url);
+    if (linkPreviewConfig?.onUrlDetect case final onUrlDetect?) {
+      onUrlDetect(extractedUrl);
     } else {
       _launchURL();
     }
   }
 
   void _launchURL() async {
-    final parsedUrl = Uri.parse(url);
+    final parsedUrl = Uri.parse(extractedUrl);
     await canLaunchUrl(parsedUrl)
         ? await launchUrl(parsedUrl)
         : throw couldNotLaunch;

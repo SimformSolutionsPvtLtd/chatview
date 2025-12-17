@@ -65,6 +65,11 @@ applicationDateFormatter(DateTime inputTime) {
   }
 }
 
+/// Regular expression to identify URLs in a text.
+const String urlRegex =
+    r'((https?://)?(www\.)?[a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b'
+    r'([-a-zA-Z0-9@:%_\+.~#?&//=]*))';
+
 /// Default widget that appears on receipts at [MessageStatus.pending] when a message
 /// is not sent or at the pending state. A custom implementation can have different
 /// widgets for different states.

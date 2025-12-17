@@ -22,6 +22,7 @@
 import 'package:chatview/chatview.dart';
 import 'package:chatview/src/widgets/custom_selection_area.dart';
 import 'package:flutter/material.dart';
+
 import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
 import 'link_preview.dart';
@@ -65,6 +66,7 @@ class TextMessageView extends StatelessWidget {
   /// Allow user to set color of highlighted message.
   final Color? highlightColor;
 
+  /// Provides configuration of active features in chat.
   final FeatureActiveConfig? featureActiveConfig;
 
   @override
@@ -78,17 +80,22 @@ class TextMessageView extends StatelessWidget {
     final textSelectionConfig = isMessageBySender
         ? outgoingChatBubbleConfig?.textSelectionConfig
         : inComingChatBubbleConfig?.textSelectionConfig;
-    final extractedUrl = textMessage.extractedUrl;
-    final baseWidget = extractedUrl != null
+    final extractedUrls = textMessage.extractedUrls;
+    final baseWidget = extractedUrls.isNotEmpty
         ? LinkPreview(
             linkPreviewConfig: _linkPreviewConfig,
             textMessage: textMessage,
-            extractedUrl: extractedUrl,
+            extractedUrls: extractedUrls,
+            normalTextStyle: _textStyle ??
+                textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
           )
         : Text(
             textMessage,
             style: _textStyle ??
-                textTheme.bodyMedium!.copyWith(
+                textTheme.bodyMedium?.copyWith(
                   color: Colors.white,
                   fontSize: 16,
                 ),

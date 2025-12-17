@@ -161,7 +161,7 @@ ChatList(
     ),
   ),
   tileConfig: ListTileConfig(
-    onTap: (chat) {,
+    onTap: (chat) {
       // Handle chat tile tap
     },
   ),

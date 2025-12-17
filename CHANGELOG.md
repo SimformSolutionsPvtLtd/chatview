@@ -1,13 +1,16 @@
 ## [3.0.0]
+
 * **Feat**: [414](https://github.com/SimformSolutionsPvtLtd/chatview/pull/414)
   Enhance link preview to support multiple URLs extraction and clickable links.
 * **Feat**: [374](https://github.com/SimformSolutionsPvtLtd/chatview/issues/374)
   Add support for displaying and selecting text and links in a single message view.
-* **Breaking**: [411](https://github.com/SimformSolutionsPvtLtd/chatview/pull/411)
-  Update the example iOS deployment target to 13, as the example depends on `audiowaveform`, which requires iOS 13 or later.
+* **Breaking**: [411](https://github.com/SimformSolutionsPvtLtd/chatview/pull/411) Update the
+  example iOS deployment target to 13, as the example depends on `audiowaveform`, which requires iOS
+  13 or later.
 * **Feat**: [401](https://github.com/SimformSolutionsPvtLtd/chatview/pull/401)
-  Added text selection and copy functionality to chat bubbles.
-  Introduced the `onTextSelection` parameter in `FeatureActiveConfig` (default: false). When enabled, users can select and copy text with a long press.
+  Added text selection and copy functionality to chat bubbles. Introduced the `onTextSelection`
+  parameter in `FeatureActiveConfig` (default: false). When enabled, users can select and copy text
+  with a long press.
 * **Breaking**: [318](https://github.com/SimformSolutionsPvtLtd/chatview/issues/318)
   Provide support for action item widgets on the chat text field with position options
   `leadingActions` and `trailingActions` in `TextFieldConfiguration`. Also, provide a way to add

@@ -1,5 +1,7 @@
 ## [3.0.0]
 
+* **Fix**: [358](https://github.com/SimformSolutionsPvtLtd/chatview/issues/358) Fix issue of Image
+  selected from the locally is unable to display in message (windows).
 * **Feat**: [414](https://github.com/SimformSolutionsPvtLtd/chatview/pull/414)
   Enhance link preview to support multiple URLs extraction and clickable links.
 * **Feat**: [374](https://github.com/SimformSolutionsPvtLtd/chatview/issues/374)

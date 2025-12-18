@@ -57,6 +57,9 @@ const String defaultDateFormat = 'dd/MM/yyyy';
 const double userAvatarRadius = 24;
 const double loadMoreCircularProgressIndicatorSize = 36;
 
+const String httpScheme = 'http';
+const String httpsScheme = 'https';
+
 String applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
     return timeago.format(inputTime);

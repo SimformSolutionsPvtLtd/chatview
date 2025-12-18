@@ -110,7 +110,12 @@ extension ValidateString on String {
     return runes.length == unEmojified.length;
   }
 
-  bool get isUrl => Uri.tryParse(this)?.isAbsolute ?? false;
+  bool get isUrl {
+    final uri = Uri.tryParse(this);
+    return uri != null &&
+        uri.isAbsolute &&
+        (uri.scheme == httpScheme || uri.scheme == httpsScheme);
+  }
 
   /// Regular expression pattern to match URLs.
   static final _urlRegex = RegExp(urlRegex, caseSensitive: false);

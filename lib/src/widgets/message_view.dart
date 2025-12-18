@@ -161,6 +161,8 @@ class _MessageViewState extends State<MessageView>
   Widget get _messageView {
     final message = widget.message.message;
     final emojiMessageConfiguration = messageConfig?.emojiMessageConfig;
+    final maxOutSideBubbleEmojis =
+        emojiMessageConfiguration?.maxOutSideBubbleEmojis;
     return Padding(
       padding: EdgeInsets.only(
         bottom: widget.message.reaction.reactions.isNotEmpty ? 6 : 0,
@@ -169,11 +171,13 @@ class _MessageViewState extends State<MessageView>
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           (() {
-                if (message.isAllEmoji) {
+                if (message.isAllEmoji &&
+                    (maxOutSideBubbleEmojis == null ||
+                        message.characters.length <= maxOutSideBubbleEmojis)) {
                   return Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      Padding(
+                      Container(
                         padding: emojiMessageConfiguration?.padding ??
                             EdgeInsets.fromLTRB(
                               leftPadding2,
@@ -183,6 +187,9 @@ class _MessageViewState extends State<MessageView>
                                   ? 14
                                   : 0,
                             ),
+                        constraints: BoxConstraints(
+                            maxWidth: widget.chatBubbleMaxWidth ??
+                                MediaQuery.sizeOf(context).width * 0.75),
                         child: Transform.scale(
                           scale: widget.shouldHighlight
                               ? widget.highlightScale

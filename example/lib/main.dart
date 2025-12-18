@@ -844,6 +844,9 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               }
               return const SizedBox.shrink();
             },
+            emojiMessageConfig: const EmojiMessageConfiguration(
+              maxOutSideBubbleEmojis: 1,
+            ),
           ),
           profileCircleConfig: const ProfileCircleConfiguration(
             padding: EdgeInsets.only(right: 4),

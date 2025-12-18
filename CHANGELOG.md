@@ -1,5 +1,8 @@
 ## [3.0.0]
 
+* **Fix**: [415](https://github.com/SimformSolutionsPvtLtd/chatview/pull/415)
+  Adjust emoji display logic to handle multiple emojis display width and added
+  `maxOutSideBubbleEmojis` parameter in `EmojiMessageConfig`.
 * **Fix**: [358](https://github.com/SimformSolutionsPvtLtd/chatview/issues/358) Fix issue of Image
   selected from the locally is unable to display in message (windows).
 * **Feat**: [414](https://github.com/SimformSolutionsPvtLtd/chatview/pull/414)

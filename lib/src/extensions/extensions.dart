@@ -125,7 +125,7 @@ extension ValidateString on String {
     final regex = _urlRegex.allMatches(this);
     final urls = <String>[];
     for (final match in regex) {
-      if (match.group(0) case final url?) {
+      if (match.group(0) case final url? when url.isUrl) {
         urls.add(url);
       }
     }

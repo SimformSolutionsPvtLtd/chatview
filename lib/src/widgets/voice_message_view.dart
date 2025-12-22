@@ -67,6 +67,12 @@ class VoiceMessageView extends StatefulWidget {
   /// Provides configuration of chat bubble appearance from current user of chat.
   final ChatBubble? outgoingChatBubbleConfig;
 
+  /// Holds the currently playing voice message controller (if any).
+  ///
+  /// Used to ensure only one voice note is playing/active across the chat,
+  /// and to allow stopping playback when starting a recording.
+  static PlayerController? currentlyPlayingController;
+
   @override
   State<VoiceMessageView> createState() => _VoiceMessageViewState();
 }
@@ -104,6 +110,11 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
   @override
   void dispose() {
     playerStateSubscription.cancel();
+
+    if (identical(VoiceMessageView.currentlyPlayingController, controller)) {
+      VoiceMessageView.currentlyPlayingController = null;
+    }
+
     controller.dispose();
     _playerState.dispose();
     super.dispose();
@@ -192,10 +203,25 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
     if (playerState.isInitialised ||
         playerState.isPaused ||
         playerState.isStopped) {
+      final previousController = VoiceMessageView.currentlyPlayingController;
+
+      /// If another audio is already playing, stop it first.
+      if (previousController != null &&
+          !identical(previousController, controller)) {
+        previousController.pausePlayer();
+
+        /// Ensure it is reset to start position for next play.
+        previousController.seekTo(0);
+      }
+
+      VoiceMessageView.currentlyPlayingController = controller;
       controller.startPlayer();
       controller.setFinishMode(finishMode: FinishMode.pause);
     } else {
       controller.pausePlayer();
+      if (identical(VoiceMessageView.currentlyPlayingController, controller)) {
+        VoiceMessageView.currentlyPlayingController = null;
+      }
     }
   }
 }

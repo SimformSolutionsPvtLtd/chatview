@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.5
-  flutter_svg: ^2.2.1
+  flutter_svg: 2.1.0
   audio_waveforms: ^2.0.1
   chatview:
     path: ../

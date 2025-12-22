@@ -2,6 +2,8 @@
 
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
+* **Fix**: [398](https://github.com/SimformSolutionsPvtLtd/chatview/pull/398)
+  Implement logic to manage voice message playback during recording and manage currently playing voice messages
 
 ## [3.0.0]
 

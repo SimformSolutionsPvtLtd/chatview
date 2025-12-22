@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import '../models/chat_bubble.dart';
 import '../models/config_models/message_reaction_configuration.dart';
 import '../models/config_models/voice_message_configuration.dart';
+import '../utils/audio_manager.dart';
 import 'reaction_widget.dart';
 
 class VoiceMessageView extends StatefulWidget {
@@ -104,6 +105,9 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
   @override
   void dispose() {
     playerStateSubscription.cancel();
+
+    AudioManager.instance.clearController(controller);
+
     controller.dispose();
     _playerState.dispose();
     super.dispose();
@@ -189,13 +193,15 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
           defaultTargetPlatform == TargetPlatform.android,
       "Voice messages are only supported with android and ios platform",
     );
+    final singlePlayerMode = widget.config?.singlePlayerMode ?? false;
     if (playerState.isInitialised ||
         playerState.isPaused ||
         playerState.isStopped) {
-      controller.startPlayer();
-      controller.setFinishMode(finishMode: FinishMode.pause);
+      AudioManager.instance
+          .startPlaying(controller, singlePlayerMode: singlePlayerMode);
     } else {
-      controller.pausePlayer();
+      AudioManager.instance
+          .pausePlaying(controller, singlePlayerMode: singlePlayerMode);
     }
   }
 }

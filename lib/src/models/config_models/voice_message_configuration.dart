@@ -43,6 +43,7 @@ class VoiceMessageConfiguration {
     this.waveformMargin,
     this.waveformPadding,
     this.enableSeekGesture = true,
+    this.singlePlayerMode = false,
   });
 
   /// Applies style to waveform.
@@ -86,4 +87,7 @@ class VoiceMessageConfiguration {
 
   /// Enable/disable seeking with gestures. Enabled by default.
   final bool enableSeekGesture;
+
+  /// Enable single player mode. When enabled, only one voice message can be played at a time.
+  final bool singlePlayerMode;
 }

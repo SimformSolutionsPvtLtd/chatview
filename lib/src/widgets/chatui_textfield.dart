@@ -36,6 +36,7 @@ import '../values/typedefs.dart';
 import 'action_widgets/camera_action_button.dart';
 import 'action_widgets/gallery_action_button.dart';
 import 'chat_textfield_view_builder.dart';
+import 'voice_message_view.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({
@@ -426,6 +427,12 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) {
+      /// If any voice note is currently playing, stop it before recording.
+      final previousController = VoiceMessageView.currentlyPlayingController;
+      if (previousController != null) {
+        previousController.pausePlayer();
+      }
+
       await controller?.record(
         recorderSettings: voiceRecordingConfig.recorderSettings,
       );

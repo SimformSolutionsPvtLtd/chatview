@@ -23,6 +23,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
@@ -144,10 +145,15 @@ class ImageMessageView extends StatelessWidget {
                           fit: BoxFit.fill,
                         );
                       } else {
-                        return Image.file(
-                          File(imageUrl),
-                          fit: BoxFit.fill,
-                        );
+                        return kIsWeb
+                            ? Image.network(
+                                imageUrl,
+                                fit: BoxFit.fill,
+                              )
+                            : Image.file(
+                                File(imageUrl),
+                                fit: BoxFit.fill,
+                              );
                       }
                     }()),
                   ),

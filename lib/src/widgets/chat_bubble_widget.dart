@@ -21,6 +21,7 @@
  */
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/feature_active_config.dart';
@@ -312,6 +313,10 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
             onMaxDuration: _onMaxDuration,
           ),
         ),
+        Text(
+  DateFormat('hh:mm a').format(widget.message.createdAt),
+  style: TextStyle(fontSize: 10, color: Colors.grey),
+)
       ],
     );
   }

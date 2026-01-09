@@ -604,6 +604,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                 _customSeparatorWidget(separator),
           ),
           sendMessageConfig: SendMessageConfiguration(
+            shouldSendImageWithText: true,
             closeIconColor: _theme.iconColor,
             replyTitleColor: _theme.textColor,
             replyMessageColor: _theme.textColor,
@@ -637,6 +638,16 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               compositionThresholdTime: const Duration(seconds: 1),
               textStyle: TextStyle(color: _theme.textColor),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              // NOTE: When using shouldSendImageWithText: true, do not provide
+              // custom leadingActions or trailingActions that include camera/gallery buttons.
+              // This allows the library to use its default buttons which properly
+              // connect to the internal onImageSelected callback.
+              //
+              // If you need custom actions, you can add them alongside the default
+              // camera/gallery buttons, but do not override their onPressed callbacks.
+
+              // Uncomment these to see custom actions (but images will send immediately):
+              /*
               leadingActions: (context, controller) =>
                   controller.text.trim().isEmpty
                       ? [
@@ -648,34 +659,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                             style: IconButton.styleFrom(
                               backgroundColor: AppColors.uiOnePurple,
                             ),
-                            onPressed: (path, replyMessage) {
-                              if (path?.isEmpty ?? true) return;
-                              _chatController.addMessage(
-                                Message(
-                                  id: DateTime.now()
-                                      .millisecondsSinceEpoch
-                                      .toString(),
-                                  message: path!,
-                                  createdAt: DateTime.now(),
-                                  messageType: MessageType.image,
-                                  sentBy: _chatController.currentUser.id,
-                                  replyMessage:
-                                      replyMessage ?? const ReplyMessage(),
-                                ),
-                              );
-                              _chatController.addMessage(
-                                Message(
-                                  message: controller.text,
-                                  id: DateTime.now()
-                                      .millisecondsSinceEpoch
-                                      .toString(),
-                                  createdAt: DateTime.now(),
-                                  sentBy: _chatController.currentUser.id,
-                                  replyMessage:
-                                      replyMessage ?? const ReplyMessage(),
-                                ),
-                              );
-                            },
+                            onPressed: null,
                           ),
                         ]
                       : [
@@ -701,34 +685,13 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                     size: 30,
                     color: _theme.iconColor,
                   ),
-                  onPressed: (path, replyMessage) {
-                    if (path?.isEmpty ?? true) return;
-                    _chatController.addMessage(
-                      Message(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        message: path!,
-                        createdAt: DateTime.now(),
-                        messageType: MessageType.image,
-                        sentBy: _chatController.currentUser.id,
-                        replyMessage: replyMessage ?? const ReplyMessage(),
-                      ),
-                    );
-                  },
+                  onPressed: null,
                 ),
                 EmojiPickerActionButton(
                   context: context,
                   onPressed: (emoji, replyMessage) {
                     if (emoji?.isEmpty ?? true) return;
                     controller.text = controller.text += emoji!;
-                    _chatController.addMessage(
-                      Message(
-                        message: controller.text,
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        createdAt: DateTime.now(),
-                        sentBy: _chatController.currentUser.id,
-                        replyMessage: replyMessage ?? const ReplyMessage(),
-                      ),
-                    );
                   },
                   icon: SvgPicture.asset(
                     AppIcons.sticker,
@@ -751,6 +714,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                   ),
                 ),
               ],
+              */
             ),
           ),
           chatBubbleConfig: ChatBubbleConfiguration(

@@ -181,12 +181,17 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                   if (widget.sendMessageConfig
                                       .shouldSendImageWithText) {
                                     if (images.isNotEmpty) {
-                                      _selectedImageViewWidgetKey.currentState
-                                          ?.selectedImages.value = [
-                                        ...?_selectedImageViewWidgetKey
-                                            .currentState?.selectedImages.value,
-                                        images
-                                      ];
+                                      final currentState =
+                                          _selectedImageViewWidgetKey
+                                              .currentState;
+                                      if (currentState != null) {
+                                        final currentImages =
+                                            currentState.selectedImages.value;
+                                        currentState.selectedImages.value = [
+                                          ...currentImages,
+                                          images
+                                        ];
+                                      }
 
                                       FocusScope.of(context)
                                           .requestFocus(_focusNode);
@@ -234,21 +239,29 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   void _onPressed() {
     final messageText = _textEditingController.text.trim();
     _textEditingController.clear();
-    if (messageText.isEmpty) return;
 
-    if (_selectedImageViewWidgetKey.currentState?.selectedImages.value
-        case final selectedImages?) {
+    final selectedImages =
+        _selectedImageViewWidgetKey.currentState?.selectedImages.value ?? [];
+
+    // Return if both message and images are empty
+    if (messageText.isEmpty && selectedImages.isEmpty) return;
+
+    // Send images if any are selected
+    if (selectedImages.isNotEmpty) {
       for (final image in selectedImages) {
         _onImageSelected(image, '');
       }
       _selectedImageViewWidgetKey.currentState?.selectedImages.value = [];
     }
 
-    widget.onSendTap.call(
-      messageText.trim(),
-      _replyMessage,
-      MessageType.text,
-    );
+    // Send text message if not empty
+    if (messageText.isNotEmpty) {
+      widget.onSendTap.call(
+        messageText.trim(),
+        _replyMessage,
+        MessageType.text,
+      );
+    }
     onCloseTap();
   }
 

@@ -29,6 +29,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/config_models/send_message_configuration.dart';
+import '../utils/audio_manager.dart';
 import '../utils/constants/constants.dart';
 import '../utils/debounce.dart';
 import '../utils/package_strings.dart';
@@ -426,6 +427,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) {
+      /// If any voice note is currently playing, stop it before recording.
+      AudioManager.instance.stopPreviousPlayback();
+
       await controller?.record(
         recorderSettings: voiceRecordingConfig.recorderSettings,
       );

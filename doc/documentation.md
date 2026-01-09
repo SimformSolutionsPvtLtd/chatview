@@ -766,6 +766,7 @@ ChatView(
   // ...
   sendMessageConfig: SendMessageConfiguration(
     voiceRecordingConfiguration: VoiceRecordingConfiguration(
+      singlePlayerMode: true, // When true, only one audio can play at a time. When false, multiple audios can play simultaneously defaults to false.
       iosEncoder: IosEncoder.kAudioFormatMPEG4AAC,
       androidOutputFormat: AndroidOutputFormat.mpeg4,
       androidEncoder: AndroidEncoder.aac,

@@ -28,10 +28,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../extensions/extensions.dart';
 import '../models/config_models/send_message_configuration.dart';
 import '../utils/constants/constants.dart';
 import '../utils/debounce.dart';
 import '../utils/package_strings.dart';
+import '../values/enumeration.dart';
 import '../values/typedefs.dart';
 import 'action_widgets/camera_action_button.dart';
 import 'action_widgets/gallery_action_button.dart';
@@ -75,6 +77,8 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       ValueNotifier(widget.textEditingController.text.isNotEmpty);
 
   RecorderController? controller;
+
+  final playerController = PlayerController();
 
   ValueNotifier<bool> isRecording = ValueNotifier(false);
 
@@ -137,6 +141,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     widget.textEditingController.removeListener(_listenTextEditingController);
+    playerController.dispose();
     super.dispose();
   }
 
@@ -426,6 +431,11 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) {
+      if (chatListConfig
+              .messageConfig?.voiceMessageConfig?.playerMode.isSingle ??
+          false) {
+        playerController.pauseAllPlayers();
+      }
       await controller?.record(
         recorderSettings: voiceRecordingConfig.recorderSettings,
       );

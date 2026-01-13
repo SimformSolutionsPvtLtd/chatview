@@ -786,6 +786,19 @@ ChatView(
       },
       iconColor: Colors.black,
     ),
+    voiceMessageConfig: VoiceMessageConfiguration(
+      // Determines whether single or multi player mode is enabled for audio playback.
+      // Note: Defaults to multi-player mode.
+      //
+      // PlayerMode.single:
+      //   - Only one audio can be played at a time.
+      //   - Starting recording will stop any currently playing audio.
+      //
+      // PlayerMode.multi:
+      //   - Multiple audios can be played simultaneously.
+      //   - Starting recording will not affect any currently playing audio.
+      playerMode: PlayerMode.single,
+    )
   ),
   // ...
 )

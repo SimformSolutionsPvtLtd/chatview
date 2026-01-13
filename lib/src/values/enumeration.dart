@@ -125,3 +125,27 @@ enum UserActiveStatusAlignment {
 
   bool get isBottomRight => this == bottomRight;
 }
+
+/// Defines the audio player mode,
+/// controlling whether single or multiple audio files can be
+/// played simultaneously.
+enum PlayerMode {
+  /// Only one audio can be played at a time.
+  ///
+  /// Note: Starting recording will stop any currently playing audio.
+  single,
+
+  /// Multiple audios can be played simultaneously.
+  ///
+  /// Note: Starting recording will not affect any currently playing audio.
+  multi;
+}
+
+/// Extension methods for PlayerMode enum.
+extension PlayerModeExtension on PlayerMode {
+  /// Checks if the player mode is single.
+  bool get isSingle => this == PlayerMode.single;
+
+  /// Checks if the player mode is multi.
+  bool get isMulti => this == PlayerMode.multi;
+}

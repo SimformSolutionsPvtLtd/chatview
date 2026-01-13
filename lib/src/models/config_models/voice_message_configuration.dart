@@ -23,6 +23,7 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 
+import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 
 /// A configuration model class for voice message bubble.
@@ -43,6 +44,7 @@ class VoiceMessageConfiguration {
     this.waveformMargin,
     this.waveformPadding,
     this.enableSeekGesture = true,
+    this.playerMode = PlayerMode.multi,
   });
 
   /// Applies style to waveform.
@@ -86,4 +88,16 @@ class VoiceMessageConfiguration {
 
   /// Enable/disable seeking with gestures. Enabled by default.
   final bool enableSeekGesture;
+
+  /// Determines whether single or multi player mode is enabled for audio playback.
+  /// Defaults to PlayerMode.multi.
+  ///
+  /// If PlayerMode.single:
+  ///   - Only one audio can be played at a time.
+  ///   - Note: Starting recording will stop any currently playing audio.
+  ///
+  /// If PlayerMode.multi:
+  ///   - Multiple audios can be played simultaneously.
+  ///   - Note: Starting recording will not affect any currently playing audio.
+  final PlayerMode playerMode;
 }

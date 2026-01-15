@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import '../models/chat_bubble.dart';
 import '../models/config_models/message_reaction_configuration.dart';
 import '../models/config_models/voice_message_configuration.dart';
+import '../values/enumeration.dart';
 import 'reaction_widget.dart';
 
 class VoiceMessageView extends StatefulWidget {
@@ -192,6 +193,9 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
     if (playerState.isInitialised ||
         playerState.isPaused ||
         playerState.isStopped) {
+      if (widget.config?.playerMode.isSingle ?? false) {
+        controller.pauseAllPlayers();
+      }
       controller.startPlayer();
       controller.setFinishMode(finishMode: FinishMode.pause);
     } else {

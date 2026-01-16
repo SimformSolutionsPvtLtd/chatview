@@ -719,10 +719,9 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                   context: context,
                   onPressed: (emoji, replyMessage) {
                     if (emoji?.isEmpty ?? true) return;
-                    controller.text = controller.text += emoji!;
                     _chatController.addMessage(
                       Message(
-                        message: controller.text,
+                        message: emoji!,
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
                         createdAt: DateTime.now(),
                         sentBy: _chatController.currentUser.id,

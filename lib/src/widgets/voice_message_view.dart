@@ -171,6 +171,18 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                     const Duration(milliseconds: 500),
                 enableSeekGesture: widget.config?.enableSeekGesture ?? true,
               ),
+              if (widget.message.voiceMessageDuration != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Text(
+                    widget.message.voiceMessageDuration!.toHHMMSS(),
+                    style: widget.config?.durationTextStyle ??
+                        const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                  ),
+                ),
             ],
           ),
         ),

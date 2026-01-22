@@ -43,6 +43,9 @@ class TextMessageView extends StatelessWidget {
     this.mentionTextStyle,
   }) : super(key: key);
 
+  /// Regular expression pattern for detecting mentions in text
+  static final RegExp _mentionRegex = RegExp(r'(@\w+)');
+
   /// Represents current message is sent by current user.
   final bool isMessageBySender;
 
@@ -186,7 +189,7 @@ class TextMessageView extends StatelessWidget {
       : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
 
   bool _hasMentions(String text) {
-    return text.contains(RegExp(r'@\w+'));
+    return _mentionRegex.hasMatch(text);
   }
 
   Widget _buildTextWithMentions(String text, TextStyle? baseStyle) {
@@ -201,8 +204,7 @@ class TextMessageView extends StatelessWidget {
         );
 
     final spans = <TextSpan>[];
-    final regex = RegExp(r'(@\w+)');
-    final matches = regex.allMatches(text);
+    final matches = _mentionRegex.allMatches(text);
 
     int lastMatchEnd = 0;
     for (final match in matches) {

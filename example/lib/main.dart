@@ -421,6 +421,9 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
     otherUsers: Data.otherUsers,
   );
 
+  // Track if we're in mention mode to handle suggestion taps appropriately
+  bool _isMentionMode = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -751,6 +754,15 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                 ),
               ],
               onMentionTriggered: (searchText) {
+                // Update mention mode flag
+                _isMentionMode = searchText.isNotEmpty;
+
+                if (searchText.isEmpty) {
+                  // Clear suggestions when mention mode ends
+                  _chatController.removeReplySuggestions();
+                  return;
+                }
+
                 // Filter users based on search text
                 final users = _chatController.otherUsers
                     .where((user) => user.name
@@ -919,16 +931,17 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               textStyle: TextStyle(color: _theme.textColor),
             ),
             onTap: (item) {
-              // Check if this is a mention selection (starts with @)
-              // If we have an active mention context, insert it
-              final sendMessageWidgetKey = context.findAncestorStateOfType<SendMessageWidgetState>();
-              if (sendMessageWidgetKey != null) {
-                // Try to insert as mention
-                sendMessageWidgetKey.insertMention(item.text);
-                // Clear suggestions after selection
-                _chatController.removeReplySuggestions();
+              if (_isMentionMode) {
+                // In mention mode, try to insert the mention
+                final sendMessageWidgetKey = 
+                    context.findAncestorStateOfType<SendMessageWidgetState>();
+                if (sendMessageWidgetKey != null) {
+                  sendMessageWidgetKey.insertMention(item.text);
+                  _chatController.removeReplySuggestions();
+                  _isMentionMode = false;
+                }
               } else {
-                // Fall back to normal suggestion behavior
+                // Normal suggestion behavior - send as message
                 _onSendTap(
                   item.text,
                   const ReplyMessage(),

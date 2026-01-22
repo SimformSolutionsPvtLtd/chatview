@@ -486,9 +486,10 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     }
 
     // Check if there's a space between trigger and cursor
+    // This ensures we only suggest mentions while typing a single word
     final textAfterTrigger = textBeforeCursor.substring(lastTriggerIndex + 1);
     if (textAfterTrigger.contains(' ')) {
-      // Space found, not a valid mention
+      // Space found, user has finished typing the mention word
       onMentionTriggered('');
       return;
     }

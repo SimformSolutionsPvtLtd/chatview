@@ -605,6 +605,39 @@ void onSendTap(String message, ReplyMessage replyMessage, MessageType messageTyp
 
 > Note: You can evaluate message type from the 'messageType' parameter and perform operations accordingly.
 
+## Voice Message Duration
+
+For voice messages, you can display the duration by passing the `voiceMessageDuration` parameter when creating a message:
+
+```dart
+final voiceMessage = Message(
+  id: '4',
+  message: '/path/to/audio/file.m4a',
+  createdAt: DateTime.now(),
+  sentBy: currentUser.id,
+  messageType: MessageType.voice,
+  voiceMessageDuration: Duration(seconds: 15),  // Display duration in voice message bubble
+);
+
+chatController.addMessage(voiceMessage);
+```
+
+The duration will be automatically displayed in the voice message bubble using the HH:MM:SS format. You can customize the text style using the `VoiceMessageConfiguration`:
+
+```dart
+ChatView(
+  // ...
+  sendMessageConfig: SendMessageConfiguration(
+    voiceMessageConfig: VoiceMessageConfiguration(
+      durationTextStyle: TextStyle(
+        fontSize: 12,
+        color: Colors.white,
+      ),
+    ),
+  ),
+)
+```
+
 # ChatView - Advanced Usage
 
 ChatView offers extensive customization options to tailor the chat UI to your specific needs.
@@ -798,6 +831,12 @@ ChatView(
       //   - Multiple audios can be played simultaneously.
       //   - Starting recording will not affect any currently playing audio.
       playerMode: PlayerMode.single,
+      
+      // Customize the text style for voice message duration display
+      durationTextStyle: TextStyle(
+        fontSize: 12,
+        color: Colors.white,
+      ),
     )
   ),
   // ...

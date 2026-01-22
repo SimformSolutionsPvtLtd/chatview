@@ -45,6 +45,7 @@ class VoiceMessageConfiguration {
     this.waveformPadding,
     this.enableSeekGesture = true,
     this.playerMode = PlayerMode.multi,
+    this.durationTextStyle,
   });
 
   /// Applies style to waveform.
@@ -100,4 +101,7 @@ class VoiceMessageConfiguration {
   ///   - Multiple audios can be played simultaneously.
   ///   - Note: Starting recording will not affect any currently playing audio.
   final PlayerMode playerMode;
+
+  /// TextStyle for voice message duration text.
+  final TextStyle? durationTextStyle;
 }

@@ -750,6 +750,41 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                   ),
                 ),
               ],
+              onMentionTriggered: (searchText) {
+                // Filter users based on search text
+                final users = _chatController.otherUsers
+                    .where((user) => user.name
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()))
+                    .toList();
+
+                // Convert users to suggestions
+                final suggestions = users.map((user) {
+                  return SuggestionItemData(
+                    text: user.name,
+                    config: const SuggestionItemConfig(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.uiOnePurple,
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                }).toList();
+
+                // Update suggestions in chat controller
+                _chatController.newSuggestions.value = suggestions;
+              },
+              mentionTriggerCharacter: '@',
+              mentionTextStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.uiOnePurple,
+              ),
             ),
           ),
           chatBubbleConfig: ChatBubbleConfiguration(
@@ -883,11 +918,24 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               ),
               textStyle: TextStyle(color: _theme.textColor),
             ),
-            onTap: (item) => _onSendTap(
-              item.text,
-              const ReplyMessage(),
-              MessageType.text,
-            ),
+            onTap: (item) {
+              // Check if this is a mention selection (starts with @)
+              // If we have an active mention context, insert it
+              final sendMessageWidgetKey = context.findAncestorStateOfType<SendMessageWidgetState>();
+              if (sendMessageWidgetKey != null) {
+                // Try to insert as mention
+                sendMessageWidgetKey.insertMention(item.text);
+                // Clear suggestions after selection
+                _chatController.removeReplySuggestions();
+              } else {
+                // Fall back to normal suggestion behavior
+                _onSendTap(
+                  item.text,
+                  const ReplyMessage(),
+                  MessageType.text,
+                );
+              }
+            },
           ),
         ),
       ),

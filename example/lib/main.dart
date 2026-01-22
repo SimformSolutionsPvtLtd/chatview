@@ -421,6 +421,9 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
     otherUsers: Data.otherUsers,
   );
 
+  // Track if we're in mention mode to handle suggestion taps appropriately
+  bool _isMentionMode = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -750,6 +753,50 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                   ),
                 ),
               ],
+              onMentionTriggered: (searchText) {
+                // Update mention mode flag
+                _isMentionMode = searchText.isNotEmpty;
+
+                if (searchText.isEmpty) {
+                  // Clear suggestions when mention mode ends
+                  _chatController.removeReplySuggestions();
+                  return;
+                }
+
+                // Filter users based on search text
+                final users = _chatController.otherUsers
+                    .where((user) => user.name
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()))
+                    .toList();
+
+                // Convert users to suggestions
+                final suggestions = users.map((user) {
+                  return SuggestionItemData(
+                    text: user.name,
+                    config: const SuggestionItemConfig(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.uiOnePurple,
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                }).toList();
+
+                // Update suggestions in chat controller
+                _chatController.newSuggestions.value = suggestions;
+              },
+              mentionTriggerCharacter: '@',
+              mentionTextStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.uiOnePurple,
+              ),
             ),
           ),
           chatBubbleConfig: ChatBubbleConfiguration(
@@ -883,11 +930,25 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               ),
               textStyle: TextStyle(color: _theme.textColor),
             ),
-            onTap: (item) => _onSendTap(
-              item.text,
-              const ReplyMessage(),
-              MessageType.text,
-            ),
+            onTap: (item) {
+              if (_isMentionMode) {
+                // In mention mode, try to insert the mention
+                final sendMessageWidgetKey = 
+                    context.findAncestorStateOfType<SendMessageWidgetState>();
+                if (sendMessageWidgetKey != null) {
+                  sendMessageWidgetKey.insertMention(item.text);
+                  _chatController.removeReplySuggestions();
+                  _isMentionMode = false;
+                }
+              } else {
+                // Normal suggestion behavior - send as message
+                _onSendTap(
+                  item.text,
+                  const ReplyMessage(),
+                  MessageType.text,
+                );
+              }
+            },
           ),
         ),
       ),

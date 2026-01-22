@@ -74,6 +74,9 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   final GlobalKey<SelectedImageViewWidgetState> _selectedImageViewWidgetKey =
       GlobalKey();
+  
+  final GlobalKey<_ChatUITextFieldState> _chatUITextFieldKey = GlobalKey();
+  
   ReplyMessage _replyMessage = const ReplyMessage();
 
   ReplyMessage get replyMessage => _replyMessage;
@@ -172,6 +175,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                   sendMessageConfig: widget.sendMessageConfig,
                                 ),
                               ChatUITextField(
+                                key: _chatUITextFieldKey,
                                 focusNode: _focusNode,
                                 textEditingController: _textEditingController,
                                 onPressed: _onPressed,
@@ -282,6 +286,12 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     } else {
       _replyMessageTextFieldViewKey.currentState?.onClose();
     }
+  }
+
+  /// Inserts a mention into the text field.
+  /// This can be called from outside to insert a user mention.
+  void insertMention(String mention) {
+    _chatUITextFieldKey.currentState?.insertMention(mention);
   }
 
   double get _bottomPadding => (!kIsWeb && Platform.isIOS)

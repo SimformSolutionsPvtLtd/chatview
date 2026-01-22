@@ -33,6 +33,7 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 - One-on-one and group chat support
 - Message reactions with emoji
 - Reply to messages functionality
+- User mentions/tagging with @ symbol
 - Link preview for URLs
 - Voice messages support
 - Image sharing capabilities

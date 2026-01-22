@@ -168,6 +168,9 @@ class TextFieldConfiguration {
     this.hintMaxLines,
     this.trailingActions,
     this.leadingActions,
+    this.onMentionTriggered,
+    this.mentionTriggerCharacter = '@',
+    this.mentionTextStyle,
   });
 
   /// Used to give max lines in text field.
@@ -239,6 +242,17 @@ class TextFieldConfiguration {
   ///
   /// Default is `true`.
   final bool hideLeadingActionsOnType;
+
+  /// Callback when user types the mention trigger character (default '@').
+  /// Provides the search text after the trigger character for filtering users.
+  final MentionCallback? onMentionTriggered;
+
+  /// Character that triggers mention suggestions. Default is '@'.
+  final String mentionTriggerCharacter;
+
+  /// Text style for mentions in the text field.
+  /// If provided, mentions will be styled differently in the message text.
+  final TextStyle? mentionTextStyle;
 }
 
 class ImagePickerConfiguration {

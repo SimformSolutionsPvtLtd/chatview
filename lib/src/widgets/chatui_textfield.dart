@@ -460,5 +460,73 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       composingStatus.value = TypeWriterStatus.typing;
     });
     _isTextNotEmptyNotifier.value = inputText.trim().isNotEmpty;
+    _detectMention(inputText);
+  }
+
+  void _detectMention(String text) {
+    final mentionTrigger =
+        textFieldConfig?.mentionTriggerCharacter ?? '@';
+    final onMentionTriggered = textFieldConfig?.onMentionTriggered;
+
+    if (onMentionTriggered == null) return;
+
+    final selection = widget.textEditingController.selection;
+    if (!selection.isValid || selection.baseOffset <= 0) return;
+
+    // Get text up to cursor position
+    final textBeforeCursor = text.substring(0, selection.baseOffset);
+
+    // Find the last occurrence of mention trigger
+    final lastTriggerIndex = textBeforeCursor.lastIndexOf(mentionTrigger);
+
+    if (lastTriggerIndex == -1) {
+      // No trigger found, clear suggestions
+      onMentionTriggered('');
+      return;
+    }
+
+    // Check if there's a space between trigger and cursor
+    final textAfterTrigger = textBeforeCursor.substring(lastTriggerIndex + 1);
+    if (textAfterTrigger.contains(' ')) {
+      // Space found, not a valid mention
+      onMentionTriggered('');
+      return;
+    }
+
+    // Valid mention detected, trigger callback with search text
+    onMentionTriggered(textAfterTrigger);
+  }
+
+  /// Inserts a mention into the text field at the current cursor position.
+  /// This method is called when a user selects a mention from the suggestions.
+  void insertMention(String mention) {
+    final mentionTrigger =
+        textFieldConfig?.mentionTriggerCharacter ?? '@';
+    final controller = widget.textEditingController;
+    final text = controller.text;
+    final selection = controller.selection;
+
+    if (!selection.isValid) return;
+
+    // Get text up to cursor position
+    final textBeforeCursor = text.substring(0, selection.baseOffset);
+
+    // Find the last occurrence of mention trigger
+    final lastTriggerIndex = textBeforeCursor.lastIndexOf(mentionTrigger);
+
+    if (lastTriggerIndex == -1) return;
+
+    // Replace from trigger to cursor with the mention
+    final newText = text.replaceRange(
+      lastTriggerIndex,
+      selection.baseOffset,
+      '$mentionTrigger$mention ',
+    );
+
+    // Update text and cursor position
+    final newCursorPos = lastTriggerIndex + mentionTrigger.length + mention.length + 1;
+    controller
+      ..text = newText
+      ..selection = TextSelection.collapsed(offset: newCursorPos);
   }
 }

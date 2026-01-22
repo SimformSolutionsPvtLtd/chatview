@@ -191,3 +191,6 @@ typedef EmojiPickerActionCallback = void Function(
   String? emoji,
   ReplyMessage? replyMessage,
 );
+typedef MentionCallback = void Function(
+  String searchText,
+);

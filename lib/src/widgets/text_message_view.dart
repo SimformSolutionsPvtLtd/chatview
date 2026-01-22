@@ -40,6 +40,7 @@ class TextMessageView extends StatelessWidget {
     this.highlightMessage = false,
     this.highlightColor,
     this.featureActiveConfig,
+    this.mentionTextStyle,
   }) : super(key: key);
 
   /// Represents current message is sent by current user.
@@ -69,6 +70,9 @@ class TextMessageView extends StatelessWidget {
   /// Provides configuration of active features in chat.
   final FeatureActiveConfig? featureActiveConfig;
 
+  /// Text style to apply to @mentions in the message.
+  final TextStyle? mentionTextStyle;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -81,25 +85,38 @@ class TextMessageView extends StatelessWidget {
         ? outgoingChatBubbleConfig?.textSelectionConfig
         : inComingChatBubbleConfig?.textSelectionConfig;
     final extractedUrls = textMessage.extractedUrls;
-    final baseWidget = extractedUrls.isNotEmpty
-        ? LinkPreview(
-            linkPreviewConfig: _linkPreviewConfig,
-            textMessage: textMessage,
-            extractedUrls: extractedUrls,
-            normalTextStyle: _textStyle ??
-                textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-          )
-        : Text(
-            textMessage,
-            style: _textStyle ??
-                textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-          );
+    
+    final Widget baseWidget;
+    if (extractedUrls.isNotEmpty) {
+      baseWidget = LinkPreview(
+        linkPreviewConfig: _linkPreviewConfig,
+        textMessage: textMessage,
+        extractedUrls: extractedUrls,
+        normalTextStyle: _textStyle ??
+            textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+      );
+    } else if (_hasMentions(textMessage)) {
+      baseWidget = _buildTextWithMentions(
+        textMessage,
+        _textStyle ??
+            textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+      );
+    } else {
+      baseWidget = Text(
+        textMessage,
+        style: _textStyle ??
+            textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+      );
+    }
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -167,4 +184,55 @@ class TextMessageView extends StatelessWidget {
   Color get _color => isMessageBySender
       ? outgoingChatBubbleConfig?.color ?? Colors.purple
       : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
+
+  bool _hasMentions(String text) {
+    return text.contains(RegExp(r'@\w+'));
+  }
+
+  Widget _buildTextWithMentions(String text, TextStyle? baseStyle) {
+    final mentionStyle = mentionTextStyle ??
+        baseStyle?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: isMessageBySender ? Colors.yellow : Colors.blue,
+        ) ??
+        TextStyle(
+          fontWeight: FontWeight.bold,
+          color: isMessageBySender ? Colors.yellow : Colors.blue,
+        );
+
+    final spans = <TextSpan>[];
+    final regex = RegExp(r'(@\w+)');
+    final matches = regex.allMatches(text);
+
+    int lastMatchEnd = 0;
+    for (final match in matches) {
+      // Add text before mention
+      if (match.start > lastMatchEnd) {
+        spans.add(TextSpan(
+          text: text.substring(lastMatchEnd, match.start),
+          style: baseStyle,
+        ));
+      }
+
+      // Add mention with special style
+      spans.add(TextSpan(
+        text: match.group(0),
+        style: mentionStyle,
+      ));
+
+      lastMatchEnd = match.end;
+    }
+
+    // Add remaining text after last mention
+    if (lastMatchEnd < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastMatchEnd),
+        style: baseStyle,
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
 }

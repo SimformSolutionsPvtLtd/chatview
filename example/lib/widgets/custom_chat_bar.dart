@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview/chatview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 
 import '../../values/colors.dart';
 import '../../values/icons.dart';
@@ -48,13 +48,7 @@ class _CustomChatBarState extends State<CustomChatBar> {
     if (_replyMessage != null) {
       _replyMessage = widget.replyMessage;
     }
-    final repliedUser = _replyMessage?.replyTo.isNotEmpty ?? false
-        ? widget.chatController.getUserFromId(_replyMessage?.replyTo ?? '')
-        : null;
-    String replyTo =
-        _replyMessage?.replyTo == widget.chatController.currentUser.id
-            ? PackageStrings.currentLocale.you
-            : repliedUser?.name ?? '';
+
     return Container(
       color: AppColors.uiTwoBackground,
       child: SafeArea(
@@ -62,60 +56,6 @@ class _CustomChatBarState extends State<CustomChatBar> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (_replyMessage?.message.isNotEmpty ?? false)
-              Container(
-                padding: const EdgeInsets.fromLTRB(8, 8, 7.5, 7.5),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: AppColors.uiTwoReplyLineColor,
-                      width: 4,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            replyTo,
-                            style: const TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              height: 1.3571428571,
-                              letterSpacing: -0.01,
-                              color: Color(0xFFD42A66),
-                            ),
-                          ),
-                          const SizedBox(height: 1.5),
-                          Text(
-                            _replyMessage?.message ?? '',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              height: 1.33,
-                              color: Color(0xFF0A0A0A),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    SizedBox.square(
-                      dimension: 32,
-                      child: IconButton(
-                        onPressed: () => ChatView.closeReplyMessageView(
-                          context,
-                        ),
-                        padding: EdgeInsets.zero,
-                        icon: SvgPicture.asset(AppIcons.closeCircular),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             Padding(
               padding: const EdgeInsets.fromLTRB(7, 5.5, 9, 5.5),
               child: ValueListenableBuilder(

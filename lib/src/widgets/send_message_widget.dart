@@ -95,83 +95,80 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
         chatListConfig.scrollToBottomButtonConfig;
     return Align(
       alignment: Alignment.bottomCenter,
-      child: isCustomTextField
-          ? Builder(
-              // Assign the key only when using a custom text field to measure its height,
-              // to preventing overlap with the message list.
-              key: chatViewIW?.chatTextFieldViewKey,
-              builder: (context) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => context.calculateAndUpdateTextFieldHeight(),
-                );
-                return widget.sendMessageBuilder?.call(_replyMessage) ??
-                    const SizedBox.shrink();
-              },
-            )
-          : SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Stack(
+          children: [
+            // This has been added to prevent messages from being
+            // displayed below the text field
+            // when the user scrolls the message list.
+            Positioned(
+              right: 0,
+              left: 0,
+              bottom: 0,
+              child: Container(
+                height: MediaQuery.of(context).size.height /
+                    ((!kIsWeb && Platform.isIOS) ? 24 : 28),
+                color: chatListConfig.chatBackgroundConfig.backgroundColor ??
+                    Colors.white,
+              ),
+            ),
+            Positioned(
+              right: 0,
+              left: 0,
+              bottom: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // This has been added to prevent messages from being
-                  // displayed below the text field
-                  // when the user scrolls the message list.
-                  Positioned(
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                    child: Container(
-                      height: MediaQuery.of(context).size.height /
-                          ((!kIsWeb && Platform.isIOS) ? 24 : 28),
-                      color:
-                          chatListConfig.chatBackgroundConfig.backgroundColor ??
-                              Colors.white,
+                  if (chatViewIW
+                          ?.featureActiveConfig.enableScrollToBottomButton ??
+                      true)
+                    Align(
+                      alignment:
+                          scrollToBottomButtonConfig?.alignment?.alignment ??
+                              Alignment.bottomCenter,
+                      child: Padding(
+                        padding: scrollToBottomButtonConfig?.padding ??
+                            EdgeInsets.zero,
+                        child: const ScrollToBottomButton(),
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                  Padding(
+                    key: chatViewIW?.chatTextFieldViewKey,
+                    padding: EdgeInsets.fromLTRB(
+                      bottomPadding4,
+                      bottomPadding4,
+                      bottomPadding4,
+                      _bottomPadding,
+                    ),
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
                       children: [
-                        if (chatViewIW?.featureActiveConfig
-                                .enableScrollToBottomButton ??
-                            true)
-                          Align(
-                            alignment: scrollToBottomButtonConfig
-                                    ?.alignment?.alignment ??
-                                Alignment.bottomCenter,
-                            child: Padding(
-                              padding: scrollToBottomButtonConfig?.padding ??
-                                  EdgeInsets.zero,
-                              child: const ScrollToBottomButton(),
-                            ),
+                        ReplyMessageView(
+                          key: _replyMessageTextFieldViewKey,
+                          sendMessageConfig: widget.sendMessageConfig,
+                          messageConfig: widget.messageConfig,
+                          builder: widget.replyMessageBuilder,
+                          onChange: (value) => _replyMessage = value,
+                        ),
+                        if (widget.sendMessageConfig.shouldSendImageWithText)
+                          SelectedImageViewWidget(
+                            key: _selectedImageViewWidgetKey,
+                            sendMessageConfig: widget.sendMessageConfig,
                           ),
-                        Padding(
-                          key: chatViewIW?.chatTextFieldViewKey,
-                          padding: EdgeInsets.fromLTRB(
-                            bottomPadding4,
-                            bottomPadding4,
-                            bottomPadding4,
-                            _bottomPadding,
-                          ),
-                          child: Stack(
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              ReplyMessageView(
-                                key: _replyMessageTextFieldViewKey,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                messageConfig: widget.messageConfig,
-                                builder: widget.replyMessageBuilder,
-                                onChange: (value) => _replyMessage = value,
-                              ),
-                              if (widget
-                                  .sendMessageConfig.shouldSendImageWithText)
-                                SelectedImageViewWidget(
-                                  key: _selectedImageViewWidgetKey,
-                                  sendMessageConfig: widget.sendMessageConfig,
-                                ),
-                              ChatUITextField(
+                        isCustomTextField
+                            ? Builder(
+                                builder: (context) {
+                                  WidgetsBinding.instance.addPostFrameCallback(
+                                    (_) => context
+                                        .calculateAndUpdateTextFieldHeight(),
+                                  );
+                                  return widget.sendMessageBuilder
+                                          ?.call(_replyMessage) ??
+                                      const SizedBox.shrink();
+                                },
+                              )
+                            : ChatUITextField(
                                 focusNode: _focusNode,
                                 textEditingController: _textEditingController,
                                 onPressed: _onPressed,
@@ -196,15 +193,15 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                   }
                                 },
                               ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -272,6 +269,10 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       _replyMessageTextFieldViewKey.currentState!.replyMessage.value =
           _replyMessage;
     }
+    // Scroll to ensure the reply widget is visible and messages are not overlapped
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      chatViewIW?.chatController.scrollToLastMessage();
+    });
   }
 
   void onCloseTap() {

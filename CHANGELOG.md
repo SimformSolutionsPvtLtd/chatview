@@ -4,6 +4,8 @@
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
   `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
+* **Fix**: [428](https://github.com/SimformSolutionsPvtLtd/chatview/pull/428) Fixed reply
+  configuration handling when using a custom text field.
 
 ## [3.0.0]
 

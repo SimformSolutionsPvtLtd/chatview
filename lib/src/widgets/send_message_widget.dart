@@ -165,35 +165,18 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 builder: widget.replyMessageBuilder,
                                 onChange: (value) => _replyMessage = value,
                               ),
-                              if (widget
-                                  .sendMessageConfig.shouldSendImageWithText)
-                                SelectedImageViewWidget(
-                                  key: _selectedImageViewWidgetKey,
-                                  sendMessageConfig: widget.sendMessageConfig,
-                                ),
+                              SelectedImageViewWidget(
+                                key: _selectedImageViewWidgetKey,
+                                sendMessageConfig: widget.sendMessageConfig,
+                              ),
                               ChatUITextField(
                                 focusNode: _focusNode,
                                 textEditingController: _textEditingController,
                                 onPressed: _onPressed,
                                 sendMessageConfig: widget.sendMessageConfig,
                                 onRecordingComplete: _onRecordingComplete,
-                                onImageSelected: (images, messageId) {
-                                  if (widget.sendMessageConfig
-                                      .shouldSendImageWithText) {
-                                    if (images.isNotEmpty) {
-                                      _selectedImageViewWidgetKey.currentState
-                                          ?.selectedImages.value = [
-                                        ...?_selectedImageViewWidgetKey
-                                            .currentState?.selectedImages.value,
-                                        images
-                                      ];
-
-                                      FocusScope.of(context)
-                                          .requestFocus(_focusNode);
-                                    }
-                                  } else {
-                                    _onImageSelected(images, '');
-                                  }
+                                onImageSelected: (imagePath) {
+                                  _onImageSelected(imagePath);
                                 },
                               ),
                             ],
@@ -219,7 +202,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     }
   }
 
-  void _onImageSelected(String imagePath, String error) {
+  void _onImageSelected(String imagePath) {
     if (imagePath.isEmpty) return;
 
     widget.onSendTap.call(imagePath, _replyMessage, MessageType.image);
@@ -239,7 +222,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     if (_selectedImageViewWidgetKey.currentState?.selectedImages.value
         case final selectedImages?) {
       for (final image in selectedImages) {
-        _onImageSelected(image, '');
+        _onImageSelected(image);
       }
       _selectedImageViewWidgetKey.currentState?.selectedImages.value = [];
     }

@@ -31,7 +31,6 @@ import '../../values/typedefs.dart';
 class SendMessageConfiguration {
   const SendMessageConfiguration({
     this.voiceRecordingConfiguration = const VoiceRecordingConfiguration(),
-    this.shouldSendImageWithText = false,
     this.allowRecordingVoice = true,
     this.textFieldConfig,
     this.textFieldBackgroundColor,
@@ -96,9 +95,6 @@ class SendMessageConfiguration {
 
   /// Configuration for cancel voice recording
   final CancelRecordConfiguration? cancelRecordConfiguration;
-
-  /// If true, then image will be sent with text message.
-  final bool shouldSendImageWithText;
 
   /// Icon to remove image from text field.
   final Widget? removeImageIcon;

@@ -336,7 +336,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                           ? null
                                           : (path, _) => widget.onImageSelected(
                                                 path ?? '',
-                                                '',
                                               ),
                                 ),
                                 GalleryActionButton(
@@ -352,7 +351,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                                           ? null
                                           : (path, _) => widget.onImageSelected(
                                                 path ?? '',
-                                                '',
                                               ),
                                 ),
                               ],

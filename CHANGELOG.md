@@ -4,6 +4,8 @@
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
   `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
+* **Feat**: [433](https://github.com/SimformSolutionsPvtLtd/chatview/pull/XXX) Add optional
+  `boxShadow` to `ChatBubble` and apply it in `TextMessageView` when set.
 
 ## [3.0.0]
 

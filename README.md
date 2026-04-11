@@ -43,6 +43,8 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 - Highly customizable UI components
 - Plug-and-play backend support using [chatview_connect][chatViewConnect]
 
+For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.github.io/chatview/).
+
 ## Documentation
 
 Visit our [documentation](https://simform-flutter-packages.web.app/chatView) site for all

@@ -261,12 +261,14 @@ extension BuildContextExtension on BuildContext {
 
   /// This getter will provide the height of the text field from the
   /// current context if available, otherwise it will return the
-  /// default height of the text field.
+  /// configurable fallback height from [ChatViewInheritedWidget], or the
+  /// [defaultChatTextFieldHeight] if no fallback is configured.
   ///
   /// **Note**: Make sure the `chatTextFieldViewKey` is assigned to retrieve
   /// actual height of text field.
   double get textFieldHeight =>
       chatViewIW?.chatTextFieldViewKey.currentContext?.size?.height ??
+      chatViewIW?.chatTextFieldHeightFallback ??
       defaultChatTextFieldHeight;
 
   ChatViewInheritedWidget? get chatViewIW =>

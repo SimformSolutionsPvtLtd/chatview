@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../inherited_widgets/configurations_inherited_widgets.dart';
+import '../utils/constants/constants.dart';
 import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
 import '../values/enumeration.dart';
@@ -65,6 +66,7 @@ class ChatView extends StatefulWidget {
     this.replyMessageBuilder,
     this.replySuggestionsConfig,
     this.scrollToBottomButtonConfig,
+    this.chatTextFieldHeightFallback,
   })  : chatBackgroundConfig =
             chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
         chatViewStateConfig =
@@ -152,6 +154,12 @@ class ChatView extends StatefulWidget {
   /// Provides a configuration for scroll to bottom button config
   final ScrollToBottomButtonConfig? scrollToBottomButtonConfig;
 
+  /// Fallback height used for the bottom padding of the message list when the
+  /// actual chat text field height cannot be determined from the layout.
+  /// This is useful to prevent the last message from being hidden behind the
+  /// chat input field. If not provided, defaults to [defaultChatTextFieldHeight].
+  final double? chatTextFieldHeightFallback;
+
   static void closeReplyMessageView(BuildContext context) {
     final state = context.findAncestorStateOfType<_ChatViewState>();
 
@@ -216,6 +224,8 @@ class _ChatViewState extends State<ChatView>
       featureActiveConfig: featureActiveConfig,
       profileCircleConfiguration: widget.profileCircleConfig,
       chatTextFieldViewKey: chatTextFieldViewKey,
+      chatTextFieldHeightFallback: widget.chatTextFieldHeightFallback ??
+          defaultChatTextFieldHeight,
       child: SuggestionsConfigIW(
         suggestionsConfig: widget.replySuggestionsConfig,
         child: ConfigurationsInheritedWidget(

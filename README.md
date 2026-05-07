@@ -36,6 +36,7 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 - Link preview for URLs
 - Voice messages support
 - Image sharing capabilities
+- Configurable chat background images with fit and repeat options
 - Custom message types
 - Typing indicators
 - Reply suggestions

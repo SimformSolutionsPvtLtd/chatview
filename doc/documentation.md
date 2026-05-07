@@ -675,6 +675,32 @@ ChatView(
 )
 ```
 
+## Chat Background Configuration
+
+Use `ChatBackgroundConfiguration` to customize the chat surface with a solid
+color, a wallpaper image, and optional image layout controls.
+
+```dart
+ChatView(
+  // ...
+  chatBackgroundConfig: ChatBackgroundConfiguration(
+    backgroundColor: const Color(0xFFF7F3EA),
+    backgroundImage: 'assets/images/chat_pattern.png',
+    backgroundImageFit: BoxFit.none,
+    backgroundImageRepeat: ImageRepeat.repeat,
+  ),
+)
+```
+
+Notes:
+
+- `backgroundImageFit` controls how the image is inscribed into the chat area.
+- `backgroundImageRepeat` controls whether the image tiles across the chat area.
+- If you want a Telegram-style repeated pattern, use a small tile asset and a
+  non-stretching fit such as `BoxFit.none`.
+- If you use `BoxFit.fill`, the image is stretched to fill the available space,
+  so the repeat effect is usually not visible.
+
 ### Loading Old Reply Messages
 
 The `loadOldReplyMessage` callback is essential for handling replies to messages that aren't 

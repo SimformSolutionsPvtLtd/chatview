@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+* **Fix**: [427](https://github.com/SimformSolutionsPvtLtd/chatview/pull/427)
+  Voice message duration is now shown when `voiceMessageDuration` is provided
+  for `MessageType.voice` messages.
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for

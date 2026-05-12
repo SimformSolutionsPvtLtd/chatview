@@ -46,6 +46,9 @@ class VoiceMessageConfiguration {
     this.enableSeekGesture = true,
     this.playerMode = PlayerMode.multi,
     this.durationTextStyle,
+    this.durationTextStyleBuilder,
+    this.showDuration = true,
+    this.durationFormat = VoiceDurationFormat.hhmmss,
   });
 
   /// Applies style to waveform.
@@ -104,4 +107,24 @@ class VoiceMessageConfiguration {
 
   /// TextStyle for voice message duration text.
   final TextStyle? durationTextStyle;
+
+  /// Optional dynamic text style builder for voice message duration text.
+  ///
+  /// Use this when you want different styles for sender vs receiver bubbles.
+  ///
+  /// If provided, this takes precedence over [durationTextStyle].
+  final DurationTextStyleBuilder? durationTextStyleBuilder;
+
+  /// Built-in duration format used for rendering voice message duration.
+  ///
+  /// Defaults to [VoiceDurationFormat.hhmmss].
+  final VoiceDurationFormat durationFormat;
+
+  /// Whether to display the voice message duration.
+  ///
+  /// If [Message.voiceMessageDuration] is not set, the duration is
+  /// automatically read from the audio file.
+  ///
+  /// Defaults to `true`.
+  final bool showDuration;
 }

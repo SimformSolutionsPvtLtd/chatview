@@ -191,6 +191,9 @@ typedef MessageStatusBuilder = Widget Function(
 typedef CustomVoiceActionIconCallback = Icon Function(
   bool isMessageBySender,
 );
+typedef DurationTextStyleBuilder = TextStyle Function(
+  bool isMessageBySender,
+);
 typedef CameraActionCallback = void Function(
   String? path,
   ReplyMessage? replyMessage,

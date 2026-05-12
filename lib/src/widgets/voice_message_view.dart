@@ -80,6 +80,11 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
   final ValueNotifier<PlayerState> _playerState =
       ValueNotifier(PlayerState.stopped);
 
+  /// Auto-detected duration read from [PlayerController.maxDuration] once
+  /// the audio file is prepared. Used when [VoiceMessageConfiguration.showDuration]
+  /// is `true` and [Message.voiceMessageDuration] is not set.
+  final ValueNotifier<Duration?> _detectedDuration = ValueNotifier(null);
+
   PlayerState get playerState => _playerState.value;
 
   PlayerWaveStyle playerWaveStyle = const PlayerWaveStyle(scaleFactor: 70);
@@ -98,7 +103,11 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
       ..preparePlayer(
         path: widget.message.message,
         noOfSamples: _waveStyle.getSamplesForWidth(widget.screenWidth * 0.5),
-      ).whenComplete(() => widget.onMaxDuration?.call(controller.maxDuration));
+      ).whenComplete(() {
+        widget.onMaxDuration?.call(controller.maxDuration);
+        _detectedDuration.value =
+            Duration(milliseconds: controller.maxDuration);
+      });
     playerStateSubscription = controller.onPlayerStateChanged
         .listen((state) => _playerState.value = state);
   }
@@ -108,6 +117,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
     playerStateSubscription.cancel();
     controller.dispose();
     _playerState.dispose();
+    _detectedDuration.dispose();
     super.dispose();
   }
 
@@ -134,15 +144,20 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                 horizontal: 8,
                 vertical: widget.message.reaction.reactions.isNotEmpty ? 15 : 0,
               ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              ValueListenableBuilder<PlayerState>(
-                builder: (context, state, child) {
-                  return IconButton(
-                    onPressed: _playOrPause,
-                    icon:
-                        state.isStopped || state.isPaused || state.isInitialised
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ValueListenableBuilder<PlayerState>(
+                    builder: (context, state, child) {
+                      return IconButton(
+                        onPressed: _playOrPause,
+                        icon: state.isStopped ||
+                                state.isPaused ||
+                                state.isInitialised
                             ? widget.config?.playIcon
                                     ?.call(widget.isMessageBySender) ??
                                 const Icon(
@@ -155,48 +170,69 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                                   Icons.stop,
                                   color: Colors.white,
                                 ),
-                  );
-                },
-                valueListenable: _playerState,
-              ),
-              AudioFileWaveforms(
-                size: Size(widget.screenWidth * 0.50, 60),
-                playerController: controller,
-                waveformType: WaveformType.fitWidth,
-                playerWaveStyle: _waveStyle,
-                padding: widget.config?.waveformPadding ??
-                    const EdgeInsets.only(right: 10),
-                margin: widget.config?.waveformMargin,
-                animationCurve: widget.config?.animationCurve ?? Curves.easeIn,
-                animationDuration: widget.config?.animationDuration ??
-                    const Duration(milliseconds: 500),
-                enableSeekGesture: widget.config?.enableSeekGesture ?? true,
-              ),
-              if (widget.message.voiceMessageDuration != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Text(
-                    widget.message.voiceMessageDuration!.toHHMMSS(),
-                    style: widget.config?.durationTextStyle ??
-                        const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
+                      );
+                    },
+                    valueListenable: _playerState,
                   ),
-                ),
+                  AudioFileWaveforms(
+                    size: Size(widget.screenWidth * 0.50, 20),
+                    playerController: controller,
+                    waveformType: WaveformType.fitWidth,
+                    playerWaveStyle: _waveStyle,
+                    padding: widget.config?.waveformPadding ??
+                        const EdgeInsets.only(right: 10),
+                    margin: widget.config?.waveformMargin,
+                    animationCurve:
+                        widget.config?.animationCurve ?? Curves.easeIn,
+                    animationDuration: widget.config?.animationDuration ??
+                        const Duration(milliseconds: 500),
+                    enableSeekGesture: widget.config?.enableSeekGesture ?? true,
+                  ),
+                  if ((widget.config?.showDuration ?? false) ||
+                      widget.message.voiceMessageDuration != null)
+                    ValueListenableBuilder<Duration?>(
+                      valueListenable: _detectedDuration,
+                      builder: (context, detectedDur, _) {
+                        final dur =
+                            widget.message.voiceMessageDuration ?? detectedDur;
+                        if (dur == null) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Text(
+                            _formatDuration(dur),
+                            style: widget.config?.durationTextStyleBuilder
+                                    ?.call(widget.isMessageBySender) ??
+                                widget.config?.durationTextStyle ??
+                                TextStyle(
+                                  fontSize: 12,
+                                  color: widget.isMessageBySender
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                ],
+              ),
               if (widget.featureActiveConfig?.showTimeInChatBubble ?? false)
-                Text(
-                  widget.message.createdAt.getTimeFromDateTime,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: widget.isMessageBySender
-                        ? Colors.white70
-                        : Colors.black54,
-                  ).merge(
-                    widget.isMessageBySender
-                        ? widget.outgoingChatBubbleConfig?.messageTimeTextStyle
-                        : widget.inComingChatBubbleConfig?.messageTimeTextStyle,
+                Padding(
+                  padding: const EdgeInsets.only(right: 8, bottom: 4),
+                  child: Text(
+                    widget.message.createdAt.getTimeFromDateTime,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: widget.isMessageBySender
+                          ? Colors.white70
+                          : Colors.black54,
+                    ).merge(
+                      widget.isMessageBySender
+                          ? widget
+                              .outgoingChatBubbleConfig?.messageTimeTextStyle
+                          : widget
+                              .inComingChatBubbleConfig?.messageTimeTextStyle,
+                    ),
                   ),
                 ),
             ],
@@ -210,6 +246,28 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
           ),
       ],
     );
+  }
+
+  String _formatDuration(Duration duration) {
+    final format = widget.config?.durationFormat ?? VoiceDurationFormat.hhmmss;
+    if (format.isMmss) {
+      final minutes =
+          duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+      final seconds =
+          duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+      return '$minutes:$seconds';
+    }
+
+    if (format.isAdaptive) {
+      final hours = duration.inHours;
+      final minutes =
+          duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+      final seconds =
+          duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+      return hours > 0 ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
+    }
+
+    return duration.toHHMMSS();
   }
 
   void _playOrPause() {

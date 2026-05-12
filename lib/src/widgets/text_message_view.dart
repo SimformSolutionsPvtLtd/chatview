@@ -86,7 +86,7 @@ class TextMessageView extends StatelessWidget {
     final extractedUrls = textMessage.extractedUrls;
     final timestampStyle = (textTheme.bodySmall ?? const TextStyle())
         .copyWith(
-          fontSize: 10,
+          fontSize: 12,
           color: isMessageBySender ? Colors.white70 : Colors.black54,
         )
         .merge(_messageTimeTextStyle);
@@ -182,7 +182,7 @@ class TextMessageView extends StatelessWidget {
                         Padding(
                           // Reserve space at bottom for timestamp without a
                           // large blank strip on the left.
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.only(bottom: 20),
                           child: messageWidget,
                         ),
                         Text(timeText, style: timestampStyle),

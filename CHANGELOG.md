@@ -1,8 +1,5 @@
 ## [Unreleased]
 
-* **Fix**: [427](https://github.com/SimformSolutionsPvtLtd/chatview/pull/427)
-  Voice message duration is now shown when `voiceMessageDuration` is provided
-  for `MessageType.voice` messages.
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
@@ -13,6 +10,7 @@
     ChatBackgroundConfiguration for controllable chat wallpaper layout.
 * **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
 * **Feat**: [115](https://github.com/SimformSolutionsPvtLtd/chatview/issues/115) Add customizable timestamp styling for chat bubbles and improve timestamp rendering logic.
+* **Fix**: [426](https://github.com/SimformSolutionsPvtLtd/chatview/issues/426) Add auto-detection and display of voice message duration
 
 ## [3.0.0]
 

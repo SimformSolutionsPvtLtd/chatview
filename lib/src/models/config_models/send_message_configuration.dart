@@ -53,6 +53,7 @@ class SendMessageConfiguration {
     this.imageBorderRadius,
     this.selectedImageViewBuilder,
     this.sendButtonStyle,
+    this.editLabel,
   });
 
   /// Used to give background color to text field.
@@ -123,6 +124,15 @@ class SendMessageConfiguration {
 
   /// Used to give style to send button.
   final ButtonStyle? sendButtonStyle;
+
+  /// Custom label displayed in the "editing message" indicator bar shown
+  /// above the text field when the user is editing an existing message.
+  ///
+  /// Example: `"Editing message"` or a localized equivalent.
+  ///
+  /// If not provided, falls back to the locale-resolved value of
+  /// `PackageStrings.currentLocale.editing`.
+  final String? editLabel;
 }
 
 class ImagePickerIconsConfiguration {

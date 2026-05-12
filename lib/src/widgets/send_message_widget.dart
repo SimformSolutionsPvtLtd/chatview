@@ -33,12 +33,14 @@ import '../values/typedefs.dart';
 import 'chatui_textfield.dart';
 import 'reply_message_view.dart';
 import 'scroll_to_bottom_button.dart';
+import 'edit_message_view.dart';
 import 'selected_image_view_widget.dart';
 
 class SendMessageWidget extends StatefulWidget {
   const SendMessageWidget({
     required this.onSendTap,
     required this.sendMessageConfig,
+    this.onEditTap,
     this.sendMessageBuilder,
     this.messageConfig,
     this.replyMessageBuilder,
@@ -50,6 +52,10 @@ class SendMessageWidget extends StatefulWidget {
 
   /// Provides configuration for text field appearance.
   final SendMessageConfiguration sendMessageConfig;
+
+  /// Callback invoked when the user confirms an edit.
+  /// Receives the original [Message] and the updated text.
+  final EditMessageCallback? onEditTap;
 
   /// Allow user to set custom text field.
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
@@ -72,9 +78,20 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   final GlobalKey<ReplyMessageViewState> _replyMessageTextFieldViewKey =
       GlobalKey();
 
+  final GlobalKey<EditMessageViewState> _editMessageViewKey = GlobalKey();
+
   final GlobalKey<SelectedImageViewWidgetState> _selectedImageViewWidgetKey =
       GlobalKey();
   ReplyMessage _replyMessage = const ReplyMessage();
+
+  /// The message currently being edited, or `null` if not in edit mode.
+  Message? _editMessage;
+
+  /// Whether the text field is currently in edit mode.
+  bool get isEditMode => _editMessage != null;
+
+  /// Public read-only access to the message currently being edited.
+  Message? get editMessage => _editMessage;
 
   ReplyMessage get replyMessage => _replyMessage;
 
@@ -165,6 +182,18 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 builder: widget.replyMessageBuilder,
                                 onChange: (value) => _replyMessage = value,
                               ),
+                              EditMessageView(
+                                key: _editMessageViewKey,
+                                sendMessageConfig: widget.sendMessageConfig,
+                                onChange: (value) {
+                                  // When the user cancels via the X button
+                                  // on EditMessageView, clear the text field.
+                                  if (value == null && _editMessage != null) {
+                                    _textEditingController.clear();
+                                  }
+                                  _editMessage = value;
+                                },
+                              ),
                               if (widget
                                   .sendMessageConfig.shouldSendImageWithText)
                                 SelectedImageViewWidget(
@@ -236,6 +265,16 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     _textEditingController.clear();
     if (messageText.isEmpty) return;
 
+    // If in edit mode, delegate to onEditTap instead of onSendTap.
+    if (isEditMode) {
+      // Only confirm the edit if a handler is registered; otherwise keep edit
+      // mode active so the user's text is not silently discarded.
+      if (widget.onEditTap == null) return;
+      widget.onEditTap!.call(_editMessage!, messageText);
+      _closeEditMode();
+      return;
+    }
+
     if (_selectedImageViewWidgetKey.currentState?.selectedImages.value
         case final selectedImages?) {
       for (final image in selectedImages) {
@@ -252,10 +291,51 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     onCloseTap();
   }
 
+  /// Puts the text field into edit mode for [message].
+  /// Pre-fills the text field with the existing message content.
+  void assignEditMessage(Message message) {
+    // Always clear any active reply before entering edit mode.
+    _replyMessage = const ReplyMessage();
+    if (_replyMessageTextFieldViewKey.currentState != null) {
+      _replyMessageTextFieldViewKey.currentState!.replyMessage.value =
+          const ReplyMessage();
+    }
+
+    _editMessage = message;
+    _textEditingController.text = message.message;
+    // Place cursor at end.
+    _textEditingController.selection = TextSelection.fromPosition(
+      TextPosition(offset: message.message.length),
+    );
+    FocusScope.of(context).requestFocus(_focusNode);
+
+    if (_editMessageViewKey.currentState == null) {
+      setState(() {});
+    } else {
+      _editMessageViewKey.currentState!.editMessage.value = message;
+    }
+  }
+
+  void _closeEditMode() {
+    if (_editMessage == null) return; // Nothing to close.
+    // Clear the text field when cancelling an edit.
+    _textEditingController.clear();
+    if (_editMessageViewKey.currentState == null) {
+      setState(() {
+        _editMessage = null;
+      });
+    } else {
+      _editMessageViewKey.currentState?.onClose();
+    }
+  }
+
   void assignReplyMessage(Message message) {
     if (currentUser == null) {
       return;
     }
+    // Clear any active edit mode before entering reply mode.
+    _closeEditMode();
+
     FocusScope.of(context).requestFocus(_focusNode);
     _replyMessage = ReplyMessage(
       message: message.message,
@@ -282,6 +362,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     } else {
       _replyMessageTextFieldViewKey.currentState?.onClose();
     }
+    // Also clear edit mode if active.
+    _closeEditMode();
   }
 
   double get _bottomPadding => (!kIsWeb && Platform.isIOS)

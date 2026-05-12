@@ -43,6 +43,7 @@ class ChatView extends StatefulWidget {
     required this.chatController,
     this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.onSendTap,
+    this.onEditTap,
     this.profileCircleConfig,
     this.chatBubbleConfig,
     this.repliedMessageConfig,
@@ -113,6 +114,10 @@ class ChatView extends StatefulWidget {
   /// message, reply message and message type.
   final StringMessageCallBack? onSendTap;
 
+  /// Callback invoked when the user confirms an edit on a message.
+  /// Receives the original [Message] and the updated text.
+  final EditMessageCallback? onEditTap;
+
   /// Provides builder which helps you to make custom text field and functionality.
   final ReplyMessageWithReturnWidget? sendMessageBuilder;
 
@@ -172,6 +177,21 @@ class ChatView extends StatefulWidget {
     );
 
     return state?._sendMessageKey.currentState?.replyMessage;
+  }
+
+  /// Returns the [Message] currently being edited, or `null` if not in edit
+  /// mode. Useful when you manage the chat state outside of [ChatView].
+  static Message? getEditingMessage(BuildContext context) {
+    final state = context.findAncestorStateOfType<_ChatViewState>();
+
+    assert(
+      state != null,
+      'ChatViewState not found. Make sure to use correct context that contains the ChatViewState',
+    );
+
+    return state?._sendMessageKey.currentState?.isEditMode == true
+        ? state?._sendMessageKey.currentState?.editMessage
+        : null;
   }
 
   @override
@@ -298,6 +318,15 @@ class _ChatViewState extends State<ChatView>
                                   assignReplyMessage: (message) =>
                                       _sendMessageKey.currentState
                                           ?.assignReplyMessage(message),
+                                  // Only wire assignEditMessage when the built-in
+                                  // SendMessageWidget is active. When a custom
+                                  // sendMessageBuilder is provided, the caller is
+                                  // responsible for handling edit via
+                                  // ReplyPopupConfiguration.onEditTap instead.
+                                  assignEditMessage: widget.sendMessageBuilder == null
+                                      ? (message) => _sendMessageKey.currentState
+                                          ?.assignEditMessage(message)
+                                      : null,
                                   textFieldConfig:
                                       widget.sendMessageConfig.textFieldConfig,
                                 ),
@@ -317,6 +346,7 @@ class _ChatViewState extends State<ChatView>
                                   _onSendTap(
                                       message, replyMessage, messageType);
                                 },
+                                onEditTap: widget.onEditTap,
                                 messageConfig: widget.messageConfig,
                                 replyMessageBuilder: widget.replyMessageBuilder,
                               ),

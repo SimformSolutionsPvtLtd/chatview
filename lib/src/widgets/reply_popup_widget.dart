@@ -31,6 +31,7 @@ class ReplyPopupWidget extends StatelessWidget {
     required this.onReplyTap,
     required this.onReportTap,
     required this.onMoreTap,
+    this.onEditTap,
     this.buttonTextStyle,
     this.topBorderColor,
   }) : super(key: key);
@@ -49,6 +50,9 @@ class ReplyPopupWidget extends StatelessWidget {
 
   /// Provides call back when user tap on more button.
   final VoidCallback onMoreTap;
+
+  /// Provides call back when user tap on edit button (own messages only).
+  final VoidCallback? onEditTap;
 
   /// Allow user to set text style of button are showed in reply snack bar.
   final TextStyle? buttonTextStyle;
@@ -86,6 +90,17 @@ class ReplyPopupWidget extends StatelessWidget {
                 onTap: onUnsendTap,
                 child: Text(
                   PackageStrings.currentLocale.unsend,
+                  textAlign: TextAlign.center,
+                  style: textStyle,
+                ),
+              ),
+            ),
+          if (sentByCurrentUser && onEditTap != null)
+            Expanded(
+              child: InkWell(
+                onTap: onEditTap,
+                child: Text(
+                  PackageStrings.currentLocale.edit,
                   textAlign: TextAlign.center,
                   style: textStyle,
                 ),

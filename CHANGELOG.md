@@ -1,13 +1,14 @@
 ## [Unreleased]
 
-* **Feat**: ✨Added backgroundImageFit and backgroundImageRepeat to 
-  ChatBackgroundConfiguration for controllable chat wallpaper layout.
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
   `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
 * **Feat**: [434](https://github.com/SimformSolutionsPvtLtd/chatview/pull/434) Add optional
   `boxShadow` to `ChatBubble` and apply it in `TextMessageView` when set.
+* **Feat**: ✨Added backgroundImageFit and backgroundImageRepeat to
+    ChatBackgroundConfiguration for controllable chat wallpaper layout.
+* **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
 
 ## [3.0.0]
 

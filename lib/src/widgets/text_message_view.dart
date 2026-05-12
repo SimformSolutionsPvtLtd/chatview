@@ -73,6 +73,8 @@ class TextMessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final textMessage = message.message;
+    final showTimestamp = featureActiveConfig?.showTimestamp ?? false;
+    final timeText = message.createdAt.getTimeFromDateTime;
     final border = isMessageBySender
         ? outgoingChatBubbleConfig?.border
         : inComingChatBubbleConfig?.border;
@@ -81,6 +83,12 @@ class TextMessageView extends StatelessWidget {
         ? outgoingChatBubbleConfig?.textSelectionConfig
         : inComingChatBubbleConfig?.textSelectionConfig;
     final extractedUrls = textMessage.extractedUrls;
+    final timestampStyle = (textTheme.bodySmall ?? const TextStyle())
+        .copyWith(
+          fontSize: 10,
+          color: isMessageBySender ? Colors.white70 : Colors.black54,
+        )
+        .merge(_messageTimeTextStyle);
     final baseWidget = extractedUrls.isNotEmpty
         ? LinkPreview(
             linkPreviewConfig: _linkPreviewConfig,
@@ -123,12 +131,77 @@ class TextMessageView extends StatelessWidget {
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
           ),
-          child: isSelectable
-              ? CustomSelectionArea(
-                  config: textSelectionConfig,
-                  child: baseWidget,
-                )
-              : baseWidget,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final messageWidget = isSelectable
+                  ? CustomSelectionArea(
+                      config: textSelectionConfig,
+                      child: baseWidget,
+                    )
+                  : baseWidget;
+
+              final canShowInSingleLine = showTimestamp &&
+                  extractedUrls.isEmpty &&
+                  !textMessage.contains('\n') &&
+                  _canRenderTimeInSingleLine(
+                    context: context,
+                    messageText: textMessage,
+                    messageStyle: _textStyle ??
+                        textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ) ??
+                        const TextStyle(fontSize: 16),
+                    timeText: timeText,
+                    timeStyle: timestampStyle,
+                    maxContentWidth: constraints.maxWidth,
+                  );
+
+              if (canShowInSingleLine) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Flexible(child: messageWidget),
+                    const SizedBox(width: 8),
+                    Text(timeText, style: timestampStyle),
+                  ],
+                );
+              }
+
+              if (showTimestamp && extractedUrls.isNotEmpty) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    messageWidget,
+                    const SizedBox(height: 4),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Text(timeText, style: timestampStyle),
+                    ),
+                  ],
+                );
+              }
+
+              if (showTimestamp) {
+                return Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Padding(
+                      // Reserve a little space at the bottom for timestamp,
+                      // without creating a large blank strip on the left.
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: messageWidget,
+                    ),
+                    Text(timeText, style: timestampStyle),
+                  ],
+                );
+              }
+
+              return messageWidget;
+            },
+          ),
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(
@@ -157,6 +230,10 @@ class TextMessageView extends StatelessWidget {
       ? outgoingChatBubbleConfig?.textStyle
       : inComingChatBubbleConfig?.textStyle;
 
+  TextStyle? get _messageTimeTextStyle => isMessageBySender
+      ? outgoingChatBubbleConfig?.messageTimeTextStyle
+      : inComingChatBubbleConfig?.messageTimeTextStyle;
+
   BorderRadiusGeometry _borderRadius(String message) => isMessageBySender
       ? outgoingChatBubbleConfig?.borderRadius ??
           (message.length < 37
@@ -170,4 +247,31 @@ class TextMessageView extends StatelessWidget {
   Color get _color => isMessageBySender
       ? outgoingChatBubbleConfig?.color ?? Colors.purple
       : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
+
+  bool _canRenderTimeInSingleLine({
+    required BuildContext context,
+    required String messageText,
+    required TextStyle messageStyle,
+    required String timeText,
+    required TextStyle? timeStyle,
+    required double maxContentWidth,
+  }) {
+    final textScaler = MediaQuery.textScalerOf(context);
+    final textDirection = Directionality.of(context);
+    final messagePainter = TextPainter(
+      text: TextSpan(text: messageText, style: messageStyle),
+      textDirection: textDirection,
+      maxLines: 1,
+      textScaler: textScaler,
+    )..layout(maxWidth: maxContentWidth);
+
+    final timePainter = TextPainter(
+      text: TextSpan(text: timeText, style: timeStyle),
+      textDirection: textDirection,
+      maxLines: 1,
+      textScaler: textScaler,
+    )..layout(maxWidth: maxContentWidth);
+
+    return messagePainter.width + 8 + timePainter.width <= maxContentWidth;
+  }
 }

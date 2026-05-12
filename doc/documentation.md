@@ -728,6 +728,14 @@ ChatView(
         topLeft: Radius.circular(12),
         bottomLeft: Radius.circular(12),
       ),
+      // Style for the timestamp text.
+      // Applies to both in-bubble timestamps (showTimestamp: true)
+      // and the swipe-to-reveal timestamp (enableSwipeToSeeTime: true).
+      messageTimeTextStyle: const TextStyle(
+        color: Colors.white70,
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+      ),
     ),
     inComingChatBubbleConfig: ChatBubble(
       color: Colors.grey.shade200,
@@ -736,11 +744,30 @@ ChatView(
         topRight: Radius.circular(12),
         bottomRight: Radius.circular(12),
       ),
+      // Style for the timestamp text.
+      // Applies to both in-bubble timestamps (showTimestamp: true)
+      // and the swipe-to-reveal timestamp (enableSwipeToSeeTime: true).
+      messageTimeTextStyle: const TextStyle(
+        color: Colors.black54,
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+      ),
     ),
   ),
   // ...
 )
 ```
+
+Timestamps rendered in bubbles use 12-hour format with AM/PM (for example, `04:32 PM`).
+You can control timestamp typography per bubble side using `ChatBubble.messageTimeTextStyle`.
+
+`ChatBubble.messageTimeTextStyle` applies to **both** timestamp display modes:
+- **In-bubble** (`FeatureActiveConfig.showTimestamp: true`) — text style inside the bubble.
+- **Swipe-to-reveal** (`FeatureActiveConfig.enableSwipeToSeeTime: true`) — per-bubble style for the swipe-out timestamp. When set, this takes priority over the global `MessageListConfiguration.messageTimeTextStyle` fallback.
+
+> **Note:** `showTimestamp` (in-bubble timestamp) and `enableSwipeToSeeTime` (swipe-to-reveal timestamp) are mutually exclusive.
+> Both live in `FeatureActiveConfig`. Setting both to `true` raises an `AssertionError` in debug mode.
+> Use `showTimestamp: true` to display the time inside each bubble, or `enableSwipeToSeeTime: true` to reveal it on swipe — never both.
 
 ## Swipe to Reply Configuration
 
@@ -847,7 +874,10 @@ ChatView(
   // ...
   featureActiveConfig: FeatureActiveConfig(
     enableSwipeToReply: true,         // Enable swipe to reply (default: true)
-    enableSwipeToSeeTime: false,      // Enable swipe to see message time (default: true)
+    // Set to true to reveal message time by swiping the chat bubble.
+    // Mutually exclusive with showTimestamp — setting both true raises
+    // an AssertionError in debug mode.
+    enableSwipeToSeeTime: true,      // Enable swipe to see message time (default: true)
     enablePagination: true,           // Enable pagination (default: false)
     enableOtherUserName: false,       // Show other user's name above bubble (default: true)
     lastSeenAgoBuilderVisibility: false, // Show last seen ago label (default: true)

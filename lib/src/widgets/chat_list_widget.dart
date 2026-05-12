@@ -85,6 +85,17 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   bool get isPaginationEnabled =>
       featureActiveConfig?.enablePagination ?? false;
 
+  /// Returns true when the swipe-to-see-time gesture should be active.
+  ///
+  /// [FeatureActiveConfig.showTimestamp] and [FeatureActiveConfig.enableSwipeToSeeTime]
+  /// are mutually exclusive — the [FeatureActiveConfig] assert already prevents
+  /// both being true simultaneously.
+  bool get _resolveSwipeToSeeTime {
+    final showTimestamp = featureActiveConfig?.showTimestamp ?? false;
+    return !showTimestamp &&
+        (featureActiveConfig?.enableSwipeToSeeTime ?? true);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -110,8 +121,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         loadingWidget: widget.loadingWidget,
         showPopUp: showPopupValue,
         scrollController: scrollController,
-        isEnableSwipeToSeeTime:
-            featureActiveConfig?.enableSwipeToSeeTime ?? true,
+        isEnableSwipeToSeeTime: _resolveSwipeToSeeTime,
         assignReplyMessage: widget.assignReplyMessage,
         onChatListTap: _onChatListTap,
         textFieldConfig: widget.textFieldConfig,

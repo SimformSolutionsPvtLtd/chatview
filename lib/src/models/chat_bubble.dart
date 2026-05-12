@@ -31,6 +31,7 @@ class ChatBubble {
     this.color,
     this.borderRadius,
     this.textStyle,
+    this.messageTimeTextStyle,
     this.padding,
     this.margin,
     this.linkPreviewConfig,
@@ -50,6 +51,15 @@ class ChatBubble {
 
   /// Used for giving text style of chat bubble.
   final TextStyle? textStyle;
+
+  /// Used for giving text style of the message timestamp.
+  ///
+  /// This applies to:
+  /// - In-bubble timestamps when `FeatureActiveConfig.showTimestamp` is `true`.
+  /// - The swipe-to-reveal timestamp when `FeatureActiveConfig.enableSwipeToSeeTime`
+  ///   is `true`. When set, this takes priority over
+  ///   [MessageListConfiguration.messageTimeTextStyle] for individual bubbles.
+  final TextStyle? messageTimeTextStyle;
 
   /// Used for giving padding of chat bubble.
   final EdgeInsetsGeometry? padding;

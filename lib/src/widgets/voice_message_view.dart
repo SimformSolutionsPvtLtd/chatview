@@ -23,14 +23,11 @@
 import 'dart:async';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chat_bubble.dart';
-import '../models/config_models/message_reaction_configuration.dart';
-import '../models/config_models/voice_message_configuration.dart';
-import '../values/enumeration.dart';
+import '../../chatview.dart';
+import '../extensions/extensions.dart';
 import 'reaction_widget.dart';
 
 class VoiceMessageView extends StatefulWidget {
@@ -44,6 +41,7 @@ class VoiceMessageView extends StatefulWidget {
     this.onMaxDuration,
     this.messageReactionConfig,
     this.config,
+    this.featureActiveConfig,
   }) : super(key: key);
 
   /// Provides configuration related to voice message.
@@ -67,6 +65,9 @@ class VoiceMessageView extends StatefulWidget {
 
   /// Provides configuration of chat bubble appearance from current user of chat.
   final ChatBubble? outgoingChatBubbleConfig;
+
+  /// Provides configuration of active features in chat.
+  final FeatureActiveConfig? featureActiveConfig;
 
   @override
   State<VoiceMessageView> createState() => _VoiceMessageViewState();
@@ -118,7 +119,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
         Container(
           decoration: widget.config?.decoration ??
               BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 color: widget.isMessageBySender
                     ? widget.outgoingChatBubbleConfig?.color
                     : widget.inComingChatBubbleConfig?.color,
@@ -171,6 +172,21 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                     const Duration(milliseconds: 500),
                 enableSeekGesture: widget.config?.enableSeekGesture ?? true,
               ),
+              if (widget.featureActiveConfig?.showTimestamp ?? false)
+                Text(
+                  widget.message.createdAt.getTimeFromDateTime,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: widget.isMessageBySender
+                        ? Colors.white70
+                        : Colors.black54,
+                  ).merge(
+                    widget.isMessageBySender
+                        ? widget.outgoingChatBubbleConfig?.messageTimeTextStyle
+                        : widget.inComingChatBubbleConfig?.messageTimeTextStyle,
+                  ),
+                ),
             ],
           ),
         ),

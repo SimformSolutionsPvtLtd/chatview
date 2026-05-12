@@ -9,6 +9,7 @@
 * **Feat**: ✨Added backgroundImageFit and backgroundImageRepeat to
     ChatBackgroundConfiguration for controllable chat wallpaper layout.
 * **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
+* **Feat**: [115](https://github.com/SimformSolutionsPvtLtd/chatview/issues/115) Add customizable timestamp styling for chat bubbles and improve timestamp rendering logic.
 
 ## [3.0.0]
 

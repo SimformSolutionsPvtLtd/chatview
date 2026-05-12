@@ -95,11 +95,20 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
   Widget build(BuildContext context) {
     // Get user from id.
     final messagedUser = chatController?.getUserFromId(widget.message.sentBy);
-    return Stack(
-      children: [
-        if (featureActiveConfig?.enableSwipeToSeeTime ?? true) ...[
+
+    // showTimestamp and enableSwipeToSeeTime are mutually exclusive
+    // (enforced by FeatureActiveConfig's assert). Only one can ever be true.
+    final bool showTimestamp = featureActiveConfig?.showTimestamp ?? false;
+
+    // Use swipe-to-see-time only when in-bubble timestamps are not active.
+    final bool useSwipeToSeeTime =
+        !showTimestamp && (featureActiveConfig?.enableSwipeToSeeTime ?? true);
+
+    if (useSwipeToSeeTime && widget.slideAnimation != null) {
+      return Stack(
+        children: [
           Visibility(
-            visible: widget.slideAnimation?.value.dx == 0.0 ? false : true,
+            visible: widget.slideAnimation!.value.dx != 0.0,
             child: Positioned.fill(
               child: Align(
                 alignment: Alignment.centerRight,
@@ -114,9 +123,15 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
             position: widget.slideAnimation!,
             child: _chatBubbleWidget(messagedUser),
           ),
-        ] else
-          _chatBubbleWidget(messagedUser),
-      ],
+        ],
+      );
+    }
+
+    final slideAnimation =
+        widget.slideAnimation ?? const AlwaysStoppedAnimation(Offset.zero);
+    return SlideTransition(
+      position: slideAnimation,
+      child: _chatBubbleWidget(messagedUser),
     );
   }
 

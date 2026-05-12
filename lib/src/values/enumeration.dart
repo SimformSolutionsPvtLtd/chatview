@@ -149,3 +149,24 @@ extension PlayerModeExtension on PlayerMode {
   /// Checks if the player mode is multi.
   bool get isMulti => this == PlayerMode.multi;
 }
+
+/// Defines built-in display formats for voice message durations.
+enum VoiceDurationFormat {
+  /// Displays as HH:MM:SS (example: 00:01:32).
+  hhmmss,
+
+  /// Displays as MM:SS (example: 01:32).
+  mmss,
+
+  /// Displays as H:MM:SS if hour > 0, otherwise MM:SS.
+  adaptive;
+}
+
+/// Extension methods for [VoiceDurationFormat].
+extension VoiceDurationFormatExtension on VoiceDurationFormat {
+  bool get isHhmmss => this == VoiceDurationFormat.hhmmss;
+
+  bool get isMmss => this == VoiceDurationFormat.mmss;
+
+  bool get isAdaptive => this == VoiceDurationFormat.adaptive;
+}

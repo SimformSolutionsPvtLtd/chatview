@@ -32,6 +32,7 @@ class ReplyPopupConfiguration {
     this.onReplyTap,
     this.onReportTap,
     this.onMoreTap,
+    this.onEditTap,
     this.backgroundColor,
     this.replyPopupBuilder,
   });
@@ -47,6 +48,9 @@ class ReplyPopupConfiguration {
 
   /// Provides callback on onReply button.
   final ValueSetter<Message>? onReplyTap;
+
+  /// Provides callback on edit button (only shown for current user's messages).
+  final ValueSetter<Message>? onEditTap;
 
   /// Provides callback on onReport button.
   final ValueSetter<Message>? onReportTap;

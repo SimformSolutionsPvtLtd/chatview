@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for

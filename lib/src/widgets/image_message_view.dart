@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../models/chat_bubble.dart';
+import '../models/config_models/feature_active_config.dart';
 import '../models/config_models/image_message_configuration.dart';
 import '../models/config_models/message_reaction_configuration.dart';
 import 'reaction_widget.dart';
@@ -44,6 +45,7 @@ class ImageMessageView extends StatelessWidget {
     this.outgoingChatBubbleConfig,
     this.highlightImage = false,
     this.highlightScale = 1.2,
+    this.featureActiveConfig,
   }) : super(key: key);
 
   /// Provides configuration of chat bubble appearance from other user of chat.
@@ -70,6 +72,9 @@ class ImageMessageView extends StatelessWidget {
   /// Provides scale of highlighted image when user taps on replied image.
   final double highlightScale;
 
+  /// Provides configuration of active features in chat.
+  final FeatureActiveConfig? featureActiveConfig;
+
   String get imageUrl => message.message;
 
   Widget get iconButton => ShareIcon(
@@ -80,7 +85,7 @@ class ImageMessageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = imageMessageConfig?.borderRadius ??
-        const BorderRadius.all(Radius.circular(14));
+        const BorderRadius.all(Radius.circular(10));
     final backgroundColor = isMessageBySender
         ? outgoingChatBubbleConfig?.color ?? Colors.purple
         : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
@@ -118,44 +123,79 @@ class ImageMessageView extends StatelessWidget {
                       ),
                   height: imageMessageConfig?.height ?? 200,
                   width: imageMessageConfig?.width ?? 150,
-                  child: ClipRRect(
-                    borderRadius: borderRadius,
-                    child: (() {
-                      if (imageUrl.isUrl) {
-                        return Image.network(
-                          imageUrl,
-                          fit: BoxFit.fitHeight,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: borderRadius,
+                        child: (() {
+                          if (imageUrl.isUrl) {
+                            return Image.network(
+                              imageUrl,
+                              fit: BoxFit.fitHeight,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
                             );
-                          },
-                        );
-                      } else if (imageUrl.fromMemory) {
-                        return Image.memory(
-                          base64Decode(imageUrl
-                              .substring(imageUrl.indexOf('base64') + 7)),
-                          fit: BoxFit.fill,
-                        );
-                      } else {
-                        return kIsWeb
-                            ? Image.network(
-                                imageUrl,
-                                fit: BoxFit.fill,
-                              )
-                            : Image.file(
-                                File(imageUrl),
-                                fit: BoxFit.fill,
-                              );
-                      }
-                    }()),
+                          } else if (imageUrl.fromMemory) {
+                            return Image.memory(
+                              base64Decode(imageUrl
+                                  .substring(imageUrl.indexOf('base64') + 7)),
+                              fit: BoxFit.fill,
+                            );
+                          } else {
+                            return kIsWeb
+                                ? Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.fill,
+                                  )
+                                : Image.file(
+                                    File(imageUrl),
+                                    fit: BoxFit.fill,
+                                  );
+                          }
+                        }()),
+                      ),
+                      if (featureActiveConfig?.showTimestamp ?? false)
+                        Positioned(
+                          right: 8,
+                          bottom: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black45,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              message.createdAt.getTimeFromDateTime,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ).merge(
+                                isMessageBySender
+                                    ? outgoingChatBubbleConfig
+                                        ?.messageTimeTextStyle
+                                    : inComingChatBubbleConfig
+                                        ?.messageTimeTextStyle,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

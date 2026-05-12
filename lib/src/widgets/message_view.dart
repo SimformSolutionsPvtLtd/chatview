@@ -220,6 +220,7 @@ class _MessageViewState extends State<MessageView>
                     outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
                     highlightImage: widget.shouldHighlight,
                     highlightScale: widget.highlightScale,
+                    featureActiveConfig: chatViewIW?.featureActiveConfig,
                   );
                 } else if (widget.message.messageType.isText) {
                   return TextMessageView(
@@ -243,6 +244,7 @@ class _MessageViewState extends State<MessageView>
                     messageReactionConfig: messageConfig?.messageReactionConfig,
                     inComingChatBubbleConfig: widget.inComingChatBubbleConfig,
                     outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+                    featureActiveConfig: chatViewIW?.featureActiveConfig,
                   );
                 } else if (widget.message.messageType.isCustom &&
                     messageConfig?.customMessageBuilder != null) {

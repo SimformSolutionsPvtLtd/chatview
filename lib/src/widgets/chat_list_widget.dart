@@ -23,6 +23,7 @@ import 'dart:io' if (kIsWeb) 'dart:html';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../chatview.dart';
 import '../extensions/extensions.dart';
@@ -73,7 +74,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   List<Message> get messageList => chatController.initialMessageList;
 
-  ScrollController get scrollController => chatController.scrollController;
+  /// Use AutoScrollController instead of regular ScrollController
+  late AutoScrollController autoScrollController;
 
   FeatureActiveConfig? featureActiveConfig;
   ChatUser? currentUser;
@@ -84,6 +86,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   void initState() {
     super.initState();
+    // Initialize AutoScrollController with custom options if needed
+    autoScrollController = AutoScrollController(
+      axis: Axis.vertical,
+      // Copy any existing scroll controller properties if needed
+    );
     _initialize();
   }
 
@@ -97,6 +104,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   }
 
   @override
+  void dispose() {
+    autoScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
       valueListenable: chatViewIW!.showPopUp,
@@ -105,7 +118,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         loadMoreData: widget.loadMoreData,
         loadingWidget: widget.loadingWidget,
         showPopUp: showPopupValue,
-        scrollController: scrollController,
+        scrollController: autoScrollController,
         isEnableSwipeToSeeTime:
             featureActiveConfig?.enableSwipeToSeeTime ?? true,
         assignReplyMessage: widget.assignReplyMessage,
@@ -137,8 +150,39 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       if (!chatController.messageStreamController.isClosed) {
         chatController.messageStreamController.add(messageList);
       }
-      if (messageList.isNotEmpty) chatController.scrollToLastMessage();
+      if (messageList.isNotEmpty) _scrollToLastMessage();
     });
+  }
+
+  /// Scroll to last message using AutoScrollController
+  void _scrollToLastMessage() {
+    if (messageList.isNotEmpty) {
+      // Scroll to the first index (which is the last message due to reverse: true)
+      autoScrollController.scrollToIndex(
+        0,
+        preferPosition: AutoScrollPosition.begin,
+        duration: const Duration(milliseconds: 300),
+      );
+    }
+  }
+
+  /// Public method to scroll to a specific message index
+  Future<void> scrollToIndex(int index, {AutoScrollPosition? preferPosition}) async {
+    await autoScrollController.scrollToIndex(
+      index,
+      preferPosition: preferPosition ?? AutoScrollPosition.begin,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
+
+  /// Scroll to a specific message by its ID
+  Future<void> scrollToMessageById(String messageId) async {
+    final index = messageList.indexWhere((message) => message.id == messageId);
+    if (index != -1) {
+      // Convert to list view index (list is reversed)
+      final listViewIndex = messageList.length - 1 - index;
+      await scrollToIndex(listViewIndex, preferPosition: AutoScrollPosition.middle);
+    }
   }
 
   void _showReplyPopup({

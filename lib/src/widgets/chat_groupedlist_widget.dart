@@ -23,6 +23,7 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/feature_active_config.dart';
@@ -54,7 +55,7 @@ class ChatGroupedListWidget extends StatefulWidget {
   final bool showPopUp;
 
   /// Pass scroll controller
-  final ScrollController scrollController;
+  final AutoScrollController scrollController;
 
   /// Provides callback for assigning reply message when user swipe on chat bubble.
   final ValueSetter<Message> assignReplyMessage;
@@ -214,25 +215,14 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     // The message is in the list but not rendered yet.
     // Scroll slightly repeatedly to ensure it is rendered.
     if (repliedMsgState == null) {
-      // Calculate total scroll extent and visible portion
-      final controllerPosition = widget.scrollController.position;
-
-      // Calculate a target position based on relative index position
-      // This estimates where the message might be in the list
-      final scrollExtent = controllerPosition.maxScrollExtent;
-      final targetPosition = scrollExtent * ((index + 1) / messages.length);
-
-      // Start a bit before the estimated position to avoid overshooting
-      final visibleHeight = controllerPosition.viewportDimension;
-      final scrollPosition = targetPosition - (visibleHeight * 0.85);
-
-      widget.scrollController
-          .animateTo(
-            scrollPosition,
-            curve: Curves.ease,
-            duration: const Duration(milliseconds: 50),
-          )
-          .then((_) => _onReplyTap(id, messages, messageIndex: index));
+      // Use scrollToIndex for more reliable scrolling
+      await widget.scrollController.scrollToIndex(
+        index,
+        preferPosition: AutoScrollPosition.middle,
+        duration: const Duration(milliseconds: 300),
+      );
+      // Try again after scrolling
+      _onReplyTap(id, messages, messageIndex: index);
       return;
     }
 
@@ -348,22 +338,32 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                   // Since the list is reversed, check if it's the last item
                   // to display the loading widget at top.
                   if (_isPrevPageLoading.value && index == itemCount - 1) {
-                    return PaginationLoader(
-                      listenable: _isPrevPageLoading,
-                      loader: widget.loadingWidget,
+                    return AutoScrollTag(
+                      key: ValueKey('loading_$index'),
+                      controller: widget.scrollController,
+                      index: index,
+                      child: PaginationLoader(
+                        listenable: _isPrevPageLoading,
+                        loader: widget.loadingWidget,
+                      ),
                     );
                   }
 
                   /// Check [messageSeparator] contains group separator for [index]
                   if (enableSeparator && messageSeparator.containsKey(index)) {
                     final separator = messageSeparator[index]!;
-                    return chatBackgroundConfig.groupSeparatorBuilder
-                            ?.call(separator.toString()) ??
-                        ChatGroupHeader(
-                          day: separator,
-                          groupSeparatorConfig:
-                              chatBackgroundConfig.defaultGroupSeparatorConfig,
-                        );
+                    return AutoScrollTag(
+                      key: ValueKey('separator_$index'),
+                      controller: widget.scrollController,
+                      index: index,
+                      child: chatBackgroundConfig.groupSeparatorBuilder
+                              ?.call(separator.toString()) ??
+                          ChatGroupHeader(
+                            day: separator,
+                            groupSeparatorConfig:
+                                chatBackgroundConfig.defaultGroupSeparatorConfig,
+                          ),
+                    );
                   }
 
                   /// By removing separators encountered till now from the [index]
@@ -400,8 +400,15 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                     },
                   );
 
+                  final autoScrollChild = AutoScrollTag(
+                    key: ValueKey('message_$index'),
+                    controller: widget.scrollController,
+                    index: index,
+                    child: messageChild,
+                  );
+
                   return index != 0
-                      ? messageChild
+                      ? autoScrollChild
                       // Since the list is reversed, we need to check if
                       // we are at the first item to display the typing indicator
                       // , suggestions and loading widget.
@@ -409,7 +416,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                           loadingWidget: widget.loadingWidget,
                           isNextPageLoading: _isNextPageLoading,
                           typingIndicatorNotifier: typingIndicatorNotifier,
-                          child: messageChild,
+                          child: autoScrollChild,
                         );
                 },
               ),

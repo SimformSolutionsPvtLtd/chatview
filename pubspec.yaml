@@ -28,6 +28,7 @@ dependencies:
   intl: 0.20.2
   url_launcher: 6.3.2
 
+  scroll_to_index: ^3.0.1
 dev_dependencies:
   flutter_lints: 6.0.0
   flutter_test:

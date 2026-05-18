@@ -23,6 +23,7 @@ import 'dart:io' if (kIsWeb) 'dart:html';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../chatview.dart';
 import '../extensions/extensions.dart';
@@ -65,15 +66,17 @@ class ChatListWidget extends StatefulWidget {
   final TextFieldConfiguration? textFieldConfig;
 
   @override
-  State<ChatListWidget> createState() => _ChatListWidgetState();
+  State<ChatListWidget> createState() => ChatListWidgetState();
 }
 
-class _ChatListWidgetState extends State<ChatListWidget> {
+class ChatListWidgetState extends State<ChatListWidget> {
   ChatController get chatController => widget.chatController;
 
   List<Message> get messageList => chatController.initialMessageList;
 
-  ScrollController get scrollController => chatController.scrollController;
+  /// 使用 chatController.scrollController（由外部传入的 AutoScrollController）
+  AutoScrollController get autoScrollController =>
+      chatController.scrollController as AutoScrollController;
 
   FeatureActiveConfig? featureActiveConfig;
   ChatUser? currentUser;
@@ -105,7 +108,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         loadMoreData: widget.loadMoreData,
         loadingWidget: widget.loadingWidget,
         showPopUp: showPopupValue,
-        scrollController: scrollController,
+        scrollController: autoScrollController,
         isEnableSwipeToSeeTime:
             featureActiveConfig?.enableSwipeToSeeTime ?? true,
         assignReplyMessage: widget.assignReplyMessage,
@@ -137,8 +140,41 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       if (!chatController.messageStreamController.isClosed) {
         chatController.messageStreamController.add(messageList);
       }
-      if (messageList.isNotEmpty) chatController.scrollToLastMessage();
+      if (messageList.isNotEmpty) _scrollToLastMessage();
     });
+  }
+
+  /// Scroll to last message using AutoScrollController
+  void _scrollToLastMessage() {
+    if (messageList.isNotEmpty) {
+      // Scroll to the first index (which is the last message due to reverse: true)
+      autoScrollController.scrollToIndex(
+        0,
+        preferPosition: AutoScrollPosition.begin,
+        duration: const Duration(milliseconds: 300),
+      );
+    }
+  }
+
+  /// Public method to scroll to a specific message index
+  Future<void> scrollToIndex(int index,
+      {AutoScrollPosition? preferPosition}) async {
+    await autoScrollController.scrollToIndex(
+      index,
+      preferPosition: preferPosition ?? AutoScrollPosition.begin,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
+
+  /// Scroll to a specific message by its ID
+  Future<void> scrollToMessageById(String messageId) async {
+    final index = messageList.indexWhere((message) => message.id == messageId);
+    if (index != -1) {
+      // Convert to list view index (list is reversed)
+      final listViewIndex = messageList.length - 1 - index;
+      await scrollToIndex(listViewIndex,
+          preferPosition: AutoScrollPosition.middle);
+    }
   }
 
   void _showReplyPopup({

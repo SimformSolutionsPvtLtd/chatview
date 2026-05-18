@@ -27,6 +27,7 @@ import 'package:chatview/src/widgets/chatview_state_widget.dart';
 import 'package:chatview/src/widgets/reaction_popup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../extensions/extensions.dart';
 import '../inherited_widgets/configurations_inherited_widgets.dart';
@@ -174,6 +175,34 @@ class ChatView extends StatefulWidget {
     return state?._sendMessageKey.currentState?.replyMessage;
   }
 
+  /// Static method to scroll to a specific index in the chat list
+  static Future<void> scrollToIndex(
+    BuildContext context,
+    int index, {
+    AutoScrollPosition? preferPosition,
+  }) async {
+    final state = context.findAncestorStateOfType<_ChatViewState>();
+    assert(
+      state != null,
+      'ChatViewState not found. Make sure to use correct context that contains the ChatViewState',
+    );
+    await state?.scrollToIndex(index, preferPosition: preferPosition);
+  }
+
+  /// Static method to scroll to a specific message by its ID
+  static Future<void> scrollToMessageById(
+    BuildContext context,
+    String messageId, {
+    AutoScrollPosition? preferPosition,
+  }) async {
+    final state = context.findAncestorStateOfType<_ChatViewState>();
+    assert(
+      state != null,
+      'ChatViewState not found. Make sure to use correct context that contains the ChatViewState',
+    );
+    await state?.scrollToMessageById(messageId, preferPosition: preferPosition);
+  }
+
   @override
   State<ChatView> createState() => _ChatViewState();
 }
@@ -181,6 +210,7 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<SendMessageWidgetState> _sendMessageKey = GlobalKey();
+  final GlobalKey<ChatListWidgetState> _chatListKey = GlobalKey();
 
   ChatController get chatController => widget.chatController;
 
@@ -287,6 +317,7 @@ class _ChatViewState extends State<ChatView>
                                     ?.unfocus(),
                                 behavior: HitTestBehavior.opaque,
                                 child: ChatListWidget(
+                                  key: _chatListKey,
                                   chatController: widget.chatController,
                                   loadMoreData: widget.loadMoreData,
                                   isLastPage: widget.isLastPage,
@@ -365,6 +396,32 @@ class _ChatViewState extends State<ChatView>
   }
 
   void replyMessageViewClose() => _sendMessageKey.currentState?.onCloseTap();
+
+  /// Scroll to a specific index in the chat list
+  Future<void> scrollToIndex(int index,
+      {AutoScrollPosition? preferPosition}) async {
+    await _chatListKey.currentState?.scrollToIndex(
+      index,
+      preferPosition: preferPosition ?? AutoScrollPosition.begin,
+    );
+  }
+
+  /// Scroll to a specific message by its ID
+  Future<void> scrollToMessageById(
+    String messageId, {
+    AutoScrollPosition? preferPosition,
+  }) async {
+    final messages = chatController.initialMessageList;
+    final index = messages.indexWhere((message) => message.id == messageId);
+    if (index != -1) {
+      // Convert to list view index (list is reversed)
+      final listViewIndex = messages.length - 1 - index;
+      await scrollToIndex(
+        listViewIndex,
+        preferPosition: preferPosition ?? AutoScrollPosition.middle,
+      );
+    }
+  }
 
   @override
   void dispose() {

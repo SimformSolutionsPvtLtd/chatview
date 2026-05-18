@@ -74,8 +74,9 @@ class ChatListWidgetState extends State<ChatListWidget> {
 
   List<Message> get messageList => chatController.initialMessageList;
 
-  /// Use AutoScrollController instead of regular ScrollController
-  late AutoScrollController autoScrollController;
+  /// 使用 chatController.scrollController（由外部传入的 AutoScrollController）
+  AutoScrollController get autoScrollController =>
+      chatController.scrollController as AutoScrollController;
 
   FeatureActiveConfig? featureActiveConfig;
   ChatUser? currentUser;
@@ -86,11 +87,6 @@ class ChatListWidgetState extends State<ChatListWidget> {
   @override
   void initState() {
     super.initState();
-    // Initialize AutoScrollController with custom options if needed
-    autoScrollController = AutoScrollController(
-      axis: Axis.vertical,
-      // Copy any existing scroll controller properties if needed
-    );
     _initialize();
   }
 
@@ -101,12 +97,6 @@ class ChatListWidgetState extends State<ChatListWidget> {
       featureActiveConfig = chatViewIW!.featureActiveConfig;
       currentUser = chatViewIW!.chatController.currentUser;
     }
-  }
-
-  @override
-  void dispose() {
-    autoScrollController.dispose();
-    super.dispose();
   }
 
   @override

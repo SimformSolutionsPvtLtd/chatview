@@ -66,10 +66,10 @@ class ChatListWidget extends StatefulWidget {
   final TextFieldConfiguration? textFieldConfig;
 
   @override
-  State<ChatListWidget> createState() => _ChatListWidgetState();
+  State<ChatListWidget> createState() => ChatListWidgetState();
 }
 
-class _ChatListWidgetState extends State<ChatListWidget> {
+class ChatListWidgetState extends State<ChatListWidget> {
   ChatController get chatController => widget.chatController;
 
   List<Message> get messageList => chatController.initialMessageList;
@@ -167,7 +167,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   }
 
   /// Public method to scroll to a specific message index
-  Future<void> scrollToIndex(int index, {AutoScrollPosition? preferPosition}) async {
+  Future<void> scrollToIndex(int index,
+      {AutoScrollPosition? preferPosition}) async {
     await autoScrollController.scrollToIndex(
       index,
       preferPosition: preferPosition ?? AutoScrollPosition.begin,
@@ -181,7 +182,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     if (index != -1) {
       // Convert to list view index (list is reversed)
       final listViewIndex = messageList.length - 1 - index;
-      await scrollToIndex(listViewIndex, preferPosition: AutoScrollPosition.middle);
+      await scrollToIndex(listViewIndex,
+          preferPosition: AutoScrollPosition.middle);
     }
   }
 

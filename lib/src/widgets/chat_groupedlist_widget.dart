@@ -360,8 +360,8 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                               ?.call(separator.toString()) ??
                           ChatGroupHeader(
                             day: separator,
-                            groupSeparatorConfig:
-                                chatBackgroundConfig.defaultGroupSeparatorConfig,
+                            groupSeparatorConfig: chatBackgroundConfig
+                                .defaultGroupSeparatorConfig,
                           ),
                     );
                   }

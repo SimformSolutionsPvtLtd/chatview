@@ -766,6 +766,13 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               receiptsWidgetConfig: ReceiptsWidgetConfig(
                 showReceiptsIn: ShowReceiptsIn.lastMessage,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x40000000),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
             inComingChatBubbleConfig: ChatBubble(
               linkPreviewConfig: LinkPreviewConfiguration(

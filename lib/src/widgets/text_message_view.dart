@@ -40,6 +40,7 @@ class TextMessageView extends StatelessWidget {
     this.highlightMessage = false,
     this.highlightColor,
     this.featureActiveConfig,
+    this.httpHeaders,
   }) : super(key: key);
 
   /// Represents current message is sent by current user.
@@ -68,6 +69,9 @@ class TextMessageView extends StatelessWidget {
 
   /// Provides configuration of active features in chat.
   final FeatureActiveConfig? featureActiveConfig;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +137,7 @@ class TextMessageView extends StatelessWidget {
             isMessageBySender: isMessageBySender,
             reaction: message.reaction,
             messageReactionConfig: messageReactionConfig,
+            httpHeaders: httpHeaders,
           ),
       ],
     );

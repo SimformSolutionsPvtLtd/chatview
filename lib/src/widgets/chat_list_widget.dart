@@ -39,6 +39,7 @@ class ChatListWidget extends StatefulWidget {
     this.isLastPage,
     this.onChatListTap,
     this.textFieldConfig,
+    this.httpHeaders,
   }) : super(key: key);
 
   /// Provides controller for accessing few function for running chat.
@@ -63,6 +64,9 @@ class ChatListWidget extends StatefulWidget {
 
   /// Provides configuration for text field config.
   final TextFieldConfiguration? textFieldConfig;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<ChatListWidget> createState() => _ChatListWidgetState();
@@ -111,6 +115,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         assignReplyMessage: widget.assignReplyMessage,
         onChatListTap: _onChatListTap,
         textFieldConfig: widget.textFieldConfig,
+        httpHeaders: widget.httpHeaders,
         onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
           if (featureActiveConfig?.enableReactionPopup ?? false) {
             chatViewIW

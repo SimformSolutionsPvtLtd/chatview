@@ -51,6 +51,7 @@ class MessageView extends StatefulWidget {
     this.messageConfig,
     this.onMaxDuration,
     this.controller,
+    this.httpHeaders,
   }) : super(key: key);
 
   /// Provides message instance of chat.
@@ -96,6 +97,9 @@ class MessageView extends StatefulWidget {
   final ChatController? controller;
 
   final ValueSetter<int>? onMaxDuration;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<MessageView> createState() => _MessageViewState();
@@ -207,6 +211,7 @@ class _MessageViewState extends State<MessageView>
                           messageReactionConfig:
                               messageConfig?.messageReactionConfig,
                           isMessageBySender: widget.isMessageBySender,
+                          httpHeaders: widget.httpHeaders,
                         ),
                     ],
                   );
@@ -220,6 +225,7 @@ class _MessageViewState extends State<MessageView>
                     outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
                     highlightImage: widget.shouldHighlight,
                     highlightScale: widget.highlightScale,
+                    httpHeaders: widget.httpHeaders,
                   );
                 } else if (widget.message.messageType.isText) {
                   return TextMessageView(
@@ -232,6 +238,7 @@ class _MessageViewState extends State<MessageView>
                     highlightColor: widget.highlightColor,
                     highlightMessage: widget.shouldHighlight,
                     featureActiveConfig: chatViewIW?.featureActiveConfig,
+                    httpHeaders: widget.httpHeaders,
                   );
                 } else if (widget.message.messageType.isVoice) {
                   return VoiceMessageView(
@@ -243,6 +250,7 @@ class _MessageViewState extends State<MessageView>
                     messageReactionConfig: messageConfig?.messageReactionConfig,
                     inComingChatBubbleConfig: widget.inComingChatBubbleConfig,
                     outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+                    httpHeaders: widget.httpHeaders,
                   );
                 } else if (widget.message.messageType.isCustom &&
                     messageConfig?.customMessageBuilder != null) {
@@ -260,6 +268,7 @@ class _MessageViewState extends State<MessageView>
                                 messageReactionConfig:
                                     messageConfig?.messageReactionConfig,
                                 isMessageBySender: widget.isMessageBySender,
+                                httpHeaders: widget.httpHeaders,
                               ),
                           ],
                         )

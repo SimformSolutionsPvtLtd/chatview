@@ -48,6 +48,7 @@ class ChatGroupedListWidget extends StatefulWidget {
     this.loadMoreData,
     this.isLastPage,
     this.loadingWidget,
+    this.httpHeaders,
   }) : super(key: key);
 
   /// Allow user to swipe to see time while reaction pop is not open.
@@ -81,6 +82,9 @@ class ChatGroupedListWidget extends StatefulWidget {
 
   /// Provides widget for loading view while pagination is enabled.
   final Widget? loadingWidget;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<ChatGroupedListWidget> createState() => _ChatGroupedListWidgetState();
@@ -396,6 +400,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                         onReplyTap: enableScrollToRepliedMsg
                             ? (id) => _onReplyTap(id, messages)
                             : null,
+                        httpHeaders: widget.httpHeaders,
                       );
                     },
                   );
@@ -409,6 +414,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                           loadingWidget: widget.loadingWidget,
                           isNextPageLoading: _isNextPageLoading,
                           typingIndicatorNotifier: typingIndicatorNotifier,
+                          httpHeaders: widget.httpHeaders,
                           child: messageChild,
                         );
                 },

@@ -33,6 +33,7 @@ class ReactionWidget extends StatefulWidget {
     required this.reaction,
     this.messageReactionConfig,
     required this.isMessageBySender,
+    this.httpHeaders,
   });
 
   /// Provides reaction instance of message.
@@ -43,6 +44,9 @@ class ReactionWidget extends StatefulWidget {
 
   /// Represents current message is sent by current user.
   final bool isMessageBySender;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<ReactionWidget> createState() => _ReactionWidgetState();
@@ -79,6 +83,7 @@ class _ReactionWidgetState extends State<ReactionWidget> {
                 chatController: chatController!,
                 reactionsBottomSheetConfig:
                     messageReactionConfig?.reactionsBottomSheetConfig,
+                httpHeaders: widget.httpHeaders,
               )
             : null,
         child: MeasureSize(
@@ -123,6 +128,7 @@ class _ReactionWidgetState extends State<ReactionWidget> {
                             messageReactionConfig?.profileCirclePadding,
                         profileCircleRadius:
                             messageReactionConfig?.profileCircleRadius,
+                        httpHeaders: widget.httpHeaders,
                       ),
                     ),
                   if (widget.reaction.reactedUserIds.length > 3 &&

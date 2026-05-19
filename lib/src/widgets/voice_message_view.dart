@@ -42,6 +42,7 @@ class VoiceMessageView extends StatefulWidget {
     this.messageReactionConfig,
     this.config,
     this.featureActiveConfig,
+    this.httpHeaders,
   });
 
   /// Provides configuration related to voice message.
@@ -68,6 +69,9 @@ class VoiceMessageView extends StatefulWidget {
 
   /// Provides configuration of active features in chat.
   final FeatureActiveConfig? featureActiveConfig;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<VoiceMessageView> createState() => _VoiceMessageViewState();
@@ -243,6 +247,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
             isMessageBySender: widget.isMessageBySender,
             reaction: widget.message.reaction,
             messageReactionConfig: widget.messageReactionConfig,
+            httpHeaders: widget.httpHeaders,
           ),
       ],
     );

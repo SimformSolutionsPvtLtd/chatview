@@ -34,6 +34,7 @@ class TypingIndicator extends StatefulWidget {
     required this.typeIndicatorConfig,
     this.showIndicator = false,
     this.chatBubbleConfig,
+    this.httpHeaders,
     super.key,
   });
 
@@ -46,6 +47,9 @@ class TypingIndicator extends StatefulWidget {
 
   /// Provides configurations related to typing indicator appearance.
   final TypeIndicatorConfiguration typeIndicatorConfig;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -200,6 +204,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
             showProfileCircle: false,
             animation: _largeBubbleAnimation,
             profileConfig: profileCircleConfiguration,
+            httpHeaders: widget.httpHeaders,
             bubble: widget.typeIndicatorConfig.customIndicator!,
           ),
         ),
@@ -222,6 +227,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
             child: UserTypingBuilder(
               animation: _largeBubbleAnimation,
               profileConfig: profileCircleConfiguration,
+              httpHeaders: widget.httpHeaders,
               bubble: TypingDotsBubble(
                 dotIntervals: _dotIntervals,
                 jumpAnimations: _jumpAnimations,

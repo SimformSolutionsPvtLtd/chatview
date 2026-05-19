@@ -10,6 +10,7 @@ class UserTypingBuilder extends StatelessWidget {
     required this.bubble,
     this.showProfileCircle = true,
     this.profileConfig,
+    this.httpHeaders,
     super.key,
   });
 
@@ -17,6 +18,9 @@ class UserTypingBuilder extends StatelessWidget {
   final Animation<double> animation;
   final ProfileCircleConfiguration? profileConfig;
   final bool showProfileCircle;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +41,7 @@ class UserTypingBuilder extends StatelessWidget {
                   profileCirclePadding: EdgeInsets.zero,
                   imageUrl: profileConfig?.profileImageUrl,
                   imageType: profileConfig?.imageType,
+                  httpHeaders: httpHeaders,
                   assetImageErrorBuilder: profileConfig?.assetImageErrorBuilder,
                   networkImageErrorBuilder:
                       profileConfig?.networkImageErrorBuilder,

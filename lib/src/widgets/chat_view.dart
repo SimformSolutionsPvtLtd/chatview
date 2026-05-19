@@ -179,21 +179,6 @@ class ChatView extends StatefulWidget {
     return state?._sendMessageKey.currentState?.replyMessage;
   }
 
-  /// Returns the [Message] currently being edited, or `null` if not in edit
-  /// mode. Useful when you manage the chat state outside of [ChatView].
-  static Message? getEditingMessage(BuildContext context) {
-    final state = context.findAncestorStateOfType<_ChatViewState>();
-
-    assert(
-      state != null,
-      'ChatViewState not found. Make sure to use correct context that contains the ChatViewState',
-    );
-
-    return state?._sendMessageKey.currentState?.isEditMode == true
-        ? state?._sendMessageKey.currentState?.editMessage
-        : null;
-  }
-
   @override
   State<ChatView> createState() => _ChatViewState();
 }
@@ -323,10 +308,12 @@ class _ChatViewState extends State<ChatView>
                                   // sendMessageBuilder is provided, the caller is
                                   // responsible for handling edit via
                                   // ReplyPopupConfiguration.onEditTap instead.
-                                  assignEditMessage: widget.sendMessageBuilder == null
-                                      ? (message) => _sendMessageKey.currentState
-                                          ?.assignEditMessage(message)
-                                      : null,
+                                  assignEditMessage:
+                                      widget.sendMessageBuilder == null
+                                          ? (message) => _sendMessageKey
+                                              .currentState
+                                              ?.assignEditMessage(message)
+                                          : null,
                                   textFieldConfig:
                                       widget.sendMessageConfig.textFieldConfig,
                                 ),

@@ -39,6 +39,7 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 - Custom message types
 - Typing indicators
 - Reply suggestions
+- Edit Message
 - Message status indicators (sent, delivered, read)
 - Highly customizable UI components
 - Plug-and-play backend support using [chatview_connect][chatViewConnect]

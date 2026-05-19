@@ -75,6 +75,37 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
   bool get isLastMessage =>
       chatController?.initialMessageList.last.id == widget.message.id;
 
+  List<Message> get _orderedMessages =>
+      chatController?.initialMessageList ?? const [];
+
+  int get _messageIndex =>
+      _orderedMessages.indexWhere((m) => m.id == widget.message.id);
+
+  bool get _groupingEnabled =>
+      featureActiveConfig?.enableConsecutiveMessageGrouping ?? false;
+
+  bool get isFirstInGroup {
+    if (!_groupingEnabled) return true;
+    final i = _messageIndex;
+    if (i <= 0) return true;
+    return !_sameGroup(_orderedMessages[i - 1]);
+  }
+
+  bool get isLastInGroup {
+    if (!_groupingEnabled) return true;
+    final i = _messageIndex;
+    if (i < 0 || i + 1 >= _orderedMessages.length) return true;
+    return !_sameGroup(_orderedMessages[i + 1]);
+  }
+
+  bool _sameGroup(Message? other) {
+    if (other == null) return false;
+    if (other.sentBy != widget.message.sentBy) return false;
+    final a = widget.message.createdAt;
+    final b = other.createdAt;
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
   FeatureActiveConfig? featureActiveConfig;
   ChatController? chatController;
   ChatUser? currentUser;
@@ -123,7 +154,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     final chatBubbleConfig = chatListConfig.chatBubbleConfig;
     return Container(
       padding: chatBubbleConfig?.padding ?? const EdgeInsets.only(left: 5.0),
-      margin: chatBubbleConfig?.margin ?? const EdgeInsets.only(bottom: 10),
+      margin: chatBubbleConfig?.margin ??
+          EdgeInsets.only(bottom: isLastInGroup ? 10 : 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment:
@@ -132,14 +164,20 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
         children: [
           if (!isMessageBySender &&
               (featureActiveConfig?.enableOtherUserProfileAvatar ?? true))
-            profileCircle(messagedUser),
+            Opacity(
+              opacity: isLastInGroup ? 1 : 0,
+              child: profileCircle(messagedUser),
+            ),
           Expanded(
             child: _messagesWidgetColumn(messagedUser),
           ),
           if (isMessageBySender) ...[getReceipt()],
           if (isMessageBySender &&
               (featureActiveConfig?.enableCurrentUserProfileAvatar ?? true))
-            profileCircle(messagedUser),
+            Opacity(
+              opacity: isLastInGroup ? 1 : 0,
+              child: profileCircle(messagedUser),
+            ),
         ],
       ),
     );
@@ -251,7 +289,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
       children: [
         if ((chatController?.otherUsers.isNotEmpty ?? false) &&
             !isMessageBySender &&
-            (featureActiveConfig?.enableOtherUserName ?? true))
+            (featureActiveConfig?.enableOtherUserName ?? true) &&
+            isFirstInGroup)
           Padding(
             padding: chatListConfig
                     .chatBubbleConfig?.inComingChatBubbleConfig?.padding ??

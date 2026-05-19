@@ -426,6 +426,8 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
     return Scaffold(
       body: SafeArea(
         child: ChatView(
+          onEditTap: (message, updatedMessage) => _chatController.updateMessage(
+              messageId: message.id, newMessage: updatedMessage),
           chatController: _chatController,
           onSendTap: _onSendTap,
           isLastPage: () => _isTopPaginationCalled && _isBottomPaginationCalled,
@@ -495,6 +497,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
             enableScrollToBottomButton: true,
             enableOtherUserProfileAvatar: true,
             enablePagination: true,
+            enableMessageEditing: true,
           ),
           scrollToBottomButtonConfig: const ScrollToBottomButtonConfig(
             padding: EdgeInsets.only(bottom: 8, right: 12),

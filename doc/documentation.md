@@ -869,43 +869,29 @@ ChatView supports editing previously sent text messages, similar to WhatsApp and
 2. Tap **Edit** in the reply pop-up.
 3. The original text is pre-filled into the input field with an *Editing* indicator above it.
 4. Modify the text and press Send.
-5. Your `onEditTap` callback is called with the **original `Message`** and the **new text**.
-6. Messages that have been edited display a subtle *Edited* label below the bubble.
+5. Your `onEditTap` callback is called with the **original `Message`** (`oldMessage`) and the **updated `Message`** (`newMessage`).
+6. Messages that have been edited display a subtle _Edited_ label below the bubble.
 
 ### Basic Integration
 
 ```dart
 ChatView(
   // ...
-  onEditTap: (Message originalMessage, String newText) {
-    // Update the message in your data source / backend.
-    // Set `updateAt` on the message to trigger the "Edited" label in the UI.
-    final updatedMessage = Message(
-      id: originalMessage.id,
-      message: newText,
-      createdAt: originalMessage.createdAt,
-      sentBy: originalMessage.sentBy,
-      updateAt: DateTime.now(), // marks the message as edited
-      replyMessage: originalMessage.replyMessage,
-      messageType: originalMessage.messageType,
-    );
-
-    chatController.updateMessage(updatedMessage); // depends on your controller API
-  },
-  replyPopupConfig: ReplyPopupConfiguration(
-    // Optional: react to the edit tap in the popup before the editing UI opens.
-    onEditTap: (message) => debugPrint('Editing: ${message.id}'),
-  ),
+  // updatedMessage is a copy of oldMessage with the new text already applied.
+  // You have access to both objects so you can do further transformations —
+  // for example, update the timestamp, change the message type, or sync with a backend.
+  onEditTap: (message, updatedMessage) => 
+    _chatController.updateMessage(messageId: message.id, newMessage: updatedMessage),
   // ...
 )
 ```
 
-### Disabling the Feature
+### Enabeling the Feature
 
 ```dart
 ChatView(
   featureActiveConfig: const FeatureActiveConfig(
-    enableEditMessage: false, // hides the Edit button entirely
+    enableEditMessage: true,
   ),
 )
 ```

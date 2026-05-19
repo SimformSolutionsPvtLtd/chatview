@@ -54,7 +54,7 @@ class SendMessageWidget extends StatefulWidget {
   final SendMessageConfiguration sendMessageConfig;
 
   /// Callback invoked when the user confirms an edit.
-  /// Receives the original [Message] and the updated text.
+  /// Receives the original [Message] and the updated [Message] with new content.
   final EditMessageCallback? onEditTap;
 
   /// Allow user to set custom text field.
@@ -85,13 +85,13 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   ReplyMessage _replyMessage = const ReplyMessage();
 
   /// The message currently being edited, or `null` if not in edit mode.
-  Message? _editMessage;
+  Message? _currentlyEditingMessage;
 
   /// Whether the text field is currently in edit mode.
-  bool get isEditMode => _editMessage != null;
+  bool get isEditMode => _currentlyEditingMessage != null;
 
   /// Public read-only access to the message currently being edited.
-  Message? get editMessage => _editMessage;
+  Message? get currentlyEditingMessage => _currentlyEditingMessage;
 
   ReplyMessage get replyMessage => _replyMessage;
 
@@ -188,10 +188,11 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 onChange: (value) {
                                   // When the user cancels via the X button
                                   // on EditMessageView, clear the text field.
-                                  if (value == null && _editMessage != null) {
+                                  if (value == null &&
+                                      _currentlyEditingMessage != null) {
                                     _textEditingController.clear();
                                   }
-                                  _editMessage = value;
+                                  _currentlyEditingMessage = value;
                                 },
                               ),
                               if (widget
@@ -270,7 +271,10 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       // Only confirm the edit if a handler is registered; otherwise keep edit
       // mode active so the user's text is not silently discarded.
       if (widget.onEditTap == null) return;
-      widget.onEditTap!.call(_editMessage!, messageText);
+      widget.onEditTap!.call(
+        _currentlyEditingMessage!,
+        _currentlyEditingMessage!.copyWith(message: messageText),
+      );
       _closeEditMode();
       return;
     }
@@ -301,7 +305,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
           const ReplyMessage();
     }
 
-    _editMessage = message;
+    _currentlyEditingMessage = message;
     _textEditingController.text = message.message;
     // Place cursor at end.
     _textEditingController.selection = TextSelection.fromPosition(
@@ -317,12 +321,12 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   }
 
   void _closeEditMode() {
-    if (_editMessage == null) return; // Nothing to close.
+    if (_currentlyEditingMessage == null) return; // Nothing to close.
     // Clear the text field when cancelling an edit.
     _textEditingController.clear();
     if (_editMessageViewKey.currentState == null) {
       setState(() {
-        _editMessage = null;
+        _currentlyEditingMessage = null;
       });
     } else {
       _editMessageViewKey.currentState?.onClose();

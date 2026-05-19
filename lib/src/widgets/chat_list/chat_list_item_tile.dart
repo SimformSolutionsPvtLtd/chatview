@@ -34,6 +34,7 @@ class ChatListItemTile extends StatelessWidget {
   const ChatListItemTile({
     required this.chat,
     required this.config,
+    this.httpHeaders,
     super.key,
   });
 
@@ -42,6 +43,9 @@ class ChatListItemTile extends StatelessWidget {
 
   /// Provides configuration for the user widget in chat list.
   final ListTileConfig config;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +78,7 @@ class ChatListItemTile extends StatelessWidget {
             config.userAvatarConfig.avatarBuilder?.call(chat) ??
                 UserAvatarView(
                   imageUrl: chat.imageUrl ?? '',
+                  httpHeaders: httpHeaders,
                   activeStatus: chat.userActiveStatus,
                   onTap: () => config.userAvatarConfig.onProfileTap?.call(chat),
                   config: config.userAvatarConfig,

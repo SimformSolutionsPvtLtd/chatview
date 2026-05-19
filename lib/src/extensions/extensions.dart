@@ -136,6 +136,7 @@ extension ValidateString on String {
     required ChatUser? Function(String) getChatUser,
     double? profileCircleRadius,
     EdgeInsets? profileCirclePadding,
+    Map<String, String>? httpHeaders,
   }) {
     final user = getChatUser(this);
     return Padding(
@@ -143,6 +144,7 @@ extension ValidateString on String {
       child: ProfileImageWidget(
         imageUrl: user?.profilePhoto,
         imageType: user?.imageType,
+        httpHeaders: httpHeaders,
         defaultAvatarImage: user?.defaultAvatarImage ?? Constants.profileImage,
         circleRadius: profileCircleRadius ?? 8,
         assetImageErrorBuilder: user?.assetImageErrorBuilder,

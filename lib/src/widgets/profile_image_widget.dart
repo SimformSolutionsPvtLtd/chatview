@@ -35,6 +35,7 @@ class ProfileImageWidget extends StatelessWidget {
     this.assetImageErrorBuilder,
     this.networkImageErrorBuilder,
     this.imageType = ImageType.network,
+    this.httpHeaders,
     required this.networkImageProgressIndicatorBuilder,
   });
 
@@ -46,6 +47,9 @@ class ProfileImageWidget extends StatelessWidget {
 
   /// Flag to check whether image is network or asset
   final ImageType? imageType;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   /// Field to set default avatar image if profile image link not provided
   final String defaultAvatarImage;
@@ -76,6 +80,7 @@ class ProfileImageWidget extends StatelessWidget {
         ImageType.network when (imageUrl?.isNotEmpty ?? false) =>
           CachedNetworkImage(
             imageUrl: imageUrl ?? defaultAvatarImage,
+            httpHeaders: httpHeaders,
             height: radius,
             width: radius,
             fit: BoxFit.cover,

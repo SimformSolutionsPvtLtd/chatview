@@ -43,6 +43,7 @@ class ChatBubbleWidget extends StatefulWidget {
     required this.onSwipe,
     this.onReplyTap,
     this.shouldHighlight = false,
+    this.httpHeaders,
   }) : super(key: key);
 
   /// Represent current instance of message.
@@ -62,6 +63,9 @@ class ChatBubbleWidget extends StatefulWidget {
 
   /// Flag for when user tap on replied message and highlight actual message.
   final bool shouldHighlight;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<ChatBubbleWidget> createState() => _ChatBubbleWidgetState();
@@ -154,6 +158,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
       profileCirclePadding: profileCircleConfig?.padding,
       imageUrl: messagedUser?.profilePhoto,
       imageType: messagedUser?.imageType,
+      httpHeaders: widget.httpHeaders,
       defaultAvatarImage:
           messagedUser?.defaultAvatarImage ?? Constants.profileImage,
       networkImageProgressIndicatorBuilder:
@@ -287,6 +292,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
             message: widget.message,
             isMessageBySender: isMessageBySender,
             messageConfig: chatListConfig.messageConfig,
+            httpHeaders: widget.httpHeaders,
             onLongPress: widget.onLongPress,
             chatBubbleMaxWidth: chatListConfig.chatBubbleConfig?.maxWidth,
             longPressAnimationDuration:

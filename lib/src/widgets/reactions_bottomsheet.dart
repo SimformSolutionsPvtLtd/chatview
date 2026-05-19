@@ -38,6 +38,9 @@ class ReactionsBottomSheet {
 
     /// Provides configuration of reaction bottom sheet appearance.
     required ReactionsBottomSheetConfiguration? reactionsBottomSheetConfig,
+
+    /// Optional HTTP headers used for querying images.
+    Map<String, String>? httpHeaders,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -93,6 +96,7 @@ class ReactionsBottomSheet {
                                 16,
                         imageUrl: reactedUser.profilePhoto,
                         imageType: reactedUser.imageType,
+                        httpHeaders: httpHeaders,
                         defaultAvatarImage: reactedUser.defaultAvatarImage,
                         assetImageErrorBuilder:
                             reactedUser.assetImageErrorBuilder,

@@ -65,6 +65,7 @@ class ChatView extends StatefulWidget {
     this.replyMessageBuilder,
     this.replySuggestionsConfig,
     this.scrollToBottomButtonConfig,
+    this.httpHeaders,
   })  : chatBackgroundConfig =
             chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
         chatViewStateConfig =
@@ -151,6 +152,9 @@ class ChatView extends StatefulWidget {
 
   /// Provides a configuration for scroll to bottom button config
   final ScrollToBottomButtonConfig? scrollToBottomButtonConfig;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   static void closeReplyMessageView(BuildContext context) {
     final state = context.findAncestorStateOfType<_ChatViewState>();
@@ -297,6 +301,7 @@ class _ChatViewState extends State<ChatView>
                                           ?.assignReplyMessage(message),
                                   textFieldConfig:
                                       widget.sendMessageConfig.textFieldConfig,
+                                  httpHeaders: widget.httpHeaders,
                                 ),
                               ),
                             if (featureActiveConfig.enableTextField)

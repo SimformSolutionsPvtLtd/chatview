@@ -47,6 +47,7 @@ class ChatViewAppBar extends StatelessWidget {
     this.assetImageErrorBuilder,
     this.networkImageErrorBuilder,
     this.imageType = ImageType.network,
+    this.httpHeaders,
     this.networkImageProgressIndicatorBuilder,
   }) : super(key: key);
 
@@ -101,6 +102,9 @@ class ChatViewAppBar extends StatelessWidget {
   /// Field to define image type [network, asset or base64]
   final ImageType imageType;
 
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
+
   /// Progress indicator builder for network image
   final NetworkImageProgressIndicatorBuilder?
       networkImageProgressIndicatorBuilder;
@@ -137,6 +141,7 @@ class ChatViewAppBar extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 8.0),
                       child: ProfileImageWidget(
                         imageUrl: profilePicture,
+                        httpHeaders: httpHeaders,
                         defaultAvatarImage: defaultAvatarImage,
                         assetImageErrorBuilder: assetImageErrorBuilder,
                         networkImageErrorBuilder: networkImageErrorBuilder,

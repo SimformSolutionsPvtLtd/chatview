@@ -12,6 +12,7 @@ class EndMessageFooter extends StatefulWidget {
     required this.isNextPageLoading,
     this.loadingWidget,
     this.typingIndicatorNotifier,
+    this.httpHeaders,
     super.key,
   });
 
@@ -19,6 +20,9 @@ class EndMessageFooter extends StatefulWidget {
   final Widget? loadingWidget;
   final ValueListenable<bool>? typingIndicatorNotifier;
   final ValueNotifier<bool> isNextPageLoading;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   @override
   State<EndMessageFooter> createState() => _EndMessageFooterState();
@@ -41,6 +45,7 @@ class _EndMessageFooterState extends State<EndMessageFooter>
               chatBubbleConfig:
                   chatListConfig.chatBubbleConfig?.inComingChatBubbleConfig,
               showIndicator: showIndicator,
+              httpHeaders: widget.httpHeaders,
             ),
           ),
         const SuggestionList(),

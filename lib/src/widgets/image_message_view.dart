@@ -44,6 +44,7 @@ class ImageMessageView extends StatelessWidget {
     this.outgoingChatBubbleConfig,
     this.highlightImage = false,
     this.highlightScale = 1.2,
+    this.httpHeaders,
   }) : super(key: key);
 
   /// Provides configuration of chat bubble appearance from other user of chat.
@@ -69,6 +70,9 @@ class ImageMessageView extends StatelessWidget {
 
   /// Provides scale of highlighted image when user taps on replied image.
   final double highlightScale;
+
+  /// Optional HTTP headers used for querying images.
+  final Map<String, String>? httpHeaders;
 
   String get imageUrl => message.message;
 
@@ -165,6 +169,7 @@ class ImageMessageView extends StatelessWidget {
                 isMessageBySender: isMessageBySender,
                 reaction: message.reaction,
                 messageReactionConfig: messageReactionConfig,
+                httpHeaders: httpHeaders,
               ),
           ],
         ),

@@ -381,10 +381,30 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                               ?.repliedMsgAutoScrollConfig
                               .enableScrollToRepliedMsg ??
                           false;
+
+                      // Grouping is computed here in O(1) by checking only the
+                      // two adjacent entries in the already-built messages list,
+                      // rather than inside each bubble
+                      //
+                      // isFirstInGroup → show sender name at the visual top of the run
+                      // isLastInGroup  → show avatar + larger margin at the visual
+                      // bottom of the run.
+                      final groupingEnabled = featureActiveConfig
+                              ?.enableConsecutiveMessageGrouping ??
+                          false;
+                      final isFirstInGroup = !groupingEnabled ||
+                          newIndex + 1 >= messages.length ||
+                          !_sameGroup(message, messages[newIndex + 1]);
+                      final isLastInGroup = !groupingEnabled ||
+                          newIndex - 1 < 0 ||
+                          !_sameGroup(message, messages[newIndex - 1]);
+
                       return ChatBubbleWidget(
                         key: messageKey,
                         message: message,
                         slideAnimation: _slideAnimation,
+                        isFirstInGroup: isFirstInGroup,
+                        isLastInGroup: isLastInGroup,
                         onLongPress: (yCoordinate, xCoordinate) =>
                             widget.onChatBubbleLongPress(
                           yCoordinate,
@@ -429,6 +449,17 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     return chatBackgroundConfig.groupedListOrder.isAsc
         ? elements.toList()
         : elements.reversed.toList();
+  }
+
+  /// Returns `true` when [a] and [b] belong to the same consecutive sender
+  /// group, i.e. they share the same [Message.sentBy] value and were sent on
+  /// the same calendar day. Used to compute [ChatBubbleWidget.isFirstInGroup]
+  /// and [ChatBubbleWidget.isLastInGroup] in O(1) at the list-item level.
+  static bool _sameGroup(Message a, Message b) {
+    if (a.sentBy != b.sentBy) return false;
+    return a.createdAt.year == b.createdAt.year &&
+        a.createdAt.month == b.createdAt.month &&
+        a.createdAt.day == b.createdAt.day;
   }
 
   /// return DateTime by checking lastMatchedDate and message created DateTime

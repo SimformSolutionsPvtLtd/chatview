@@ -1,9 +1,10 @@
 ## [Unreleased]
 
-* **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
+* **Fix**: [128](https://github.com/SimformSolutionsPvtLtd/chatview/issues/128)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
   `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
+* * **Feat**: [440](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) feat: :sparkles: Implement consecutive message grouping.
 
 ## [3.0.0]
 

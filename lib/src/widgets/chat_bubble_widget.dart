@@ -43,6 +43,8 @@ class ChatBubbleWidget extends StatefulWidget {
     required this.onSwipe,
     this.onReplyTap,
     this.shouldHighlight = false,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   }) : super(key: key);
 
   /// Represent current instance of message.
@@ -63,6 +65,20 @@ class ChatBubbleWidget extends StatefulWidget {
   /// Flag for when user tap on replied message and highlight actual message.
   final bool shouldHighlight;
 
+  /// Whether this message is the first in a consecutive run of messages from
+  /// the same sender on the same day. When [true], the sender name is shown
+  /// above the bubble.
+  ///
+  /// Defaults to `true` (safe fallback: always show name).
+  final bool isFirstInGroup;
+
+  /// Whether this message is the last in a consecutive run of messages from
+  /// the same sender on the same day. When [true], the profile avatar is
+  /// visible and a larger bottom margin is applied.
+  ///
+  /// Defaults to `true` (safe fallback: always show avatar).
+  final bool isLastInGroup;
+
   @override
   State<ChatBubbleWidget> createState() => _ChatBubbleWidgetState();
 }
@@ -74,6 +90,10 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
 
   bool get isLastMessage =>
       chatController?.initialMessageList.last.id == widget.message.id;
+
+  bool get isFirstInGroup => widget.isFirstInGroup;
+
+  bool get isLastInGroup => widget.isLastInGroup;
 
   FeatureActiveConfig? featureActiveConfig;
   ChatController? chatController;
@@ -123,7 +143,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     final chatBubbleConfig = chatListConfig.chatBubbleConfig;
     return Container(
       padding: chatBubbleConfig?.padding ?? const EdgeInsets.only(left: 5.0),
-      margin: chatBubbleConfig?.margin ?? const EdgeInsets.only(bottom: 10),
+      margin: chatBubbleConfig?.margin ??
+          EdgeInsets.only(bottom: isLastInGroup ? 10 : 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment:
@@ -132,14 +153,35 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
         children: [
           if (!isMessageBySender &&
               (featureActiveConfig?.enableOtherUserProfileAvatar ?? true))
-            profileCircle(messagedUser),
+            // IgnorePointer + ExcludeSemantics keep the avatar's layout space
+            // so bubbles stay aligned, but block tap/long-press callbacks and
+            // screen-reader nodes when the avatar is not visible.
+            ExcludeSemantics(
+              excluding: !isLastInGroup,
+              child: IgnorePointer(
+                ignoring: !isLastInGroup,
+                child: Opacity(
+                  opacity: isLastInGroup ? 1.0 : 0.0,
+                  child: profileCircle(messagedUser),
+                ),
+              ),
+            ),
           Expanded(
             child: _messagesWidgetColumn(messagedUser),
           ),
           if (isMessageBySender) ...[getReceipt()],
           if (isMessageBySender &&
               (featureActiveConfig?.enableCurrentUserProfileAvatar ?? true))
-            profileCircle(messagedUser),
+            ExcludeSemantics(
+              excluding: !isLastInGroup,
+              child: IgnorePointer(
+                ignoring: !isLastInGroup,
+                child: Opacity(
+                  opacity: isLastInGroup ? 1.0 : 0.0,
+                  child: profileCircle(messagedUser),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -251,7 +293,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
       children: [
         if ((chatController?.otherUsers.isNotEmpty ?? false) &&
             !isMessageBySender &&
-            (featureActiveConfig?.enableOtherUserName ?? true))
+            (featureActiveConfig?.enableOtherUserName ?? true) &&
+            isFirstInGroup)
           Padding(
             padding: chatListConfig
                     .chatBubbleConfig?.inComingChatBubbleConfig?.padding ??

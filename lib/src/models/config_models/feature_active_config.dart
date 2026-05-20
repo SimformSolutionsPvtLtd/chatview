@@ -37,6 +37,7 @@ class FeatureActiveConfig {
     this.enableOtherUserName = true,
     this.enableScrollToBottomButton = false,
     this.enableTextSelection = false,
+    this.enableConsecutiveMessageGrouping = false,
   });
 
   /// Used for enable/disable swipe to reply.
@@ -85,4 +86,12 @@ class FeatureActiveConfig {
   ///
   /// Defaults to `false`.
   final bool enableTextSelection;
+
+  /// When `true`, consecutive messages from the same author on the same day
+  /// are visually grouped: the sender name is shown only on the first message
+  /// of the run, the profile avatar is shown only on the last, and the
+  /// inter-message margin is tightened.
+  ///
+  /// Defaults to `false`.
+  final bool enableConsecutiveMessageGrouping;
 }

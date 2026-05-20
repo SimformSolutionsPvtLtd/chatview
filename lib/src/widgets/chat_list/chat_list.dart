@@ -56,6 +56,7 @@ class ChatList extends StatefulWidget {
     this.chatBuilder,
     this.appbar,
     this.loadMoreChats,
+    this.headerSlivers,
     this.header,
     this.footer,
     this.isLastPage,
@@ -82,6 +83,12 @@ class ChatList extends StatefulWidget {
   /// Defaults to `false`.
   /// If set to `true`, pagination will not trigger loading more chats.
   final ValueGetter<bool>? isLastPage;
+
+  /// List of sliver headers to be displayed at the top of the chat list.
+  /// 
+  /// Each widget in this list must be a sliver widget that builds a
+  /// [RenderSliver] (e.g. [SliverAppBar], [SliverPersistentHeader], etc.)
+  final List<Widget>? headerSlivers;
 
   /// Header widget to be displayed at the top of the chat list.
   final Widget? header;
@@ -179,6 +186,7 @@ class _ChatListState extends State<ChatList> {
               ),
             ),
           ),
+        ...?widget.headerSlivers,
         if (widget.header case final header?) SliverToBoxAdapter(child: header),
         StreamBuilder<List<ChatListItem>>(
           stream: _controller.chatListStream,

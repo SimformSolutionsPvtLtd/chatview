@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Feat**: ✨Added backgroundImageFit and backgroundImageRepeat to 
+  ChatBackgroundConfiguration for controllable chat wallpaper layout.
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for

@@ -30,6 +30,8 @@ class ChatBackgroundConfiguration {
     this.defaultGroupSeparatorConfig,
     this.backgroundColor,
     this.backgroundImage,
+    this.backgroundImageFit,
+    this.backgroundImageRepeat,
     this.height,
     this.width,
     this.groupSeparatorBuilder,
@@ -49,6 +51,14 @@ class ChatBackgroundConfiguration {
 
   /// Provides background image of chat view.
   final String? backgroundImage;
+
+  /// Provides how the background image should be inscribed into the container.
+  /// Defaults to [BoxFit.fill].
+  final BoxFit? backgroundImageFit;
+
+  /// Provides how the background image should be repeated in the container.
+  /// Defaults to [ImageRepeat.noRepeat].
+  final ImageRepeat? backgroundImageRepeat;
 
   /// Provides padding of chat view.
   final EdgeInsetsGeometry? padding;

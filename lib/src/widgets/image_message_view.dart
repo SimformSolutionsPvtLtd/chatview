@@ -19,11 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:convert';
-import 'dart:io';
 
+import 'package:chatview/src/widgets/adaptive_image.dart';
 import 'package:chatview_utils/chatview_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
@@ -85,7 +83,7 @@ class ImageMessageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = imageMessageConfig?.borderRadius ??
-        const BorderRadius.all(Radius.circular(10));
+        const BorderRadius.all(Radius.circular(14));
     final backgroundColor = isMessageBySender
         ? outgoingChatBubbleConfig?.color ?? Colors.purple
         : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
@@ -127,46 +125,9 @@ class ImageMessageView extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: borderRadius,
-                        child: (() {
-                          if (imageUrl.isUrl) {
-                            return Image.network(
-                              imageUrl,
-                              fit: BoxFit.fitHeight,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                            );
-                          } else if (imageUrl.fromMemory) {
-                            return Image.memory(
-                              base64Decode(imageUrl
-                                  .substring(imageUrl.indexOf('base64') + 7)),
-                              fit: BoxFit.fill,
-                            );
-                          } else {
-                            return kIsWeb
-                                ? Image.network(
-                                    imageUrl,
-                                    fit: BoxFit.fill,
-                                  )
-                                : Image.file(
-                                    File(imageUrl),
-                                    fit: BoxFit.fill,
-                                  );
-                          }
-                        }()),
+                        child: AdaptiveImage(imageUrl: imageUrl),
                       ),
-                      if (featureActiveConfig?.showTimestamp ?? false)
+                      if (featureActiveConfig?.showTimeInChatBubble ?? false)
                         Positioned(
                           right: 8,
                           bottom: 8,

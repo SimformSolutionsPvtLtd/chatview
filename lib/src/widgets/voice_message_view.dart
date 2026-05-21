@@ -172,7 +172,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                     const Duration(milliseconds: 500),
                 enableSeekGesture: widget.config?.enableSeekGesture ?? true,
               ),
-              if (widget.featureActiveConfig?.showTimestamp ?? false)
+              if (widget.featureActiveConfig?.showTimeInChatBubble ?? false)
                 Text(
                   widget.message.createdAt.getTimeFromDateTime,
                   style: TextStyle(

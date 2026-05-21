@@ -55,7 +55,7 @@ class ChatBubble {
   /// Used for giving text style of the message timestamp.
   ///
   /// This applies to:
-  /// - In-bubble timestamps when `FeatureActiveConfig.showTimestamp` is `true`.
+  /// - In-bubble timestamps when `FeatureActiveConfig.showTimeInChatBubble` is `true`.
   /// - The swipe-to-reveal timestamp when `FeatureActiveConfig.enableSwipeToSeeTime`
   ///   is `true`. When set, this takes priority over
   ///   [MessageListConfiguration.messageTimeTextStyle] for individual bubbles.

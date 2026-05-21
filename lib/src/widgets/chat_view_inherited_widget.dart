@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 
 import '../models/config_models/feature_active_config.dart';
 import '../models/config_models/profile_circle_configuration.dart';
+import '../utils/constants/constants.dart';
 import 'reaction_popup.dart';
 
 /// This widget for alternative of excessive amount of passing arguments
@@ -37,11 +38,18 @@ class ChatViewInheritedWidget extends InheritedWidget {
     required this.chatController,
     required this.chatTextFieldViewKey,
     this.profileCircleConfiguration,
+    this.chatTextFieldHeightFallback = defaultChatTextFieldHeight,
   }) : super(key: key, child: child);
   final FeatureActiveConfig featureActiveConfig;
   final ProfileCircleConfiguration? profileCircleConfiguration;
   final ChatController chatController;
   final GlobalKey chatTextFieldViewKey;
+
+  /// Fallback height used for the bottom padding of the message list when the
+  /// actual chat text field height cannot be determined from the layout.
+  /// Defaults to [defaultChatTextFieldHeight].
+  final double chatTextFieldHeightFallback;
+
   final ValueNotifier<bool> showPopUp = ValueNotifier(false);
   final ValueNotifier<double> chatTextFieldHeight = ValueNotifier(0.0);
   final GlobalKey<ReactionPopupState> reactionPopupKey = GlobalKey();
@@ -51,5 +59,6 @@ class ChatViewInheritedWidget extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant ChatViewInheritedWidget oldWidget) =>
-      oldWidget.featureActiveConfig != featureActiveConfig;
+      oldWidget.featureActiveConfig != featureActiveConfig ||
+      oldWidget.chatTextFieldHeightFallback != chatTextFieldHeightFallback;
 }

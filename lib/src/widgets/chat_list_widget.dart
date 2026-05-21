@@ -87,12 +87,13 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   /// Returns true when the swipe-to-see-time gesture should be active.
   ///
-  /// [FeatureActiveConfig.showTimestamp] and [FeatureActiveConfig.enableSwipeToSeeTime]
+  /// [FeatureActiveConfig.showTimeInChatBubble] and [FeatureActiveConfig.enableSwipeToSeeTime]
   /// are mutually exclusive — the [FeatureActiveConfig] assert already prevents
   /// both being true simultaneously.
   bool get _resolveSwipeToSeeTime {
-    final showTimestamp = featureActiveConfig?.showTimestamp ?? false;
-    return !showTimestamp &&
+    final showTimeInChatBubble =
+        featureActiveConfig?.showTimeInChatBubble ?? false;
+    return !showTimeInChatBubble &&
         (featureActiveConfig?.enableSwipeToSeeTime ?? true);
   }
 

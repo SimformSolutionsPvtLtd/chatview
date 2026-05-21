@@ -73,7 +73,8 @@ class TextMessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final textMessage = message.message;
-    final showTimestamp = featureActiveConfig?.showTimestamp ?? false;
+    final showTimeInChatBubble =
+        featureActiveConfig?.showTimeInChatBubble ?? false;
     final timeText = message.createdAt.getTimeFromDateTime;
     final border = isMessageBySender
         ? outgoingChatBubbleConfig?.border
@@ -89,25 +90,29 @@ class TextMessageView extends StatelessWidget {
           color: isMessageBySender ? Colors.white70 : Colors.black54,
         )
         .merge(_messageTimeTextStyle);
+    final effectiveTextStyle = _textStyle ??
+        textTheme.bodyMedium?.copyWith(
+          color: Colors.white,
+          fontSize: 16,
+        ) ??
+        const TextStyle(color: Colors.white, fontSize: 16);
     final baseWidget = extractedUrls.isNotEmpty
         ? LinkPreview(
             linkPreviewConfig: _linkPreviewConfig,
             textMessage: textMessage,
             extractedUrls: extractedUrls,
-            normalTextStyle: _textStyle ??
-                textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+            normalTextStyle: effectiveTextStyle,
           )
         : Text(
             textMessage,
-            style: _textStyle ??
-                textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+            style: effectiveTextStyle,
           );
+    final messageWidget = isSelectable
+        ? CustomSelectionArea(
+            config: textSelectionConfig,
+            child: baseWidget,
+          )
+        : baseWidget;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -131,77 +136,61 @@ class TextMessageView extends StatelessWidget {
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
           ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final messageWidget = isSelectable
-                  ? CustomSelectionArea(
-                      config: textSelectionConfig,
-                      child: baseWidget,
-                    )
-                  : baseWidget;
+          child: showTimeInChatBubble
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (extractedUrls.isNotEmpty) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          messageWidget,
+                          const SizedBox(height: 4),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Text(timeText, style: timestampStyle),
+                          ),
+                        ],
+                      );
+                    }
 
-              final canShowInSingleLine = showTimestamp &&
-                  extractedUrls.isEmpty &&
-                  !textMessage.contains('\n') &&
-                  _canRenderTimeInSingleLine(
-                    context: context,
-                    messageText: textMessage,
-                    messageStyle: _textStyle ??
-                        textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ) ??
-                        const TextStyle(fontSize: 16),
-                    timeText: timeText,
-                    timeStyle: timestampStyle,
-                    maxContentWidth: constraints.maxWidth,
-                  );
+                    final canShowInSingleLine = !textMessage.contains('\n') &&
+                        _canRenderTimeInSingleLine(
+                          context: context,
+                          messageText: textMessage,
+                          messageStyle: effectiveTextStyle,
+                          timeText: timeText,
+                          timeStyle: timestampStyle,
+                          maxContentWidth: constraints.maxWidth,
+                        );
 
-              if (canShowInSingleLine) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Flexible(child: messageWidget),
-                    const SizedBox(width: 8),
-                    Text(timeText, style: timestampStyle),
-                  ],
-                );
-              }
+                    if (canShowInSingleLine) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Flexible(child: messageWidget),
+                          const SizedBox(width: 8),
+                          Text(timeText, style: timestampStyle),
+                        ],
+                      );
+                    }
 
-              if (showTimestamp && extractedUrls.isNotEmpty) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    messageWidget,
-                    const SizedBox(height: 4),
-                    Align(
+                    return Stack(
                       alignment: Alignment.bottomRight,
-                      child: Text(timeText, style: timestampStyle),
-                    ),
-                  ],
-                );
-              }
-
-              if (showTimestamp) {
-                return Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Padding(
-                      // Reserve a little space at the bottom for timestamp,
-                      // without creating a large blank strip on the left.
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: messageWidget,
-                    ),
-                    Text(timeText, style: timestampStyle),
-                  ],
-                );
-              }
-
-              return messageWidget;
-            },
-          ),
+                      children: [
+                        Padding(
+                          // Reserve space at bottom for timestamp without a
+                          // large blank strip on the left.
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: messageWidget,
+                        ),
+                        Text(timeText, style: timestampStyle),
+                      ],
+                    );
+                  },
+                )
+              : messageWidget,
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(
@@ -256,14 +245,10 @@ class TextMessageView extends StatelessWidget {
     required TextStyle? timeStyle,
     required double maxContentWidth,
   }) {
+    if (messageText.length > 60) return false;
+
     final textScaler = MediaQuery.textScalerOf(context);
     final textDirection = Directionality.of(context);
-    final messagePainter = TextPainter(
-      text: TextSpan(text: messageText, style: messageStyle),
-      textDirection: textDirection,
-      maxLines: 1,
-      textScaler: textScaler,
-    )..layout(maxWidth: maxContentWidth);
 
     final timePainter = TextPainter(
       text: TextSpan(text: timeText, style: timeStyle),
@@ -272,6 +257,16 @@ class TextMessageView extends StatelessWidget {
       textScaler: textScaler,
     )..layout(maxWidth: maxContentWidth);
 
-    return messagePainter.width + 8 + timePainter.width <= maxContentWidth;
+    final availableForMessage = maxContentWidth - 8 - timePainter.width;
+
+    final messagePainter = TextPainter(
+      text: TextSpan(text: messageText, style: messageStyle),
+      textDirection: textDirection,
+      maxLines: 1,
+      textScaler: textScaler,
+    )..layout(maxWidth: availableForMessage);
+
+    return !messagePainter.didExceedMaxLines &&
+        messagePainter.width <= availableForMessage;
   }
 }

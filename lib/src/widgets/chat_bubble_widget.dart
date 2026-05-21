@@ -96,13 +96,14 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     // Get user from id.
     final messagedUser = chatController?.getUserFromId(widget.message.sentBy);
 
-    // showTimestamp and enableSwipeToSeeTime are mutually exclusive
+    // showTimeInChatBubble and enableSwipeToSeeTime are mutually exclusive
     // (enforced by FeatureActiveConfig's assert). Only one can ever be true.
-    final bool showTimestamp = featureActiveConfig?.showTimestamp ?? false;
+    final bool showTimeInChatBubble =
+        featureActiveConfig?.showTimeInChatBubble ?? false;
 
     // Use swipe-to-see-time only when in-bubble timestamps are not active.
-    final bool useSwipeToSeeTime =
-        !showTimestamp && (featureActiveConfig?.enableSwipeToSeeTime ?? true);
+    final bool useSwipeToSeeTime = !showTimeInChatBubble &&
+        (featureActiveConfig?.enableSwipeToSeeTime ?? true);
 
     if (useSwipeToSeeTime && widget.slideAnimation != null) {
       return Stack(

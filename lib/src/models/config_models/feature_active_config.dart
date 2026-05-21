@@ -38,13 +38,7 @@ class FeatureActiveConfig {
     this.enableOtherUserName = true,
     this.enableScrollToBottomButton = false,
     this.enableTextSelection = false,
-  }) : assert(
-         !(enableSwipeToSeeTime && showTimestamp),
-         'FeatureActiveConfig: enableSwipeToSeeTime and showTimestamp cannot '
-         'both be true at the same time. '
-         'Use showTimestamp: true to display the time inside each bubble, '
-         'or enableSwipeToSeeTime: true to reveal it on swipe — not both.',
-       );
+  });
 
   /// Used for enable/disable swipe to reply.
   final bool enableSwipeToReply;
@@ -56,24 +50,16 @@ class FeatureActiveConfig {
   final bool enableTextField;
 
   /// Used for enable/disable swipe whole chat to see message created time.
-  ///
-  /// **Mutually exclusive with `showTimestamp`.**
-  /// Setting both `enableSwipeToSeeTime: true` and `showTimestamp: true` will
-  /// throw an [AssertionError] in debug mode.
   final bool enableSwipeToSeeTime;
 
   /// Used to globally control whether message timestamps are shown inside chat bubbles.
   /// Defaults to `false`.
   ///
-  /// **Mutually exclusive with `enableSwipeToSeeTime`.**
-  /// Setting both `showTimestamp: true` and `enableSwipeToSeeTime: true` will
-  /// throw an [AssertionError] in debug mode.
-  ///
   /// When `true`, timestamps are displayed inside bubbles for all message types
   /// (text, image, voice). Use `ChatBubble.messageTimeTextStyle` to customise
   /// the appearance of the timestamp text per bubble direction.
   ///
-  /// See also: `enableSwipeToSeeTime`, which uses the same `ChatBubble.messageTimeTextStyle`
+  /// See also: [enableSwipeToSeeTime], which uses the same `ChatBubble.messageTimeTextStyle`
   /// for its per-bubble swipe-out timestamp styling.
   final bool showTimestamp;
 

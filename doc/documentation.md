@@ -765,10 +765,6 @@ You can control timestamp typography per bubble side using `ChatBubble.messageTi
 - **In-bubble** (`FeatureActiveConfig.showTimestamp: true`) — text style inside the bubble.
 - **Swipe-to-reveal** (`FeatureActiveConfig.enableSwipeToSeeTime: true`) — per-bubble style for the swipe-out timestamp. When set, this takes priority over the global `MessageListConfiguration.messageTimeTextStyle` fallback.
 
-> **Note:** `showTimestamp` (in-bubble timestamp) and `enableSwipeToSeeTime` (swipe-to-reveal timestamp) are mutually exclusive.
-> Both live in `FeatureActiveConfig`. Setting both to `true` raises an `AssertionError` in debug mode.
-> Use `showTimestamp: true` to display the time inside each bubble, or `enableSwipeToSeeTime: true` to reveal it on swipe — never both.
-
 ## Swipe to Reply Configuration
 
 ```dart
@@ -874,9 +870,6 @@ ChatView(
   // ...
   featureActiveConfig: FeatureActiveConfig(
     enableSwipeToReply: true,
-    // Set to true to reveal message time by swiping the chat bubble.
-    // Mutually exclusive with showTimestamp — setting both true raises
-    // an AssertionError in debug mode.
     enableSwipeToSeeTime: true,
     enablePagination: true,
     enableOtherUserName: false,

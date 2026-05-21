@@ -183,6 +183,13 @@ class Data {
 
   static getMessageList({bool isExampleOne = true}) => [
         Message(
+          id: '0',
+          message: "Hey @John, can you help @Sarah with the project?",
+          createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
+          sentBy: '1',
+          status: MessageStatus.read,
+        ),
+        Message(
           id: '1',
           message: "How's it going?",
           createdAt: DateTime.now().subtract(const Duration(days: 30)),

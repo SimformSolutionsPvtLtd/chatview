@@ -232,6 +232,7 @@ class _MessageViewState extends State<MessageView>
                     highlightColor: widget.highlightColor,
                     highlightMessage: widget.shouldHighlight,
                     featureActiveConfig: chatViewIW?.featureActiveConfig,
+                    mentionTextStyle: null, // Can be customized via config in future
                   );
                 } else if (widget.message.messageType.isVoice) {
                   return VoiceMessageView(

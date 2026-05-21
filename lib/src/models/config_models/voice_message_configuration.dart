@@ -45,6 +45,10 @@ class VoiceMessageConfiguration {
     this.waveformPadding,
     this.enableSeekGesture = true,
     this.playerMode = PlayerMode.multi,
+    this.durationTextStyle,
+    this.durationTextStyleBuilder,
+    this.showDuration = false,
+    this.durationFormat = VoiceDurationFormat.hhmmss,
   });
 
   /// Applies style to waveform.
@@ -100,4 +104,31 @@ class VoiceMessageConfiguration {
   ///   - Multiple audios can be played simultaneously.
   ///   - Note: Starting recording will not affect any currently playing audio.
   final PlayerMode playerMode;
+
+  /// TextStyle for voice message duration text.
+  final TextStyle? durationTextStyle;
+
+  /// Optional dynamic text style builder for voice message duration text.
+  ///
+  /// Use this when you want different styles for sender vs receiver bubbles.
+  ///
+  /// If provided, this takes precedence over [durationTextStyle].
+  final DurationTextStyleBuilder? durationTextStyleBuilder;
+
+  /// Built-in duration format used for rendering voice message duration.
+  ///
+  /// Defaults to [VoiceDurationFormat.hhmmss].
+  final VoiceDurationFormat durationFormat;
+
+  /// When `true`, the voice message duration is automatically calculated
+  /// from the audio file and displayed next to the waveform.
+  ///
+  /// The duration is read from the audio player after the file is prepared —
+  /// no need to set [Message.voiceMessageDuration] manually.
+  ///
+  /// If [Message.voiceMessageDuration] is also set on the message, it takes
+  /// precedence over the auto-detected duration.
+  ///
+  /// Defaults to `false`.
+  final bool showDuration;
 }

@@ -79,6 +79,11 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
   final ValueNotifier<PlayerState> _playerState =
       ValueNotifier(PlayerState.stopped);
 
+  /// Auto-detected duration read from [PlayerController.maxDuration] once
+  /// the audio file is prepared. Used when [VoiceMessageConfiguration.showDuration]
+  /// is `true` and [Message.voiceMessageDuration] is not set.
+  final ValueNotifier<Duration?> _detectedDuration = ValueNotifier(null);
+
   PlayerState get playerState => _playerState.value;
 
   PlayerWaveStyle playerWaveStyle = const PlayerWaveStyle(scaleFactor: 70);
@@ -97,7 +102,11 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
       ..preparePlayer(
         path: widget.message.message,
         noOfSamples: _waveStyle.getSamplesForWidth(widget.screenWidth * 0.5),
-      ).whenComplete(() => widget.onMaxDuration?.call(controller.maxDuration));
+      ).whenComplete(() {
+        widget.onMaxDuration?.call(controller.maxDuration);
+        _detectedDuration.value =
+        Duration(milliseconds: controller.maxDuration);
+      });
     playerStateSubscription = controller.onPlayerStateChanged
         .listen((state) => _playerState.value = state);
   }
@@ -107,6 +116,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
     playerStateSubscription.cancel();
     controller.dispose();
     _playerState.dispose();
+      _detectedDuration.dispose();
     super.dispose();
   }
 
@@ -171,6 +181,31 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                     const Duration(milliseconds: 500),
                 enableSeekGesture: widget.config?.enableSeekGesture ?? true,
               ),
+              if ((widget.config?.showDuration ?? false) ||
+                  widget.message.voiceMessageDuration != null)
+                ValueListenableBuilder<Duration?>(
+                  valueListenable: _detectedDuration,
+                  builder: (context, detectedDur, _) {
+                    final dur =
+                        widget.message.voiceMessageDuration ?? detectedDur;
+                    if (dur == null) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Text(
+                        _formatDuration(dur),
+                        style: widget.config?.durationTextStyleBuilder
+                                ?.call(widget.isMessageBySender) ??
+                            widget.config?.durationTextStyle ??
+                            TextStyle(
+                              fontSize: 12,
+                              color: widget.isMessageBySender
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                      ),
+                    );
+                  },
+                ),
             ],
           ),
         ),
@@ -182,6 +217,28 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
           ),
       ],
     );
+  }
+
+  String _formatDuration(Duration duration) {
+    final format = widget.config?.durationFormat ?? VoiceDurationFormat.hhmmss;
+    if (format.isMmss) {
+      final minutes =
+          duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+      final seconds =
+          duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+      return '$minutes:$seconds';
+    }
+
+    if (format.isAdaptive) {
+      final hours = duration.inHours;
+      final minutes =
+          duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+      final seconds =
+          duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+      return hours > 0 ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
+    }
+
+    return duration.toHHMMSS();
   }
 
   void _playOrPause() {

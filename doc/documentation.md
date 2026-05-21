@@ -605,6 +605,62 @@ void onSendTap(String message, ReplyMessage replyMessage, MessageType messageTyp
 
 > Note: You can evaluate message type from the 'messageType' parameter and perform operations accordingly.
 
+## Voice Message Duration
+
+ChatView can display the duration of a voice message next to its waveform.
+
+### Auto-detect duration (recommended)
+
+Set `showDuration: true` in `VoiceMessageConfiguration`. The duration is read
+automatically from the audio file after it is prepared — no need to pass it
+manually on the `Message`.
+
+```dart
+ChatView(
+  // ...
+  sendMessageConfig: SendMessageConfiguration(
+    voiceMessageConfig: VoiceMessageConfiguration(
+      /// Automatically calculate and show the audio duration.
+      showDuration: true,
+
+      /// Optional: use a built-in format.
+      /// VoiceDurationFormat.hhmmss (default), VoiceDurationFormat.mmss,
+      /// or VoiceDurationFormat.adaptive.
+      durationFormat: VoiceDurationFormat.mmss,
+
+      /// Optional: customize the duration text style.
+      durationTextStyle: TextStyle(
+        fontSize: 12,
+        color: Colors.white,
+      ),
+    ),
+  ),
+)
+```
+
+### Manual duration override
+
+You can still pass a `voiceMessageDuration` on the `Message` if you want to
+display a specific value (e.g. a duration stored in your backend). When set,
+it takes precedence over the auto-detected value.
+
+```dart
+final voiceMessage = Message(
+  id: '4',
+  message: '/path/to/audio/file.m4a',
+  createdAt: DateTime.now(),
+  sentBy: currentUser.id,
+  messageType: MessageType.voice,
+  voiceMessageDuration: Duration(seconds: 15), // overrides auto-detection
+);
+
+chatController.addMessage(voiceMessage);
+```
+
+The duration is displayed based on `durationFormat`. Showing the duration is enabled automatically whenever
+`voiceMessageDuration` is set on the message even if `showDuration` is
+`false`, ensuring backward compatibility.
+
 # ChatView - Advanced Usage
 
 ChatView offers extensive customization options to tailor the chat UI to your specific needs.
@@ -798,6 +854,19 @@ ChatView(
       //   - Multiple audios can be played simultaneously.
       //   - Starting recording will not affect any currently playing audio.
       playerMode: PlayerMode.single,
+
+      // Automatically calculate and display the voice message duration.
+      // Duration is read from the audio file — no need to pass it on the Message.
+      showDuration: true,
+
+      // Optional built-in duration format.
+      durationFormat: VoiceDurationFormat.adaptive,
+
+      // Optional: customize the duration text style.
+      durationTextStyle: TextStyle(
+        fontSize: 12,
+        color: Colors.white,
+      ),
     )
   ),
   // ...

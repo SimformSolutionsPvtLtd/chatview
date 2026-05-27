@@ -853,6 +853,34 @@ ChatView(
     lastSeenAgoBuilderVisibility: false,
     receiptsBuilderVisibility: false,
     enableTextSelection: true,
+    enableConsecutiveMessageGrouping: true, // grouping feature
+  ),
+  // ...
+)
+```
+
+## Consecutive Message Grouping
+
+When `enableConsecutiveMessageGrouping` is set to `true`, ChatView detects runs of consecutive messages that share the **same sender** and were sent on the **same calendar day**, then applies three visual changes that make the conversation feel more compact and easier to scan — similar to the behaviour seen in iMessage, WhatsApp, and Telegram.
+
+### Visual changes
+
+| Element        | Normal (grouping off)                 | Grouped (grouping on)                                                                                              |
+| -------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Sender name    | Shown above **every** incoming bubble | Shown only above the **first** bubble in the run                                                                   |
+| Profile avatar | Shown beside **every** bubble         | Shown only beside the **last** bubble in the run; hidden (but still laid out) for others so alignment is preserved |
+
+### Usage
+
+```dart
+ChatView(
+  chatController: _chatController,
+  featureActiveConfig: const FeatureActiveConfig(
+    enableConsecutiveMessageGrouping: true,
+    // Keep sender names visible so the first bubble in each run
+    // still identifies who is speaking.
+    enableOtherUserName: true,
+    enableOtherUserProfileAvatar: true,
   ),
   // ...
 )

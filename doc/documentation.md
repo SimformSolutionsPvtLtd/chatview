@@ -853,6 +853,93 @@ ChatView(
     lastSeenAgoBuilderVisibility: false,
     receiptsBuilderVisibility: false,
     enableTextSelection: true,
+    enableEditMessage: true, // Enable the Edit Message feature (default: true)
+  ),
+  // ...
+)
+```
+
+## Edit Message Feature
+
+ChatView supports editing previously sent text messages, similar to WhatsApp and Telegram.
+
+### How It Works
+
+1. Long-press a message bubble sent by the current user.
+2. Tap **Edit** in the reply pop-up.
+3. The original text is pre-filled into the input field with an *Editing* indicator above it.
+4. Modify the text and press Send.
+5. Your `onEditTap` callback is called with the **original `Message`** (`oldMessage`) and the **updated `Message`** (`newMessage`).
+6. Messages that have been edited display a subtle _Edited_ label below the bubble.
+
+### Basic Integration
+
+```dart
+ChatView(
+  // ...
+  // updatedMessage is a copy of oldMessage with the new text already applied.
+  // You have access to both objects so you can do further transformations —
+  // for example, update the timestamp, change the message type, or sync with a backend.
+  onEditTap: (message, updatedMessage) => 
+    _chatController.updateMessage(messageId: message.id, newMessage: updatedMessage),
+  // ...
+)
+```
+
+### Enabeling the Feature
+
+```dart
+ChatView(
+  featureActiveConfig: const FeatureActiveConfig(
+    enableEditMessage: true,
+  ),
+)
+```
+
+### Localization
+
+The edit-related strings can be customized via `ChatViewLocale`:
+
+```dart
+PackageStrings.addLocaleObject(
+  'es',
+  const ChatViewLocale(
+    // ... all other required fields ...
+    edit: 'Editar',
+    edited: 'Editado',
+    editing: 'Editando',
+  ),
+);
+PackageStrings.setLocale('es');
+```
+
+### Static Helper
+
+Use `ChatView.getEditingMessage(context)` to read the message currently being edited
+from a widget that is a descendant of `ChatView`:
+
+```dart
+final editingMsg = ChatView.getEditingMessage(context);
+if (editingMsg != null) {
+  // User is in edit mode for editingMsg.
+}
+```
+
+### Customizing the Edit Indicator Label
+
+When a user enters edit mode, an indicator bar is displayed above the text field showing a label
+(default: locale-resolved `"Editing"`). You can override this label via `SendMessageConfiguration`:
+
+```dart
+ChatView(
+  // ...
+  sendMessageConfig: SendMessageConfiguration(
+    /// The label shown in the editing indicator bar above the text field
+    /// when the user is editing an existing message.
+    ///
+    /// If omitted, falls back to the locale-resolved value of
+    /// `PackageStrings.currentLocale.editing` (e.g. `"Editing"`).
+    editLabel: 'Editing message',
   ),
   // ...
 )

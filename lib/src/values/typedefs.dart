@@ -96,6 +96,14 @@ typedef ChatBubbleLongPressCallback = void Function(
   double xCordinate,
   Message message,
 );
+
+/// Callback invoked when the user confirms an edit.
+/// [message] is the original message before editing.
+/// [updatedMessage] is the updated message object with new content.
+typedef EditMessageCallback = void Function(
+  Message message,
+  Message updatedMessage,
+);
 typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
   BuildContext context,
   T value,

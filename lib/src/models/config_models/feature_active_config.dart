@@ -37,6 +37,7 @@ class FeatureActiveConfig {
     this.enableOtherUserName = true,
     this.enableScrollToBottomButton = false,
     this.enableTextSelection = false,
+    this.enableMessageEditing = false,
   });
 
   /// Used for enable/disable swipe to reply.
@@ -85,4 +86,13 @@ class FeatureActiveConfig {
   ///
   /// Defaults to `false`.
   final bool enableTextSelection;
+
+  /// Used for enable/disable the Edit Message feature.
+  ///
+  /// When enabled, an "Edit" option appears in the reply popup for
+  /// messages sent by the current user, allowing them to modify the
+  /// message text in-place.
+  ///
+  /// Defaults to `false`.
+  final bool enableMessageEditing;
 }

@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import '../extensions/extensions.dart';
 import '../models/config_models/feature_active_config.dart';
 import '../utils/constants/constants.dart';
+import '../utils/package_strings.dart';
 import '../values/enumeration.dart';
 import '../values/typedefs.dart';
 import 'chat_view_inherited_widget.dart';
@@ -273,6 +274,22 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
                   onTap: () => widget.onReplyTap
                       ?.call(widget.message.replyMessage.messageId),
                 ),
+        if (widget.message.updatedAt != null)
+          Padding(
+            padding: EdgeInsets.only(
+              left: isMessageBySender ? 0 : 8,
+              right: isMessageBySender ? 8 : 0,
+              bottom: 2,
+            ),
+            child: Text(
+              PackageStrings.currentLocale.edited,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
         SwipeToReply(
           isMessageByCurrentUser: isMessageBySender,
           onSwipe: isMessageBySender ? onLeftSwipe : onRightSwipe,

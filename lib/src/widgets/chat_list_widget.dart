@@ -34,6 +34,7 @@ class ChatListWidget extends StatefulWidget {
     Key? key,
     required this.chatController,
     required this.assignReplyMessage,
+    this.assignEditMessage,
     this.loadingWidget,
     this.loadMoreData,
     this.isLastPage,
@@ -57,6 +58,9 @@ class ChatListWidget extends StatefulWidget {
   /// Provides callback for assigning reply message when user swipe to chat
   /// bubble.
   final ValueSetter<Message> assignReplyMessage;
+
+  /// Provides callback for entering edit mode for a message.
+  final ValueSetter<Message>? assignEditMessage;
 
   /// Provides callback when user tap anywhere on whole chat.
   final VoidCallback? onChatListTap;
@@ -187,10 +191,41 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   replyPopup?.onReplyTap?.call(message);
                 },
+                onEditTap: _buildEditTapHandler(
+                  message: message,
+                  sentByCurrentUser: sentByCurrentUser,
+                  replyPopup: replyPopup,
+                ),
                 sentByCurrentUser: sentByCurrentUser,
               ),
         ),
       ).closed;
+  }
+
+  VoidCallback? _buildEditTapHandler({
+    required Message message,
+    required bool sentByCurrentUser,
+    required ReplyPopupConfiguration? replyPopup,
+  }) {
+    if (!sentByCurrentUser) return null;
+    if (!(featureActiveConfig?.enableMessageEditing ?? true)) return null;
+
+    // Only enable Edit when we can actually enter edit mode.
+    if (widget.assignEditMessage == null) return null;
+
+    return () => _handleEditTap(message, replyPopup);
+  }
+
+  void _handleEditTap(
+    Message message,
+    ReplyPopupConfiguration? replyPopup,
+  ) {
+    widget.assignEditMessage?.call(message);
+    if (featureActiveConfig?.enableReactionPopup ?? false) {
+      chatViewIW?.showPopUp.value = false;
+    }
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    replyPopup?.onEditTap?.call(message);
   }
 
   void _onChatListTap() {

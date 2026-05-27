@@ -56,6 +56,9 @@ final class ChatViewLocale {
     required this.deleteChat,
     required this.noChats,
     required this.noSearchResults,
+    this.edit = 'Edit',
+    this.edited = 'Edited',
+    this.editing = 'Editing',
   });
 
   /// Create from `Map<String, String>`
@@ -94,6 +97,9 @@ final class ChatViewLocale {
       deleteChat: map['deleteChat']?.toString() ?? '',
       noChats: map['noChats']?.toString() ?? '',
       noSearchResults: map['noSearchResults']?.toString() ?? '',
+      edit: map['edit']?.toString() ?? 'Edit',
+      edited: map['edited']?.toString() ?? 'Edited',
+      editing: map['editing']?.toString() ?? 'Editing',
     );
   }
 
@@ -131,6 +137,15 @@ final class ChatViewLocale {
   final String noChats;
   final String noSearchResults;
 
+  /// Label for the edit action button in the reply popup.
+  final String edit;
+
+  /// Label shown next to an edited message.
+  final String edited;
+
+  /// Label shown in the text field header when editing a message.
+  final String editing;
+
   /// English defaults
   static const en = ChatViewLocale(
     today: 'Today',
@@ -166,5 +181,8 @@ final class ChatViewLocale {
     deleteChat: 'Delete Chat',
     noChats: 'No Chats',
     noSearchResults: 'No search results',
+    edit: 'Edit',
+    edited: 'Edited',
+    editing: 'Editing',
   );
 }

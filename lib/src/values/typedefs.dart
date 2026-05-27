@@ -37,7 +37,7 @@ typedef DoubleCallBack = void Function(
   double yPosition,
   double xPosition,
 );
-typedef StringsCallBack = void Function(String emoji, String messageId);
+typedef StringsCallBack = void Function(String emoji);
 typedef StringWithReturnWidget = Widget Function(String separator);
 typedef DragUpdateDetailsCallback = void Function(DragUpdateDetails);
 typedef MoreTapCallBack = void Function(

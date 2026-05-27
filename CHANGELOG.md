@@ -4,6 +4,9 @@
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
   `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
+* **Breaking**: [430](https://github.com/SimformSolutionsPvtLtd/chatview/pull/430) Removed
+  `shouldSendImageWithText` parameter. The example app now demonstrates an image preview screen with optional text
+  captions using `GalleryActionButton` and a custom preview handler to achieve similar functionality.
 
 ## [3.0.0]
 

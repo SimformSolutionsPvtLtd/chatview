@@ -6,7 +6,7 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 ## Preview
 
 | ChatList                                                                                                         | ChatView                                                                                                         |
-|------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | ![ChatList_Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatlist.gif) | ![ChatView Preview](https://raw.githubusercontent.com/SimformSolutionsPvtLtd/chatview/main/preview/chatview.gif) |
 
 ## Features
@@ -46,19 +46,18 @@ For a live web demo, visit [Chat View Example](https://simformsolutionspvtltd.gi
 ## Compatibility with [chatview_connect](https://pub.dev/packages/chatview_connect)
 
 | chatview version | [chatview_connect](https://pub.dev/packages/chatview_connect) version |
-|------------------|-----------------------------------------------------------------------|
+| ---------------- | --------------------------------------------------------------------- |
 | `>=2.4.1 <3.0.0` | `0.0.1`                                                               |
 | `>= 3.0.0`       | `3.0.0`                                                               |
 
 ## Compatible Message Types
 
 |  Message Types  | Android | iOS | MacOS | Web | Linux | Windows |
-|:---------------:|:-------:|:---:|:-----:|:---:|:-----:|:-------:|
+| :-------------: | :-----: | :-: | :---: | :-: | :---: | :-----: |
 |  Text messages  |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
 | Image messages  |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
-| Voice messages  |   ✔️    | ✔️  |   ❌   |  ❌  |   ❌   |    ❌    |
+| Voice messages  |   ✔️    | ✔️  |  ❌   | ❌  |  ❌   |   ❌    |
 | Custom messages |   ✔️    | ✔️  |  ✔️   | ✔️  |  ✔️   |   ✔️    |
-
 
 # Installation
 
@@ -84,6 +83,7 @@ import 'package:chatview/chatview.dart';
 ### For Image Picker
 
 #### iOS
+
 Add the following keys to your _Info.plist_ file, located in `<project root>/ios/Runner/Info.plist`:
 
 ```xml
@@ -98,24 +98,30 @@ Add the following keys to your _Info.plist_ file, located in `<project root>/ios
 ### For Voice Messages
 
 #### iOS
-* Add this row in `ios/Runner/Info.plist`:
+
+- Add this row in `ios/Runner/Info.plist`:
+
 ```xml
 <key>NSMicrophoneUsageDescription</key>
 <string>This app requires Mic permission.</string>
 ```
 
-* This plugin requires iOS 13.0 or higher. Add this line in `Podfile`:
+- This plugin requires iOS 13.0 or higher. Add this line in `Podfile`:
+
 ```ruby
 platform :ios, '13.0'
 ```
 
 #### Android
-* Change the minimum Android SDK version to 21 (or higher) in your `android/app/build.gradle` file:
+
+- Change the minimum Android SDK version to 21 (or higher) in your `android/app/build.gradle` file:
+
 ```gradle
 minSdkVersion 21
 ```
 
-* Add RECORD_AUDIO permission in `AndroidManifest.xml`:
+- Add RECORD_AUDIO permission in `AndroidManifest.xml`:
+
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 ```
@@ -499,7 +505,7 @@ ChatList(
 )
 ```
 
-## ChatList States Configuration 
+## ChatList States Configuration
 
 ```dart
 ChatList(
@@ -597,7 +603,7 @@ void onSendTap(String message, ReplyMessage replyMessage, MessageType messageTyp
     replyMessage: replyMessage,
     messageType: messageType,
   );
-  
+
   // Add message to chat controller
   chatController.addMessage(newMessage);
 }
@@ -677,14 +683,14 @@ ChatView(
 
 ### Loading Old Reply Messages
 
-The `loadOldReplyMessage` callback is essential for handling replies to messages that aren't 
-currently loaded in the chat view. When a user taps on a replied message, ChatView automatically 
-searches for the original message in the current message list. If the original message isn't 
-found (typically because it's an older message), this callback is triggered to load the 
+The `loadOldReplyMessage` callback is essential for handling replies to messages that aren't
+currently loaded in the chat view. When a user taps on a replied message, ChatView automatically
+searches for the original message in the current message list. If the original message isn't
+found (typically because it's an older message), this callback is triggered to load the
 necessary historical messages.
 
-It is recommended to fetch messages such that the target message would fall in the middle of the 
-loaded messages, i.e., if the target message id is 25 and page size is 20, then load messages 
+It is recommended to fetch messages such that the target message would fall in the middle of the
+loaded messages, i.e., if the target message id is 25 and page size is 20, then load messages
 with ids from 15 to 35.
 
 #### Example:
@@ -858,7 +864,6 @@ ChatView(
 )
 ```
 
-
 ## Text Selection Config
 
 ```dart
@@ -867,17 +872,17 @@ ChatView(
   textSelectionConfig: TextSelectionConfig(
     // Use platform-specific text selection controls (default is null for platform default)
     selectionControls: null,
-    
+
     // Focus node for managing text selection focus
     focusNode: FocusNode(),
-    
+
     // Callback triggered when text selection changes
     onSelectionChanged: (SelectedContent? content) {
       if (content != null) {
         debugPrint('Selected text: ${content.plainText}');
       }
     },
-    
+
     // Customize the context menu shown during text selection
     contextMenuBuilder: (context, selectableRegionState) {
       return AdaptiveTextSelectionToolbar(
@@ -897,10 +902,10 @@ ChatView(
         ],
       );
     },
-    
+
     // Configure the magnifier shown during text selection
     magnifierConfiguration: const TextMagnifierConfiguration(),
-    
+
     // Customize text selection theme (colors, handle size, etc.)
     themeData: const TextSelectionThemeData(
       cursorColor: Colors.blue,
@@ -914,7 +919,7 @@ ChatView(
 
 ## Two-Way Pagination
 
-ChatView supports two-way pagination for efficiently loading messages in both directions - 
+ChatView supports two-way pagination for efficiently loading messages in both directions -
 loading older messages when scrolling to the top and newer messages when scrolling to the bottom.
 This feature enables lazy loading and memory optimization for large chat histories.
 
@@ -961,7 +966,7 @@ Widget build(BuildContext context) {
             limit: 20,
           ),
         };
-        
+
         // Add the loaded messages to the chat controller
         _chatController.loadMoreData(
           newMessages,
@@ -979,7 +984,7 @@ Widget build(BuildContext context) {
 2. **Error Handling**: Always handle API errors gracefully in your `loadMoreData` callback
 3. **Loading States**: Use the built-in loading indicators or customize them for better UX
 4. **Pagination State**: Properly manage `isLastPage` to prevent unnecessary API calls
-5. **Reference Messages**: Use the provided reference message for cursor-based pagination for 
+5. **Reference Messages**: Use the provided reference message for cursor-based pagination for
    better performance
 
 ## Link Preview Configuration
@@ -1018,7 +1023,7 @@ ChatView(
     flashingCircleBrightColor: Colors.grey,
     flashingCircleDarkColor: Colors.black,
     // For custom indicator
-    // padding: const EdgeInsets.only(left: 12), 
+    // padding: const EdgeInsets.only(left: 12),
     // customIndicator: Container(
     //   margin: const EdgeInsets.only(left: 8),
     //   decoration: const BoxDecoration(
@@ -1125,6 +1130,7 @@ ChatView(
 ```
 
 ## Internationalization
+
 ChatView supports internationalization (i18n) for various languages. You can set the locale using the `PackageString.setLocale('en')`.
 
 ```dart
@@ -1151,51 +1157,65 @@ PackageStrings.addLocaleObject(
 PackageStrings.setLocale('es');
 ```
 
-## Send Image With Message
-You can send images along with your messages by enabling the `shouldSendImageWithText` flag in `sendMessageConfig` all the other things will be handled by the package itself. Here's how to do it:
+## Image Preview and Sending Flow
+
+You can customize the view for sending images by using the `GalleryActionButton` in `trailingActions`. Here's a practical example that opens an image preview screen before sending:
 
 ```dart
 sendMessageConfig: SendMessageConfiguration(
-  shouldSendImageWithText: true, // Enable sending images with text
-),
-```
-
-You can also customize the view by using the `selectedImageViewBuilder` field of the `sendMessageConfig`:
-
-```dart
-sendMessageConfig: SendMessageConfiguration(
-  shouldSendImageWithText: true,
-  selectedImageViewBuilder: (images, onImageRemove) {
-    if (images.isNotEmpty) {
-      return SizedBox(
-        width: MediaQuery.sizeOf(context).width,
-        child: Stack(
-          children: [
-            Image.file(
-              File(images.first),
-              height: 100,
-            ),
-            Positioned(
-            right: 0,
-            top: 0,
-            child: IconButton(
-              icon: const Icon(
-                Icons.close,
-              ),
-              onPressed: () {
-                 onImageRemove.call(
-                  imagePath: images.first,
-                 );
-               },
-             ),
-            ),
-          ],
+  textFieldConfig: TextFieldConfiguration(
+    trailingActions: (context, controller) => [
+      GalleryActionButton(
+        icon: Icon(
+          Icons.photo_rounded,
+          size: 30,
+          color: _theme.iconColor,
         ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  },
+        onPressed: (path, replyMessage) {
+          if (path?.isEmpty ?? true) return;
+          // Open fullscreen image preview before sending
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              fullscreenDialog: true,
+              builder: (_) => ImagePreviewScreen(
+                imagePath: path!,
+                replyMessage: replyMessage,
+                chatName: widget.chat.name,
+                onSend: (imagePath, caption, reply) {
+                  // Create a timestamp for unique message IDs
+                  final timeStamp = DateTime.now().microsecondsSinceEpoch;
+                  // Add image message
+                  _chatController.addMessage(
+                    Message(
+                      id: '${timeStamp}_img',
+                      message: imagePath,
+                      createdAt: DateTime.now(),
+                      messageType: MessageType.image,
+                      sentBy: _chatController.currentUser.id,
+                      replyMessage: reply ?? const ReplyMessage(),
+                    ),
+                  );
+
+                  // Add caption if provided
+                  if (caption.isNotEmpty) {
+                    _chatController.addMessage(
+                      Message(
+                        id: '${timeStamp}_cap',
+                        message: caption,
+                        createdAt: DateTime.now(),
+                        messageType: MessageType.text,
+                        sentBy: _chatController.currentUser.id,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    ],
+  ),
 ),
 ```
 
@@ -1205,10 +1225,10 @@ Easily connect Chatview UI to any backend using the [**Chatview Connect**](https
 package. It offers ready-to-use solutions for
 real-time messaging with supporting media uploads.
 
-
 # Migration Guide
 
 ## Migration Guide for ChatView 3.0.0
+
 This guide will help you migrate your code from previous versions of ChatView to version 3.0.0.
 
 ## Key Changes
@@ -1220,6 +1240,7 @@ encapsulates the recorder settings for both iOS and Android platforms. The `andr
 property has been removed so whatever format will be given by the encoder that will be used.
 
 Previous Usage:
+
 ```dart
 ChatView(
   sendMessageConfig: SendMessageConfiguration(
@@ -1234,6 +1255,7 @@ ChatView(
 ```
 
 New Usage:
+
 ```dart
 ChatView(
   sendMessageConfig: SendMessageConfiguration(
@@ -1255,6 +1277,7 @@ ChatView(
 ### Text Field Action Items
 
 You can now add action buttons to the input field using two builders:
+
 - `leadingActions`: widgets shown before the text field.
 - `trailingActions`: widgets shown after the text field.
 
@@ -1310,7 +1333,7 @@ textFieldConfig: TextFieldConfiguration(
 ## Main Contributors
 
 | ![img](https://avatars.githubusercontent.com/u/25323183?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/56400956?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/65003381?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/41247722?v=4&s=200) | ![img](https://avatars.githubusercontent.com/u/72062416?v=4&s=200) |
-|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|:------------------------------------------------------------------:|
+| :----------------------------------------------------------------: | :----------------------------------------------------------------: | :----------------------------------------------------------------: | :----------------------------------------------------------------: | :----------------------------------------------------------------: |
 |           [Vatsal Tanna](https://github.com/vatsaltanna)           |        [Ujas Majithiya](https://github.com/Ujas-Majithiya)         |         [Apurva Kanthraviya](https://github.com/apurva780)         |         [Aditya Chavda](https://github.com/aditya-chavda)          |    [Yash Dhrangdhariya](https://github.com/Yash-Dhrangdhariya)     |
 
 ## How to Contribute

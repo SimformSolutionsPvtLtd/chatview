@@ -9,6 +9,7 @@ import 'models/chat_list_theme.dart';
 import 'models/chatview_theme.dart';
 import 'values/colors.dart';
 import 'values/icons.dart';
+import 'widgets/image_preview_screen.dart';
 
 void main() {
   runApp(const Example());
@@ -703,14 +704,40 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
                   ),
                   onPressed: (path, replyMessage) {
                     if (path?.isEmpty ?? true) return;
-                    _chatController.addMessage(
-                      Message(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        message: path!,
-                        createdAt: DateTime.now(),
-                        messageType: MessageType.image,
-                        sentBy: _chatController.currentUser.id,
-                        replyMessage: replyMessage ?? const ReplyMessage(),
+                    // Open fullscreen image preview before sending.
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        fullscreenDialog: true,
+                        builder: (_) => ImagePreviewScreen(
+                          imagePath: path!,
+                          replyMessage: replyMessage,
+                          chatName: widget.chat.name,
+                          onSend: (imagePath, caption, reply) {
+                            final timeStamp =
+                                DateTime.now().microsecondsSinceEpoch;
+                            _chatController.addMessage(
+                              Message(
+                                id: '${timeStamp}_img',
+                                message: imagePath,
+                                createdAt: DateTime.now(),
+                                messageType: MessageType.image,
+                                sentBy: _chatController.currentUser.id,
+                                replyMessage: reply ?? const ReplyMessage(),
+                              ),
+                            );
+                            if (caption.isNotEmpty) {
+                              _chatController.addMessage(
+                                Message(
+                                  id: '${timeStamp}_cap',
+                                  message: caption,
+                                  createdAt: DateTime.now(),
+                                  messageType: MessageType.text,
+                                  sentBy: _chatController.currentUser.id,
+                                ),
+                              );
+                            }
+                          },
+                        ),
                       ),
                     );
                   },

@@ -73,6 +73,10 @@ class ChatBackgroundConfiguration {
 
   /// Used to give text style of message's time while user swipe to see time of
   /// message.
+  ///
+  /// Acts as a global fallback for the swipe-to-reveal timestamp.
+  /// If [ChatBubble.messageTimeTextStyle] is set on the outgoing or incoming
+  /// bubble config, it takes priority over this value for that specific bubble.
   final TextStyle? messageTimeTextStyle;
 
   /// Used to give colour of message's time while user swipe to see time of

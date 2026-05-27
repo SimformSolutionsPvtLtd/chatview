@@ -70,7 +70,7 @@ extension TimeDifference on DateTime {
     return formatter.format(this);
   }
 
-  String get getTimeFromDateTime => DateFormat.Hm().format(this);
+  String get getTimeFromDateTime => DateFormat('hh:mm a').format(this);
 
   /// Returns `true` if [other] occurs on the same calendar day as
   /// this [DateTime].

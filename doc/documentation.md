@@ -728,6 +728,14 @@ ChatView(
         topLeft: Radius.circular(12),
         bottomLeft: Radius.circular(12),
       ),
+      // Style for the timestamp text.
+      // Applies to both in-bubble timestamps (showTimestamp: true)
+      // and the swipe-to-reveal timestamp (enableSwipeToSeeTime: true).
+      messageTimeTextStyle: const TextStyle(
+        color: Colors.white70,
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+      ),
     ),
     inComingChatBubbleConfig: ChatBubble(
       color: Colors.grey.shade200,
@@ -736,11 +744,26 @@ ChatView(
         topRight: Radius.circular(12),
         bottomRight: Radius.circular(12),
       ),
+      // Style for the timestamp text.
+      // Applies to both in-bubble timestamps (showTimestamp: true)
+      // and the swipe-to-reveal timestamp (enableSwipeToSeeTime: true).
+      messageTimeTextStyle: const TextStyle(
+        color: Colors.black54,
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+      ),
     ),
   ),
   // ...
 )
 ```
+
+Timestamps rendered in bubbles use 12-hour format with AM/PM (for example, `04:32 PM`).
+You can control timestamp typography per bubble side using `ChatBubble.messageTimeTextStyle`.
+
+`ChatBubble.messageTimeTextStyle` applies to **both** timestamp display modes:
+- **In-bubble** (`FeatureActiveConfig.showTimestamp: true`) — text style inside the bubble.
+- **Swipe-to-reveal** (`FeatureActiveConfig.enableSwipeToSeeTime: true`) — per-bubble style for the swipe-out timestamp. When set, this takes priority over the global `MessageListConfiguration.messageTimeTextStyle` fallback.
 
 ## Swipe to Reply Configuration
 
@@ -847,7 +870,7 @@ ChatView(
   // ...
   featureActiveConfig: FeatureActiveConfig(
     enableSwipeToReply: true,
-    enableSwipeToSeeTime: false,
+    enableSwipeToSeeTime: true,
     enablePagination: true,
     enableOtherUserName: false,
     lastSeenAgoBuilderVisibility: false,

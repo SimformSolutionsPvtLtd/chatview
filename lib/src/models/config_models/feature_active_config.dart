@@ -26,6 +26,7 @@ class FeatureActiveConfig {
     this.enableReactionPopup = true,
     this.enableTextField = true,
     this.enableSwipeToSeeTime = true,
+    this.showTimestamp = false,
     this.enableCurrentUserProfileAvatar = false,
     this.enableOtherUserProfileAvatar = true,
     this.enableReplySnackBar = true,
@@ -50,6 +51,17 @@ class FeatureActiveConfig {
 
   /// Used for enable/disable swipe whole chat to see message created time.
   final bool enableSwipeToSeeTime;
+
+  /// Used to globally control whether message timestamps are shown inside chat bubbles.
+  /// Defaults to `false`.
+  ///
+  /// When `true`, timestamps are displayed inside bubbles for all message types
+  /// (text, image, voice). Use `ChatBubble.messageTimeTextStyle` to customise
+  /// the appearance of the timestamp text per bubble direction.
+  ///
+  /// See also: [enableSwipeToSeeTime], which uses the same `ChatBubble.messageTimeTextStyle`
+  /// for its per-bubble swipe-out timestamp styling.
+  final bool showTimestamp;
 
   /// Used for enable/disable current user profile circle.
   final bool enableCurrentUserProfileAvatar;

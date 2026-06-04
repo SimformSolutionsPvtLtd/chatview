@@ -39,6 +39,7 @@ class ChatBubble {
     this.onMessageRead,
     this.border,
     this.textSelectionConfig,
+    this.boxShadow,
   });
 
   /// Used for giving color of chat bubble.
@@ -75,4 +76,9 @@ class ChatBubble {
 
   /// Configuration for text selection behavior and appearance.
   final TextSelectionConfig? textSelectionConfig;
+
+  /// Optional shadow(s) drawn under the chat bubble.
+  ///
+  /// When null, no shadow is applied (default behavior).
+  final List<BoxShadow>? boxShadow;
 }

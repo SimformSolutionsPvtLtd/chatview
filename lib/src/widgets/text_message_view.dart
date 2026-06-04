@@ -119,6 +119,9 @@ class TextMessageView extends StatelessWidget {
             color: highlightMessage ? highlightColor : _color,
             border: border,
             borderRadius: _borderRadius(textMessage),
+            boxShadow: isMessageBySender
+                ? outgoingChatBubbleConfig?.boxShadow
+                : inComingChatBubbleConfig?.boxShadow,
           ),
           child: isSelectable
               ? CustomSelectionArea(

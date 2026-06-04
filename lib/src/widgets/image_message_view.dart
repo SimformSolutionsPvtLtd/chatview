@@ -29,6 +29,7 @@ import '../models/chat_bubble.dart';
 import '../models/config_models/feature_active_config.dart';
 import '../models/config_models/image_message_configuration.dart';
 import '../models/config_models/message_reaction_configuration.dart';
+import '../utils/constants/constants.dart';
 import 'reaction_widget.dart';
 import 'share_icon.dart';
 
@@ -44,6 +45,8 @@ class ImageMessageView extends StatelessWidget {
     this.highlightImage = false,
     this.highlightScale = 1.2,
     this.featureActiveConfig,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   /// Provides configuration of chat bubble appearance from other user of chat.
@@ -73,6 +76,12 @@ class ImageMessageView extends StatelessWidget {
   /// Provides configuration of active features in chat.
   final FeatureActiveConfig? featureActiveConfig;
 
+  /// True when this is the oldest message in a consecutive same-sender group.
+  final bool isFirstInGroup;
+
+  /// True when this is the newest message in a consecutive same-sender group.
+  final bool isLastInGroup;
+
   String get imageUrl => message.message;
 
   Widget get iconButton => ShareIcon(
@@ -80,10 +89,44 @@ class ImageMessageView extends StatelessWidget {
         imageUrl: imageUrl,
       );
 
+  BorderRadius _groupAwareBorderRadius() {
+    if (imageMessageConfig?.borderRadius != null) {
+      return imageMessageConfig!.borderRadius!;
+    }
+    const r = imageBubbleBorderRadius;
+    final groupingEnabled = featureActiveConfig?.enableMessageGrouping ?? true;
+    final standalone = isFirstInGroup && isLastInGroup;
+    if (!groupingEnabled || standalone) {
+      return const BorderRadius.all(Radius.circular(r));
+    }
+    final small = (featureActiveConfig?.chainedCornerRadius ??
+            (r * messageGroupCornerRadiusFactor))
+        .clamp(0.0, r);
+
+    // Sender → reduce only right-side corners.
+    // Receiver → reduce only left-side corners.
+    // First (top): bottom corner = small (connects down to next msg).
+    // Last (bottom): top corner = small (connects up to prev msg).
+    if (isMessageBySender) {
+      return BorderRadius.only(
+        topLeft: const Radius.circular(r),
+        topRight: Radius.circular(isFirstInGroup ? r : small),
+        bottomLeft: const Radius.circular(r),
+        bottomRight: Radius.circular(isLastInGroup ? r : small),
+      );
+    } else {
+      return BorderRadius.only(
+        topLeft: Radius.circular(isFirstInGroup ? r : small),
+        topRight: const Radius.circular(r),
+        bottomLeft: Radius.circular(isLastInGroup ? r : small),
+        bottomRight: const Radius.circular(r),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final borderRadius = imageMessageConfig?.borderRadius ??
-        const BorderRadius.all(Radius.circular(14));
+    final borderRadius = _groupAwareBorderRadius();
     final backgroundColor = isMessageBySender
         ? outgoingChatBubbleConfig?.color ?? Colors.purple
         : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;

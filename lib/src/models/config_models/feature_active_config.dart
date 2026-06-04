@@ -39,6 +39,10 @@ class FeatureActiveConfig {
     this.enableScrollToBottomButton = false,
     this.enableTextSelection = false,
     this.enableMessageEditing = false,
+    this.enableMessageGrouping = true,
+    this.messageGroupingThresholdMinutes = 1,
+    this.chainedCornerRadius,
+    this.messageGroupSpacing,
   });
 
   /// Used for enable/disable swipe to reply.
@@ -107,4 +111,32 @@ class FeatureActiveConfig {
   ///
   /// Defaults to `false`.
   final bool enableMessageEditing;
+
+  /// When enabled, consecutive messages from the same sender sent within
+  /// [messageGroupingThresholdMinutes] are visually grouped: the avatar and
+  /// sender name are shown only on the first/last message of each group.
+  ///
+  /// Defaults to `true`.
+  final bool enableMessageGrouping;
+
+  /// Maximum gap in minutes between two messages for them to be considered
+  /// part of the same visual group. Only used when [enableMessageGrouping] is `true`.
+  ///
+  /// Defaults to `5`.
+  final int messageGroupingThresholdMinutes;
+
+  /// Corner radius applied to the connecting corners of grouped bubbles —
+  /// i.e. the corners on the avatar side that "chain" consecutive messages
+  /// together visually.
+  ///
+  /// When `null`, defaults to 30 % of the bubble's base border radius.
+  /// Only used when [enableMessageGrouping] is `true`.
+  final double? chainedCornerRadius;
+
+  /// Vertical gap in pixels between consecutive messages that belong to the
+  /// same sender group.
+  ///
+  /// When `null`, defaults to `2.0`.
+  /// Only used when [enableMessageGrouping] is `true`.
+  final double? messageGroupSpacing;
 }

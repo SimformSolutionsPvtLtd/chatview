@@ -44,6 +44,8 @@ class ChatBubbleWidget extends StatefulWidget {
     required this.onSwipe,
     this.onReplyTap,
     this.shouldHighlight = false,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   }) : super(key: key);
 
   /// Represent current instance of message.
@@ -63,6 +65,14 @@ class ChatBubbleWidget extends StatefulWidget {
 
   /// Flag for when user tap on replied message and highlight actual message.
   final bool shouldHighlight;
+
+  /// True when this is the oldest message in a consecutive same-sender group.
+  /// Controls sender name visibility.
+  final bool isFirstInGroup;
+
+  /// True when this is the newest message in a consecutive same-sender group.
+  /// Controls avatar visibility; a spacer is shown when false to preserve alignment.
+  final bool isLastInGroup;
 
   @override
   State<ChatBubbleWidget> createState() => _ChatBubbleWidgetState();
@@ -138,9 +148,27 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
 
   Widget _chatBubbleWidget(ChatUser? messagedUser) {
     final chatBubbleConfig = chatListConfig.chatBubbleConfig;
+    final profileCircleConfig = chatListConfig.profileCircleConfig;
+    final avatarRadius = profileCircleConfig?.circleRadius ?? 16;
+    final resolvedAvatarPadding = (profileCircleConfig?.padding ??
+            const EdgeInsets.only(
+                left: avatarDefaultPaddingLeft,
+                right: avatarDefaultPaddingRight))
+        .resolve(Directionality.of(context));
+    final avatarSpacerWidth = avatarRadius * 2 +
+        resolvedAvatarPadding.left +
+        resolvedAvatarPadding.right;
+
     return Container(
       padding: chatBubbleConfig?.padding ?? const EdgeInsets.only(left: 5.0),
-      margin: chatBubbleConfig?.margin ?? const EdgeInsets.only(bottom: 10),
+      margin: chatBubbleConfig?.margin ??
+          EdgeInsets.only(
+            bottom: (featureActiveConfig?.enableMessageGrouping ?? true) &&
+                    !widget.isLastInGroup
+                ? (featureActiveConfig?.messageGroupSpacing ??
+                        messageGroupDefaultSpacing)
+                : 10.0,
+          ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment:
@@ -149,14 +177,18 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
         children: [
           if (!isMessageBySender &&
               (featureActiveConfig?.enableOtherUserProfileAvatar ?? true))
-            profileCircle(messagedUser),
+            widget.isLastInGroup
+                ? profileCircle(messagedUser)
+                : SizedBox(width: avatarSpacerWidth),
           Expanded(
             child: _messagesWidgetColumn(messagedUser),
           ),
           if (isMessageBySender) ...[getReceipt()],
           if (isMessageBySender &&
               (featureActiveConfig?.enableCurrentUserProfileAvatar ?? true))
-            profileCircle(messagedUser),
+            widget.isLastInGroup
+                ? profileCircle(messagedUser)
+                : SizedBox(width: avatarSpacerWidth),
         ],
       ),
     );
@@ -276,6 +308,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
       children: [
         if ((chatController?.otherUsers.isNotEmpty ?? false) &&
             !isMessageBySender &&
+            widget.isFirstInGroup &&
             (featureActiveConfig?.enableOtherUserName ?? true))
           Padding(
             padding: chatListConfig
@@ -351,6 +384,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
                     ?.repliedMsgAutoScrollConfig.highlightScale ??
                 1.1,
             onMaxDuration: _onMaxDuration,
+            isFirstInGroup: widget.isFirstInGroup,
+            isLastInGroup: widget.isLastInGroup,
           ),
         ),
       ],

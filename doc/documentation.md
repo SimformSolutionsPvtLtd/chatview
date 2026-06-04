@@ -36,6 +36,7 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 - Typing indicators
 - Reply suggestions
 - Two-way pagination with lazy loading
+- Message grouping for consecutive messages from the same sender
 - Connect ChatView to any backend
   using [chatview_connect](https://pub.dev/packages/chatview_connect)
 - And a wide range of configuration options to customize your chat.
@@ -862,6 +863,12 @@ ChatView(
     receiptsBuilderVisibility: false, // Show message receipts (default: true)
     enableTextSelection: true,        // Enable text selection in bubbles (default: false)
     enableMessageEditing: true,       // Enable the edit message feature (default: false)
+
+    // Message Grouping
+    enableMessageGrouping: true,               // Enable/disable grouping (default: true)
+    messageGroupingThresholdMinutes: 5,        // Max gap in minutes to be in the same group (default: 1)
+    chainedCornerRadius: 4.0,             // Connecting corner radius; null → 30% of base radius
+    messageGroupSpacing: 2.0,                  // Vertical gap (px) between grouped messages; null → 2.0
   ),
   // ...
 )

@@ -40,6 +40,8 @@ class TextMessageView extends StatelessWidget {
     this.highlightMessage = false,
     this.highlightColor,
     this.featureActiveConfig,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   /// Represents current message is sent by current user.
@@ -68,6 +70,12 @@ class TextMessageView extends StatelessWidget {
 
   /// Provides configuration of active features in chat.
   final FeatureActiveConfig? featureActiveConfig;
+
+  /// True when this is the oldest message in a consecutive same-sender group.
+  final bool isFirstInGroup;
+
+  /// True when this is the newest message in a consecutive same-sender group.
+  final bool isLastInGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -224,16 +232,44 @@ class TextMessageView extends StatelessWidget {
       : inComingChatBubbleConfig?.messageTimeTextStyle;
 
   BorderRadiusGeometry _borderRadius(
-          String message, bool showTimeInChatBubble) =>
-      isMessageBySender
-          ? outgoingChatBubbleConfig?.borderRadius ??
-              BorderRadius.circular(showTimeInChatBubble && message.length < 37
-                  ? replyBorderRadius1
-                  : replyBorderRadius2)
-          : inComingChatBubbleConfig?.borderRadius ??
-              BorderRadius.circular(showTimeInChatBubble && message.length < 29
-                  ? replyBorderRadius1
-                  : replyBorderRadius2);
+      String message, bool showTimeInChatBubble) {
+    final config =
+        isMessageBySender ? outgoingChatBubbleConfig : inComingChatBubbleConfig;
+    if (config?.borderRadius != null) return config!.borderRadius!;
+
+    final r =
+        (showTimeInChatBubble && message.length < (isMessageBySender ? 37 : 29))
+            ? replyBorderRadius1
+            : replyBorderRadius2;
+
+    final groupingEnabled = featureActiveConfig?.enableMessageGrouping ?? true;
+    final standalone = isFirstInGroup && isLastInGroup;
+    if (!groupingEnabled || standalone) return BorderRadius.circular(r);
+
+    final small = (featureActiveConfig?.chainedCornerRadius ??
+            (r * messageGroupCornerRadiusFactor))
+        .clamp(0.0, r);
+
+    // Sender → reduce only right-side corners (avatar is on the right).
+    // Receiver → reduce only left-side corners (avatar is on the left).
+    // First (top): bottom corner = small (connects down to next msg).
+    // Last (bottom): top corner = small (connects up to prev msg).
+    if (isMessageBySender) {
+      return BorderRadius.only(
+        topLeft: Radius.circular(r),
+        topRight: Radius.circular(isFirstInGroup ? r : small),
+        bottomLeft: Radius.circular(r),
+        bottomRight: Radius.circular(isLastInGroup ? r : small),
+      );
+    } else {
+      return BorderRadius.only(
+        topLeft: Radius.circular(isFirstInGroup ? r : small),
+        topRight: Radius.circular(r),
+        bottomLeft: Radius.circular(isLastInGroup ? r : small),
+        bottomRight: Radius.circular(r),
+      );
+    }
+  }
 
   Color get _color => isMessageBySender
       ? outgoingChatBubbleConfig?.color ?? Colors.purple

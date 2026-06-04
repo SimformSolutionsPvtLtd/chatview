@@ -51,6 +51,8 @@ class MessageView extends StatefulWidget {
     this.messageConfig,
     this.onMaxDuration,
     this.controller,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   /// Provides message instance of chat.
@@ -96,6 +98,12 @@ class MessageView extends StatefulWidget {
   final ChatController? controller;
 
   final ValueSetter<int>? onMaxDuration;
+
+  /// True when this is the oldest message in a consecutive same-sender group.
+  final bool isFirstInGroup;
+
+  /// True when this is the newest message in a consecutive same-sender group.
+  final bool isLastInGroup;
 
   @override
   State<MessageView> createState() => _MessageViewState();
@@ -221,6 +229,8 @@ class _MessageViewState extends State<MessageView>
                     highlightImage: widget.shouldHighlight,
                     highlightScale: widget.highlightScale,
                     featureActiveConfig: chatViewIW?.featureActiveConfig,
+                    isFirstInGroup: widget.isFirstInGroup,
+                    isLastInGroup: widget.isLastInGroup,
                   );
                 } else if (widget.message.messageType.isText) {
                   return TextMessageView(
@@ -233,6 +243,8 @@ class _MessageViewState extends State<MessageView>
                     highlightColor: widget.highlightColor,
                     highlightMessage: widget.shouldHighlight,
                     featureActiveConfig: chatViewIW?.featureActiveConfig,
+                    isFirstInGroup: widget.isFirstInGroup,
+                    isLastInGroup: widget.isLastInGroup,
                   );
                 } else if (widget.message.messageType.isVoice) {
                   return VoiceMessageView(

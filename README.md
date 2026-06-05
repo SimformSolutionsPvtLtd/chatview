@@ -72,6 +72,20 @@ Make `ChatView` backend-ready with [chatview_connect][chatViewConnect]
 - ⚙️ Setup in 3 steps: set **Service Type** -> **User ID** and get **`ChatManager`**
 - 💬 Supports **1-on-1** and **group chats** with **media uploads** *(audio not supported).*
 
+## Using with AI Assistants
+
+An [`llms.txt`](llms.txt) file is included at the root of this repository. It contains a
+compact, structured reference — visual element → config path mapping, full widget config trees,
+key models, controller API, and common recipes — formatted for LLM consumption.
+
+When asking an AI assistant (Claude, Cursor, Copilot, etc.) to help configure or customize
+this package, point it to `llms.txt` alongside your screenshots or code:
+
+> "Here is the chatview package reference: [llms.txt contents]. My chat screen looks like
+> [screenshot]. How do I make the outgoing bubble dark blue?"
+
+The AI will resolve UI elements directly to config class properties without guessing.
+
 ## Support
 
 For questions, issues, or feature

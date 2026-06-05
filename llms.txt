@@ -1,0 +1,406 @@
+# chatview — Flutter Chat UI Package
+
+**Version:** 3.0.0 | **Import:** `package:chatview/chatview.dart`
+**Pub:** https://pub.dev/packages/chatview | **Platforms:** Android, iOS, macOS, Web, Linux, Windows
+
+Two main widgets: `ChatView` (single conversation screen) and `ChatList` (conversation list screen).
+
+---
+
+## Quick Setup
+
+```dart
+// 1. Controller
+final controller = ChatController(
+  initialMessageList: messages,   // List<Message>
+  scrollController: ScrollController(),
+  currentUser: ChatUser(id: '1', name: 'Me'),
+  otherUsers: [ChatUser(id: '2', name: 'Them')],
+);
+
+// 2. Widget
+ChatView(
+  chatController: controller,
+  onSendTap: (message, replyMessage, messageType) {
+    controller.addMessage(Message(
+      id: UniqueKey().toString(),
+      message: message,
+      createdAt: DateTime.now(),
+      sentBy: '1',
+      replyMessage: replyMessage,
+      messageType: messageType,
+    ));
+  },
+  chatViewState: ChatViewState.hasMessages,
+)
+```
+
+---
+
+## ChatView — Full Config Tree
+
+```
+ChatView(
+  chatController: ChatController          ← manages messages & users
+  onSendTap: OnSendTap                    ← REQUIRED: (message, replyMsg, type) → void
+  chatViewState: ChatViewState            ← hasMessages | loading | error | noData
+  chatViewStateConfig: ChatViewStateConfiguration  ← custom widgets for each state
+
+  appBar: ChatViewAppBar                  ← top navigation bar
+  chatBackgroundConfiguration: ChatBackgroundConfiguration  ← screen background
+
+  chatBubbleConfig: ChatBubbleConfiguration        ← message bubbles
+  reactionPopupConfig: ReactionPopupConfiguration  ← emoji reaction sheet
+  repliedMessageConfig: RepliedMessageConfiguration ← reply preview in bubble
+  messageConfig: MessageConfiguration              ← custom message type builders
+
+  sendMessageConfig: SendMessageConfiguration      ← input bar (text, voice, images)
+  textFieldConfig: TextFieldConfiguration          ← text input appearance
+  replyMessageBuilder: (ctx, state) → Widget       ← custom reply preview above input
+
+  typeIndicatorConfig: TypeIndicatorConfiguration  ← "typing..." bubble
+  replySuggestionsConfig: ReplySuggestionsConfig   ← quick reply chips
+
+  featureActiveConfig: FeatureActiveConfig         ← feature on/off flags
+  swipeToReplyConfig: SwipeToReplyConfiguration    ← swipe gesture
+  textSelectionConfig: TextSelectionConfig         ← text selection behavior
+
+  loadMoreData: (ChatPaginationDirection, Message) → Future<void>  ← pagination
+  isLastPage: () → bool                           ← stop pagination
+  loadingWidget: Widget                            ← pagination loader
+
+  scrollToBottomButtonConfig: ScrollToBottomButtonConfig  ← scroll-to-bottom FAB
+)
+```
+
+---
+
+## Visual Element → Config Path
+
+| What you see in UI | Config class + path |
+|---|---|
+| **Message bubble (outgoing)** | `chatBubbleConfig.outgoingChatBubbleConfig: ChatBubble` |
+| **Message bubble (incoming)** | `chatBubbleConfig.inComingChatBubbleConfig: ChatBubble` |
+| Bubble color | `ChatBubble.color` |
+| Bubble shape / corners | `ChatBubble.borderRadius` |
+| Bubble text style | `ChatBubble.textStyle` |
+| Bubble padding | `ChatBubble.padding` |
+| Bubble shadow | `ChatBubble.boxShadow` |
+| **Message timestamp** | `chatBubbleConfig.inComingChatBubbleConfig.messageTimeTextStyle / messageTimeIconColor` |
+| **Read receipts (✓✓ ticks)** | `featureActiveConfig.receiptsBuilderVisibility` + `chatBubbleConfig.outgoingChatBubbleConfig.receiptsWidget` |
+| **Sender name above bubble** | `featureActiveConfig.enableOtherUserName` + `chatBubbleConfig.inComingChatBubbleConfig.senderNameTextStyle` |
+| **Emoji reaction row** | `reactionPopupConfig: ReactionPopupConfiguration` |
+| Reaction popup background | `reactionPopupConfig.backgroundColor` |
+| Reaction popup shadow | `reactionPopupConfig.shadow` |
+| Reaction popup emoji list | `reactionPopupConfig.emojiList` (List<String>) |
+| **Reply preview inside bubble** | `repliedMessageConfig: RepliedMessageConfiguration` |
+| Reply background color | `repliedMessageConfig.backgroundColor` |
+| Reply vertical bar color | `repliedMessageConfig.verticalBarColor` |
+| Reply highlight on scroll | `repliedMessageConfig.repliedMsgAutoScrollConfig.enableHighlightRepliedMsg` |
+| **"Typing..." indicator** | `typeIndicatorConfig: TypeIndicatorConfiguration` |
+| Typing dots color (bright) | `typeIndicatorConfig.flashingCircleBrightColor` |
+| Typing dots color (dark) | `typeIndicatorConfig.flashingCircleDarkColor` |
+| Custom typing widget | `typeIndicatorConfig.customIndicator` |
+| Show/hide typing indicator | `chatController.setTypingIndicator = true/false` |
+| **Top app bar** | `appBar: ChatViewAppBar` |
+| App bar avatar | `ChatViewAppBar.profilePicture` + `imageType` |
+| App bar title | `ChatViewAppBar.chatTitle` |
+| App bar subtitle / status | `ChatViewAppBar.userStatus` |
+| App bar action buttons | `ChatViewAppBar.actions` |
+| **Input/send bar** | `sendMessageConfig: SendMessageConfiguration` |
+| Send button icon | `sendMessageConfig.sendButtonConfig.icon` |
+| Send button color | `sendMessageConfig.sendButtonConfig.iconColor` |
+| Enable/disable image send | `sendMessageConfig.imagePickerIconsConfig` |
+| Enable/disable voice | `VoiceRecordingConfiguration` inside `sendMessageConfig` |
+| Voice waveform style | `sendMessageConfig.voiceRecordingConfiguration.waveStyle: WaveStyle` |
+| Leading input actions | `textFieldConfig.leadingActions: (ctx, controller) → List<Widget>` |
+| Trailing input actions | `textFieldConfig.trailingActions: (ctx, controller) → List<Widget>` |
+| Camera button | `CameraActionButton` (built-in widget) |
+| Gallery button | `GalleryActionButton` (built-in widget) |
+| Overlay/more button | `OverlayActionButton` + `OverlayActionWidget` list |
+| Input text field style | `textFieldConfig.textStyle` |
+| Input hint text | `textFieldConfig.hintText` |
+| Input border | `textFieldConfig.border` |
+| Input background color | `textFieldConfig.decoration` |
+| **Reply suggestions chips** | `replySuggestionsConfig: ReplySuggestionsConfig` |
+| Suggestion chip style | `replySuggestionsConfig.itemConfig: SuggestionItemConfig` |
+| Suggestion list layout | `replySuggestionsConfig.listConfig: SuggestionListConfig` |
+| Add/remove suggestions | `chatController.addReplySuggestions(list)` / `.removeReplySuggestions()` |
+| **Link preview card** | `chatBubbleConfig.linkPreviewConfig: LinkPreviewConfiguration` |
+| Link preview title style | `linkPreviewConfig.titleStyle` |
+| Link preview body style | `linkPreviewConfig.bodyStyle` |
+| Link preview background | `linkPreviewConfig.backgroundColor` |
+| **Screen background** | `chatBackgroundConfiguration: ChatBackgroundConfiguration` |
+| Background color | `chatBackgroundConfiguration.backgroundColor` |
+| Background image | `chatBackgroundConfiguration.backgroundImage` |
+| **Swipe-to-reply gesture** | `swipeToReplyConfig: SwipeToReplyConfiguration` |
+| Swipe enable/disable | `featureActiveConfig.enableSwipeToReply` |
+| Swipe left callback | `swipeToReplyConfig.onLeftSwipe` |
+| Swipe right callback | `swipeToReplyConfig.onRightSwipe` |
+| **"Last seen" text** | `featureActiveConfig.lastSeenAgoBuilderVisibility` |
+| **Pagination loader** | `loadingWidget` on `ChatView` |
+| Scroll-to-bottom button | `scrollToBottomButtonConfig: ScrollToBottomButtonConfig` |
+
+---
+
+## Feature Flags (`FeatureActiveConfig`)
+
+```dart
+featureActiveConfig: FeatureActiveConfig(
+  enableSwipeToReply: true,          // swipe gesture on messages
+  enableSwipeToSeeTime: true,        // swipe left to reveal timestamp
+  enablePagination: true,            // infinite scroll / lazy loading
+  enableOtherUserName: true,         // show sender name above bubble (groups)
+  enableReactionPopup: true,         // long-press emoji reaction popup
+  enableCurrentUserProfileAvatar: false, // avatar next to your own messages
+  enableOtherUserProfileAvatar: true,    // avatar next to other's messages
+  lastSeenAgoBuilderVisibility: true,    // "last seen X ago" text
+  receiptsBuilderVisibility: true,       // ✓✓ read receipt icons
+  enableTextSelection: false,            // selectable message text
+)
+```
+
+---
+
+## Key Models
+
+### Message
+```dart
+Message(
+  id: String,                          // unique
+  message: String,                     // text content (or file path for images)
+  createdAt: DateTime,
+  sentBy: String,                      // ChatUser.id
+  messageType: MessageType,            // text | image | voice | custom
+  status: MessageStatus,               // pending | sent | delivered | read | undelivered
+  replyMessage: ReplyMessage,          // non-null if replying
+  reaction: Reaction,                  // emoji reactions on this message
+  isFirstInGroup: bool,                // auto-set; true = show avatar/name
+  isLastInGroup: bool,                 // auto-set; true = show timestamp
+)
+```
+
+### ChatUser
+```dart
+ChatUser(
+  id: String,
+  name: String,
+  profilePhoto: String?,   // URL or asset path
+  imageType: ImageType,    // network | asset
+)
+```
+
+### ReplyMessage
+```dart
+ReplyMessage(
+  messageId: String,
+  message: String,
+  replyBy: String,        // ChatUser.id who is replying
+  replyTo: String,        // ChatUser.id being replied to
+  messageType: MessageType,
+)
+```
+
+---
+
+## ChatController API
+
+```dart
+chatController.addMessage(message)              // append new message
+chatController.loadMoreData(messages, direction: ChatPaginationDirection)
+chatController.replaceMessageList(messages)     // replace entire list
+chatController.updateMessage(message)           // update existing by id
+chatController.updateMessageStatus(messageId, status)
+chatController.removeMessage(messageId)
+chatController.setTypingIndicator = true/false  // show/hide typing bubble
+chatController.addReplySuggestions(list)        // show quick reply chips
+chatController.removeReplySuggestions()
+chatController.scrollToLastMessage()
+chatController.initialMessageList               // current List<Message>
+chatController.currentUser                      // ChatUser
+chatController.otherUsers                       // List<ChatUser>
+```
+
+---
+
+## Message Types
+
+| Type | `MessageType` value | Platform support |
+|---|---|---|
+| Text | `MessageType.text` | All |
+| Image | `MessageType.image` | All |
+| Voice | `MessageType.voice` | Android, iOS only |
+| Custom | `MessageType.custom` | All |
+
+Custom message rendering:
+```dart
+messageConfig: MessageConfiguration(
+  customMessageBuilder: (replyMessage) => YourWidget(),
+  showReactionsOnCustomMessages: true,
+)
+```
+
+---
+
+## ChatList — Full Config Tree
+
+```
+ChatList(
+  controller: ChatListController          ← manages list state
+  appbar: ChatListAppBar                  ← top bar
+  tileConfig: ListTileConfig              ← each conversation row
+  menuConfig: ChatMenuConfig              ← long-press context menu
+  searchConfig: SearchConfig              ← search bar
+  header: Widget                          ← widget above list (filter chips, etc.)
+  footer: Widget                          ← widget below list
+  stateConfig: ListStateConfig            ← empty/error state widgets
+  loadMoreConfig: LoadMoreConfig          ← pagination loader style
+)
+```
+
+### ListTileConfig — visual elements
+
+| What you see | Property |
+|---|---|
+| User name text style | `userNameTextStyle` |
+| Last message text style | `lastMessageTextStyle` |
+| Avatar size | `userAvatarConfig.radius` |
+| Avatar background | `userAvatarConfig.backgroundColor` |
+| Online indicator dot | `userActiveStatusConfig: UserActiveStatusConfig` |
+| Online dot color | `userActiveStatusConfig.color: (status) → Color` |
+| Online dot position | `userActiveStatusConfig.alignment: UserActiveStatusAlignment` |
+| Unread count badge | `unreadCountConfig: UnreadCountConfig` |
+| Unread badge color | `unreadCountConfig.backgroundColor` |
+| Typing indicator | `typingStatusConfig: TypingStatusConfig` |
+| Message read status icon | `lastMessageStatusConfig: LastMessageStatusConfig` |
+| Last message time | `timeConfig: LastMessageTimeConfig` |
+| Tile tap | `onTap: (ChatListItem) → void` |
+| Tile padding | `padding` |
+| Custom trailing widget | `trailingBuilder: (chat) → Widget` |
+| Custom name widget | `userNameBuilder: (chat) → Widget` |
+| Custom last message widget | `lastMessageTileBuilder: (message) → Widget` |
+
+---
+
+## ChatListController API
+
+```dart
+ChatListController(
+  initialChatList: List<ChatListItem>,
+  scrollController: ScrollController(),
+)
+
+controller.addChat(chat)
+controller.removeChat(id)
+controller.updateChat(id, (prev) => prev.copyWith(...))
+controller.setSearchChats(list)         // filter displayed list
+controller.clearSearch()                // restore full list
+controller.chatListMap                  // Map<String, ChatListItem>
+controller.pinnedChats                  // List<ChatListItem>
+```
+
+---
+
+## Internationalization
+
+```dart
+// Add locale
+PackageStrings.addLocaleObject('es', ChatViewLocale(
+  today: 'Hoy', yesterday: 'Ayer', reply: 'Responder',
+  you: 'Tú', send: 'Enviar', photo: 'Foto', message: 'Mensaje',
+  more: 'Más', unsend: 'Desenviar', report: 'Reportar',
+  repliedToYou: 'Te respondió', repliedBy: 'Respondido por',
+  replyTo: 'Responder a', reactionPopupTitle: '...',
+));
+
+// Activate
+PackageStrings.setLocale('es');
+```
+
+---
+
+## Platform Setup Checklist
+
+**iOS** (voice + images): add to `Info.plist`:
+```xml
+<key>NSCameraUsageDescription</key><string>...</string>
+<key>NSMicrophoneUsageDescription</key><string>...</string>
+<key>NSPhotoLibraryUsageDescription</key><string>...</string>
+```
+Also: `platform :ios, '13.0'` in Podfile.
+
+**Android** (voice): add to `AndroidManifest.xml`:
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO"/>
+```
+Also: `minSdkVersion 21` in `build.gradle`.
+
+---
+
+## Common Recipes
+
+**Change bubble colors:**
+```dart
+chatBubbleConfig: ChatBubbleConfiguration(
+  outgoingChatBubbleConfig: ChatBubble(color: Colors.blue),
+  inComingChatBubbleConfig: ChatBubble(color: Colors.grey.shade200),
+)
+```
+
+**Enable reactions with custom emojis:**
+```dart
+reactionPopupConfig: ReactionPopupConfiguration(
+  emojiList: ['❤️', '👍', '😂', '😮', '😢', '🙏'],
+  userReactionCallback: (message, emoji) { /* save to backend */ },
+)
+```
+
+**Add voice messages:**
+```dart
+sendMessageConfig: SendMessageConfiguration(
+  voiceRecordingConfiguration: VoiceRecordingConfiguration(
+    recorderSettings: RecorderSettings(bitRate: 128000, sampleRate: 44100),
+  ),
+)
+```
+
+**Enable pagination:**
+```dart
+ChatView(
+  featureActiveConfig: FeatureActiveConfig(enablePagination: true),
+  isLastPage: () => loadedCount >= totalCount,
+  loadMoreData: (direction, refMsg) async {
+    final msgs = await api.fetch(direction, refMsg.id);
+    chatController.loadMoreData(msgs, direction: direction);
+  },
+)
+```
+
+**Show quick reply suggestions:**
+```dart
+chatController.addReplySuggestions([
+  SuggestionItemData(text: 'OK'),
+  SuggestionItemData(text: 'Thanks!'),
+]);
+```
+
+**Custom message type:**
+```dart
+// Send
+Message(id: ..., message: jsonPayload, messageType: MessageType.custom, ...)
+
+// Render
+messageConfig: MessageConfiguration(
+  customMessageBuilder: (replyMsg) => MyCustomWidget(data: replyMsg.message),
+)
+```
+
+**Disable specific features:**
+```dart
+featureActiveConfig: FeatureActiveConfig(
+  enableSwipeToReply: false,
+  lastSeenAgoBuilderVisibility: false,
+  receiptsBuilderVisibility: false,
+  enableReactionPopup: false,
+)
+```

@@ -30,12 +30,12 @@ import 'link_preview_text.dart';
 
 class LinkPreview extends StatelessWidget {
   const LinkPreview({
-    Key? key,
+    super.key,
     required this.textMessage,
     required this.extractedUrls,
     this.linkPreviewConfig,
     this.normalTextStyle,
-  }) : super(key: key);
+  });
 
   /// Provides the whole text message to show.
   final String textMessage;

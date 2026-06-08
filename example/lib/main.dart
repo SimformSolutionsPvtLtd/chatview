@@ -817,14 +817,14 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               ),
               inComingPlayerWaveStyle: PlayerWaveStyle(
                 liveWaveColor: _theme.iconColor,
-                fixedWaveColor: AppColors.black20,
+                fixedWaveColor: _theme.iconColor.withValues(alpha: 0.2),
                 backgroundColor: Colors.transparent,
                 scaleFactor: 60,
                 waveThickness: 3,
                 spacing: 4,
               ),
-              outgoingPlayerWaveStyle: PlayerWaveStyle(
-                liveWaveColor: _theme.iconColor,
+              outgoingPlayerWaveStyle: const PlayerWaveStyle(
+                liveWaveColor: Colors.white,
                 fixedWaveColor: AppColors.white20,
                 backgroundColor: Colors.transparent,
                 scaleFactor: 60,

@@ -31,11 +31,11 @@ import 'vertical_line.dart';
 
 class ReplyMessageWidget extends StatelessWidget {
   const ReplyMessageWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.repliedMessageConfig,
     this.onTap,
-  }) : super(key: key);
+  });
 
   /// Provides message instance of chat.
   final Message message;

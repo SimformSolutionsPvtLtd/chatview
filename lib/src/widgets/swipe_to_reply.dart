@@ -26,11 +26,11 @@ import 'reply_icon.dart';
 
 class SwipeToReply extends StatefulWidget {
   const SwipeToReply({
-    Key? key,
+    super.key,
     required this.onSwipe,
     required this.child,
     this.isMessageByCurrentUser = true,
-  }) : super(key: key);
+  });
 
   /// Provides callback when user swipes chat bubble from left side.
   final VoidCallback onSwipe;

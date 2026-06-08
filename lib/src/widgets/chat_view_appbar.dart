@@ -29,7 +29,7 @@ import 'profile_image_widget.dart';
 
 class ChatViewAppBar extends StatelessWidget {
   const ChatViewAppBar({
-    Key? key,
+    super.key,
     required this.chatTitle,
     this.backGroundColor,
     this.userStatus,
@@ -48,7 +48,7 @@ class ChatViewAppBar extends StatelessWidget {
     this.networkImageErrorBuilder,
     this.imageType = ImageType.network,
     this.networkImageProgressIndicatorBuilder,
-  }) : super(key: key);
+  });
 
   /// Allow user to change colour of appbar.
   final Color? backGroundColor;

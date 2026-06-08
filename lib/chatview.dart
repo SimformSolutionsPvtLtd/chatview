@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-library chatview;
+library;
 
 export 'package:audio_waveforms/audio_waveforms.dart'
     show

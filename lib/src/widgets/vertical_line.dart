@@ -23,12 +23,12 @@ import 'package:flutter/material.dart';
 
 class VerticalLine extends StatelessWidget {
   const VerticalLine({
-    Key? key,
+    super.key,
     this.leftPadding = 0,
     this.rightPadding = 0,
     this.verticalBarColor,
     this.verticalBarWidth,
-  }) : super(key: key);
+  });
 
   /// Allow user to set color of bar
   final Color? verticalBarColor;

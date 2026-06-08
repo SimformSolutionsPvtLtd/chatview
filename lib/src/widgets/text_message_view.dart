@@ -30,7 +30,7 @@ import 'reaction_widget.dart';
 
 class TextMessageView extends StatelessWidget {
   const TextMessageView({
-    Key? key,
+    super.key,
     required this.isMessageBySender,
     required this.message,
     this.chatBubbleMaxWidth,
@@ -40,7 +40,7 @@ class TextMessageView extends StatelessWidget {
     this.highlightMessage = false,
     this.highlightColor,
     this.featureActiveConfig,
-  }) : super(key: key);
+  });
 
   /// Represents current message is sent by current user.
   final bool isMessageBySender;
@@ -131,7 +131,7 @@ class TextMessageView extends StatelessWidget {
           decoration: BoxDecoration(
             color: highlightMessage ? highlightColor : _color,
             border: border,
-            borderRadius: _borderRadius(textMessage),
+            borderRadius: _borderRadius(textMessage, showTimeInChatBubble),
             boxShadow: isMessageBySender
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
@@ -223,15 +223,17 @@ class TextMessageView extends StatelessWidget {
       ? outgoingChatBubbleConfig?.messageTimeTextStyle
       : inComingChatBubbleConfig?.messageTimeTextStyle;
 
-  BorderRadiusGeometry _borderRadius(String message) => isMessageBySender
-      ? outgoingChatBubbleConfig?.borderRadius ??
-          (message.length < 37
-              ? BorderRadius.circular(replyBorderRadius1)
-              : BorderRadius.circular(replyBorderRadius2))
-      : inComingChatBubbleConfig?.borderRadius ??
-          (message.length < 29
-              ? BorderRadius.circular(replyBorderRadius1)
-              : BorderRadius.circular(replyBorderRadius2));
+  BorderRadiusGeometry _borderRadius(
+          String message, bool showTimeInChatBubble) =>
+      isMessageBySender
+          ? outgoingChatBubbleConfig?.borderRadius ??
+              BorderRadius.circular(showTimeInChatBubble && message.length < 37
+                  ? replyBorderRadius1
+                  : replyBorderRadius2)
+          : inComingChatBubbleConfig?.borderRadius ??
+              BorderRadius.circular(showTimeInChatBubble && message.length < 29
+                  ? replyBorderRadius1
+                  : replyBorderRadius2);
 
   Color get _color => isMessageBySender
       ? outgoingChatBubbleConfig?.color ?? Colors.purple

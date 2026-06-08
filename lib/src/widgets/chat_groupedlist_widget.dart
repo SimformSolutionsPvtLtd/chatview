@@ -37,7 +37,7 @@ import 'pagination_loader.dart';
 
 class ChatGroupedListWidget extends StatefulWidget {
   const ChatGroupedListWidget({
-    Key? key,
+    super.key,
     required this.showPopUp,
     required this.scrollController,
     required this.assignReplyMessage,
@@ -48,7 +48,7 @@ class ChatGroupedListWidget extends StatefulWidget {
     this.loadMoreData,
     this.isLastPage,
     this.loadingWidget,
-  }) : super(key: key);
+  });
 
   /// Allow user to swipe to see time while reaction pop is not open.
   final bool showPopUp;

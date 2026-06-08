@@ -290,11 +290,13 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
                   onTap: () => widget.onReplyTap
                       ?.call(widget.message.replyMessage.messageId),
                 ),
-        if (widget.message.updatedAt != null)
+        if (widget.message.updatedAt != null && isMessageBySender)
           Padding(
             padding: EdgeInsets.only(
-              left: isMessageBySender ? 0 : 8,
-              right: isMessageBySender ? 8 : 0,
+              right: (featureActiveConfig?.showTimeInChatBubble ?? false) &&
+                      widget.message.message.length < 37
+                  ? replyBorderRadius1
+                  : replyBorderRadius2,
               bottom: 2,
             ),
             child: Text(
@@ -302,7 +304,6 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
               style: const TextStyle(
                 fontSize: 11,
                 color: Colors.grey,
-                fontStyle: FontStyle.italic,
               ),
             ),
           ),

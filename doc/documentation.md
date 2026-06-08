@@ -29,6 +29,7 @@ Flutter applications with [Flexible Backend Integration](https://pub.dev/package
 - One-on-one and group chat support
 - Message reactions with emoji
 - Reply to messages functionality
+- User mentions/tagging with @ symbol
 - Link preview
 - Voice messages
 - Image sharing
@@ -1304,6 +1305,88 @@ textFieldConfig: TextFieldConfiguration(
   }
 ),
 ```
+
+### User Mentions/Tagging
+
+ChatView now supports user mentions (tagging) with @ symbol, similar to platforms like Slack or WhatsApp. When users type @ in the text field, a searchable list of users appears, and selecting a user inserts their mention into the message. Mentions are visually distinct in sent messages.
+
+#### Setting Up Mentions
+
+Configure mentions through `TextFieldConfiguration`:
+
+```dart
+sendMessageConfig: SendMessageConfiguration(
+  textFieldConfig: TextFieldConfiguration(
+    onMentionTriggered: (searchText) {
+      // Filter users based on search text
+      final users = chatController.otherUsers
+          .where((user) => user.name
+              .toLowerCase()
+              .contains(searchText.toLowerCase()))
+          .toList();
+
+      // Convert users to suggestions
+      final suggestions = users.map((user) {
+        return SuggestionItemData(
+          text: user.name,
+          config: const SuggestionItemConfig(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
+            textStyle: TextStyle(color: Colors.white),
+          ),
+        );
+      }).toList();
+
+      // Update suggestions in chat controller
+      chatController.newSuggestions.value = suggestions;
+    },
+    mentionTriggerCharacter: '@', // Default is '@'
+    mentionTextStyle: const TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Colors.blue,
+    ),
+  ),
+),
+```
+
+#### Handling Mention Selection
+
+Configure `ReplySuggestionsConfig` to handle mention insertion:
+
+```dart
+replySuggestionsConfig: ReplySuggestionsConfig(
+  onTap: (item) {
+    // Get the SendMessageWidget state
+    final sendMessageWidgetKey = context.findAncestorStateOfType<SendMessageWidgetState>();
+    if (sendMessageWidgetKey != null) {
+      // Insert mention at cursor position
+      sendMessageWidgetKey.insertMention(item.text);
+      // Clear suggestions after selection
+      chatController.removeReplySuggestions();
+    }
+  },
+),
+```
+
+#### Visual Styling
+
+Mentions in messages are automatically styled based on `mentionTextStyle`. By default:
+- Outgoing messages: mentions are bold and yellow
+- Incoming messages: mentions are bold and blue
+
+You can customize this by setting `mentionTextStyle` in `TextFieldConfiguration`.
+
+#### Key Features
+
+- **Auto-detection**: Typing @ automatically triggers mention mode
+- **Live filtering**: User list filters as you type
+- **Smart insertion**: Mentions are inserted at cursor position
+- **Visual distinction**: @mentions are highlighted in messages
+- **Customizable**: Configure trigger character and styling
+- **Non-intrusive**: Only activates when @ is typed
 
 # Contributors
 

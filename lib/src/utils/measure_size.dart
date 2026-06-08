@@ -26,10 +26,10 @@ import 'package:flutter/material.dart';
 /// It also gives update when size changes.
 class MeasureSize extends StatefulWidget {
   const MeasureSize({
-    Key? key,
+    super.key,
     required this.onSizeChange,
     required this.child,
-  }) : super(key: key);
+  });
   final Widget? child;
   final ValueSetter<bool> onSizeChange;
 

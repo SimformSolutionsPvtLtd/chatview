@@ -5,8 +5,8 @@ import '../models/models.dart';
 
 class ConfigurationsInheritedWidget extends InheritedWidget {
   const ConfigurationsInheritedWidget({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     required this.chatBackgroundConfig,
     this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.reactionPopupConfig,
@@ -18,7 +18,7 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
     this.replyPopupConfig,
     this.emojiPickerSheetConfig,
     this.scrollToBottomButtonConfig,
-  }) : super(key: key, child: child);
+  });
 
   /// Provides configuration for background of chat.
   final ChatBackgroundConfiguration chatBackgroundConfig;

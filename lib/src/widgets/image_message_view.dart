@@ -34,7 +34,7 @@ import 'share_icon.dart';
 
 class ImageMessageView extends StatelessWidget {
   const ImageMessageView({
-    Key? key,
+    super.key,
     required this.message,
     required this.isMessageBySender,
     this.imageMessageConfig,
@@ -44,7 +44,7 @@ class ImageMessageView extends StatelessWidget {
     this.highlightImage = false,
     this.highlightScale = 1.2,
     this.featureActiveConfig,
-  }) : super(key: key);
+  });
 
   /// Provides configuration of chat bubble appearance from other user of chat.
   final ChatBubble? inComingChatBubbleConfig;

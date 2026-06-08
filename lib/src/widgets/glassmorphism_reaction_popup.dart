@@ -28,10 +28,10 @@ import '../utils/constants/constants.dart';
 
 class GlassMorphismReactionPopup extends StatelessWidget {
   const GlassMorphismReactionPopup({
-    Key? key,
+    super.key,
     required this.child,
     this.reactionPopupConfig,
-  }) : super(key: key);
+  });
 
   /// Allow user to assign custom widget which is appeared in glassmorphism
   /// effect.

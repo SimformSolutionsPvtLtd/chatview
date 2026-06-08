@@ -29,11 +29,11 @@ import 'reactions_bottomsheet.dart';
 
 class ReactionWidget extends StatefulWidget {
   const ReactionWidget({
-    Key? key,
+    super.key,
     required this.reaction,
     this.messageReactionConfig,
     required this.isMessageBySender,
-  }) : super(key: key);
+  });
 
   /// Provides reaction instance of message.
   final Reaction reaction;

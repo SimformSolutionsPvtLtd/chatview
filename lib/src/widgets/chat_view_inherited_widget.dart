@@ -31,13 +31,13 @@ import 'reaction_popup.dart';
 /// over widgets.
 class ChatViewInheritedWidget extends InheritedWidget {
   ChatViewInheritedWidget({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     required this.featureActiveConfig,
     required this.chatController,
     required this.chatTextFieldViewKey,
     this.profileCircleConfiguration,
-  }) : super(key: key, child: child);
+  });
   final FeatureActiveConfig featureActiveConfig;
   final ProfileCircleConfiguration? profileCircleConfiguration;
   final ChatController chatController;

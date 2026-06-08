@@ -39,7 +39,7 @@ import 'suggestions/suggestions_config_inherited_widget.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({
-    Key? key,
+    super.key,
     required this.chatController,
     this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.onSendTap,
@@ -69,8 +69,7 @@ class ChatView extends StatefulWidget {
   })  : chatBackgroundConfig =
             chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
         chatViewStateConfig =
-            chatViewStateConfig ?? const ChatViewStateConfiguration(),
-        super(key: key);
+            chatViewStateConfig ?? const ChatViewStateConfiguration();
 
   /// Provides configuration related to user profile circle avatar.
   final ProfileCircleConfiguration? profileCircleConfig;
@@ -250,8 +249,9 @@ class _ChatViewState extends State<ChatView>
                         : DecorationImage(
                             fit: chatBackgroundConfig.backgroundImageFit ??
                                 BoxFit.fill,
-                            repeat: chatBackgroundConfig.backgroundImageRepeat ??
-                                ImageRepeat.noRepeat,
+                            repeat:
+                                chatBackgroundConfig.backgroundImageRepeat ??
+                                    ImageRepeat.noRepeat,
                             image: imageUrl.isUrl
                                 ? NetworkImage(imageUrl)
                                 : imageUrl.toMemoryImage() ??

@@ -30,10 +30,10 @@ import 'glassmorphism_reaction_popup.dart';
 
 class ReactionPopup extends StatefulWidget {
   const ReactionPopup({
-    Key? key,
+    super.key,
     required this.onTap,
     required this.showPopUp,
-  }) : super(key: key);
+  });
 
   /// Provides call back when user taps on reaction pop-up.
   final VoidCallback onTap;

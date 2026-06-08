@@ -80,7 +80,8 @@ class EditMessageViewState extends State<EditMessageView> {
               top: Radius.circular(14),
             ),
           ),
-          padding: const EdgeInsets.only(left: leftPadding, right: leftPadding, bottom: 48),
+          padding: const EdgeInsets.only(
+              left: leftPadding, right: leftPadding, bottom: 48),
           child: Row(
             children: [
               Expanded(

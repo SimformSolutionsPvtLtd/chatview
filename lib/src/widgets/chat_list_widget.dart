@@ -202,29 +202,16 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   replyPopup?.onReplyTap?.call(message);
                 },
-                onEditTap: _buildEditTapHandler(
-                  message: message,
-                  sentByCurrentUser: sentByCurrentUser,
-                  replyPopup: replyPopup,
-                ),
+                onEditTap: (!sentByCurrentUser ||
+                        !message.messageType.isText ||
+                        !(featureActiveConfig?.enableMessageEditing ?? true) ||
+                        widget.assignEditMessage == null)
+                    ? null
+                    : () => _handleEditTap(message, replyPopup),
                 sentByCurrentUser: sentByCurrentUser,
               ),
         ),
       ).closed;
-  }
-
-  VoidCallback? _buildEditTapHandler({
-    required Message message,
-    required bool sentByCurrentUser,
-    required ReplyPopupConfiguration? replyPopup,
-  }) {
-    if (!sentByCurrentUser) return null;
-    if (!(featureActiveConfig?.enableMessageEditing ?? true)) return null;
-
-    // Only enable Edit when we can actually enter edit mode.
-    if (widget.assignEditMessage == null) return null;
-
-    return () => _handleEditTap(message, replyPopup);
   }
 
   void _handleEditTap(

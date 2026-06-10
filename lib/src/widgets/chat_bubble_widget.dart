@@ -290,7 +290,9 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
                   onTap: () => widget.onReplyTap
                       ?.call(widget.message.replyMessage.messageId),
                 ),
-        if (widget.message.updatedAt != null && isMessageBySender)
+        if (widget.message.updatedAt != null &&
+            isMessageBySender &&
+            widget.message.messageType.isText)
           Padding(
             padding: EdgeInsets.only(
               right: (featureActiveConfig?.showTimeInChatBubble ?? false) &&

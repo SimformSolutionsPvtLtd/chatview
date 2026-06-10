@@ -184,7 +184,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
   }
 
   void onRightSwipe() {
-    if (maxDuration != null) {
+    if (maxDuration != null && widget.message.voiceMessageDuration == null) {
       widget.message.voiceMessageDuration =
           Duration(milliseconds: maxDuration!);
     }
@@ -196,7 +196,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
   }
 
   void onLeftSwipe() {
-    if (maxDuration != null) {
+    if (maxDuration != null && widget.message.voiceMessageDuration == null) {
       widget.message.voiceMessageDuration =
           Duration(milliseconds: maxDuration!);
     }

@@ -144,7 +144,7 @@ class ImageMessageView extends StatelessWidget {
                               message.createdAt.getTimeFromDateTime,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ).merge(
                                 isMessageBySender

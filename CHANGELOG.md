@@ -10,6 +10,7 @@
     ChatBackgroundConfiguration for controllable chat wallpaper layout.
 * **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
 * **Feat**: [115](https://github.com/SimformSolutionsPvtLtd/chatview/issues/115) Add customizable timestamp styling for chat bubbles and improve timestamp rendering logic.
+* **Fix**: [426](https://github.com/SimformSolutionsPvtLtd/chatview/issues/426) Add auto-detection and display of voice message duration
 
 ## [3.0.0]
 

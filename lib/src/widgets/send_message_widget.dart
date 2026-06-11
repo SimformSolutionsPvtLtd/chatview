@@ -271,6 +271,10 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       // Only confirm the edit if a handler is registered; otherwise keep edit
       // mode active so the user's text is not silently discarded.
       if (widget.onEditTap == null) return;
+      if (messageText == _currentlyEditingMessage!.message) {
+        _closeEditMode();
+        return;
+      }
       widget.onEditTap!.call(
         _currentlyEditingMessage!,
         _currentlyEditingMessage!.copyWith(

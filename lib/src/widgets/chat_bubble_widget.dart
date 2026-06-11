@@ -262,6 +262,14 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
   }
 
   Widget _messagesWidgetColumn(ChatUser? messagedUser) {
+    // If showTimeInChatBubble is enabled and message length is less than 37,
+    // use smaller horizontal padding to accommodate time in the bubble.
+    // Otherwise, use larger padding.
+    final horizontalPadding =
+        ((featureActiveConfig?.showTimeInChatBubble ?? false) &&
+                widget.message.message.length < 37)
+            ? replyBorderRadius1
+            : replyBorderRadius2;
     return Column(
       crossAxisAlignment:
           isMessageBySender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -291,14 +299,11 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
                       ?.call(widget.message.replyMessage.messageId),
                 ),
         if (widget.message.updatedAt != null &&
-            isMessageBySender &&
             widget.message.messageType.isText)
           Padding(
             padding: EdgeInsets.only(
-              right: (featureActiveConfig?.showTimeInChatBubble ?? false) &&
-                      widget.message.message.length < 37
-                  ? replyBorderRadius1
-                  : replyBorderRadius2,
+              left: isMessageBySender ? 0 : horizontalPadding,
+              right: isMessageBySender ? horizontalPadding : 0,
               bottom: 2,
             ),
             child: Text(

@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+* **Fix**: Prevent the chat `ListView` item count from inflating during
+  pagination. The previous-page loader slot was added with a mutating
+  `++itemCount`, so rebuilds triggered while a load was in flight (e.g. when the
+  text field height changed) could push the count past the real item count and
+  cause out-of-range errors.
 * **Perf**: Use `CachedNetworkImage` for network image messages so images are
   cached to disk and served from cache instead of being re-downloaded when
   scrolling back through long, image-heavy conversations.

@@ -330,59 +330,73 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                 _isNextPageLoading,
                 _isPrevPageLoading,
               ]),
-              builder: (context, child) => ListView.builder(
-                key: _listKey.value,
-                controller: widget.scrollController,
-                // When reaction popup is being appeared at that user should not
-                // scroll.
-                physics:
-                    showPopUp ? const NeverScrollableScrollPhysics() : null,
-                padding: EdgeInsets.only(
-                  // Adds bottom space to the message list, ensuring it is displayed
-                  // above the message text field.
-                  bottom: chatViewIW?.chatTextFieldHeight.value ?? 0,
-                ),
-                reverse: true,
-                itemCount: _isPrevPageLoading.value ? ++itemCount : itemCount,
-                itemBuilder: (context, index) {
-                  // Since the list is reversed, check if it's the last item
-                  // to display the loading widget at top.
-                  if (_isPrevPageLoading.value && index == itemCount - 1) {
-                    return PaginationLoader(
-                      listenable: _isPrevPageLoading,
-                      loader: widget.loadingWidget,
-                    );
-                  }
+              builder: (context, child) {
+                // Whether to reserve an extra slot at the top (the list is
+                // reversed) for the previous-page loader.
+                final showPrevPageLoader = _isPrevPageLoading.value;
 
-                  /// Check [messageSeparator] contains group separator for [index]
-                  if (enableSeparator && messageSeparator.containsKey(index)) {
-                    final separator = messageSeparator[index]!;
-                    return chatBackgroundConfig.groupSeparatorBuilder
-                            ?.call(separator.toString()) ??
-                        ChatGroupHeader(
-                          day: separator,
-                          groupSeparatorConfig:
-                              chatBackgroundConfig.defaultGroupSeparatorConfig,
-                        );
-                  }
+                // Derive the effective count without mutating [itemCount].
+                // Using `++itemCount` here would permanently inflate the
+                // captured [itemCount] every time this builder re-runs while
+                // [_isPrevPageLoading] is true (e.g. when the text field
+                // height changes during a load), eventually producing
+                // out-of-range indices.
+                final effectiveItemCount =
+                    showPrevPageLoader ? itemCount + 1 : itemCount;
 
-                  /// By removing separators encountered till now from the [index]
-                  /// so that we'll get actual index to display message in chat
-                  var newIndex = index - (separatorCounts[index] ?? 0);
+                return ListView.builder(
+                  key: _listKey.value,
+                  controller: widget.scrollController,
+                  // When reaction popup is being appeared at that user should
+                  // not scroll.
+                  physics:
+                      showPopUp ? const NeverScrollableScrollPhysics() : null,
+                  padding: EdgeInsets.only(
+                    // Adds bottom space to the message list, ensuring it is
+                    // displayed above the message text field.
+                    bottom: chatViewIW?.chatTextFieldHeight.value ?? 0,
+                  ),
+                  reverse: true,
+                  itemCount: effectiveItemCount,
+                  itemBuilder: (context, index) {
+                    // Since the list is reversed, check if it's the last item
+                    // to display the loading widget at top.
+                    if (showPrevPageLoader && index == effectiveItemCount - 1) {
+                      return PaginationLoader(
+                        listenable: _isPrevPageLoading,
+                        loader: widget.loadingWidget,
+                      );
+                    }
 
-                  final messageChild = ValueListenableBuilder<String?>(
-                    valueListenable: _replyId,
-                    builder: (context, state, child) {
-                      final message = messages[newIndex];
-                      final messageKey =
-                          _messageKeys[message.id] ??= GlobalKey();
-                      final enableScrollToRepliedMsg = chatListConfig
-                              .repliedMessageConfig
-                              ?.repliedMsgAutoScrollConfig
-                              .enableScrollToRepliedMsg ??
-                          false;
+                    /// Check [messageSeparator] contains group separator for [index]
+                    if (enableSeparator &&
+                        messageSeparator.containsKey(index)) {
+                      final separator = messageSeparator[index]!;
+                      return chatBackgroundConfig.groupSeparatorBuilder
+                              ?.call(separator.toString()) ??
+                          ChatGroupHeader(
+                            day: separator,
+                            groupSeparatorConfig: chatBackgroundConfig
+                                .defaultGroupSeparatorConfig,
+                          );
+                    }
 
-                      // ListView is reversed: index 0 = newest (bottom).
+                    /// By removing separators encountered till now from the [index]
+                    /// so that we'll get actual index to display message in chat
+                    var newIndex = index - (separatorCounts[index] ?? 0);
+
+                    final messageChild = ValueListenableBuilder<String?>(
+                      valueListenable: _replyId,
+                      builder: (context, state, child) {
+                        final message = messages[newIndex];
+                        final messageKey =
+                            _messageKeys[message.id] ??= GlobalKey();
+                        final enableScrollToRepliedMsg = chatListConfig
+                                .repliedMessageConfig
+                                ?.repliedMsgAutoScrollConfig
+                                .enableScrollToRepliedMsg ??
+                            false;
+  // ListView is reversed: index 0 = newest (bottom).
                       // isLastInGroup  → avatar shown (newest in group, visually bottom).
                       // isFirstInGroup → name shown  (oldest in group, visually top).
                       //
@@ -402,42 +416,40 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                           (prevMessage?.updatedAt != null);
                       final isFirstInGroup = newIndex == messages.length - 1 ||
                           !_isSameGroup(message, messages[newIndex + 1]) ||
-                          message.updatedAt != null;
-
-                      return ChatBubbleWidget(
-                        key: messageKey,
-                        message: message,
-                        slideAnimation: _slideAnimation,
-                        onLongPress: (yCoordinate, xCoordinate) =>
-                            widget.onChatBubbleLongPress(
-                          yCoordinate,
-                          xCoordinate,
-                          message,
-                        ),
-                        onSwipe: widget.assignReplyMessage,
-                        shouldHighlight: state == message.id,
-                        onReplyTap: enableScrollToRepliedMsg
-                            ? (id) => _onReplyTap(id, messages)
-                            : null,
-                        isFirstInGroup: isFirstInGroup,
+                          message.updatedAt != null;                      return ChatBubbleWidget(
+                          key: messageKey,
+                          message: message,
+                          slideAnimation: _slideAnimation,
+                          onLongPress: (yCoordinate, xCoordinate) =>
+                              widget.onChatBubbleLongPress(
+                            yCoordinate,
+                            xCoordinate,
+                            message,
+                          ),
+                          onSwipe: widget.assignReplyMessage,
+                          shouldHighlight: state == message.id,
+                          onReplyTap: enableScrollToRepliedMsg
+                              ? (id) => _onReplyTap(id, messages)
+                              : null,isFirstInGroup: isFirstInGroup,
                         isLastInGroup: isLastInGroup,
-                      );
-                    },
-                  );
-
-                  return index != 0
-                      ? messageChild
-                      // Since the list is reversed, we need to check if
-                      // we are at the first item to display the typing indicator
-                      // , suggestions and loading widget.
-                      : EndMessageFooter(
-                          loadingWidget: widget.loadingWidget,
-                          isNextPageLoading: _isNextPageLoading,
-                          typingIndicatorNotifier: typingIndicatorNotifier,
-                          child: messageChild,
                         );
-                },
-              ),
+                      },
+                    );
+
+                    return index != 0
+                        ? messageChild
+                        // Since the list is reversed, we need to check if
+                        // we are at the first item to display the typing indicator
+                        // , suggestions and loading widget.
+                        : EndMessageFooter(
+                            loadingWidget: widget.loadingWidget,
+                            isNextPageLoading: _isNextPageLoading,
+                            typingIndicatorNotifier: typingIndicatorNotifier,
+                            child: messageChild,
+                          );
+                  },
+                );
+              },
             ),
           );
         }

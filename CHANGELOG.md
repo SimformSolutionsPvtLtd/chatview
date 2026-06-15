@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+* **Perf**: Reuse cached `DateFormat`, `EmojiParser`, and `RegExp` instances on the
+  chat render hot path instead of rebuilding them for every chat bubble, keeping
+  scrolling smooth with large message lists.
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.
 * **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for

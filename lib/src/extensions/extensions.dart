@@ -60,17 +60,32 @@ extension TimeDifference on DateTime {
     } else if (differenceInDays <= 1 && differenceInDays >= -1) {
       return PackageStrings.currentLocale.yesterday;
     } else {
-      final DateFormat formatter = DateFormat(chatSeparatorDatePattern);
-      return formatter.format(this);
+      return TimeDifference._cachedDateFormat(chatSeparatorDatePattern)
+          .format(this);
     }
   }
 
-  String get getDateFromDateTime {
-    final DateFormat formatter = DateFormat(dateFormat);
-    return formatter.format(this);
-  }
+  /// Cached [DateFormat] instances keyed by the active locale and pattern.
+  ///
+  /// Constructing a [DateFormat] parses its pattern, which is relatively
+  /// expensive. These getters are called for every (visible) chat bubble on
+  /// every rebuild as well as for every message while building date
+  /// separators, so reusing the formatter avoids redundant work and keeps
+  /// scrolling smooth even with very large message lists.
+  ///
+  /// The cache key includes [Intl.getCurrentLocale] so that, exactly like the
+  /// previous per-call `DateFormat(pattern)` construction, the output still
+  /// reflects the active locale if the host app changes [Intl.defaultLocale]
+  /// at runtime.
+  static final Map<String, DateFormat> _dateFormatCache = {};
 
-  String get getTimeFromDateTime => DateFormat('hh:mm a').format(this);
+  static DateFormat _cachedDateFormat(String pattern) =>
+      _dateFormatCache['${Intl.getCurrentLocale()}|$pattern'] ??=
+          DateFormat(pattern);
+
+  String get getDateFromDateTime => _cachedDateFormat(dateFormat).format(this);
+
+  String get getTimeFromDateTime => _cachedDateFormat('hh:mm a').format(this);
 
   /// Returns `true` if [other] occurs on the same calendar day as
   /// this [DateTime].
@@ -83,9 +98,23 @@ extension TimeDifference on DateTime {
 
 /// Extension on String which implements different types string validations.
 extension ValidateString on String {
+  /// Cached regular expression for matching image URLs.
+  ///
+  /// Building a [RegExp] compiles the pattern, so it is created once and
+  /// reused instead of being recompiled on every call.
+  static final RegExp _imageUrlRegExp = RegExp(imageUrlRegExpression);
+
+  /// Shared [EmojiParser] instance.
+  ///
+  /// The [EmojiParser] constructor decodes a large emoji JSON dataset and
+  /// builds lookup maps (thousands of entries). Previously a new instance was
+  /// created for every [isAllEmoji] call — which runs for every text bubble on
+  /// every rebuild — causing severe jank while scrolling. Reusing a single
+  /// instance removes that per-frame cost entirely.
+  static final EmojiParser _emojiParser = EmojiParser();
+
   bool get isImageUrl {
-    final imageUrlRegExp = RegExp(imageUrlRegExpression);
-    return imageUrlRegExp.hasMatch(this) || startsWith('data:image');
+    return _imageUrlRegExp.hasMatch(this) || startsWith('data:image');
   }
 
   bool get fromMemory => startsWith('data:image');
@@ -106,7 +135,7 @@ extension ValidateString on String {
   }
 
   bool get isAllEmoji {
-    final unEmojified = EmojiParser().parseEmojis(this);
+    final unEmojified = _emojiParser.parseEmojis(this);
     return runes.length == unEmojified.length;
   }
 

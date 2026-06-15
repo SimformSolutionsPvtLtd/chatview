@@ -84,8 +84,14 @@ class EmojiUtil {
   /// When processing emojis, we don't need to store the graphical byte
   /// which is 0xfe0f, or so-called 'Non-Spacing Mark'.
   ///
-  static String? stripNSM(String? name) => name?.replaceAll(
-      RegExp(EmojiConst.charNonSpacingMark), EmojiConst.charEmpty);
+  /// Cached regular expression for the Non-Spacing Mark.
+  ///
+  /// [stripNSM] is invoked for every character while parsing emojis, so the
+  /// pattern is compiled once and reused instead of on every call.
+  static final RegExp _nsmRegExp = RegExp(EmojiConst.charNonSpacingMark);
+
+  static String? stripNSM(String? name) =>
+      name?.replaceAll(_nsmRegExp, EmojiConst.charEmpty);
 }
 
 ///

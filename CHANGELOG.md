@@ -1,4 +1,4 @@
-## [Unreleased]
+## 3.1.0
 
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
   Rendering issue in attached image preview when sending message on web.

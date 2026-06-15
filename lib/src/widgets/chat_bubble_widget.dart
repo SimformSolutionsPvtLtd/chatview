@@ -166,7 +166,7 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
             bottom: (featureActiveConfig?.enableMessageGrouping ?? true) &&
                     !widget.isLastInGroup
                 ? (featureActiveConfig?.messageGroupSpacing ??
-                        messageGroupDefaultSpacing)
+                    messageGroupDefaultSpacing)
                 : 10.0,
           ),
       child: Row(

@@ -463,8 +463,10 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       chatBackgroundConfig.messageSorter ??
           (a, b) => b.createdAt.compareTo(a.createdAt),
     );
+    // [elements] is already a fresh copy, so it can be returned directly for
+    // the ascending case instead of allocating another list.
     return chatBackgroundConfig.groupedListOrder.isAsc
-        ? elements.toList()
+        ? elements
         : elements.reversed.toList();
   }
 

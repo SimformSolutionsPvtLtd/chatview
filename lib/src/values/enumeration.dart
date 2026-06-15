@@ -47,6 +47,45 @@ extension ChatViewStateExtension on ChatViewState {
   bool get noMessages => this == ChatViewState.noData;
 }
 
+/// Defines how the sending → sent receipt transition is animated next to an
+/// outgoing chat bubble.
+enum SendingMessageAnimationType {
+  /// Default. A small dot/circle indicator that slides out to the right once
+  /// the message transitions from pending to sent.
+  slideOut,
+
+  /// A minimal "Sending..." text label (no surrounding padding) that fades and
+  /// collapses away once the message is sent.
+  textLabel,
+
+  /// WhatsApp-style. A clock icon shown while the message is pending that
+  /// cross-fades into a tick (check) once the message is sent.
+  ///
+  /// For text messages it renders inline at the bubble's bottom-right (next to
+  /// the timestamp), per-message, so [ShowReceiptsIn.lastMessage] does not
+  /// limit it — every outgoing bubble shows its own tick, matching the
+  /// WhatsApp pattern. For non-text messages it renders beside the bubble via
+  /// the standard receipt slot. The [ReceiptsWidgetConfig.receiptsBuilder]
+  /// override applies only to that beside-bubble slot, not the inline tick.
+  clockToTick;
+
+  /// Returns true if the animation type is [slideOut].
+  bool get isSlideOut => this == slideOut;
+
+  /// Returns true if the animation type is [textLabel].
+  bool get isTextLabel => this == textLabel;
+
+  /// Returns true if the animation type is [clockToTick].
+  bool get isClockToTick => this == clockToTick;
+
+  /// Human-readable label, handy for settings/menus.
+  String get label => switch (this) {
+        slideOut => 'Slide-out dot',
+        textLabel => 'Sending text',
+        clockToTick => 'Clock to tick',
+      };
+}
+
 enum GroupedListOrder { asc, desc }
 
 extension GroupedListOrderExtension on GroupedListOrder {

@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
+import 'chat_message_sending_to_sent_animation.dart';
 import 'link_preview.dart';
 import 'reaction_widget.dart';
 
@@ -121,6 +122,16 @@ class TextMessageView extends StatelessWidget {
             child: baseWidget,
           )
         : baseWidget;
+
+    // WhatsApp-style clock/tick rendered inline at the bubble's bottom-right
+    // (next to the timestamp) for outgoing messages. Honors the
+    // receiptsBuilderVisibility feature flag, consistent with the beside-bubble
+    // receipt path in ChatBubbleWidget.getReceipt().
+    final showInBubbleReceipt = isMessageBySender &&
+        (featureActiveConfig?.receiptsBuilderVisibility ?? true) &&
+        (outgoingChatBubbleConfig
+                ?.receiptsWidgetConfig?.sendingAnimationType.isClockToTick ??
+            false);
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -144,8 +155,40 @@ class TextMessageView extends StatelessWidget {
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
           ),
-          child: showTimeInChatBubble
-              ? LayoutBuilder(
+          child: showInBubbleReceipt
+              ? Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          bottom: sendingReceiptInBubbleReservedHeight),
+                      child: messageWidget,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (showTimeInChatBubble) ...[
+                          Text(timeText, style: timestampStyle),
+                          const SizedBox(width: 4),
+                        ],
+                        ValueListenableBuilder<MessageStatus>(
+                          valueListenable: message.statusNotifier,
+                          builder: (_, status, __) =>
+                              SendingMessageAnimatingWidget(
+                            status,
+                            type: SendingMessageAnimationType.clockToTick,
+                            color: outgoingChatBubbleConfig
+                                    ?.receiptsWidgetConfig?.sendingIndicatorColor ??
+                                timestampStyle.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : showTimeInChatBubble
+                  ? LayoutBuilder(
                   builder: (context, constraints) {
                     if (extractedUrls.isNotEmpty) {
                       return Column(

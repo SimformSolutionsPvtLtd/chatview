@@ -738,6 +738,14 @@ ChatView(
         fontWeight: FontWeight.w500,
       ),
     ),
+    receiptsWidgetConfig: ReceiptsWidgetConfig(
+    // Animation style for the pending → sent transition.
+    // SendingMessageAnimationType.slideOut (default), .textLabel, or .clockToTick.
+    sendingAnimationType: SendingMessageAnimationType.clockToTick,
+    // Color of the sending indicator (currently honored by clockToTick).
+    sendingIndicatorColor: Colors.white70,
+),
+    ),
     inComingChatBubbleConfig: // Similar to outgoingChatBubbleConfig
   ),
   // ...

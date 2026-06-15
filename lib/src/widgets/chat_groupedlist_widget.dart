@@ -396,27 +396,29 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                                 ?.repliedMsgAutoScrollConfig
                                 .enableScrollToRepliedMsg ??
                             false;
-  // ListView is reversed: index 0 = newest (bottom).
-                      // isLastInGroup  → avatar shown (newest in group, visually bottom).
-                      // isFirstInGroup → name shown  (oldest in group, visually top).
-                      //
-                      // Edited messages show an "Edited" label ABOVE the bubble,
-                      // creating a visual break only on the top side. So:
-                      //  • isFirstInGroup=true when THIS message is edited
-                      //    (Edited label above → detach from older message above).
-                      //  • isLastInGroup=true when the NEWER/below neighbor is
-                      //    edited (that neighbor's Edited label visually separates
-                      //    it from the current message below).
-                      // The connection below the edited message is preserved so
-                      // messages sent after it stay grouped with it.
-                      final prevMessage =
-                          newIndex > 0 ? messages[newIndex - 1] : null;
-                      final isLastInGroup = newIndex == 0 ||
-                          !_isSameGroup(message, messages[newIndex - 1]) ||
-                          (prevMessage?.updatedAt != null);
-                      final isFirstInGroup = newIndex == messages.length - 1 ||
-                          !_isSameGroup(message, messages[newIndex + 1]) ||
-                          message.updatedAt != null;                      return ChatBubbleWidget(
+                        // ListView is reversed: index 0 = newest (bottom).
+                        // isLastInGroup  → avatar shown (newest in group, visually bottom).
+                        // isFirstInGroup → name shown  (oldest in group, visually top).
+                        //
+                        // Edited messages show an "Edited" label ABOVE the bubble,
+                        // creating a visual break only on the top side. So:
+                        //  • isFirstInGroup=true when THIS message is edited
+                        //    (Edited label above → detach from older message above).
+                        //  • isLastInGroup=true when the NEWER/below neighbor is
+                        //    edited (that neighbor's Edited label visually separates
+                        //    it from the current message below).
+                        // The connection below the edited message is preserved so
+                        // messages sent after it stay grouped with it.
+                        final prevMessage =
+                            newIndex > 0 ? messages[newIndex - 1] : null;
+                        final isLastInGroup = newIndex == 0 ||
+                            !_isSameGroup(message, messages[newIndex - 1]) ||
+                            (prevMessage?.updatedAt != null);
+                        final isFirstInGroup = newIndex ==
+                                messages.length - 1 ||
+                            !_isSameGroup(message, messages[newIndex + 1]) ||
+                            message.updatedAt != null;
+                        return ChatBubbleWidget(
                           key: messageKey,
                           message: message,
                           slideAnimation: _slideAnimation,
@@ -430,8 +432,9 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
                           shouldHighlight: state == message.id,
                           onReplyTap: enableScrollToRepliedMsg
                               ? (id) => _onReplyTap(id, messages)
-                              : null,isFirstInGroup: isFirstInGroup,
-                        isLastInGroup: isLastInGroup,
+                              : null,
+                          isFirstInGroup: isFirstInGroup,
+                          isLastInGroup: isLastInGroup,
                         );
                       },
                     );

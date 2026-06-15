@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+* **Perf**: Use `CachedNetworkImage` for network image messages so images are
+  cached to disk and served from cache instead of being re-downloaded when
+  scrolling back through long, image-heavy conversations.
 * **Perf**: Reuse cached `DateFormat`, `EmojiParser`, and `RegExp` instances on the
   chat render hot path instead of rebuilding them for every chat bubble, keeping
   scrolling smooth with large message lists.

@@ -1,5 +1,17 @@
 ## [Unreleased]
 
+* **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
+  Rendering issue in attached image preview when sending message on web.
+* **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
+  `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
+* **Feat**: [434](https://github.com/SimformSolutionsPvtLtd/chatview/pull/434) Add optional
+  `boxShadow` to `ChatBubble` and apply it in `TextMessageView` when set.
+* **Feat**: ✨Added backgroundImageFit and backgroundImageRepeat to
+    ChatBackgroundConfiguration for controllable chat wallpaper layout.
+* **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
+* **Feat**: [115](https://github.com/SimformSolutionsPvtLtd/chatview/issues/115) Add customizable timestamp styling for chat bubbles and improve timestamp rendering logic.
+* **Fix**: [426](https://github.com/SimformSolutionsPvtLtd/chatview/issues/426) Add auto-detection and display of voice message duration
+* **Feat**: [128](https://github.com/SimformSolutionsPvtLtd/chatview/issues/128)  Add message grouping feature to chat bubbles for improved UI
 * **Perf**: Avoid an unnecessary message list copy in `sortMessage` for the
   ascending case (the sorted list is already a fresh copy).
 * **Fix**: Prevent the chat `ListView` item count from inflating during
@@ -13,18 +25,6 @@
 * **Perf**: Reuse cached `DateFormat`, `EmojiParser`, and `RegExp` instances on the
   chat render hot path instead of rebuilding them for every chat bubble, keeping
   scrolling smooth with large message lists.
-* **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)
-  Rendering issue in attached image preview when sending message on web.
-* **Feat**: [420](https://github.com/SimformSolutionsPvtLtd/chatview/pull/420) Added support for
-  `playerMode` in `VoiceMessageConfiguration` with `single` and `multi`.
-* **Feat**: [434](https://github.com/SimformSolutionsPvtLtd/chatview/pull/434) Add optional
-  `boxShadow` to `ChatBubble` and apply it in `TextMessageView` when set.
-* **Feat**: ✨Added backgroundImageFit and backgroundImageRepeat to
-    ChatBackgroundConfiguration for controllable chat wallpaper layout.
-* **Feat**: [336](https://github.com/SimformSolutionsPvtLtd/chatview/issues/336) Add edit message support.
-* **Feat**: [115](https://github.com/SimformSolutionsPvtLtd/chatview/issues/115) Add customizable timestamp styling for chat bubbles and improve timestamp rendering logic.
-* **Fix**: [426](https://github.com/SimformSolutionsPvtLtd/chatview/issues/426) Add auto-detection and display of voice message duration
-* **Feat**: [128](https://github.com/SimformSolutionsPvtLtd/chatview/issues/128)  Add message grouping feature to chat bubbles for improved UI
 
 ## [3.0.0]
 

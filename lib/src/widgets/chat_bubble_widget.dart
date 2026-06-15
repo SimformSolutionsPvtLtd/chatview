@@ -183,7 +183,6 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
           Expanded(
             child: _messagesWidgetColumn(messagedUser),
           ),
-          if (isMessageBySender) ...[getReceipt()],
           if (isMessageBySender &&
               (featureActiveConfig?.enableCurrentUserProfileAvatar ?? true))
             widget.isLastInGroup
@@ -246,6 +245,14 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     }
   }
 
+  SendingMessageAnimationType get sendingAnimationType =>
+      chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig
+          ?.receiptsWidgetConfig?.sendingAnimationType ??
+      SendingMessageAnimationType.slideOut;
+
+  Color? get sendingIndicatorColor => chatListConfig.chatBubbleConfig
+      ?.outgoingChatBubbleConfig?.receiptsWidgetConfig?.sendingIndicatorColor;
+
   Widget getReceipt() {
     final showReceipts = chatListConfig.chatBubbleConfig
             ?.outgoingChatBubbleConfig?.receiptsWidgetConfig?.showReceiptsIn ??
@@ -261,7 +268,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
             return chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig
                     ?.receiptsWidgetConfig?.receiptsBuilder
                     ?.call(value) ??
-                sendMessageAnimationBuilder(value);
+                sendMessageAnimationBuilder(value,
+                    type: sendingAnimationType, color: sendingIndicatorColor);
           }
           return const SizedBox();
         },
@@ -278,9 +286,12 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
               return chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig
                       ?.receiptsWidgetConfig?.receiptsBuilder
                       ?.call(value) ??
-                  sendMessageAnimationBuilder(value);
+                  sendMessageAnimationBuilder(value,
+                      type: sendingAnimationType,
+                      color: sendingIndicatorColor);
             }
-            return sendMessageAnimationBuilder(value);
+            return sendMessageAnimationBuilder(value,
+                type: sendingAnimationType, color: sendingIndicatorColor);
           });
     }
     return const SizedBox();
@@ -347,48 +358,73 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
               ),
             ),
           ),
-        SwipeToReply(
-          isMessageByCurrentUser: isMessageBySender,
-          onSwipe: isMessageBySender ? onLeftSwipe : onRightSwipe,
-          child: MessageView(
-            outgoingChatBubbleConfig:
-                chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig,
-            isLongPressEnable:
-                (featureActiveConfig?.enableReactionPopup ?? true) ||
-                    (featureActiveConfig?.enableReplySnackBar ?? true),
-            inComingChatBubbleConfig:
-                chatListConfig.chatBubbleConfig?.inComingChatBubbleConfig,
-            message: widget.message,
-            isMessageBySender: isMessageBySender,
-            messageConfig: chatListConfig.messageConfig,
-            onLongPress: widget.onLongPress,
-            chatBubbleMaxWidth: chatListConfig.chatBubbleConfig?.maxWidth,
-            longPressAnimationDuration:
-                chatListConfig.chatBubbleConfig?.longPressAnimationDuration,
-            onDoubleTap: featureActiveConfig?.enableDoubleTapToLike ?? false
-                ? chatListConfig.chatBubbleConfig?.onDoubleTap ??
-                    (message) => currentUser != null
-                        ? chatController?.setReaction(
-                            emoji: heart,
-                            messageId: message.id,
-                            userId: currentUser!.id,
-                          )
-                        : null
-                : null,
-            shouldHighlight: widget.shouldHighlight,
-            controller: chatController,
-            highlightColor: chatListConfig.repliedMessageConfig
-                    ?.repliedMsgAutoScrollConfig.highlightColor ??
-                Colors.grey,
-            highlightScale: chatListConfig.repliedMessageConfig
-                    ?.repliedMsgAutoScrollConfig.highlightScale ??
-                1.1,
-            onMaxDuration: _onMaxDuration,
-            isFirstInGroup: widget.isFirstInGroup,
-            isLastInGroup: widget.isLastInGroup,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SwipeToReply(
+              isMessageByCurrentUser: isMessageBySender,
+              onSwipe: isMessageBySender ? onLeftSwipe : onRightSwipe,
+              child: _messageView(),
+            ),
+            // slideOut indicator sits to the right of the bubble.
+            if (isMessageBySender && sendingAnimationType.isSlideOut)
+              getReceipt(),
+            // clockToTick renders inline inside text bubbles (see
+            // TextMessageView); for non-text messages there is no inline slot,
+            // so fall back to showing it beside the bubble.
+            if (isMessageBySender &&
+                sendingAnimationType.isClockToTick &&
+                !widget.message.messageType.isText)
+              getReceipt(),
+          ],
         ),
+        // textLabel indicator sits just below the bubble, aligned to its side.
+        if (isMessageBySender && sendingAnimationType.isTextLabel)
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: getReceipt(),
+          ),
       ],
+    );
+  }
+
+  Widget _messageView() {
+    return MessageView(
+      outgoingChatBubbleConfig:
+          chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig,
+      isLongPressEnable: (featureActiveConfig?.enableReactionPopup ?? true) ||
+          (featureActiveConfig?.enableReplySnackBar ?? true),
+      inComingChatBubbleConfig:
+          chatListConfig.chatBubbleConfig?.inComingChatBubbleConfig,
+      message: widget.message,
+      isMessageBySender: isMessageBySender,
+      messageConfig: chatListConfig.messageConfig,
+      onLongPress: widget.onLongPress,
+      chatBubbleMaxWidth: chatListConfig.chatBubbleConfig?.maxWidth,
+      longPressAnimationDuration:
+          chatListConfig.chatBubbleConfig?.longPressAnimationDuration,
+      onDoubleTap: featureActiveConfig?.enableDoubleTapToLike ?? false
+          ? chatListConfig.chatBubbleConfig?.onDoubleTap ??
+              (message) => currentUser != null
+                  ? chatController?.setReaction(
+                      emoji: heart,
+                      messageId: message.id,
+                      userId: currentUser!.id,
+                    )
+                  : null
+          : null,
+      shouldHighlight: widget.shouldHighlight,
+      controller: chatController,
+      highlightColor: chatListConfig
+              .repliedMessageConfig?.repliedMsgAutoScrollConfig.highlightColor ??
+          Colors.grey,
+      highlightScale: chatListConfig
+              .repliedMessageConfig?.repliedMsgAutoScrollConfig.highlightScale ??
+          1.1,
+      onMaxDuration: _onMaxDuration,
+      isFirstInGroup: widget.isFirstInGroup,
+      isLastInGroup: widget.isLastInGroup,
     );
   }
 

@@ -23,6 +23,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../values/enumeration.dart';
 import '../../widgets/chat_message_sending_to_sent_animation.dart';
 import '../timeago/timeago.dart' as timeago;
 
@@ -66,6 +67,30 @@ const double loadMoreCircularProgressIndicatorSize = 36;
 const String httpScheme = 'http';
 const String httpsScheme = 'https';
 
+/// Diameter of the sending-status indicator circle.
+const double sendingIndicatorSize = 6;
+
+/// Default color of the sending-status indicator (dot / text / clock-tick)
+/// when no explicit color is provided.
+const Color sendingIndicatorDefaultColor = Color(0xFF666f79);
+
+/// Duration of the sending-to-sent indicator slide animation.
+const Duration sendingAnimationDuration = Duration(milliseconds: 400);
+
+/// Curve of the sending-to-sent indicator slide animation.
+const Curve sendingAnimationCurve = Curves.easeOut;
+
+/// Size of the clock/tick icon for the WhatsApp-style sending indicator.
+const double sendingTickIconSize = 14;
+
+/// Vertical space reserved at the bottom of a text bubble for the inline
+/// WhatsApp-style clock/tick (and timestamp) so it never overlaps the message.
+const double sendingReceiptInBubbleReservedHeight = 18;
+
+/// Text shown by the [SendingMessageAnimationType.textLabel] indicator while a
+/// message is pending.
+const String sendingLabelText = 'Sending...';
+
 String applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
     return timeago.format(inputTime);
@@ -83,8 +108,12 @@ const String urlRegex =
 /// is not sent or at the pending state. A custom implementation can have different
 /// widgets for different states.
 /// Right now it is implemented to appear right next to the outgoing bubble.
-Widget sendMessageAnimationBuilder(MessageStatus status) {
-  return SendingMessageAnimatingWidget(status);
+Widget sendMessageAnimationBuilder(
+  MessageStatus status, {
+  SendingMessageAnimationType type = SendingMessageAnimationType.slideOut,
+  Color? color,
+}) {
+  return SendingMessageAnimatingWidget(status, type: type, color: color);
 }
 
 /// Default builder when the message has got seen as of now

@@ -168,7 +168,12 @@ class ImageMessageView extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: borderRadius,
-                        child: AdaptiveImage(imageUrl: imageUrl),
+                        child: SizedBox.expand(
+                          child: AdaptiveImage(
+                            imageUrl: imageUrl,
+                            fit: imageMessageConfig?.fit ?? BoxFit.cover,
+                          ),
+                        ),
                       ),
                       if (featureActiveConfig?.showTimeInChatBubble ?? false)
                         Positioned(

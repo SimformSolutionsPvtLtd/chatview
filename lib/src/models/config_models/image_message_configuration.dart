@@ -33,6 +33,7 @@ class ImageMessageConfiguration {
     this.padding,
     this.margin,
     this.borderRadius,
+    this.fit = BoxFit.cover,
   });
 
   /// Provides configuration of share button while image message is appeared.
@@ -61,6 +62,12 @@ class ImageMessageConfiguration {
 
   /// Used for giving border of image message.
   final Border? border;
+
+  /// How the image should be inscribed into the message bubble box.
+  ///
+  /// Defaults to [BoxFit.cover] (fills the bubble, center-cropped). Use
+  /// [BoxFit.contain] to show the whole image without cropping.
+  final BoxFit fit;
 }
 
 class ShareIconConfiguration {

@@ -7,9 +7,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AdaptiveImage extends StatelessWidget {
-  const AdaptiveImage({super.key, required this.imageUrl});
+  const AdaptiveImage({
+    super.key,
+    required this.imageUrl,
+    this.fit = BoxFit.cover,
+  });
 
   final String imageUrl;
+
+  /// How the image is inscribed into its box. See [BoxFit].
+  final BoxFit fit;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +27,7 @@ class AdaptiveImage extends StatelessWidget {
       // which keeps large image-heavy chats smooth and saves bandwidth.
       return CachedNetworkImage(
         imageUrl: imageUrl,
-        fit: BoxFit.fitHeight,
+        fit: fit,
         progressIndicatorBuilder: (context, url, progress) => Center(
           child: CircularProgressIndicator(value: progress.progress),
         ),
@@ -31,15 +38,15 @@ class AdaptiveImage extends StatelessWidget {
     } else if (imageUrl.fromMemory) {
       return Image.memory(
         _decodeBase64(imageUrl),
-        fit: BoxFit.fill,
+        fit: fit,
         // Avoid a flicker to a blank frame while the next decode happens on
         // rebuild (e.g. during scrolling).
         gaplessPlayback: true,
       );
     } else {
       return kIsWeb
-          ? Image.network(imageUrl, fit: BoxFit.fill)
-          : Image.file(File(imageUrl), fit: BoxFit.fill);
+          ? Image.network(imageUrl, fit: fit)
+          : Image.file(File(imageUrl), fit: fit);
     }
   }
 

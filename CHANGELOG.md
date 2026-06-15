@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Perf**: Avoid an unnecessary message list copy in `sortMessage` for the
+  ascending case (the sorted list is already a fresh copy).
 * **Fix**: Prevent the chat `ListView` item count from inflating during
   pagination. The previous-page loader slot was added with a mutating
   `++itemCount`, so rebuilds triggered while a load was in flight (e.g. when the

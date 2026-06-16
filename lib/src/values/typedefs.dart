@@ -112,6 +112,7 @@ typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
 typedef TextFieldActionWidgetBuilder = List<Widget> Function(
   BuildContext context,
   TextEditingController controller,
+  bool isEditMode,
 );
 typedef BackgroundImageLoadError = void Function(
   Object exception,

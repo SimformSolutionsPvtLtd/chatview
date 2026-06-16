@@ -1302,11 +1302,14 @@ You can now add action buttons to the input field using two builders:
 - `trailingActions`: widgets shown after the text field.
 
 Use built‑in `CameraActionButton`, `GalleryActionButton`, and optionally an `OverlayActionButton`
-that groups multiple `OverlayActionWidget`s. Place them on either side as needed. Example below:
+that groups multiple `OverlayActionWidget`s. Place them on either side as needed.
+
+Both builders receive an `isEditMode` flag (`true` while a message is being edited), so you can
+show, hide, or swap actions based on edit state. Example below:
 
 ```dart
 textFieldConfig: TextFieldConfiguration(
-  trailingActions: (context, controller) {
+  trailingActions: (context, controller, isEditMode) {
     return [
       CameraActionButton(
         icon: const Icon(

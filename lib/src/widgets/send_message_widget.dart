@@ -87,6 +87,8 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   /// The message currently being edited, or `null` if not in edit mode.
   Message? _currentlyEditingMessage;
 
+  final _isEditModeNotifier = ValueNotifier<bool>(false);
+
   /// Whether the text field is currently in edit mode.
   bool get isEditMode => _currentlyEditingMessage != null;
 
@@ -193,6 +195,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                     _textEditingController.clear();
                                   }
                                   _currentlyEditingMessage = value;
+                                  _isEditModeNotifier.value = value != null;
                                 },
                               ),
                               if (widget
@@ -206,6 +209,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                 textEditingController: _textEditingController,
                                 onPressed: _onPressed,
                                 sendMessageConfig: widget.sendMessageConfig,
+                                isEditModeNotifier: _isEditModeNotifier,
                                 onRecordingComplete: _onRecordingComplete,
                                 onImageSelected: (images, messageId) {
                                   if (widget.sendMessageConfig
@@ -389,6 +393,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   void dispose() {
     _textEditingController.dispose();
     _focusNode.dispose();
+    _isEditModeNotifier.dispose();
     super.dispose();
   }
 }

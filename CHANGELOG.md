@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 * **Feat**: [454](https://github.com/SimformSolutionsPvtLtd/chatview/pull/454) :sparkles: Add configurable image fit option for AdaptiveImage widget
+* **Fix**: [456](https://github.com/SimformSolutionsPvtLtd/chatview/pull/456) Expose isEditMode to leadingActions/trailingActions builders
 
 ## 3.1.0
 

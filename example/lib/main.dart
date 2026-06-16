@@ -640,64 +640,75 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               compositionThresholdTime: const Duration(seconds: 1),
               textStyle: TextStyle(color: _theme.textColor),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              leadingActions: (context, controller) =>
-                  controller.text.trim().isEmpty
-                      ? [
-                          CameraActionButton(
-                            icon: const Icon(
-                              Icons.camera_alt_rounded,
-                              color: Colors.white,
-                            ),
-                            style: IconButton.styleFrom(
-                              backgroundColor: AppColors.uiOnePurple,
-                            ),
-                            onPressed: (path, replyMessage) {
-                              if (path?.isEmpty ?? true) return;
-                              _chatController.addMessage(
-                                Message(
-                                  id: DateTime.now()
-                                      .millisecondsSinceEpoch
-                                      .toString(),
-                                  message: path!,
-                                  createdAt: DateTime.now(),
-                                  messageType: MessageType.image,
-                                  sentBy: _chatController.currentUser.id,
-                                  replyMessage:
-                                      replyMessage ?? const ReplyMessage(),
-                                ),
-                              );
-                              _chatController.addMessage(
-                                Message(
-                                  message: controller.text,
-                                  id: DateTime.now()
-                                      .millisecondsSinceEpoch
-                                      .toString(),
-                                  createdAt: DateTime.now(),
-                                  sentBy: _chatController.currentUser.id,
-                                  replyMessage:
-                                      replyMessage ?? const ReplyMessage(),
-                                ),
-                              );
-                            },
+              leadingActions: (context, controller, isEditing) {
+                if (controller.text.trim().isEmpty) {
+                  return [
+                    CameraActionButton(
+                      icon: const Icon(
+                        Icons.camera_alt_rounded,
+                        color: Colors.white,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.uiOnePurple,
+                      ),
+                      onPressed: (path, replyMessage) {
+                        if (path?.isEmpty ?? true) return;
+                        final now = DateTime.now();
+                        _chatController.addMessage(
+                          Message(
+                            id: '${now.millisecondsSinceEpoch}_img',
+                            message: path!,
+                            createdAt: now,
+                            messageType: MessageType.image,
+                            sentBy: _chatController.currentUser.id,
+                            replyMessage: replyMessage ?? const ReplyMessage(),
                           ),
-                        ]
-                      : [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.search_rounded,
-                              color: Colors.white,
-                            ),
-                            style: IconButton.styleFrom(
-                              backgroundColor: AppColors.uiOnePurple,
-                            ),
-                            onPressed: () =>
-                                ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Search button pressed')),
-                            ),
+                        );
+                        _chatController.addMessage(
+                          Message(
+                            message: controller.text,
+                            id: '${now.millisecondsSinceEpoch}_txt',
+                            createdAt: now,
+                            sentBy: _chatController.currentUser.id,
+                            replyMessage: replyMessage ?? const ReplyMessage(),
                           ),
-                        ],
-              trailingActions: (context, controller) => [
+                        );
+                      },
+                    ),
+                  ];
+                } else if (isEditing) {
+                  return [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: AppColors.uiOnePurple,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                    )
+                  ];
+                } else {
+                  return [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.search_rounded,
+                        color: Colors.white,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.uiOnePurple,
+                      ),
+                      onPressed: () =>
+                          ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Search button pressed')),
+                      ),
+                    ),
+                  ];
+                }
+              },
+              trailingActions: (context, controller, isEditing) => [
                 GalleryActionButton(
                   icon: Icon(
                     Icons.photo_rounded,

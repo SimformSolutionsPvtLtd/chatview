@@ -47,6 +47,7 @@ class ChatUITextField extends StatefulWidget {
     required this.onRecordingComplete,
     required this.onImageSelected,
     required this.sendMessageConfig,
+    required this.isEditModeNotifier,
     super.key,
   });
 
@@ -67,6 +68,9 @@ class ChatUITextField extends StatefulWidget {
 
   /// Provides callback when user select images from camera/gallery.
   final StringsCallBack onImageSelected;
+
+  /// Notifier for whether the text field is in edit mode.
+  final ValueNotifier<bool> isEditModeNotifier;
 
   @override
   State<ChatUITextField> createState() => _ChatUITextFieldState();
@@ -240,23 +244,29 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                   child: Row(
                     children: [
                       ValueListenableBuilder(
-                        valueListenable: _isTextNotEmptyNotifier,
-                        builder: (context, isNotEmpty, _) {
-                          final hideLeadingActions =
-                              (textFieldConfig?.hideLeadingActionsOnType ??
-                                      false) &&
-                                  isNotEmpty;
-                          if (hideLeadingActions) {
-                            return const SizedBox.shrink();
-                          }
-                          final actions = textFieldConfig?.leadingActions?.call(
-                            context,
-                            widget.textEditingController,
-                          );
-                          return actions == null
-                              ? const SizedBox.shrink()
-                              : Row(children: actions);
-                        },
+                        valueListenable: widget.isEditModeNotifier,
+                        builder: (context, isEditing, _) =>
+                            ValueListenableBuilder(
+                          valueListenable: _isTextNotEmptyNotifier,
+                          builder: (context, isNotEmpty, _) {
+                            final hideLeadingActions =
+                                (textFieldConfig?.hideLeadingActionsOnType ??
+                                        false) &&
+                                    isNotEmpty;
+                            if (hideLeadingActions) {
+                              return const SizedBox.shrink();
+                            }
+                            final actions =
+                                textFieldConfig?.leadingActions?.call(
+                              context,
+                              widget.textEditingController,
+                              isEditing,
+                            );
+                            return actions == null
+                                ? const SizedBox.shrink()
+                                : Row(children: actions);
+                          },
+                        ),
                       ),
                       Expanded(
                         child: TextField(
@@ -321,6 +331,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                           ...textFieldConfig?.trailingActions?.call(
                                 context,
                                 widget.textEditingController,
+                                widget.isEditModeNotifier.value,
                               ) ??
                               [
                                 CameraActionButton(

@@ -2,6 +2,7 @@
 
 * **Feat**: [454](https://github.com/SimformSolutionsPvtLtd/chatview/pull/454) :sparkles: Add configurable image fit option for AdaptiveImage widget
 * **Feat**: [457](https://github.com/SimformSolutionsPvtLtd/chatview/pull/457) :sparkles: Add errorWidget support to ImageMessageConfiguration
+* **Fix**: [458](https://github.com/SimformSolutionsPvtLtd/chatview/pull/458) Enhance text field action animations for improved UX
 
 ## 3.1.0
 

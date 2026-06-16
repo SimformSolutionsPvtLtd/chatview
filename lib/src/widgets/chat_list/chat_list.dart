@@ -59,7 +59,6 @@ class ChatList extends StatefulWidget {
     this.header,
     this.footer,
     this.isLastPage,
-    this.httpHeaders,
     super.key,
   });
 
@@ -137,9 +136,6 @@ class ChatList extends StatefulWidget {
   /// - If there is an error in stream, it will show an error state.
   final ListStateConfig stateConfig;
 
-  /// Optional HTTP headers used for querying images.
-  final Map<String, String>? httpHeaders;
-
   @override
   State<ChatList> createState() => _ChatListState();
 }
@@ -202,7 +198,6 @@ class _ChatListState extends State<ChatList> {
                         ChatListItemTile(
                           chat: chat,
                           config: widget.tileConfig,
-                          httpHeaders: widget.httpHeaders,
                         );
                     return widget.menuConfig.enabled
                         ? ChatListTileContextMenu(

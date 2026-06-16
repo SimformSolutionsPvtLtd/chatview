@@ -14,9 +14,13 @@ class AdaptiveImage extends StatelessWidget {
     required this.imageUrl,
     this.fit = BoxFit.cover,
     this.errorBuilder,
+    this.httpHeaders,
   });
 
   final String imageUrl;
+
+  /// Optional HTTP headers sent when fetching a network image.
+  final Map<String, String>? httpHeaders;
 
   /// How the image is inscribed into its box. See [BoxFit].
   final BoxFit fit;
@@ -34,6 +38,7 @@ class AdaptiveImage extends StatelessWidget {
       // which keeps large image-heavy chats smooth and saves bandwidth.
       return CachedNetworkImage(
         imageUrl: imageUrl,
+        httpHeaders: httpHeaders,
         fit: fit,
         progressIndicatorBuilder: (context, url, progress) => Center(
           child: CircularProgressIndicator(value: progress.progress),
@@ -52,11 +57,10 @@ class AdaptiveImage extends StatelessWidget {
       );
     } else {
       return kIsWeb
-          ? Image.network(
-              imageUrl,
+          ? Image.network(imageUrl,
               fit: fit,
               errorBuilder: (context, error, _) => _buildError(context, error),
-            )
+              headers: httpHeaders)
           : Image.file(
               File(imageUrl),
               fit: fit,

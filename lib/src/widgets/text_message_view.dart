@@ -42,7 +42,6 @@ class TextMessageView extends StatelessWidget {
     this.featureActiveConfig,
     this.isFirstInGroup = true,
     this.isLastInGroup = true,
-    this.httpHeaders,
   });
 
   /// Represents current message is sent by current user.
@@ -77,9 +76,6 @@ class TextMessageView extends StatelessWidget {
 
   /// True when this is the newest message in a consecutive same-sender group.
   final bool isLastInGroup;
-
-  /// Optional HTTP headers used for querying images.
-  final Map<String, String>? httpHeaders;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +206,6 @@ class TextMessageView extends StatelessWidget {
             isMessageBySender: isMessageBySender,
             reaction: message.reaction,
             messageReactionConfig: messageReactionConfig,
-            httpHeaders: httpHeaders,
           ),
       ],
     );

@@ -23,6 +23,7 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../extensions/extensions.dart';
 import '../models/config_models/replied_message_configuration.dart';
 import '../utils/constants/constants.dart';
 import '../utils/package_strings.dart';
@@ -49,6 +50,8 @@ class ReplyMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final httpHeaders =
+        context.chatListConfig.messageConfig?.imageMessageConfig?.httpHeaders;
     final chatController = ChatViewInheritedWidget.of(context)?.chatController;
     final currentUser = chatController?.currentUser;
     final replyBySender = message.replyMessage.replyBy == currentUser?.id;
@@ -105,7 +108,10 @@ class ReplyMessageWidget extends StatelessWidget {
                                   80,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: NetworkImage(replyMessage),
+                                  image: NetworkImage(
+                                    replyMessage,
+                                    headers: httpHeaders,
+                                  ),
                                   fit: BoxFit.fill,
                                 ),
                                 borderRadius:

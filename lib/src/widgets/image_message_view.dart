@@ -44,7 +44,6 @@ class ImageMessageView extends StatelessWidget {
     this.outgoingChatBubbleConfig,
     this.highlightImage = false,
     this.highlightScale = 1.2,
-    this.httpHeaders,
     this.featureActiveConfig,
     this.isFirstInGroup = true,
     this.isLastInGroup = true,
@@ -82,9 +81,6 @@ class ImageMessageView extends StatelessWidget {
 
   /// True when this is the newest message in a consecutive same-sender group.
   final bool isLastInGroup;
-
-  /// Optional HTTP headers used for querying images.
-  final Map<String, String>? httpHeaders;
 
   String get imageUrl => message.message;
 
@@ -177,6 +173,7 @@ class ImageMessageView extends StatelessWidget {
                             imageUrl: imageUrl,
                             fit: imageMessageConfig?.fit ?? BoxFit.cover,
                             errorBuilder: imageMessageConfig?.errorBuilder,
+                            httpHeaders: imageMessageConfig?.httpHeaders,
                           ),
                         ),
                       ),
@@ -219,7 +216,6 @@ class ImageMessageView extends StatelessWidget {
                 isMessageBySender: isMessageBySender,
                 reaction: message.reaction,
                 messageReactionConfig: messageReactionConfig,
-                httpHeaders: httpHeaders,
               ),
           ],
         ),

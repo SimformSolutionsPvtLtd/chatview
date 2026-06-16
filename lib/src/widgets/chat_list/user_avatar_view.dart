@@ -37,7 +37,6 @@ class UserAvatarView extends StatelessWidget {
     required this.showStatus,
     required this.activeStatus,
     this.onTap,
-    this.httpHeaders,
     super.key,
   });
 
@@ -56,9 +55,6 @@ class UserAvatarView extends StatelessWidget {
   /// Image URL of the user.
   final String imageUrl;
 
-  /// Optional HTTP headers used for querying images.
-  final Map<String, String>? httpHeaders;
-
   /// Callback function to handle profile tap.
   final VoidCallback? onTap;
 
@@ -76,7 +72,7 @@ class UserAvatarView extends StatelessWidget {
             backgroundImage: imageUrl.isEmpty
                 ? null
                 : imageUrl.isUrl
-                    ? CachedNetworkImageProvider(imageUrl, headers: httpHeaders)
+                    ? CachedNetworkImageProvider(imageUrl)
                     : imageUrl.toMemoryImage() ?? FileImage(File(imageUrl)),
           ),
           if (showStatus)

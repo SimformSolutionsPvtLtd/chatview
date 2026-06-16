@@ -38,7 +38,6 @@ class ProfileCircle extends StatelessWidget {
     this.assetImageErrorBuilder,
     this.networkImageErrorBuilder,
     this.imageType = ImageType.network,
-    this.httpHeaders,
     this.networkImageProgressIndicatorBuilder,
   });
 
@@ -52,9 +51,6 @@ class ProfileCircle extends StatelessWidget {
 
   /// Field to define image type [network, asset or base64]
   final ImageType? imageType;
-
-  /// Optional HTTP headers used for querying images.
-  final Map<String, String>? httpHeaders;
 
   /// Allow user to set whole padding of profile circle view.
   final EdgeInsetsGeometry? profileCirclePadding;
@@ -92,7 +88,6 @@ class ProfileCircle extends StatelessWidget {
         child: ProfileImageWidget(
           circleRadius: circleRadius ?? 16,
           imageUrl: imageUrl,
-          httpHeaders: httpHeaders,
           defaultAvatarImage: defaultAvatarImage,
           assetImageErrorBuilder: assetImageErrorBuilder,
           networkImageErrorBuilder: networkImageErrorBuilder,

@@ -45,7 +45,15 @@ class ImageMessageConfiguration {
     this.borderRadius,
     this.fit = BoxFit.cover,
     this.errorBuilder,
+    this.httpHeaders,
   });
+
+  /// Optional HTTP headers sent when fetching network image messages.
+  ///
+  /// Useful when image requests require authentication. Scoped to chat image
+  /// messages (and their replied-message previews) only; avatars, profile
+  /// pictures and app bar images are unaffected.
+  final Map<String, String>? httpHeaders;
 
   /// Provides configuration of share button while image message is appeared.
   final ShareIconConfiguration? shareIconConfig;

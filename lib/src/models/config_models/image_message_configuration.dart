@@ -22,6 +22,16 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+/// Builds the widget shown when an image message fails to load.
+///
+/// [imageUrl] is the image source (network url, file path, or data uri) and
+/// [error] is the object thrown while loading it.
+typedef ImageMessageErrorWidgetBuilder = Widget Function(
+  BuildContext context,
+  String imageUrl,
+  Object error,
+);
+
 class ImageMessageConfiguration {
   const ImageMessageConfiguration({
     this.hideShareIcon = false,
@@ -34,6 +44,7 @@ class ImageMessageConfiguration {
     this.margin,
     this.borderRadius,
     this.fit = BoxFit.cover,
+    this.errorBuilder,
   });
 
   /// Provides configuration of share button while image message is appeared.
@@ -68,6 +79,11 @@ class ImageMessageConfiguration {
   /// Defaults to [BoxFit.cover] (fills the bubble, center-cropped). Use
   /// [BoxFit.contain] to show the whole image without cropping.
   final BoxFit fit;
+
+  /// Builds a custom widget shown when an image fails to load, with access to
+  /// the failing [imageUrl] and the [error]. Replaces the default broken-image
+  /// placeholder when set.
+  final ImageMessageErrorWidgetBuilder? errorBuilder;
 }
 
 class ShareIconConfiguration {

@@ -253,9 +253,47 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                             context,
                             widget.textEditingController,
                           );
-                          return actions == null
-                              ? const SizedBox.shrink()
-                              : Row(children: actions);
+                          final showActions =
+                              !hideLeadingActions && actions != null;
+                          return AnimatedSize(
+                            duration: textFieldActionAnimationDuration,
+                            curve: Curves.easeOutCubic,
+                            alignment: Alignment.centerLeft,
+                            child: AnimatedSwitcher(
+                              duration: textFieldActionAnimationDuration,
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              layoutBuilder: (currentChild, previousChildren) {
+                                return Stack(
+                                  alignment: Alignment.centerLeft,
+                                  children: [
+                                    ...previousChildren,
+                                    if (currentChild != null) currentChild,
+                                  ],
+                                );
+                              },
+                              transitionBuilder: (child, animation) {
+                                return ClipRect(
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(-0.35, 0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: showActions
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: actions,
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          );
                         },
                       ),
                       Expanded(
@@ -303,92 +341,46 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
               ValueListenableBuilder<bool>(
                 valueListenable: _isTextNotEmptyNotifier,
                 builder: (_, isNotEmpty, child) {
-                  if (isNotEmpty) {
-                    return IconButton(
-                      color: sendMessageConfig.defaultSendButtonColor ??
-                          Colors.green,
-                      style: sendMessageConfig.sendButtonStyle,
-                      onPressed: (textFieldConfig?.enabled ?? true)
-                          ? _onPressed
-                          : null,
-                      icon: sendMessageConfig.sendButtonIcon ??
-                          const Icon(Icons.send),
-                    );
-                  } else {
-                    return Row(
-                      children: [
-                        if (!isRecordingValue)
-                          ...textFieldConfig?.trailingActions?.call(
-                                context,
-                                widget.textEditingController,
-                              ) ??
-                              [
-                                CameraActionButton(
-                                  icon: imagePickerIconsConfig
-                                          ?.cameraImagePickerIcon ??
-                                      Icon(
-                                        Icons.camera_alt_outlined,
-                                        color: imagePickerIconsConfig
-                                            ?.cameraIconColor,
-                                      ),
-                                  onPressed:
-                                      !(textFieldConfig?.enabled ?? false)
-                                          ? null
-                                          : (path, _) => widget.onImageSelected(
-                                                path ?? '',
-                                                '',
-                                              ),
-                                ),
-                                GalleryActionButton(
-                                  icon: imagePickerIconsConfig
-                                          ?.galleryImagePickerIcon ??
-                                      Icon(
-                                        Icons.image,
-                                        color: imagePickerIconsConfig
-                                            ?.galleryIconColor,
-                                      ),
-                                  onPressed:
-                                      !(textFieldConfig?.enabled ?? false)
-                                          ? null
-                                          : (path, _) => widget.onImageSelected(
-                                                path ?? '',
-                                                '',
-                                              ),
-                                ),
-                              ],
-
-                        // Always add the voice button at the end if allowed
-                        if ((sendMessageConfig.allowRecordingVoice) &&
-                            !kIsWeb &&
-                            (Platform.isIOS || Platform.isAndroid))
-                          IconButton(
-                            onPressed: (textFieldConfig?.enabled ?? true)
-                                ? _recordOrStop
-                                : null,
-                            icon: (isRecordingValue
-                                    ? voiceRecordingConfig.stopIcon
-                                    : voiceRecordingConfig.micIcon) ??
-                                Icon(
-                                  isRecordingValue ? Icons.stop : Icons.mic,
-                                  color: voiceRecordingConfig.recorderIconColor,
-                                ),
+                  return AnimatedSize(
+                    duration: textFieldActionAnimationDuration,
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.centerRight,
+                    child: AnimatedSwitcher(
+                      duration: textFieldActionAnimationDuration,
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      // Right-align and keep the incoming child on top so the
+                      // bar never expands to the union of both children.
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.centerRight,
+                          children: [
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
+                      transitionBuilder: (child, animation) {
+                        return ClipRect(
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0.35, 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
                           ),
-
-                        if (isRecordingValue &&
-                            cancelRecordConfiguration != null)
-                          IconButton(
-                            onPressed: () {
-                              cancelRecordConfiguration?.onCancel?.call();
-                              _cancelRecording();
-                            },
-                            icon: cancelRecordConfiguration?.icon ??
-                                const Icon(Icons.cancel_outlined),
-                            color: cancelRecordConfiguration?.iconColor ??
-                                voiceRecordingConfig.recorderIconColor,
-                          ),
-                      ],
-                    );
-                  }
+                        );
+                      },
+                      child: _buildTrailing(
+                        context,
+                        isNotEmpty: isNotEmpty,
+                        isRecordingValue: isRecordingValue,
+                      ),
+                    ),
+                  );
                 },
               ),
             ],
@@ -396,6 +388,87 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         },
       ),
     );
+  }
+
+  Widget _buildTrailing(
+    BuildContext context, {
+    required bool isNotEmpty,
+    required bool isRecordingValue,
+  }) {
+    if (isNotEmpty) {
+      return IconButton(
+        color: sendMessageConfig.defaultSendButtonColor ?? Colors.green,
+        style: sendMessageConfig.sendButtonStyle,
+        onPressed: (textFieldConfig?.enabled ?? true) ? _onPressed : null,
+        icon: sendMessageConfig.sendButtonIcon ?? const Icon(Icons.send),
+      );
+    } else {
+      return Row(
+        children: [
+          if (!isRecordingValue)
+            ...textFieldConfig?.trailingActions?.call(
+                  context,
+                  widget.textEditingController,
+                ) ??
+                [
+                  CameraActionButton(
+                    icon: imagePickerIconsConfig?.cameraImagePickerIcon ??
+                        Icon(
+                          Icons.camera_alt_outlined,
+                          color: imagePickerIconsConfig?.cameraIconColor,
+                        ),
+                    onPressed: !(textFieldConfig?.enabled ?? false)
+                        ? null
+                        : (path, _) => widget.onImageSelected(
+                              path ?? '',
+                              '',
+                            ),
+                  ),
+                  GalleryActionButton(
+                    icon: imagePickerIconsConfig?.galleryImagePickerIcon ??
+                        Icon(
+                          Icons.image,
+                          color: imagePickerIconsConfig?.galleryIconColor,
+                        ),
+                    onPressed: !(textFieldConfig?.enabled ?? false)
+                        ? null
+                        : (path, _) => widget.onImageSelected(
+                              path ?? '',
+                              '',
+                            ),
+                  ),
+                ],
+
+          // Always add the voice button at the end if allowed
+          if ((sendMessageConfig.allowRecordingVoice) &&
+              !kIsWeb &&
+              (Platform.isIOS || Platform.isAndroid))
+            IconButton(
+              onPressed:
+                  (textFieldConfig?.enabled ?? true) ? _recordOrStop : null,
+              icon: (isRecordingValue
+                      ? voiceRecordingConfig.stopIcon
+                      : voiceRecordingConfig.micIcon) ??
+                  Icon(
+                    isRecordingValue ? Icons.stop : Icons.mic,
+                    color: voiceRecordingConfig.recorderIconColor,
+                  ),
+            ),
+
+          if (isRecordingValue && cancelRecordConfiguration != null)
+            IconButton(
+              onPressed: () {
+                cancelRecordConfiguration?.onCancel?.call();
+                _cancelRecording();
+              },
+              icon: cancelRecordConfiguration?.icon ??
+                  const Icon(Icons.cancel_outlined),
+              color: cancelRecordConfiguration?.iconColor ??
+                  voiceRecordingConfig.recorderIconColor,
+            ),
+        ],
+      );
+    }
   }
 
   void _onPressed() {

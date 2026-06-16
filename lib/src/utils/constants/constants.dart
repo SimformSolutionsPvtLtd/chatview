@@ -100,3 +100,7 @@ Widget lastSeenAgoBuilder(Message message, String formattedDate) {
 }
 
 const suggestionListAnimationDuration = Duration(milliseconds: 200);
+
+/// Duration for the text field send/action button and leading icon
+/// switch animations.
+const textFieldActionAnimationDuration = Duration(milliseconds: 200);

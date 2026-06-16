@@ -30,6 +30,7 @@ const String imageUrlRegExpression =
     r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)';
 const String dateFormat = "yyyy-MM-dd";
 const String couldNotLaunch = "Could not launch";
+const String couldNotLoadImage = "Couldn't load image";
 const String heart = "\u{2764}";
 const String faceWithTears = "\u{1F602}";
 const String disappointedFace = "\u{1F625}";

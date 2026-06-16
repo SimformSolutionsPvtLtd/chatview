@@ -172,6 +172,7 @@ class ImageMessageView extends StatelessWidget {
                           child: AdaptiveImage(
                             imageUrl: imageUrl,
                             fit: imageMessageConfig?.fit ?? BoxFit.cover,
+                            errorBuilder: imageMessageConfig?.errorBuilder,
                           ),
                         ),
                       ),

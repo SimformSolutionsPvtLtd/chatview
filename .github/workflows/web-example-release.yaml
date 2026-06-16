@@ -29,11 +29,11 @@ jobs:
       - name: Flutter action
         uses: subosito/flutter-action@v2.13.0
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.41.0'
           cache: true
-          cache-key: 'flutter-macos-stable-3.22.0-apple'
-          cache-path: '${{ runner.tool_cache }}/flutter/macos-stable-3.22.0-apple'
-          pub-cache-key: 'flutter-pub-macos-stable-3.22.0-apple'
+          cache-key: 'flutter-macos-stable-3.41.0-apple'
+          cache-path: '${{ runner.tool_cache }}/flutter/macos-stable-3.41.0-apple'
+          pub-cache-key: 'flutter-pub-macos-stable-3.41.0-apple'
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Project Clean Up

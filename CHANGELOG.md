@@ -4,6 +4,7 @@
 * **Feat**: [457](https://github.com/SimformSolutionsPvtLtd/chatview/pull/457) :sparkles: Add errorWidget support to ImageMessageConfiguration
 * **Fix**: [458](https://github.com/SimformSolutionsPvtLtd/chatview/pull/458) Enhance text field action animations for improved UX
 * **Refactor**: [455](https://github.com/SimformSolutionsPvtLtd/chatview/pull/455) Rework sending receipt animation with different transition
+* **Fix**: [463](https://github.com/SimformSolutionsPvtLtd/chatview/pull/463) Implement "Seen" receipt reveal animation with fade, slide, and expand effects
 
 ## 3.1.0
 

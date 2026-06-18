@@ -36,6 +36,7 @@ import '../models/config_models/reply_suggestions_config.dart';
 import '../utils/constants/constants.dart';
 import '../utils/emoji_parser.dart';
 import '../utils/package_strings.dart';
+import '../utils/timeago/timeago.dart' as timeago;
 import '../values/enumeration.dart';
 import '../widgets/chat_view_inherited_widget.dart';
 import '../widgets/profile_image_widget.dart';
@@ -43,6 +44,14 @@ import '../widgets/suggestions/suggestions_config_inherited_widget.dart';
 
 /// Extension for DateTime to get specific formats of dates and time.
 extension TimeDifference on DateTime {
+  String get applicationDateFormatter {
+    if (DateTime.now().difference(this).inDays <= 3) {
+      return timeago.format(this);
+    } else {
+      return DateFormat('dd MMM yyyy').format(this);
+    }
+  }
+
   String getDay(String chatSeparatorDatePattern) {
     final now = DateTime.now();
 

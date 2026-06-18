@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'package:chatview/src/widgets/message_last_seen_ago.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -285,31 +286,62 @@ class _MessageViewState extends State<MessageView>
               const SizedBox(),
           if (widget.statusBelowBubble case final status?)
             Padding(padding: const EdgeInsets.only(right: 6), child: status),
-          ValueListenableBuilder(
-            valueListenable: widget.message.statusNotifier,
-            builder: (context, value, child) {
-              if (widget.isMessageBySender &&
-                  widget.controller?.initialMessageList.last.id ==
-                      widget.message.id &&
-                  widget.message.status == MessageStatus.read) {
-                if (ChatViewInheritedWidget.of(context)
-                        ?.featureActiveConfig
-                        .lastSeenAgoBuilderVisibility ??
-                    true) {
-                  return widget.outgoingChatBubbleConfig?.receiptsWidgetConfig
-                          ?.lastSeenAgoBuilder
-                          ?.call(
-                              widget.message,
-                              applicationDateFormatter(
-                                  widget.message.createdAt)) ??
-                      lastSeenAgoBuilder(widget.message,
-                          applicationDateFormatter(widget.message.createdAt));
-                }
-                return const SizedBox();
-              }
-              return const SizedBox();
-            },
-          )
+          if (widget.isMessageBySender)
+            ValueListenableBuilder(
+              valueListenable: widget.message.statusNotifier,
+              builder: (context, status, child) {
+                final showSeen =
+                    widget.controller?.initialMessageList.lastOrNull?.id ==
+                            widget.message.id &&
+                        status.isRead &&
+                        (ChatViewInheritedWidget.of(context)
+                                ?.featureActiveConfig
+                                .lastSeenAgoBuilderVisibility ??
+                            true);
+                return AnimatedSwitcher(
+                  duration: seenAppearanceAnimationDuration,
+                  switchInCurve: seenAppearanceAnimationCurve,
+                  // Flipped so the label leaves quickly instead of slowing down.
+                  switchOutCurve: seenAppearanceAnimationCurve.flipped,
+                  transitionBuilder: (child, animation) => SizeTransition(
+                    sizeFactor: animation,
+                    // TODO: Use `alignment: Alignment.topCenter` and remove
+                    // axisAlignment (and the ignore) once the minimum Flutter
+                    // version has `SizeTransition.alignment` (after 3.41).
+                    // ignore: deprecated_member_use
+                    axisAlignment: -1.0,
+                    // With the Align's widthFactor, keeps the row at content width.
+                    fixedCrossAxisSizeFactor: 1.0,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.35),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                  child: showSeen
+                      ? Align(
+                          key: const ValueKey('seen'),
+                          widthFactor: 1.0,
+                          alignment: Alignment.centerRight,
+                          child: widget.outgoingChatBubbleConfig
+                                  ?.receiptsWidgetConfig?.lastSeenAgoBuilder
+                                  ?.call(
+                                      widget.message,
+                                      widget.message.createdAt
+                                          .applicationDateFormatter) ??
+                              MessageLastSeenAgo(
+                                createAt: widget.message.createdAt,
+                              ),
+                        )
+                      : const SizedBox(key: ValueKey('seen-empty')),
+                );
+              },
+            )
         ],
       ),
     );

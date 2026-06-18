@@ -19,11 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview_utils/chatview_utils.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-import '../timeago/timeago.dart' as timeago;
+import 'package:flutter/material.dart' show Color, Curve, Curves;
 
 const String imageUrlRegExpression =
     r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)';
@@ -84,30 +80,17 @@ const double clockToTickIconSize = 14;
 /// Horizontal padding around the clock/tick icon.
 const double clockToTickIconPadding = 2;
 
-String applicationDateFormatter(DateTime inputTime) {
-  if (DateTime.now().difference(inputTime).inDays <= 3) {
-    return timeago.format(inputTime);
-  } else {
-    return DateFormat('dd MMM yyyy').format(inputTime);
-  }
-}
+/// Duration of the "Seen" receipt reveal (fade + slide + expand) shown below
+/// the last outgoing bubble once it is read.
+const Duration seenAppearanceAnimationDuration = Duration(milliseconds: 300);
+
+/// Curve of the "Seen" receipt reveal animation.
+const Curve seenAppearanceAnimationCurve = Curves.easeOutCubic;
 
 /// Regular expression to identify URLs in a text.
 const String urlRegex =
     r'((https?://)?(www\.)?[a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b'
     r'([-a-zA-Z0-9@:%_\+.~#?&//=]*))';
-
-/// Default builder when the message has got seen as of now
-/// is visible at the bottom of the chat bubble
-Widget lastSeenAgoBuilder(Message message, String formattedDate) {
-  return Padding(
-    padding: const EdgeInsets.all(2),
-    child: Text(
-      'Seen ${applicationDateFormatter(message.createdAt)}    ',
-      style: const TextStyle(color: Colors.grey, fontSize: 12),
-    ),
-  );
-}
 
 const suggestionListAnimationDuration = Duration(milliseconds: 200);
 

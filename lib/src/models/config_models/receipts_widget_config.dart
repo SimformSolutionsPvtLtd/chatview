@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'package:flutter/material.dart';
+
 import '../../utils/constants/constants.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
@@ -29,6 +31,8 @@ class ReceiptsWidgetConfig {
     this.receiptsBuilder,
     this.lastSeenAgoBuilder,
     this.showReceiptsIn = ShowReceiptsIn.lastMessage,
+    this.sendingAnimationType = SendingMessageAnimationType.slideOut,
+    this.sendingIndicatorColor,
   });
 
   /// The builder that builds widget that right next to the senders message bubble.
@@ -44,4 +48,16 @@ class ReceiptsWidgetConfig {
 
   /// Whether to show receipts in all messages or not defaults to [ShowReceiptsIn.lastMessage]
   final ShowReceiptsIn showReceiptsIn;
+
+  /// The animation style used by the default [sendMessageAnimationBuilder] for
+  /// the pending → sent transition next to an outgoing bubble.
+  ///
+  /// Ignored when a custom [receiptsBuilder] is provided.
+  /// Defaults to [SendingMessageAnimationType.slideOut].
+  final SendingMessageAnimationType sendingAnimationType;
+
+  /// Color of the sending indicator. Currently honored only by
+  /// [SendingMessageAnimationType.clockToTick] (clock / single tick / double
+  /// tick). When null a default grey is used.
+  final Color? sendingIndicatorColor;
 }

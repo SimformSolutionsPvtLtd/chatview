@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../models/chat_bubble.dart';
-import '../../models/config_models/type_indicator_configuration.dart';
+import '../../models/config_models/chat_view/chat_bubble.dart';
+import '../../models/config_models/chat_view/type_indicator/type_indicator_configuration.dart';
 import '../../utils/constants/constants.dart';
 import 'animated_dot_builder.dart';
 
@@ -17,7 +17,7 @@ class TypingDotsBubble extends StatelessWidget {
 
   final ChatBubble? chatBubbleConfig;
   final List<Interval> dotIntervals;
-  final List<Animation<dynamic>> jumpAnimations;
+  final List<Animation<double>> jumpAnimations;
   final AnimationController repeatAnimationController;
   final TypeIndicatorConfiguration typeIndicatorConfig;
 
@@ -38,7 +38,7 @@ class TypingDotsBubble extends StatelessWidget {
         color: chatBubbleConfig?.color ?? Colors.grey.shade500,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
             AnimatedDotBuilder(

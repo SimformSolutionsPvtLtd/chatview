@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -72,29 +74,31 @@ class ChatListTileContextMenuWeb extends StatelessWidget {
     final overlayBox =
         Overlay.maybeOf(context)?.context.findRenderObject() as RenderBox?;
     final actionsLength = actions.length;
-    showMenu<int>(
-      context: context,
-      position: RelativeRect.fromRect(
-        globalPosition & const Size(40, 40),
-        Offset.zero & (overlayBox?.size ?? Size.zero),
-      ),
-      items: [
-        for (var i = 0; i < actionsLength; i++)
-          if (actions[i] case final actionChild)
-            actionChild is CupertinoContextMenuAction
-                ? actionChild.toPopUpMenuItem<int>(
-                    value: i,
-                    errorColor: errorColor,
-                  )
-                : PopupMenuItem<int>(
-                    value: i,
-                    child: actionChild,
-                  ),
-      ],
-    ).whenComplete(() {
-      if (highlightNotifier.value != null) {
-        highlightNotifier.value = null;
-      }
-    });
+    unawaited(
+      showMenu<int>(
+        context: context,
+        position: RelativeRect.fromRect(
+          globalPosition & const Size(40, 40),
+          Offset.zero & (overlayBox?.size ?? Size.zero),
+        ),
+        items: [
+          for (var i = 0; i < actionsLength; i++)
+            if (actions[i] case final actionChild)
+              actionChild is CupertinoContextMenuAction
+                  ? actionChild.toPopUpMenuItem<int>(
+                      value: i,
+                      errorColor: errorColor,
+                    )
+                  : PopupMenuItem<int>(
+                      value: i,
+                      child: actionChild,
+                    ),
+        ],
+      ).whenComplete(() {
+        if (highlightNotifier.value != null) {
+          highlightNotifier.value = null;
+        }
+      }),
+    );
   }
 }

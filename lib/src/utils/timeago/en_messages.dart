@@ -1,6 +1,6 @@
 // This code is sourced from the timeago package available on pub.dev. link : https://pub.dev/packages/timeago
 
-import 'package:chatview/src/utils/timeago/lookupmessages.dart';
+import 'lookupmessages.dart';
 
 /// English Messages
 class EnMessages implements LookupMessages {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../chatview.dart' show ChatView;
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/image_picker_configuration.dart';
 import '../../utils/helper.dart';
 import '../../values/typedefs.dart';
 import 'text_field_action_button.dart';

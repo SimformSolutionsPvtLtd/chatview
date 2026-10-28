@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-library;
-
 export 'package:audio_waveforms/audio_waveforms.dart'
     show
         AndroidEncoder,
@@ -56,5 +54,5 @@ export 'src/widgets/action_widgets/overlay_action_button.dart';
 export 'src/widgets/action_widgets/text_field_action_button.dart';
 export 'src/widgets/chat_list/chatlist.dart';
 export 'src/widgets/chat_view.dart';
-export 'src/widgets/chat_view_appbar.dart';
-export 'src/widgets/edit_message_view.dart';
+export 'src/widgets/common/chat_view_appbar.dart';
+export 'src/widgets/message_input/edit_message_view.dart';

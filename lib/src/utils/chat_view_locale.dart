@@ -181,8 +181,5 @@ final class ChatViewLocale {
     deleteChat: 'Delete Chat',
     noChats: 'No Chats',
     noSearchResults: 'No search results',
-    edit: 'Edit',
-    edited: 'Edited',
-    editing: 'Editing',
   );
 }

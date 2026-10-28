@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../chatview.dart' show ChatView;
 import '../../values/typedefs.dart';
-import '../emoji_picker_widget.dart';
+import '../message_input/emoji_picker_widget.dart';
 import 'text_field_action_button.dart';
 
 /// Emoji picker action button implementation.

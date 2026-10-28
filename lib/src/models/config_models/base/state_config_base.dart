@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../chat_view_state_widget_config.dart';
+import 'chat_view_state_widget_config.dart';
 
 abstract base class StateConfigBase {
   const StateConfigBase({

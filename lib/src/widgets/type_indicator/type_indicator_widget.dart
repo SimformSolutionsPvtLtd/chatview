@@ -20,12 +20,14 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/chat_bubble.dart';
-import '../../models/config_models/profile_circle_configuration.dart';
-import '../../models/config_models/type_indicator_configuration.dart';
+import '../../models/config_models/chat_view/chat_bubble.dart';
+import '../../models/config_models/chat_view/profile_circle_configuration.dart';
+import '../../models/config_models/chat_view/type_indicator/type_indicator_configuration.dart';
 import 'typing_dots_bubble.dart';
 import 'user_typing_builder.dart';
 
@@ -63,11 +65,11 @@ class _TypingIndicatorState extends State<TypingIndicator>
   final List<Interval> _dotIntervals = const [
     Interval(0.25, 0.8),
     Interval(0.35, 0.9),
-    Interval(0.45, 1.0),
+    Interval(0.45, 1),
   ];
 
   final List<AnimationController> _jumpControllers = [];
-  final List<Animation> _jumpAnimations = [];
+  final List<Animation<double>> _jumpAnimations = [];
 
   ProfileCircleConfiguration? profileCircleConfiguration;
 
@@ -88,19 +90,19 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
     _indicatorSpaceAnimation = CurvedAnimation(
       parent: _appearanceController,
-      curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-      reverseCurve: const Interval(0.0, 1.0, curve: Curves.easeOut),
+      curve: const Interval(0, 0.4, curve: Curves.easeOut),
+      reverseCurve: const Interval(0, 1, curve: Curves.easeOut),
     ).drive(
       Tween<double>(
-        begin: 0.0,
-        end: 60.0,
+        begin: 0,
+        end: 60,
       ),
     );
 
     _largeBubbleAnimation = CurvedAnimation(
       parent: _appearanceController,
-      curve: const Interval(0.3, 1.0, curve: Curves.elasticOut),
-      reverseCurve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+      curve: const Interval(0.3, 1, curve: Curves.elasticOut),
+      reverseCurve: const Interval(0.5, 1, curve: Curves.easeOut),
     );
 
     _repeatingController = AnimationController(
@@ -108,7 +110,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
       duration: const Duration(milliseconds: 1500),
     );
 
-    for (int i = 0; i < 3; i++) {
+    for (var i = 0; i < 3; i++) {
       _jumpControllers.add(
         AnimationController(
           vsync: this,
@@ -119,8 +121,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
       _jumpAnimations.add(
         CurvedAnimation(
           parent: _jumpControllers[i],
-          curve: Interval((0.2 * i), 0.7, curve: Curves.easeOutSine),
-          reverseCurve: Interval((0.2 * i), 0.7, curve: Curves.easeOut),
+          curve: Interval(0.2 * i, 0.7, curve: Curves.easeOutSine),
+          reverseCurve: Interval(0.2 * i, 0.7, curve: Curves.easeOut),
         ).drive(
           Tween<double>(
             begin: 0,
@@ -160,28 +162,26 @@ class _TypingIndicatorState extends State<TypingIndicator>
   void dispose() {
     _appearanceController.dispose();
     _repeatingController.dispose();
-    for (var element in _jumpControllers) {
+    for (final element in _jumpControllers) {
       element.dispose();
     }
     super.dispose();
   }
 
   void _showIndicator() {
-    _appearanceController
-      ..duration = const Duration(milliseconds: 750)
-      ..forward();
-    _repeatingController.repeat();
-    for (int i = 0; i < 3; i++) {
-      _jumpControllers[i].repeat(reverse: true);
+    _appearanceController.duration = const Duration(milliseconds: 750);
+    unawaited(_appearanceController.forward());
+    unawaited(_repeatingController.repeat());
+    for (var i = 0; i < 3; i++) {
+      unawaited(_jumpControllers[i].repeat(reverse: true));
     }
   }
 
   void _hideIndicator() {
-    _appearanceController
-      ..duration = const Duration(milliseconds: 150)
-      ..reverse();
+    _appearanceController.duration = const Duration(milliseconds: 150);
+    unawaited(_appearanceController.reverse());
     _repeatingController.stop();
-    for (int i = 0; i < 3; i++) {
+    for (var i = 0; i < 3; i++) {
       _jumpControllers[i].stop();
     }
   }

@@ -31,8 +31,10 @@ class PackageStrings {
 
   /// Set the current locale for the package strings (e.g., 'en', 'es').
   static void setLocale(String locale) {
-    assert(_localeObjects.containsKey(locale),
-        'Locale "$locale" not found. Please add it using PackageStrings.addLocaleObject("$locale", ChatViewLocale(...)) before setting.');
+    assert(
+      _localeObjects.containsKey(locale),
+      'Locale "$locale" not found. Please add it using PackageStrings.addLocaleObject("$locale", ChatViewLocale(...)) before setting.',
+    );
     if (_localeObjects.containsKey(locale)) {
       _currentLocale = locale;
     }

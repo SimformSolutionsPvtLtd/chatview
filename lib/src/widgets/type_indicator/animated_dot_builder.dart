@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/type_indicator_configuration.dart';
+import '../../models/config_models/chat_view/type_indicator/type_indicator_configuration.dart';
 
 class AnimatedDotBuilder extends StatelessWidget {
   const AnimatedDotBuilder({
@@ -13,7 +13,7 @@ class AnimatedDotBuilder extends StatelessWidget {
     super.key,
   });
 
-  final Animation jumpAnimation;
+  final Animation<double> jumpAnimation;
   final Interval dotInterval;
   final AnimationController repeatAnimationController;
   final TypeIndicatorConfiguration typeIndicatorConfig;

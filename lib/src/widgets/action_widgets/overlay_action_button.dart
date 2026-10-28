@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart' show ReplyMessage;
 import 'package:flutter/material.dart';
 
 import '../../../chatview.dart' show ChatView;
-import '../../models/overlay_action_widget.dart';
+import '../../models/config_models/chat_view/message_input/overlay_action_widget.dart';
 import 'text_field_action_button.dart';
 
 /// Custom action button that displays a plus icon and
@@ -176,7 +178,7 @@ class _OverlayActionButtonState
                               icon: option.icon,
                               tooltip: option.label,
                               onPressed: () {
-                                hideOverlay();
+                                unawaited(hideOverlay());
                                 option.onTap.call(replyMessage);
                               },
                             );
@@ -193,7 +195,7 @@ class _OverlayActionButtonState
       },
     );
     Overlay.of(context, rootOverlay: true).insert(_plusOverlayEntry);
-    _overlayAnimationController.forward();
+    unawaited(_overlayAnimationController.forward());
   }
 
   /// Calculates the size and position of the overlay based on

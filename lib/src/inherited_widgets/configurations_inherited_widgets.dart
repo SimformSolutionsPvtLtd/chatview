@@ -5,9 +5,9 @@ import '../models/models.dart';
 
 class ConfigurationsInheritedWidget extends InheritedWidget {
   const ConfigurationsInheritedWidget({
-    super.key,
     required super.child,
     required this.chatBackgroundConfig,
+    super.key,
     this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.reactionPopupConfig,
     this.messageConfig,

@@ -24,12 +24,12 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/reply_suggestions_config.dart';
+import '../../models/config_models/chat_view/message_input/reply_suggestions_config.dart';
 
 class SuggestionItem extends StatelessWidget {
   const SuggestionItem({
-    super.key,
     required this.suggestionItemData,
+    super.key,
   });
 
   final SuggestionItemData suggestionItemData;

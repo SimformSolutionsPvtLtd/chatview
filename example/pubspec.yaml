@@ -17,6 +17,7 @@ dependencies:
   chatview:
     path: ../
   intl:
+  marionette_flutter: ^0.7.0
 
 dev_dependencies:
   flutter_test:
@@ -24,6 +25,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^2.0.1
+  marionette_mcp: ^0.7.0
 
 flutter:
   uses-material-design: true

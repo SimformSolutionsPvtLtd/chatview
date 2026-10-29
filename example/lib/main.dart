@@ -1,7 +1,11 @@
+import 'dart:ui';
+
 import 'package:chatview/chatview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:marionette_flutter/marionette_flutter.dart';
 
 import 'data.dart';
 import 'example_two/example_two_list_screen.dart';
@@ -11,7 +15,37 @@ import 'values/colors.dart';
 import 'values/icons.dart';
 
 void main() {
-  runApp(const Example());
+  if (!kReleaseMode) {
+    final logCollector = PrintLogCollector();
+    MarionetteBinding.ensureInitialized(
+      MarionetteConfiguration(
+        logCollector: logCollector,
+        maxScreenshotSize: const Size(1200, 1200),
+        enableSessionReports: true,
+      ),
+    );
+
+    final printToConsole = debugPrint;
+    debugPrint = (message, {wrapWidth}) {
+      printToConsole(message, wrapWidth: wrapWidth);
+      if (message != null) {
+        logCollector.addLog('[${DateTime.now().toIso8601String()}] $message');
+      }
+    };
+
+    final previousOnError = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      logCollector.addLog(
+        '[${DateTime.now().toIso8601String()}] UNCAUGHT: $error\n$stack',
+      );
+      return previousOnError?.call(error, stack) ?? false;
+    };
+
+    runApp(const MarionetteDeviceConfig(child: Example()));
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+    runApp(const Example());
+  }
 }
 
 class Example extends StatelessWidget {

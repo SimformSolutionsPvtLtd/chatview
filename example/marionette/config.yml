@@ -1,0 +1,190 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# /marionette-test TEAM config (committed).
+#
+# • config.local.yml overrides app and workflow keys per developer.
+# • Safety rules there can only be stricter; lists there only add.
+# • A missing key takes its default. Uncomment a key to set it.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Format version of this file. Don't change it.
+version: 1
+
+
+# ─── Test cases: how many, and where they come from ──────────────────────────
+cases:
+  # How thorough the cases are:
+  #   low    — the main flow, layout errors, one screenshot check per screen;
+  #            no UX checks
+  #   medium — low + every branch, every screen state, core UX checks
+  #   high   — medium + edge cases, large and bold text, dark mode,
+  #            every UX check
+  depth: high                              # low | medium | high
+
+  # Where the cases and their expected results come from. Input is your
+  # request, the ticket, its Figma design, linked pages and docs.
+  #   mixed — input first; the app's code adds what it doesn't cover
+  #   input — input only; anything unclear is asked, then assumed and marked
+  #           in the report
+  #   code  — the app's code sets the rules; input says what the feature is for
+  source: mixed                            # mixed | input | code
+
+  # Stop after writing the cases, so you can review or change them before
+  # they run. false: run them straight away; approvals still stop the run.
+  review: false                            # true | false
+
+  # Check how the screens look (layout, cut-off or hidden content, the Figma
+  # design) and how they behave (keyboard, focus, system bars), as `depth` sets.
+  ui_ux_checks: true                       # true | false
+
+
+# ─── Safety rules ────────────────────────────────────────────────────────────
+policy:
+  # Before an action that saves or changes data (create, edit, delete,
+  # sign up):
+  #   allowed   — run it (sign-ups still ask)
+  #   confirm   — ask first
+  #   forbidden — never run it unless you OK that case in the request; a developer can't loosen it in config.local.yml
+  mutations: confirm                       # allowed | confirm | forbidden
+
+  # Actions that always need a yes first, whatever `mutations` says.
+  irreversible: []                         # list, e.g. [delete account, make payment]
+
+
+# ─── What happens to the bugs the test finds ─────────────────────────────────
+fix:
+  #   ask  — after the run, list the bugs; apply only the fixes you pick
+  #   auto — fix them without asking
+  #   off  — never touch code; just report
+  mode: off                                # ask | auto | off
+
+  # Re-test the app after fixing. false: fix once and stop; say "retest"
+  # to re-test.
+  reverify: false                          # true | false
+
+  # With reverify on: how many times in a row a fix may fail its re-test
+  # before giving up.
+  max_rounds: 2                            # a whole number
+
+  # Commit the fixes locally once they pass a re-test. Never pushes.
+  commit: false                            # true | false
+
+
+# ─── How the test gets a signed-in app ───────────────────────────────────────
+auth:
+  # Text shown on the first screen after a successful login, so the test
+  # knows login worked. The test fills it in from the app's code.
+  #post_login_screen: <screen text>       # text visible on that screen
+
+  # Wrong-password attempts allowed on each test account in one run before
+  # the test asks first. Keep it below the backend's lockout limit.
+  max_failed_logins: 2                     # a whole number
+
+
+# ─── How the app is built and launched ───────────────────────────────────────
+app:
+  # Build flavors the app has. Commented out if the app has none.
+  #flavors: [<detected flavors>]            # list of flavor names
+
+  # The flavor the team tests on. Commented out if the app has no flavors.
+  #flavor: <team's test flavor>             # one of `flavors`
+
+  # Command that launches the app. {flavor} and {device} are filled in for you.
+  #run: flutter run --flavor {flavor} -d {device}   # any command
+
+
+# ─── Screen recording ────────────────────────────────────────────────────────
+recording:
+  # Record the screen while the cases run, linked from the report. Android,
+  # iOS simulator and USB-connected iPhone only.
+  enabled: false                           # true | false
+
+
+# ─── QA report ───────────────────────────────────────────────────────────────
+report:
+  # The finished run as one self-contained HTML page, screenshots embedded, for
+  # sharing or attaching to a ticket.
+  html: ask                                # ask | always | off
+
+
+# ─── Where this app's tickets live ───────────────────────────────────────────
+# Set the tracker the team uses, so a pasted task id or key (ABC-T123), or a
+# work item id, is enough.
+#tracker:
+#  zoho:
+#     # The name in the Zoho URL: projects.zoho.com/portal/<name>
+#    portal: <portal name or id>
+
+#     # Digits only; not the project name or its PR-<n> key.
+#    project: <project id>
+
+#  azure:
+#     # As in the work item URL, with spaces, not %20.
+#    project: <project name>
+
+
+# ─── Where this app's designs live ───────────────────────────────────────────
+# Set the Figma files the team designs in, so a pasted node id (10727-125217)
+# is enough. A full Figma link in the request always wins over these.
+#figma:
+#  files:
+#    - label: <short name>          # letters, digits, - and _; name it in a request: "app 10727-125217"
+#      key: <file key>              # figma.com/design/<file key>/<file name>?node-id=…
+#      name: <file name>            # the <file name> part of that URL
+#      default: true                # at most one file; the file a node id with no label reads
+
+
+# ─── Lessons a run learns ────────────────────────────────────────────────────
+# Screens to skip, accepted bugs, app-specific tricks, settings it had to ask
+# for, misplaced or unknown keys.
+promote:
+  #   ask  — suggest config changes and wait
+  #   auto — make them and say so; changing a value already set is still asked
+  #   off  — only mention them in chat
+  mode: ask                                # ask | auto | off
+
+
+# ─── Screens or code the test must never drive ───────────────────────────────
+# e.g. one that costs money per call.
+skip: []                                   # list of {path or screen, why}
+#  - path: lib/<feature-path>/
+#    why: <e.g. hits a live quota on every run>
+
+
+# ─── Known bugs the team has accepted ────────────────────────────────────────
+# Still tested, but not reported as new.
+known_issues: []                           # list of {what, why}
+#  - what: <accepted bug>
+#    why: <who accepted it, and when>
+
+
+# ─── Files for file and photo picker tests (Android) ─────────────────────────
+# Files the test may push to the device. Commit them, e.g. under
+# marionette/fixtures/. Without them the test makes an image or text file
+# itself, or asks.
+fixtures: []                               # list of {path, what}
+#  - path: <e.g. marionette/fixtures/invoice.pdf>   # relative to the app root
+#    what: <e.g. a PDF under 1 MB>
+
+
+# ─── Notes for driving this app ──────────────────────────────────────────────
+# Learned on earlier runs: how to target a widget, how to reach a screen, what
+# is slow or flaky. Marionette's own behaviour goes under `quirks` below.
+patterns: []                               # list of {what, why}
+#  - what: <e.g. the date field opens a picker; tap its OK button by position>
+#    why: <what it cost to learn>
+
+#  - what: <e.g. the feed loads in about 4 s on the dev flavor; wait before checking it>
+#    why: <e.g. checks right after opening saw the skeleton loader>
+
+#  - what: <e.g. reach Settings through the profile avatar; the drawer entry is hidden on tablets>
+#    why: <e.g. the drawer route isn't built at tablet width>
+
+
+# ─── Marionette behaviour seen in this app ───────────────────────────────────
+# Behaviour the test doesn't already handle; each entry tagged by
+# version · platform.
+quirks: []                                 # list of {what, workaround, seen_on, retest_by}
+#  - what: <e.g. scroll_to can't reach rows in the Orders tab list>
+#    workaround: <e.g. pass ancestor_keys: [orders_list]>
+#    seen_on: <e.g. 0.7.0 · Android>       # marionette_flutter version · platform
+#    retest_by: <e.g. scroll_to finds the row without ancestor_keys>

@@ -47,3 +47,8 @@ app.*.map.json
 
 # IOS files
 ios/Podfile.lock
+
+# Marionette
+marionette/config.local.yml
+marionette/secrets.local.yml
+marionette/runs/

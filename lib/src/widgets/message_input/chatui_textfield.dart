@@ -230,6 +230,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
         valueListenable: isRecording,
         builder: (_, isRecordingValue, child) {
           return Row(
+            crossAxisAlignment:
+                textFieldConfig?.trailingActionsAlignment.crossAxisAlignment ??
+                    CrossAxisAlignment.center,
             children: [
               if (isRecordingValue && controller != null && !kIsWeb)
                 Expanded(
@@ -259,6 +262,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
               else
                 Expanded(
                   child: Row(
+                    crossAxisAlignment: textFieldConfig
+                            ?.leadingActionsAlignment.crossAxisAlignment ??
+                        CrossAxisAlignment.center,
                     children: [
                       ValueListenableBuilder(
                         valueListenable: _isTextNotEmptyNotifier,

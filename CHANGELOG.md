@@ -5,6 +5,7 @@
 * **Fix**: [458](https://github.com/SimformSolutionsPvtLtd/chatview/pull/458) Enhance text field action animations for improved UX
 * **Refactor**: [455](https://github.com/SimformSolutionsPvtLtd/chatview/pull/455) Rework sending receipt animation with different transition
 * **Fix**: [463](https://github.com/SimformSolutionsPvtLtd/chatview/pull/463) Implement "Seen" receipt reveal animation with fade, slide, and expand effects
+* **Perf**: :zap: Swipe-to-see-time now follows the finger and the message time fades in with the swipe. Only the bubbles rebuild on swipe frames, not the whole message list.
 
 ## 3.1.0
 

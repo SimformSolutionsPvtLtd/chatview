@@ -25,6 +25,7 @@ import 'package:flutter/material.dart'
     show BorderRadius, EdgeInsetsGeometry, TextStyle, ValueSetter;
 import 'package:flutter/services.dart';
 
+import '../../../../values/enumeration.dart';
 import '../../../../values/typedefs.dart';
 
 class TextFieldConfiguration {
@@ -49,6 +50,8 @@ class TextFieldConfiguration {
     this.hintMaxLines,
     this.trailingActions,
     this.leadingActions,
+    this.leadingActionsAlignment = TextFieldActionsAlignment.center,
+    this.trailingActionsAlignment = TextFieldActionsAlignment.center,
   });
 
   /// Used to give max lines in text field.
@@ -123,4 +126,21 @@ class TextFieldConfiguration {
   ///
   /// Default is `true`.
   final bool hideLeadingActionsOnType;
+
+  /// Where [leadingActions] sit when the text field grows to several lines.
+  ///
+  /// Example: [TextFieldActionsAlignment.bottom] keeps them beside the last
+  /// line of text.
+  ///
+  /// Default is [TextFieldActionsAlignment.center].
+  final TextFieldActionsAlignment leadingActionsAlignment;
+
+  /// Where the trailing actions (and the send button) sit when the text field
+  /// grows to several lines.
+  ///
+  /// Example: [TextFieldActionsAlignment.bottom] keeps the send button beside
+  /// the last line of text.
+  ///
+  /// Default is [TextFieldActionsAlignment.center].
+  final TextFieldActionsAlignment trailingActionsAlignment;
 }

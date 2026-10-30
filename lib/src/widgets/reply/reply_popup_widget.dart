@@ -21,6 +21,7 @@
  */
 import 'package:flutter/material.dart';
 
+import '../../extensions/extensions.dart';
 import '../../utils/package_strings.dart';
 
 class ReplyPopupWidget extends StatelessWidget {
@@ -64,7 +65,7 @@ class ReplyPopupWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textStyle =
         buttonTextStyle ?? const TextStyle(fontSize: 14, color: Colors.black);
-    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceWidth = context.widthFraction();
     return Container(
       height: deviceWidth > 500 ? deviceWidth * 0.05 : deviceWidth * 0.13,
       decoration: BoxDecoration(

@@ -975,7 +975,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
   Widget _buildUnavailableMessage(Message message) {
     return Container(
       constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+          BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       margin: EdgeInsets.fromLTRB(
           5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),

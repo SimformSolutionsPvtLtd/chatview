@@ -36,12 +36,21 @@ class ScrollToBottomButton extends StatefulWidget {
 class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
   bool isButtonVisible = false;
 
+  /// The controller our scroll listener is on. Kept because `chatViewIW` is
+  /// null in [dispose], and the controller can change (a chat switch).
+  ScrollController? _scrollController;
+
   @override
   void didChangeDependencies() {
-    chatViewIW?.chatController.scrollController
-      ?..removeListener(_updateScrollButtonVisibility)
-      ..addListener(_updateScrollButtonVisibility);
     super.didChangeDependencies();
+    final scrollController = chatViewIW?.chatController.scrollController;
+    // Same controller: the listener is already added.
+    if (scrollController == _scrollController) return;
+    // The ChatView got another controller (a chat switch): leave the old one,
+    // then listen to the new one.
+    _scrollController?.removeListener(_updateScrollButtonVisibility);
+    _scrollController = scrollController
+      ?..addListener(_updateScrollButtonVisibility);
   }
 
   @override
@@ -88,8 +97,7 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
 
   @override
   void dispose() {
-    chatViewIW?.chatController.scrollController
-        .removeListener(_updateScrollButtonVisibility);
+    _scrollController?.removeListener(_updateScrollButtonVisibility);
     super.dispose();
   }
 

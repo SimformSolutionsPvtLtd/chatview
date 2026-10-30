@@ -6,6 +6,7 @@
 * **Refactor**: [455](https://github.com/SimformSolutionsPvtLtd/chatview/pull/455) Rework sending receipt animation with different transition
 * **Fix**: [463](https://github.com/SimformSolutionsPvtLtd/chatview/pull/463) Implement "Seen" receipt reveal animation with fade, slide, and expand effects
 * **Perf**: :zap: Swipe-to-see-time now follows the finger and the message time fades in with the swipe. Only the bubbles rebuild on swipe frames, not the whole message list.
+* **Fix**: :bug: Fix use-after-dispose errors and listener leaks: the reply jump is async-safe and reports a missing target through `onReplyTargetNotFound`, the text field registers its listener once, the scroll-to-bottom button and voice messages clean up on dispose, and typing no longer scrolls the list to the bottom on every rebuild.
 
 ## 3.1.0
 

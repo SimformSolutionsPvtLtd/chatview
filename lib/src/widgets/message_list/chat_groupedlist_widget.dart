@@ -196,10 +196,16 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       // We have already requested user to load more data containing the message
       // id. But still the message is not found in the list.
       if (messageIndex?.isNegative ?? false) {
-        throw Exception(
-          'Failed to find message with id: $id. '
-          'Please ensure to load the message in loadMoreData callback.',
-        );
+        final onNotFound = repliedMsgConfig.onReplyTargetNotFound;
+        if (onNotFound != null) {
+          onNotFound(id);
+        } else {
+          debugPrint(
+            'Failed to find message with id: $id. '
+            'Please ensure to load the message in loadOldReplyMessage.',
+          );
+        }
+        return;
       }
 
       await repliedMsgConfig.loadOldReplyMessage(id);

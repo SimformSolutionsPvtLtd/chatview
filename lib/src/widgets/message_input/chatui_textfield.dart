@@ -146,6 +146,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     widget.textEditingController.removeListener(_listenTextEditingController);
+    controller?.dispose();
     playerController.dispose();
     super.dispose();
   }
@@ -528,9 +529,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   }
 
   void _listenTextEditingController() {
-    widget.textEditingController.addListener(() {
-      _onChanged(widget.textEditingController.text);
-    });
+    _onChanged(widget.textEditingController.text);
   }
 
   void _onChanged(String inputText) {

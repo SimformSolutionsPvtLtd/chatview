@@ -279,6 +279,14 @@ extension StatefulWidgetExtension on State {
 
 /// Extension on State for accessing inherited widget.
 extension BuildContextExtension on BuildContext {
+  Size get screenSize => MediaQuery.sizeOf(this);
+
+  double heightFraction({double sizeFraction = 1}) =>
+      screenSize.height * sizeFraction;
+
+  double widthFraction({double sizeFraction = 1}) =>
+      screenSize.width * sizeFraction;
+
   /// This method calculates and updates the height of the chat text field.
   /// It retrieves the height from the current context and updates the
   /// `chatTextFieldHeight` in the `ChatViewInheritedWidget`.

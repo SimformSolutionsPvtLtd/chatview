@@ -379,7 +379,7 @@ class _ExampleTwoChatScreenState extends State<ExampleTwoChatScreen> {
   Widget _buildLocationMessage(Message message) {
     return Container(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.75,
+        maxWidth: MediaQuery.sizeOf(context).width * 0.75,
       ),
       padding: const EdgeInsets.all(12),
       margin: EdgeInsets.fromLTRB(

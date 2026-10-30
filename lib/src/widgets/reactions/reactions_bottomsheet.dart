@@ -23,6 +23,7 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../../extensions/extensions.dart';
 import '../../models/models.dart';
 import '../common/profile_image_widget.dart';
 
@@ -43,7 +44,7 @@ class ReactionsBottomSheet {
       context: context,
       builder: (BuildContext context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: context.heightFraction(sizeFraction: 0.5),
           color: reactionsBottomSheetConfig?.backgroundColor,
           child: ListView.builder(
             padding: reactionsBottomSheetConfig?.bottomSheetPadding ??

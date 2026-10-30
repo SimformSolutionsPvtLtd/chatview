@@ -127,7 +127,7 @@ class TextMessageView extends StatelessWidget {
         Container(
           constraints: BoxConstraints(
             maxWidth:
-                chatBubbleMaxWidth ?? MediaQuery.of(context).size.width * 0.75,
+                chatBubbleMaxWidth ?? context.widthFraction(sizeFraction: 0.75),
           ),
           padding: _padding ??
               const EdgeInsets.symmetric(

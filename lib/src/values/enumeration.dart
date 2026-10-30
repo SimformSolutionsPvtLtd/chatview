@@ -65,6 +65,22 @@ enum ScrollButtonAlignment {
   final Alignment alignment;
 }
 
+/// Where a group of text field actions sits when the text field grows taller
+/// than one line.
+///
+/// Example: with a four-line field, [top] keeps the actions beside the first
+/// line, [bottom] beside the last line (like most messaging apps) and
+/// [center] in the middle. A single-line field looks the same for all three.
+enum TextFieldActionsAlignment {
+  top(CrossAxisAlignment.start),
+  center(CrossAxisAlignment.center),
+  bottom(CrossAxisAlignment.end);
+
+  const TextFieldActionsAlignment(this.crossAxisAlignment);
+
+  final CrossAxisAlignment crossAxisAlignment;
+}
+
 enum SuggestionItemsType {
   scrollable,
   multiline;

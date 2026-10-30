@@ -1348,6 +1348,21 @@ textFieldConfig: TextFieldConfiguration(
 ),
 ```
 
+#### Action position
+
+When the text field grows to several lines, choose where each group of actions sits with
+`leadingActionsAlignment` and `trailingActionsAlignment` (`top`, `center` or `bottom`, default
+`center`). A single-line field looks the same for all three.
+
+```dart
+textFieldConfig: TextFieldConfiguration(
+  // The search button stays beside the last line of text, like most messaging apps.
+  leadingActionsAlignment: TextFieldActionsAlignment.bottom,
+  // Also keeps the send button at the bottom.
+  trailingActionsAlignment: TextFieldActionsAlignment.bottom,
+),
+```
+
 # Contributors
 
 ## Main Contributors

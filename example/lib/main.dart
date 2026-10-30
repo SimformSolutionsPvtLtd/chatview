@@ -674,6 +674,8 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               compositionThresholdTime: const Duration(seconds: 1),
               textStyle: TextStyle(color: _theme.textColor),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              leadingActionsAlignment: TextFieldActionsAlignment.bottom,
+              trailingActionsAlignment: TextFieldActionsAlignment.bottom,
               leadingActions: (context, controller) =>
                   controller.text.trim().isEmpty
                       ? [

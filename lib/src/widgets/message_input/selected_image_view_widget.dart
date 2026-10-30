@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
 import '../../utils/constants/constants.dart';
-import 'chat_textfield_view_builder.dart';
 
 class SelectedImageViewWidget extends StatefulWidget {
   const SelectedImageViewWidget({
@@ -27,7 +26,7 @@ class SelectedImageViewWidgetState extends State<SelectedImageViewWidget> {
   @override
   Widget build(BuildContext context) {
     final mqSize = MediaQuery.sizeOf(context);
-    return ChatTextFieldViewBuilder<List<String>>(
+    return ValueListenableBuilder<List<String>>(
       valueListenable: selectedImages,
       builder: (context, images, child) {
         if (widget.sendMessageConfig?.selectedImageViewBuilder != null) {

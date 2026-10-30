@@ -6,7 +6,6 @@ import '../../models/models.dart';
 import '../../utils/constants/constants.dart';
 import '../../utils/package_strings.dart';
 import '../../values/typedefs.dart';
-import '../message_input/chat_textfield_view_builder.dart';
 import 'reply_message_type_view.dart';
 
 class ReplyMessageView extends StatefulWidget {
@@ -67,7 +66,7 @@ class ReplyMessageViewState extends State<ReplyMessageView> {
   Widget build(BuildContext context) {
     final replyTitle = '${PackageStrings.currentLocale.replyTo} $_replyTo';
 
-    return ChatTextFieldViewBuilder<ReplyMessage>(
+    return ValueListenableBuilder<ReplyMessage>(
       valueListenable: replyMessage,
       builder: (_, state, child) {
         if (state.message.isEmpty) {

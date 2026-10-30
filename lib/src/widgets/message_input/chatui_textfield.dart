@@ -41,7 +41,6 @@ import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../action_widgets/camera_action_button.dart';
 import '../action_widgets/gallery_action_button.dart';
-import 'chat_textfield_view_builder.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({
@@ -213,7 +212,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
             BorderRadius.circular(textFieldBorderRadius),
         color: sendMessageConfig.textFieldBackgroundColor ?? Colors.white,
       ),
-      child: ChatTextFieldViewBuilder<bool>(
+      child: ValueListenableBuilder<bool>(
         valueListenable: isRecording,
         builder: (_, isRecordingValue, child) {
           return Row(

@@ -26,7 +26,6 @@ import 'package:flutter/material.dart';
 import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
 import '../../utils/constants/constants.dart';
 import '../../utils/package_strings.dart';
-import 'chat_textfield_view_builder.dart';
 
 /// A widget shown above the text field when the user is editing a message.
 ///
@@ -60,7 +59,7 @@ class EditMessageViewState extends State<EditMessageView> {
 
   @override
   Widget build(BuildContext context) {
-    return ChatTextFieldViewBuilder<Message?>(
+    return ValueListenableBuilder<Message?>(
       valueListenable: editMessage,
       builder: (_, state, __) {
         if (state == null) return const SizedBox.shrink();

@@ -33,8 +33,9 @@ import '../../values/typedefs.dart';
 import '../common/profile_circle.dart';
 import '../reply/reply_message_widget.dart';
 import '../reply/swipe_to_reply.dart';
-import 'message_time_widget.dart';
+import 'bubble_slide.dart';
 import 'message_view.dart';
+import 'fading_message_time.dart';
 
 class ChatBubbleWidget extends StatefulWidget {
   const ChatBubbleWidget({
@@ -119,30 +120,22 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     if (useSwipeToSeeTime && widget.slideAnimation != null) {
       return Stack(
         children: [
-          Visibility(
-            visible: widget.slideAnimation!.value.dx != 0.0,
-            child: Positioned.fill(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: MessageTimeWidget(
-                  messageTime: widget.message.createdAt,
-                  isCurrentUser: isMessageBySender,
-                ),
-              ),
-            ),
+          FadingMessageTime(
+            slideAnimation: widget.slideAnimation!,
+            messageTime: widget.message.createdAt,
+            isCurrentUser: isMessageBySender,
           ),
-          SlideTransition(
-            position: widget.slideAnimation!,
+          BubbleSlide(
+            animation: widget.slideAnimation!,
             child: _chatBubbleWidget(messagedUser),
           ),
         ],
       );
     }
 
-    final slideAnimation =
-        widget.slideAnimation ?? const AlwaysStoppedAnimation(Offset.zero);
-    return SlideTransition(
-      position: slideAnimation,
+    return BubbleSlide(
+      animation:
+          widget.slideAnimation ?? const AlwaysStoppedAnimation(Offset.zero),
       child: _chatBubbleWidget(messagedUser),
     );
   }

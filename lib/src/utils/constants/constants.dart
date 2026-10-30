@@ -63,6 +63,17 @@ const String defaultDateFormat = 'dd/MM/yyyy';
 const double userAvatarRadius = 24;
 const double loadMoreCircularProgressIndicatorSize = 36;
 
+/// Logical pixels the messages slide left to reveal their time.
+///
+/// The time label fades in over the same distance, and the drag stops here.
+///
+/// Example: after a 60px drag the messages have moved 60px and the label is
+/// at 50% opacity. At 120px the label is fully visible.
+const double timeRevealDistance = 120;
+
+/// How long the messages take to slide back after the finger lifts.
+const Duration timeRevealSnapBackDuration = Duration(milliseconds: 200);
+
 const String httpScheme = 'http';
 const String httpsScheme = 'https';
 

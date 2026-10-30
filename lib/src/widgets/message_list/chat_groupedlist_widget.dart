@@ -30,6 +30,7 @@ import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/feature_active_config.dart';
 import '../../models/config_models/chat_view/message/message_list_configuration.dart';
 import '../../models/config_models/chat_view/message_input/text_field_configuration.dart';
+import '../../utils/constants/constants.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../message_types/chat_bubble_widget.dart';
@@ -119,24 +120,28 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
   ValueListenable<bool>? get typingIndicatorNotifier =>
       chatController?.typingIndicatorNotifier;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeAnimation();
-  }
-
+  /// Creates the swipe-to-see-time animation, once, and only if the feature
+  /// is enabled.
+  ///
+  /// The controller (0 to 1) tracks the drag. [_slideAnimation] maps it to an
+  /// offset from 0 to `-timeRevealDistance` (left). Bubbles listen to
+  /// [_slideAnimation] directly, so dragging never rebuilds the list.
+  ///
+  /// Example: with a [timeRevealDistance] of 120, a 30px drag sets the
+  /// controller to 0.25 and the offset to `Offset(-30, 0)`.
   void _initializeAnimation() {
-    // When this flag is on at that time only animation controllers will be
-    // initialized.
-    if (!isEnableSwipeToSeeTime) return;
+    if (!isEnableSwipeToSeeTime || _animationController != null) return;
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: timeRevealSnapBackDuration,
     );
-    _slideAnimation =
-        Tween<Offset>(begin: Offset.zero, end: Offset.zero).animate(
-      CurvedAnimation(curve: Curves.decelerate, parent: _animationController!),
-    );
+    // No curve, so messages follow the finger 1:1. A curve such as
+    // Curves.decelerate would move them 90px after a 60px drag.
+    // The curve is applied only on release, in onHorizontalDragEnd.
+    _slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-timeRevealDistance, 0),
+    ).animate(_animationController!);
   }
 
   @override
@@ -156,15 +161,15 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       onHorizontalDragUpdate:
           isEnableSwipeToSeeTime && !showPopUp ? _onHorizontalDrag : null,
       onHorizontalDragEnd: isEnableSwipeToSeeTime && !showPopUp
-          ? (_) => _animationController?.reverse()
+          ? (_) => unawaited(
+                _animationController?.animateBack(
+                  0,
+                  curve: chatBackgroundConfig.messageTimeAnimationCurve,
+                ),
+              )
           : null,
       onTap: widget.onChatListTap,
-      child: _animationController == null
-          ? _chatStreamBuilder
-          : AnimatedBuilder(
-              animation: _animationController!,
-              builder: (_, __) => _chatStreamBuilder,
-            ),
+      child: _chatStreamBuilder,
     );
   }
 
@@ -262,23 +267,16 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     }
   }
 
-  /// When user swipe at that time only animation is assigned with value.
+  /// Moves the messages with the finger.
+  ///
+  /// Each update adds the finger's movement since the last update (`delta`) to
+  /// the controller, so the messages follow the finger exactly.
+  ///
+  /// A leftward drag reveals the time, a rightward drag hides it.
   void _onHorizontalDrag(DragUpdateDetails details) {
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(-0.2, 0),
-    ).animate(
-      CurvedAnimation(
-        curve: chatBackgroundConfig.messageTimeAnimationCurve,
-        parent: _animationController!,
-      ),
-    );
-
-    unawaited(
-      details.delta.dx > 1
-          ? _animationController?.reverse()
-          : _animationController?.forward(),
-    );
+    if (_animationController case final controller?) {
+      controller.value -= details.delta.dx / timeRevealDistance;
+    }
   }
 
   @override

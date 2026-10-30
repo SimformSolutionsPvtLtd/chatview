@@ -126,7 +126,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
               },
             )
           : SizedBox(
-              width: MediaQuery.of(context).size.width,
+              width: context.screenSize.width,
               child: Stack(
                 children: [
                   // This has been added to prevent messages from being
@@ -137,7 +137,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                     left: 0,
                     bottom: 0,
                     child: Container(
-                      height: MediaQuery.of(context).size.height /
+                      height: context.screenSize.height /
                           ((!kIsWeb && Platform.isIOS) ? 24 : 28),
                       color:
                           chatListConfig.chatBackgroundConfig.backgroundColor ??

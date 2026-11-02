@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// `leadingActionsAlignment` / `trailingActionsAlignment` choose where the
 /// action buttons sit when the text field grows to several lines.
 void main() {
-  // Half of the 48px slot each action group is centered in.
+  // Half the height of a 48px action button.
   const half = kMinInteractiveDimension / 2;
 
   Future<void> mount(
@@ -37,8 +37,14 @@ void main() {
             sendMessageConfig: SendMessageConfiguration(
               textFieldConfig: TextFieldConfiguration(
                 hideLeadingActionsOnType: false,
-                leadingActions: (context, controller) =>
-                    const [Icon(Icons.search)],
+                // A real button, 48px like the send button, so it fills the
+                // single-line field and is pinned, not centered, when it grows.
+                leadingActions: (context, controller) => [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.search),
+                  ),
+                ],
                 leadingActionsAlignment:
                     leading ?? TextFieldActionsAlignment.center,
                 trailingActionsAlignment:
@@ -90,7 +96,7 @@ void main() {
     await tester.enterText(find.byType(TextField), 'one');
     await tester.pumpAndSettle();
     expect(search(tester), field(tester).center.dy,
-        reason: 'a single-line field keeps the icon centered');
+        reason: 'a single-line field keeps the button centered');
 
     await growField(tester);
     expect(search(tester), field(tester).bottom - half);

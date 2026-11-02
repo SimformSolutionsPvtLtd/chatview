@@ -737,14 +737,15 @@ ChatView(
         fontSize: 11,
         fontWeight: FontWeight.w500,
       ),
-    ),
-    receiptsWidgetConfig: ReceiptsWidgetConfig(
-    // Animation style for the pending → sent transition.
-    // SendingMessageAnimationType.slideOut (default), .textLabel, or .clockToTick.
-    sendingAnimationType: SendingMessageAnimationType.clockToTick,
-    // Color of the sending indicator (currently honored by clockToTick).
-    sendingIndicatorColor: Colors.white70,
-),
+      receiptsWidgetConfig: ReceiptsWidgetConfig(
+        // Animation style for the pending → sent transition:
+        // SendingMessageAnimationType.slideOut (default), .textLabel or
+        // .clockToTick (WhatsApp-style, inline inside text bubbles).
+        // Ignored when a custom receiptsBuilder is provided.
+        sendingAnimationType: SendingMessageAnimationType.clockToTick,
+        // Color of the sending indicator.
+        sendingIndicatorColor: Colors.white70,
+      ),
     ),
     inComingChatBubbleConfig: // Similar to outgoingChatBubbleConfig
   ),
@@ -1196,6 +1197,11 @@ PackageStrings.addLocaleObject(
     send: 'Enviar',
     you: 'Tú',
     report: 'Reportar',
+    // Optional: announced by screen readers / shown by the textLabel indicator.
+    sending: 'Enviando...',
+    sent: 'Enviado',
+    read: 'Leído',
+    notDelivered: 'No entregado',
   ),
 );
 

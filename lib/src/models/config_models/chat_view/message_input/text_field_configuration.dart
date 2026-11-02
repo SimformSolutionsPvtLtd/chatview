@@ -72,6 +72,9 @@ class TextFieldConfiguration {
   final TextStyle? hintStyle;
 
   /// Used to give text style of actual text in text field.
+  ///
+  /// Default text colour is white on a dark `textFieldBackgroundColor` and
+  /// black on a light one (the default fill is white).
   final TextStyle? textStyle;
 
   /// Used to give border radius in text field.

@@ -98,6 +98,16 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   TextFieldConfiguration? get textFieldConfig =>
       sendMessageConfig.textFieldConfig;
 
+  Color get _backgroundColor =>
+      sendMessageConfig.textFieldBackgroundColor ?? Colors.white;
+
+  /// Text colour used when no `textStyle` is given: white on a dark fill, black
+  /// on a light one, so typed text is never white on white.
+  Color get _defaultTextColor =>
+      ThemeData.estimateBrightnessForColor(_backgroundColor) == Brightness.dark
+          ? Colors.white
+          : Colors.black;
+
   CancelRecordConfiguration? get cancelRecordConfiguration =>
       sendMessageConfig.cancelRecordConfiguration;
 
@@ -210,7 +220,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       decoration: BoxDecoration(
         borderRadius: textFieldConfig?.borderRadius ??
             BorderRadius.circular(textFieldBorderRadius),
-        color: sendMessageConfig.textFieldBackgroundColor ?? Colors.white,
+        color: _backgroundColor,
       ),
       child: ValueListenableBuilder<bool>(
         valueListenable: isRecording,
@@ -314,7 +324,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                           focusNode: widget.focusNode,
                           controller: widget.textEditingController,
                           style: textFieldConfig?.textStyle ??
-                              const TextStyle(color: Colors.white),
+                              TextStyle(color: _defaultTextColor),
                           maxLines: textFieldConfig?.maxLines ?? 5,
                           minLines: textFieldConfig?.minLines ?? 1,
                           keyboardType: textFieldConfig?.textInputType,
@@ -326,9 +336,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                           decoration: InputDecoration(
                             hintText: textFieldConfig?.hintText ??
                                 PackageStrings.currentLocale.message,
-                            fillColor:
-                                sendMessageConfig.textFieldBackgroundColor ??
-                                    Colors.white,
+                            fillColor: _backgroundColor,
                             filled: true,
                             hintMaxLines: textFieldConfig?.hintMaxLines ?? 1,
                             hintStyle: textFieldConfig?.hintStyle ??

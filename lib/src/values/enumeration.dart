@@ -25,7 +25,16 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-enum ShowReceiptsIn { all, lastMessage }
+import '../utils/package_strings.dart';
+
+enum ShowReceiptsIn {
+  all,
+  lastMessage;
+
+  bool get isAll => this == ShowReceiptsIn.all;
+
+  bool get isLastMessage => this == ShowReceiptsIn.lastMessage;
+}
 
 enum SuggestionListAlignment {
   left(Alignment.bottomLeft),
@@ -45,6 +54,34 @@ extension ChatViewStateExtension on ChatViewState {
   bool get isError => this == ChatViewState.error;
 
   bool get noMessages => this == ChatViewState.noData;
+}
+
+/// Defines how the sending → sent receipt transition is animated next to an
+/// outgoing chat bubble.
+enum SendingMessageAnimationType {
+  /// Default. A small dot/circle indicator that slides out to the right once
+  /// the message transitions from pending to sent.
+  slideOut,
+
+  /// A minimal "Sending..." text label (no surrounding padding) that fades and
+  /// collapses away once the message is sent.
+  textLabel,
+
+  /// WhatsApp-style clock that turns into a tick once sent.
+  ///
+  /// Text, image and voice bubbles draw it inline next to the time, and
+  /// [ShowReceiptsIn] is ignored. Custom messages draw it below the bubble.
+  /// A custom `receiptsBuilder` replaces it and is drawn below the bubble.
+  clockToTick;
+
+  /// Returns true if the animation type is [slideOut].
+  bool get isSlideOut => this == slideOut;
+
+  /// Returns true if the animation type is [textLabel].
+  bool get isTextLabel => this == textLabel;
+
+  /// Returns true if the animation type is [clockToTick].
+  bool get isClockToTick => this == clockToTick;
 }
 
 enum GroupedListOrder { asc, desc }
@@ -169,4 +206,23 @@ extension VoiceDurationFormatExtension on VoiceDurationFormat {
   bool get isMmss => this == VoiceDurationFormat.mmss;
 
   bool get isAdaptive => this == VoiceDurationFormat.adaptive;
+}
+
+extension MessageStatusExtension on MessageStatus {
+  String get localizedLabel {
+    final locale = PackageStrings.currentLocale;
+    return switch (this) {
+      MessageStatus.pending => locale.sending,
+      MessageStatus.delivered => locale.sent,
+      MessageStatus.read => locale.read,
+      MessageStatus.undelivered => locale.notDelivered,
+    };
+  }
+
+  IconData get statusIcon => switch (this) {
+        MessageStatus.pending => Icons.access_time,
+        MessageStatus.delivered => Icons.check,
+        MessageStatus.read => Icons.done_all,
+        MessageStatus.undelivered => Icons.error_outline,
+      };
 }

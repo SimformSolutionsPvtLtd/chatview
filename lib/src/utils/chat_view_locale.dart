@@ -59,6 +59,10 @@ final class ChatViewLocale {
     this.edit = 'Edit',
     this.edited = 'Edited',
     this.editing = 'Editing',
+    this.sending = 'Sending...',
+    this.sent = 'Sent',
+    this.read = 'Read',
+    this.notDelivered = 'Not delivered',
   });
 
   /// Create from `Map<String, String>`
@@ -100,6 +104,10 @@ final class ChatViewLocale {
       edit: map['edit']?.toString() ?? 'Edit',
       edited: map['edited']?.toString() ?? 'Edited',
       editing: map['editing']?.toString() ?? 'Editing',
+      sending: map['sending']?.toString() ?? 'Sending...',
+      sent: map['sent']?.toString() ?? 'Sent',
+      read: map['read']?.toString() ?? 'Read',
+      notDelivered: map['notDelivered']?.toString() ?? 'Not delivered',
     );
   }
 
@@ -146,6 +154,18 @@ final class ChatViewLocale {
   /// Label shown in the text field header when editing a message.
   final String editing;
 
+  /// Label shown (and announced) while an outgoing message is pending.
+  final String sending;
+
+  /// Announced for a sent / delivered outgoing message.
+  final String sent;
+
+  /// Announced for an outgoing message that has been read.
+  final String read;
+
+  /// Announced for an outgoing message that could not be delivered.
+  final String notDelivered;
+
   /// English defaults
   static const en = ChatViewLocale(
     today: 'Today',
@@ -184,5 +204,9 @@ final class ChatViewLocale {
     edit: 'Edit',
     edited: 'Edited',
     editing: 'Editing',
+    sending: 'Sending...',
+    sent: 'Sent',
+    read: 'Read',
+    notDelivered: 'Not delivered',
   );
 }

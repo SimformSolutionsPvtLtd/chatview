@@ -23,7 +23,6 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../widgets/chat_message_sending_to_sent_animation.dart';
 import '../timeago/timeago.dart' as timeago;
 
 const String imageUrlRegExpression =
@@ -66,6 +65,28 @@ const double loadMoreCircularProgressIndicatorSize = 36;
 const String httpScheme = 'http';
 const String httpsScheme = 'https';
 
+/// Diameter of the sending-status indicator circle.
+const double slideOutDotSize = 6;
+
+/// Default color of the sending-status indicator (dot / text / clock-tick)
+/// when no explicit color is provided.
+const Color sendingIndicatorDefaultColor = Color(0xFF666f79);
+
+/// Duration of the sending-to-sent indicator animation.
+const Duration sendingAnimationDuration = Duration(milliseconds: 400);
+
+/// Curve of the sending-to-sent indicator animation.
+const Curve sendingAnimationCurve = Curves.easeOut;
+
+/// Size of the clock/tick icon for the WhatsApp-style sending indicator.
+const double clockToTickIconSize = 14;
+
+/// Space reserved under bubble text for the inline time and tick.
+const double inBubbleReceiptHeight = 18;
+
+/// Horizontal padding around the clock/tick icon.
+const double clockToTickIconPadding = 2;
+
 String applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
     return timeago.format(inputTime);
@@ -78,14 +99,6 @@ String applicationDateFormatter(DateTime inputTime) {
 const String urlRegex =
     r'((https?://)?(www\.)?[a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b'
     r'([-a-zA-Z0-9@:%_\+.~#?&//=]*))';
-
-/// Default widget that appears on receipts at [MessageStatus.pending] when a message
-/// is not sent or at the pending state. A custom implementation can have different
-/// widgets for different states.
-/// Right now it is implemented to appear right next to the outgoing bubble.
-Widget sendMessageAnimationBuilder(MessageStatus status) {
-  return SendingMessageAnimatingWidget(status);
-}
 
 /// Default builder when the message has got seen as of now
 /// is visible at the bottom of the chat bubble

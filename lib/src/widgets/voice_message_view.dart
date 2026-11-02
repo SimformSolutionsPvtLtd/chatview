@@ -27,7 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../chatview.dart';
-import '../extensions/extensions.dart';
+import 'in_bubble_time_and_receipt.dart';
 import 'reaction_widget.dart';
 
 class VoiceMessageView extends StatefulWidget {
@@ -123,6 +123,12 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
 
   @override
   Widget build(BuildContext context) {
+    final showTime = widget.featureActiveConfig?.showTimeInChatBubble ?? false;
+    final showReceipt = InBubbleTimeAndReceipt.shouldShowReceipt(
+      isMessageBySender: widget.isMessageBySender,
+      outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+      featureActiveConfig: widget.featureActiveConfig,
+    );
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -139,10 +145,14 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
               ),
           padding: widget.config?.padding ??
               const EdgeInsets.symmetric(horizontal: 8),
+          // Horizontal margin matches the text bubble (5 left, 6 right) so
+          // voice bubbles line up with other message types.
           margin: widget.config?.margin ??
-              EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: widget.message.reaction.reactions.isNotEmpty ? 15 : 0,
+              EdgeInsets.fromLTRB(
+                5,
+                widget.message.reaction.reactions.isNotEmpty ? 15 : 0,
+                6,
+                widget.message.reaction.reactions.isNotEmpty ? 15 : 0,
               ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -215,12 +225,15 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
                     ),
                 ],
               ),
-              if (widget.featureActiveConfig?.showTimeInChatBubble ?? false)
+              if (showTime || showReceipt)
                 Padding(
                   padding: const EdgeInsets.only(right: 8, bottom: 4),
-                  child: Text(
-                    widget.message.createdAt.getTimeFromDateTime,
-                    style: TextStyle(
+                  child: InBubbleTimeAndReceipt(
+                    message: widget.message,
+                    showTime: showTime,
+                    showReceipt: showReceipt,
+                    outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+                    timeStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: widget.isMessageBySender

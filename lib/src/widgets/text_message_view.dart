@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
+import 'in_bubble_time_and_receipt.dart';
 import 'link_preview.dart';
 import 'reaction_widget.dart';
 
@@ -121,6 +122,14 @@ class TextMessageView extends StatelessWidget {
             child: baseWidget,
           )
         : baseWidget;
+
+    // Inline clock/tick next to the time; a custom receiptsBuilder replaces it
+    // (see MessageStatusIndicator).
+    final showInBubbleReceipt = InBubbleTimeAndReceipt.shouldShowReceipt(
+      isMessageBySender: isMessageBySender,
+      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+      featureActiveConfig: featureActiveConfig,
+    );
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -144,61 +153,80 @@ class TextMessageView extends StatelessWidget {
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
           ),
-          child: showTimeInChatBubble
-              ? LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (extractedUrls.isNotEmpty) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          messageWidget,
-                          const SizedBox(height: 4),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Text(timeText, style: timestampStyle),
-                          ),
-                        ],
-                      );
-                    }
-
-                    final canShowInSingleLine = !textMessage.contains('\n') &&
-                        _canRenderTimeInSingleLine(
-                          context: context,
-                          messageText: textMessage,
-                          messageStyle: effectiveTextStyle,
-                          timeText: timeText,
-                          timeStyle: timestampStyle,
-                          maxContentWidth: constraints.maxWidth,
-                        );
-
-                    if (canShowInSingleLine) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Flexible(child: messageWidget),
-                          const SizedBox(width: 8),
-                          Text(timeText, style: timestampStyle),
-                        ],
-                      );
-                    }
-
-                    return Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Padding(
-                          // Reserve space at bottom for timestamp without a
-                          // large blank strip on the left.
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: messageWidget,
-                        ),
-                        Text(timeText, style: timestampStyle),
-                      ],
-                    );
-                  },
+          child: showInBubbleReceipt
+              ? Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: inBubbleReceiptHeight),
+                      child: messageWidget,
+                    ),
+                    InBubbleTimeAndReceipt(
+                      message: message,
+                      timeStyle: timestampStyle,
+                      showTime: showTimeInChatBubble,
+                      showReceipt: true,
+                      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+                    ),
+                  ],
                 )
-              : messageWidget,
+              : showTimeInChatBubble
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (extractedUrls.isNotEmpty) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              messageWidget,
+                              const SizedBox(height: 4),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Text(timeText, style: timestampStyle),
+                              ),
+                            ],
+                          );
+                        }
+
+                        final canShowInSingleLine =
+                            !textMessage.contains('\n') &&
+                                _canRenderTimeInSingleLine(
+                                  context: context,
+                                  messageText: textMessage,
+                                  messageStyle: effectiveTextStyle,
+                                  timeText: timeText,
+                                  timeStyle: timestampStyle,
+                                  maxContentWidth: constraints.maxWidth,
+                                );
+
+                        if (canShowInSingleLine) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Flexible(child: messageWidget),
+                              const SizedBox(width: 8),
+                              Text(timeText, style: timestampStyle),
+                            ],
+                          );
+                        }
+
+                        return Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Padding(
+                              // Reserve space at bottom for timestamp without a
+                              // large blank strip on the left.
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: messageWidget,
+                            ),
+                            Text(timeText, style: timestampStyle),
+                          ],
+                        );
+                      },
+                    )
+                  : messageWidget,
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(

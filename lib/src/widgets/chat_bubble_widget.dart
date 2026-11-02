@@ -24,11 +24,13 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/feature_active_config.dart';
+import '../models/config_models/receipts_widget_config.dart';
 import '../utils/constants/constants.dart';
 import '../utils/package_strings.dart';
 import '../values/enumeration.dart';
 import '../values/typedefs.dart';
-import 'chat_view_inherited_widget.dart';
+import 'chat_bubble_with_status.dart';
+import 'message_status_indicator.dart';
 import 'message_time_widget.dart';
 import 'message_view.dart';
 import 'profile_circle.dart';
@@ -183,7 +185,6 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
           Expanded(
             child: _messagesWidgetColumn(messagedUser),
           ),
-          if (isMessageBySender) ...[getReceipt()],
           if (isMessageBySender &&
               (featureActiveConfig?.enableCurrentUserProfileAvatar ?? true))
             widget.isLastInGroup
@@ -246,45 +247,31 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     }
   }
 
-  Widget getReceipt() {
-    final showReceipts = chatListConfig.chatBubbleConfig
-            ?.outgoingChatBubbleConfig?.receiptsWidgetConfig?.showReceiptsIn ??
-        ShowReceiptsIn.lastMessage;
-    if (showReceipts == ShowReceiptsIn.all) {
-      return ValueListenableBuilder(
-        valueListenable: widget.message.statusNotifier,
-        builder: (context, value, child) {
-          if (ChatViewInheritedWidget.of(context)
-                  ?.featureActiveConfig
-                  .receiptsBuilderVisibility ??
-              true) {
-            return chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig
-                    ?.receiptsWidgetConfig?.receiptsBuilder
-                    ?.call(value) ??
-                sendMessageAnimationBuilder(value);
-          }
-          return const SizedBox();
-        },
-      );
-    } else if (showReceipts == ShowReceiptsIn.lastMessage && isLastMessage) {
-      return ValueListenableBuilder(
-          valueListenable:
-              chatController!.initialMessageList.last.statusNotifier,
-          builder: (context, value, child) {
-            if (ChatViewInheritedWidget.of(context)
-                    ?.featureActiveConfig
-                    .receiptsBuilderVisibility ??
-                true) {
-              return chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig
-                      ?.receiptsWidgetConfig?.receiptsBuilder
-                      ?.call(value) ??
-                  sendMessageAnimationBuilder(value);
-            }
-            return sendMessageAnimationBuilder(value);
-          });
-    }
-    return const SizedBox();
-  }
+  ReceiptsWidgetConfig? get _receiptsConfig => chatListConfig
+      .chatBubbleConfig?.outgoingChatBubbleConfig?.receiptsWidgetConfig;
+
+  SendingMessageAnimationType get _sendingAnimationType =>
+      _receiptsConfig?.sendingAnimationType ??
+      SendingMessageAnimationType.slideOut;
+
+  /// Whether the clock/tick sits below the bubble: custom messages have no
+  /// inline slot, and a custom `receiptsBuilder` replaces the inline tick.
+  bool get _showClockToTickBelowBubble =>
+      _sendingAnimationType.isClockToTick &&
+      (widget.message.messageType.isCustom ||
+          _receiptsConfig?.receiptsBuilder != null);
+
+  /// Whether the status indicator sits beside the bubble.
+  bool get _showStatusBesideBubble =>
+      isMessageBySender && _sendingAnimationType.isSlideOut;
+
+  /// Whether the status indicator sits just below the bubble.
+  bool get _showStatusBelowBubble =>
+      isMessageBySender &&
+      (_sendingAnimationType.isTextLabel || _showClockToTickBelowBubble);
+
+  bool get _showStatusIndicator =>
+      _showStatusBesideBubble || _showStatusBelowBubble;
 
   void _onAvatarLongPress(ChatUser? user) {
     if (chatListConfig.profileCircleConfig?.onAvatarLongPress != null &&
@@ -347,45 +334,55 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
               ),
             ),
           ),
-        SwipeToReply(
-          isMessageByCurrentUser: isMessageBySender,
-          onSwipe: isMessageBySender ? onLeftSwipe : onRightSwipe,
-          child: MessageView(
-            outgoingChatBubbleConfig:
-                chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig,
-            isLongPressEnable:
-                (featureActiveConfig?.enableReactionPopup ?? true) ||
-                    (featureActiveConfig?.enableReplySnackBar ?? true),
-            inComingChatBubbleConfig:
-                chatListConfig.chatBubbleConfig?.inComingChatBubbleConfig,
-            message: widget.message,
-            isMessageBySender: isMessageBySender,
-            messageConfig: chatListConfig.messageConfig,
-            onLongPress: widget.onLongPress,
-            chatBubbleMaxWidth: chatListConfig.chatBubbleConfig?.maxWidth,
-            longPressAnimationDuration:
-                chatListConfig.chatBubbleConfig?.longPressAnimationDuration,
-            onDoubleTap: featureActiveConfig?.enableDoubleTapToLike ?? false
-                ? chatListConfig.chatBubbleConfig?.onDoubleTap ??
-                    (message) => currentUser != null
-                        ? chatController?.setReaction(
-                            emoji: heart,
-                            messageId: message.id,
-                            userId: currentUser!.id,
-                          )
-                        : null
-                : null,
-            shouldHighlight: widget.shouldHighlight,
-            controller: chatController,
-            highlightColor: chatListConfig.repliedMessageConfig
-                    ?.repliedMsgAutoScrollConfig.highlightColor ??
-                Colors.grey,
-            highlightScale: chatListConfig.repliedMessageConfig
-                    ?.repliedMsgAutoScrollConfig.highlightScale ??
-                1.1,
-            onMaxDuration: _onMaxDuration,
-            isFirstInGroup: widget.isFirstInGroup,
-            isLastInGroup: widget.isLastInGroup,
+        ChatBubbleWithStatus(
+          isStatusBelow: _showStatusBelowBubble,
+          statusIndicator: _showStatusIndicator
+              ? MessageStatusIndicator(
+                  message: widget.message,
+                  isLast: isLastMessage,
+                )
+              : null,
+          alignStatusToBottom: _receiptsConfig?.receiptsBuilder != null,
+          bubble: SwipeToReply(
+            isMessageByCurrentUser: isMessageBySender,
+            onSwipe: isMessageBySender ? onLeftSwipe : onRightSwipe,
+            child: MessageView(
+              outgoingChatBubbleConfig:
+                  chatListConfig.chatBubbleConfig?.outgoingChatBubbleConfig,
+              isLongPressEnable:
+                  (featureActiveConfig?.enableReactionPopup ?? true) ||
+                      (featureActiveConfig?.enableReplySnackBar ?? true),
+              inComingChatBubbleConfig:
+                  chatListConfig.chatBubbleConfig?.inComingChatBubbleConfig,
+              message: widget.message,
+              isMessageBySender: isMessageBySender,
+              messageConfig: chatListConfig.messageConfig,
+              onLongPress: widget.onLongPress,
+              chatBubbleMaxWidth: chatListConfig.chatBubbleConfig?.maxWidth,
+              longPressAnimationDuration:
+                  chatListConfig.chatBubbleConfig?.longPressAnimationDuration,
+              onDoubleTap: featureActiveConfig?.enableDoubleTapToLike ?? false
+                  ? chatListConfig.chatBubbleConfig?.onDoubleTap ??
+                      (message) => currentUser != null
+                          ? chatController?.setReaction(
+                              emoji: heart,
+                              messageId: message.id,
+                              userId: currentUser!.id,
+                            )
+                          : null
+                  : null,
+              shouldHighlight: widget.shouldHighlight,
+              controller: chatController,
+              highlightColor: chatListConfig.repliedMessageConfig
+                      ?.repliedMsgAutoScrollConfig.highlightColor ??
+                  Colors.grey,
+              highlightScale: chatListConfig.repliedMessageConfig
+                      ?.repliedMsgAutoScrollConfig.highlightScale ??
+                  1.1,
+              onMaxDuration: _onMaxDuration,
+              isFirstInGroup: widget.isFirstInGroup,
+              isLastInGroup: widget.isLastInGroup,
+            ),
           ),
         ),
       ],

@@ -20,7 +20,8 @@
  * SOFTWARE.
  */
 
-import '../../utils/constants/constants.dart';
+import 'package:flutter/material.dart';
+
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 
@@ -29,12 +30,14 @@ class ReceiptsWidgetConfig {
     this.receiptsBuilder,
     this.lastSeenAgoBuilder,
     this.showReceiptsIn = ShowReceiptsIn.lastMessage,
+    this.sendingAnimationType = SendingMessageAnimationType.slideOut,
+    this.sendingIndicatorColor,
   });
 
   /// The builder that builds widget that right next to the senders message bubble.
   /// Right now it's implemented to show animation only at the last message just
   /// like instagram.
-  /// By default [sendMessageAnimationBuilder]
+  /// By default the indicator selected by [sendingAnimationType] is used.
   final ReceiptBuilder? receiptsBuilder;
 
   /// Just like Instagram messages receipts are displayed at the bottom of last
@@ -44,4 +47,20 @@ class ReceiptsWidgetConfig {
 
   /// Whether to show receipts in all messages or not defaults to [ShowReceiptsIn.lastMessage]
   final ShowReceiptsIn showReceiptsIn;
+
+  /// The animation style used by the default status indicator for the
+  /// pending → sent transition next to an outgoing bubble.
+  ///
+  /// Ignored when a custom [receiptsBuilder] is provided.
+  /// Defaults to [SendingMessageAnimationType.slideOut].
+  ///
+  /// ```dart
+  /// ReceiptsWidgetConfig(
+  ///   sendingAnimationType: SendingMessageAnimationType.clockToTick,
+  /// )
+  /// ```
+  final SendingMessageAnimationType sendingAnimationType;
+
+  /// Color of the sending indicator. Defaults to a grey.
+  final Color? sendingIndicatorColor;
 }

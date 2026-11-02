@@ -24,12 +24,12 @@ import 'package:chatview/src/widgets/adaptive_image.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../extensions/extensions.dart';
 import '../models/chat_bubble.dart';
 import '../models/config_models/feature_active_config.dart';
 import '../models/config_models/image_message_configuration.dart';
 import '../models/config_models/message_reaction_configuration.dart';
 import '../utils/constants/constants.dart';
+import 'in_bubble_time_and_receipt.dart';
 import 'reaction_widget.dart';
 import 'share_icon.dart';
 
@@ -127,6 +127,12 @@ class ImageMessageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = _groupAwareBorderRadius();
+    final showTime = featureActiveConfig?.showTimeInChatBubble ?? false;
+    final showReceipt = InBubbleTimeAndReceipt.shouldShowReceipt(
+      isMessageBySender: isMessageBySender,
+      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+      featureActiveConfig: featureActiveConfig,
+    );
     final backgroundColor = isMessageBySender
         ? outgoingChatBubbleConfig?.color ?? Colors.purple
         : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
@@ -176,7 +182,7 @@ class ImageMessageView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (featureActiveConfig?.showTimeInChatBubble ?? false)
+                      if (showTime || showReceipt)
                         Positioned(
                           right: 8,
                           bottom: 8,
@@ -189,9 +195,13 @@ class ImageMessageView extends StatelessWidget {
                               color: Colors.black45,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text(
-                              message.createdAt.getTimeFromDateTime,
-                              style: const TextStyle(
+                            child: InBubbleTimeAndReceipt(
+                              message: message,
+                              showTime: showTime,
+                              showReceipt: showReceipt,
+                              outgoingChatBubbleConfig:
+                                  outgoingChatBubbleConfig,
+                              timeStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,

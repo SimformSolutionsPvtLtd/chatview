@@ -53,7 +53,11 @@ class MessageView extends StatefulWidget {
     this.controller,
     this.isFirstInGroup = true,
     this.isLastInGroup = true,
+    this.statusBelowBubble,
   });
+
+  /// Status indicator shown right below the bubble, above the "Seen" label.
+  final Widget? statusBelowBubble;
 
   /// Provides message instance of chat.
   final Message message;
@@ -179,9 +183,7 @@ class _MessageViewState extends State<MessageView>
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           (() {
-                if (message.isAllEmoji &&
-                    (maxOutSideBubbleEmojis == null ||
-                        message.characters.length <= maxOutSideBubbleEmojis)) {
+                if (message.isOutsideBubbleEmoji(maxOutSideBubbleEmojis)) {
                   return Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -281,6 +283,8 @@ class _MessageViewState extends State<MessageView>
                 }
               }()) ??
               const SizedBox(),
+          if (widget.statusBelowBubble case final status?)
+            Padding(padding: const EdgeInsets.only(right: 6), child: status),
           ValueListenableBuilder(
             valueListenable: widget.message.statusNotifier,
             builder: (context, value, child) {

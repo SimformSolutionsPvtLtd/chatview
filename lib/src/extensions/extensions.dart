@@ -139,6 +139,14 @@ extension ValidateString on String {
     return runes.length == unEmojified.length;
   }
 
+  /// Whether this text is shown as bare emojis outside a chat bubble, i.e. it
+  /// is all emoji and within [maxOutSideBubbleEmojis] (no limit when null).
+  bool isOutsideBubbleEmoji(int? maxOutSideBubbleEmojis) =>
+      // Cheap length check first, so the emoji parse is skipped for long text.
+      (maxOutSideBubbleEmojis == null ||
+          characters.length <= maxOutSideBubbleEmojis) &&
+      isAllEmoji;
+
   bool get isUrl {
     final uri = Uri.tryParse(this);
     return uri != null &&

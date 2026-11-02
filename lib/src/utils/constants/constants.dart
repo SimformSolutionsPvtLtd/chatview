@@ -87,6 +87,13 @@ const double inBubbleReceiptHeight = 18;
 /// Horizontal padding around the clock/tick icon.
 const double clockToTickIconPadding = 2;
 
+/// Duration of the "Seen" receipt reveal (fade + slide + expand) shown below
+/// the last outgoing bubble once it is read.
+const Duration seenAppearanceAnimationDuration = Duration(milliseconds: 300);
+
+/// Curve of the "Seen" receipt reveal animation.
+const Curve seenAppearanceAnimationCurve = Curves.easeOutCubic;
+
 String applicationDateFormatter(DateTime inputTime) {
   if (DateTime.now().difference(inputTime).inDays <= 3) {
     return timeago.format(inputTime);

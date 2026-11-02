@@ -284,26 +284,49 @@ class _MessageViewState extends State<MessageView>
           ValueListenableBuilder(
             valueListenable: widget.message.statusNotifier,
             builder: (context, value, child) {
-              if (widget.isMessageBySender &&
+              final showSeen = widget.isMessageBySender &&
                   widget.controller?.initialMessageList.last.id ==
                       widget.message.id &&
-                  widget.message.status == MessageStatus.read) {
-                if (ChatViewInheritedWidget.of(context)
-                        ?.featureActiveConfig
-                        .lastSeenAgoBuilderVisibility ??
-                    true) {
-                  return widget.outgoingChatBubbleConfig?.receiptsWidgetConfig
-                          ?.lastSeenAgoBuilder
-                          ?.call(
-                              widget.message,
-                              applicationDateFormatter(
-                                  widget.message.createdAt)) ??
-                      lastSeenAgoBuilder(widget.message,
-                          applicationDateFormatter(widget.message.createdAt));
-                }
-                return const SizedBox();
-              }
-              return const SizedBox();
+                  widget.message.status == MessageStatus.read &&
+                  (ChatViewInheritedWidget.of(context)
+                          ?.featureActiveConfig
+                          .lastSeenAgoBuilderVisibility ??
+                      true);
+              return AnimatedSwitcher(
+                duration: seenAppearanceAnimationDuration,
+                switchInCurve: seenAppearanceAnimationCurve,
+                switchOutCurve: seenAppearanceAnimationCurve,
+                transitionBuilder: (child, animation) => SizeTransition(
+                  alignment: Alignment.topCenter,
+                  sizeFactor: animation,
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.35),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  ),
+                ),
+                child: showSeen
+                    ? Align(
+                        key: const ValueKey('seen'),
+                        alignment: Alignment.centerRight,
+                        child: widget.outgoingChatBubbleConfig
+                                ?.receiptsWidgetConfig?.lastSeenAgoBuilder
+                                ?.call(
+                                    widget.message,
+                                    applicationDateFormatter(
+                                        widget.message.createdAt)) ??
+                            lastSeenAgoBuilder(
+                                widget.message,
+                                applicationDateFormatter(
+                                    widget.message.createdAt)),
+                      )
+                    : const SizedBox(key: ValueKey('seen-empty')),
+              );
             },
           )
         ],

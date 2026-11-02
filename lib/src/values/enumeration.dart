@@ -25,7 +25,16 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-enum ShowReceiptsIn { all, lastMessage }
+import '../utils/package_strings.dart';
+
+enum ShowReceiptsIn {
+  all,
+  lastMessage;
+
+  bool get isAll => this == ShowReceiptsIn.all;
+
+  bool get isLastMessage => this == ShowReceiptsIn.lastMessage;
+}
 
 enum SuggestionListAlignment {
   left(Alignment.bottomLeft),
@@ -58,15 +67,11 @@ enum SendingMessageAnimationType {
   /// collapses away once the message is sent.
   textLabel,
 
-  /// WhatsApp-style. A clock icon shown while the message is pending that
-  /// cross-fades into a tick (check) once the message is sent.
+  /// WhatsApp-style clock that turns into a tick once sent.
   ///
-  /// For text messages it renders inline at the bubble's bottom-right (next to
-  /// the timestamp), per-message, so [ShowReceiptsIn.lastMessage] does not
-  /// limit it — every outgoing bubble shows its own tick, matching the
-  /// WhatsApp pattern. For non-text messages it renders beside the bubble via
-  /// the standard receipt slot. The [ReceiptsWidgetConfig.receiptsBuilder]
-  /// override applies only to that beside-bubble slot, not the inline tick.
+  /// Text, image and voice bubbles draw it inline next to the time, and
+  /// [ShowReceiptsIn] is ignored. Custom messages draw it below the bubble.
+  /// A custom `receiptsBuilder` replaces it and is drawn below the bubble.
   clockToTick;
 
   /// Returns true if the animation type is [slideOut].
@@ -77,13 +82,6 @@ enum SendingMessageAnimationType {
 
   /// Returns true if the animation type is [clockToTick].
   bool get isClockToTick => this == clockToTick;
-
-  /// Human-readable label, handy for settings/menus.
-  String get label => switch (this) {
-        slideOut => 'Slide-out dot',
-        textLabel => 'Sending text',
-        clockToTick => 'Clock to tick',
-      };
 }
 
 enum GroupedListOrder { asc, desc }
@@ -208,4 +206,23 @@ extension VoiceDurationFormatExtension on VoiceDurationFormat {
   bool get isMmss => this == VoiceDurationFormat.mmss;
 
   bool get isAdaptive => this == VoiceDurationFormat.adaptive;
+}
+
+extension MessageStatusExtension on MessageStatus {
+  String get localizedLabel {
+    final locale = PackageStrings.currentLocale;
+    return switch (this) {
+      MessageStatus.pending => locale.sending,
+      MessageStatus.delivered => locale.sent,
+      MessageStatus.read => locale.read,
+      MessageStatus.undelivered => locale.notDelivered,
+    };
+  }
+
+  IconData get statusIcon => switch (this) {
+        MessageStatus.pending => Icons.access_time,
+        MessageStatus.delivered => Icons.check,
+        MessageStatus.read => Icons.done_all,
+        MessageStatus.undelivered => Icons.error_outline,
+      };
 }

@@ -25,7 +25,7 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
-import 'chat_message_sending_to_sent_animation.dart';
+import 'in_bubble_time_and_receipt.dart';
 import 'link_preview.dart';
 import 'reaction_widget.dart';
 
@@ -123,15 +123,13 @@ class TextMessageView extends StatelessWidget {
           )
         : baseWidget;
 
-    // WhatsApp-style clock/tick rendered inline at the bubble's bottom-right
-    // (next to the timestamp) for outgoing messages. Honors the
-    // receiptsBuilderVisibility feature flag, consistent with the beside-bubble
-    // receipt path in ChatBubbleWidget.getReceipt().
-    final showInBubbleReceipt = isMessageBySender &&
-        (featureActiveConfig?.receiptsBuilderVisibility ?? true) &&
-        (outgoingChatBubbleConfig
-                ?.receiptsWidgetConfig?.sendingAnimationType.isClockToTick ??
-            false);
+    // Inline clock/tick next to the time; a custom receiptsBuilder replaces it
+    // (see MessageStatusIndicator).
+    final showInBubbleReceipt = InBubbleTimeAndReceipt.shouldShowReceipt(
+      isMessageBySender: isMessageBySender,
+      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+      featureActiveConfig: featureActiveConfig,
+    );
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -160,88 +158,75 @@ class TextMessageView extends StatelessWidget {
                   alignment: Alignment.bottomRight,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(
-                          bottom: sendingReceiptInBubbleReservedHeight),
+                      padding:
+                          const EdgeInsets.only(bottom: inBubbleReceiptHeight),
                       child: messageWidget,
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (showTimeInChatBubble) ...[
-                          Text(timeText, style: timestampStyle),
-                          const SizedBox(width: 4),
-                        ],
-                        ValueListenableBuilder<MessageStatus>(
-                          valueListenable: message.statusNotifier,
-                          builder: (_, status, __) =>
-                              SendingMessageAnimatingWidget(
-                            status,
-                            type: SendingMessageAnimationType.clockToTick,
-                            color: outgoingChatBubbleConfig
-                                    ?.receiptsWidgetConfig?.sendingIndicatorColor ??
-                                timestampStyle.color,
-                          ),
-                        ),
-                      ],
+                    InBubbleTimeAndReceipt(
+                      message: message,
+                      timeStyle: timestampStyle,
+                      showTime: showTimeInChatBubble,
+                      showReceipt: true,
+                      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
                     ),
                   ],
                 )
               : showTimeInChatBubble
                   ? LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (extractedUrls.isNotEmpty) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          messageWidget,
-                          const SizedBox(height: 4),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Text(timeText, style: timestampStyle),
-                          ),
-                        ],
-                      );
-                    }
+                      builder: (context, constraints) {
+                        if (extractedUrls.isNotEmpty) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              messageWidget,
+                              const SizedBox(height: 4),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Text(timeText, style: timestampStyle),
+                              ),
+                            ],
+                          );
+                        }
 
-                    final canShowInSingleLine = !textMessage.contains('\n') &&
-                        _canRenderTimeInSingleLine(
-                          context: context,
-                          messageText: textMessage,
-                          messageStyle: effectiveTextStyle,
-                          timeText: timeText,
-                          timeStyle: timestampStyle,
-                          maxContentWidth: constraints.maxWidth,
+                        final canShowInSingleLine =
+                            !textMessage.contains('\n') &&
+                                _canRenderTimeInSingleLine(
+                                  context: context,
+                                  messageText: textMessage,
+                                  messageStyle: effectiveTextStyle,
+                                  timeText: timeText,
+                                  timeStyle: timestampStyle,
+                                  maxContentWidth: constraints.maxWidth,
+                                );
+
+                        if (canShowInSingleLine) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Flexible(child: messageWidget),
+                              const SizedBox(width: 8),
+                              Text(timeText, style: timestampStyle),
+                            ],
+                          );
+                        }
+
+                        return Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Padding(
+                              // Reserve space at bottom for timestamp without a
+                              // large blank strip on the left.
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: messageWidget,
+                            ),
+                            Text(timeText, style: timestampStyle),
+                          ],
                         );
-
-                    if (canShowInSingleLine) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Flexible(child: messageWidget),
-                          const SizedBox(width: 8),
-                          Text(timeText, style: timestampStyle),
-                        ],
-                      );
-                    }
-
-                    return Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Padding(
-                          // Reserve space at bottom for timestamp without a
-                          // large blank strip on the left.
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: messageWidget,
-                        ),
-                        Text(timeText, style: timestampStyle),
-                      ],
-                    );
-                  },
-                )
-              : messageWidget,
+                      },
+                    )
+                  : messageWidget,
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(

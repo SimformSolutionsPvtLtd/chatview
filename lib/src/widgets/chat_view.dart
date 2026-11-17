@@ -200,11 +200,31 @@ class _ChatViewState extends State<ChatView>
 
   late GlobalKey chatTextFieldViewKey;
 
+  // Created once here, not in ChatViewInheritedWidget, which is rebuilt (and
+  // would reset them) every time the host rebuilds ChatView.
+  final ValueNotifier<bool> _showPopUp = ValueNotifier(false);
+  final ValueNotifier<double> _chatTextFieldHeight = ValueNotifier(0);
+  final GlobalKey<ReactionPopupState> _reactionPopupKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     setLocaleMessages('en', ReceiptsCustomMessages());
     chatTextFieldViewKey = GlobalKey();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The notifiers outlive host rebuilds, so a feature switched off must
+    // clear what it left behind: its padding / its scroll lock.
+    final old = oldWidget.featureActiveConfig;
+    if (old.enableTextField && !featureActiveConfig.enableTextField) {
+      _chatTextFieldHeight.value = 0;
+    }
+    if (old.enableReactionPopup && !featureActiveConfig.enableReactionPopup) {
+      _showPopUp.value = false;
+    }
   }
 
   @override
@@ -220,6 +240,9 @@ class _ChatViewState extends State<ChatView>
       featureActiveConfig: featureActiveConfig,
       profileCircleConfiguration: widget.profileCircleConfig,
       chatTextFieldViewKey: chatTextFieldViewKey,
+      showPopUp: _showPopUp,
+      chatTextFieldHeight: _chatTextFieldHeight,
+      reactionPopupKey: _reactionPopupKey,
       child: SuggestionsConfigIW(
         suggestionsConfig: widget.replySuggestionsConfig,
         child: ConfigurationsInheritedWidget(
@@ -388,7 +411,8 @@ class _ChatViewState extends State<ChatView>
 
   @override
   void dispose() {
-    chatViewIW?.showPopUp.dispose();
+    _showPopUp.dispose();
+    _chatTextFieldHeight.dispose();
     super.dispose();
   }
 }

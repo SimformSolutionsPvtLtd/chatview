@@ -28,9 +28,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../inherited_widgets/chat_view_inherited_widget.dart';
 import '../inherited_widgets/configurations_inherited_widgets.dart';
-import '../models/config_models/chat_view/chat_bubble_configuration.dart';
+import '../inherited_widgets/suggestions_config_inherited_widget.dart';
 import '../models/config_models/chat_list/list_type_indicator_config.dart';
+import '../models/config_models/chat_view/chat_bubble_configuration.dart';
 import '../models/config_models/chat_view/message/message_list_configuration.dart';
 import '../models/config_models/chat_view/message_input/reply_suggestions_config.dart';
 import '../utils/constants/constants.dart';
@@ -38,9 +40,7 @@ import '../utils/emoji_parser.dart';
 import '../utils/package_strings.dart';
 import '../utils/timeago/timeago.dart' as timeago;
 import '../values/enumeration.dart';
-import '../inherited_widgets/chat_view_inherited_widget.dart';
 import '../widgets/common/profile_image_widget.dart';
-import '../inherited_widgets/suggestions_config_inherited_widget.dart';
 
 /// Extension for DateTime to get specific formats of dates and time.
 extension TimeDifference on DateTime {

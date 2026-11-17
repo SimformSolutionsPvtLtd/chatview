@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import 'pagination_loader.dart';
 import '../suggestions/suggestion_list.dart';
 import '../type_indicator/type_indicator_widget.dart';
+import 'pagination_loader.dart';
 
 class EndMessageFooter extends StatefulWidget {
   const EndMessageFooter({

@@ -13,7 +13,7 @@ class AnimatedDotBuilder extends StatelessWidget {
     super.key,
   });
 
-  final Animation jumpAnimation;
+  final Animation<double> jumpAnimation;
   final Interval dotInterval;
   final AnimationController repeatAnimationController;
   final TypeIndicatorConfiguration typeIndicatorConfig;

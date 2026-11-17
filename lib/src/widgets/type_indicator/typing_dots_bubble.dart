@@ -17,7 +17,7 @@ class TypingDotsBubble extends StatelessWidget {
 
   final ChatBubble? chatBubbleConfig;
   final List<Interval> dotIntervals;
-  final List<Animation<dynamic>> jumpAnimations;
+  final List<Animation<double>> jumpAnimations;
   final AnimationController repeatAnimationController;
   final TypeIndicatorConfiguration typeIndicatorConfig;
 
@@ -38,7 +38,7 @@ class TypingDotsBubble extends StatelessWidget {
         color: chatBubbleConfig?.color ?? Colors.grey.shade500,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
             AnimatedDotBuilder(

@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -63,10 +65,10 @@ class _SendingTextLabelState extends State<SendingTextLabel>
     final isPending = widget.status.isPending;
     if (isPending && !wasPending) {
       // Retry: show the label again.
-      _animationController.forward();
+      unawaited(_animationController.forward());
     } else if (!isPending && wasPending) {
       // Sent: collapse the label.
-      _animationController.reverse();
+      unawaited(_animationController.reverse());
     }
   }
 

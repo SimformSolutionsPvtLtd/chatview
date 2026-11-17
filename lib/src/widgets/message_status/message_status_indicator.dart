@@ -24,24 +24,23 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/chat_view/message/receipts_widget_config.dart';
-import '../../values/enumeration.dart';
 import '../../inherited_widgets/chat_view_inherited_widget.dart';
+import '../../values/enumeration.dart';
 import '../sending_animation/sending_message_animating_widget.dart';
 
 /// Status indicator (sending, sent, read, ...) of an outgoing message that is
 /// rendered next to its chat bubble. This is the "receipt" configured through
-/// [ReceiptsWidgetConfig].
+/// `ReceiptsWidgetConfig`.
 ///
-/// Depending on [ReceiptsWidgetConfig.showReceiptsIn] it is shown for every
+/// Depending on `ReceiptsWidgetConfig.showReceiptsIn` it is shown for every
 /// message or only for the last one, and it uses the custom
-/// [ReceiptsWidgetConfig.receiptsBuilder] when one is provided, falling back to
+/// `ReceiptsWidgetConfig.receiptsBuilder` when one is provided, falling back to
 /// [SendingMessageAnimatingWidget] otherwise.
 class MessageStatusIndicator extends StatelessWidget {
   const MessageStatusIndicator({
-    super.key,
     required this.message,
     required this.isLast,
+    super.key,
   });
 
   /// Message whose status is shown.

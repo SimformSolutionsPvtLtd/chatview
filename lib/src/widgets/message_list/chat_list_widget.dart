@@ -26,14 +26,14 @@ import 'package:flutter/material.dart';
 
 import '../../../chatview.dart';
 import '../../extensions/extensions.dart';
-import 'chat_groupedlist_widget.dart';
 import '../reply/reply_popup_widget.dart';
+import 'chat_groupedlist_widget.dart';
 
 class ChatListWidget extends StatefulWidget {
   const ChatListWidget({
-    super.key,
     required this.chatController,
     required this.assignReplyMessage,
+    super.key,
     this.assignEditMessage,
     this.loadingWidget,
     this.loadMoreData,
@@ -211,7 +211,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                 sentByCurrentUser: sentByCurrentUser,
               ),
         ),
-      ).closed;
+      );
   }
 
   void _handleEditTap(

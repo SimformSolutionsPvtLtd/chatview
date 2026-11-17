@@ -19,28 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/src/widgets/message_status/message_last_seen_ago.dart';
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
+import '../../inherited_widgets/chat_view_inherited_widget.dart';
 import '../../models/config_models/chat_view/chat_bubble.dart';
 import '../../models/config_models/chat_view/message/message_configuration.dart';
 import '../../utils/constants/constants.dart';
 import '../../values/typedefs.dart';
-import '../../inherited_widgets/chat_view_inherited_widget.dart';
-import '../message_types/image/image_message_view.dart';
+import '../message_status/message_last_seen_ago.dart';
 import '../reactions/reaction_widget.dart';
+import '../message_types/image/image_message_view.dart';
 import '../message_types/text/text_message_view.dart';
 import '../message_types/voice/voice_message_view.dart';
 
 class MessageView extends StatefulWidget {
   const MessageView({
-    super.key,
     required this.message,
     required this.isMessageBySender,
     required this.onLongPress,
     required this.isLongPressEnable,
+    super.key,
     this.chatBubbleMaxWidth,
     this.inComingChatBubbleConfig,
     this.outgoingChatBubbleConfig,
@@ -131,12 +133,11 @@ class _MessageViewState extends State<MessageView>
         duration: widget.longPressAnimationDuration ??
             const Duration(milliseconds: 250),
         upperBound: 0.1,
-        lowerBound: 0.0,
       );
 
       _animationController?.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          _animationController?.reverse();
+          unawaited(_animationController?.reverse());
         }
       });
     }
@@ -150,24 +151,16 @@ class _MessageViewState extends State<MessageView>
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPressStart: isLongPressEnable ? _onLongPressStart : null,
-      onDoubleTap: () {
-        if (widget.onDoubleTap != null) widget.onDoubleTap!(widget.message);
-      },
-      child: (() {
-        if (isLongPressEnable) {
-          return AnimatedBuilder(
-            builder: (_, __) {
-              return Transform.scale(
+      onDoubleTap: () => widget.onDoubleTap?.call(widget.message),
+      child: isLongPressEnable
+          ? AnimatedBuilder(
+              builder: (_, __) => Transform.scale(
                 scale: 1 - _animationController!.value,
                 child: _messageView,
-              );
-            },
-            animation: _animationController!,
-          );
-        } else {
-          return _messageView;
-        }
-      }()),
+              ),
+              animation: _animationController!,
+            )
+          : _messageView,
     );
   }
 
@@ -199,8 +192,9 @@ class _MessageViewState extends State<MessageView>
                                   : 0,
                             ),
                         constraints: BoxConstraints(
-                            maxWidth: widget.chatBubbleMaxWidth ??
-                                MediaQuery.sizeOf(context).width * 0.75),
+                          maxWidth: widget.chatBubbleMaxWidth ??
+                              MediaQuery.sizeOf(context).width * 0.75,
+                        ),
                         child: Transform.scale(
                           scale: widget.shouldHighlight
                               ? widget.highlightScale
@@ -305,13 +299,15 @@ class _MessageViewState extends State<MessageView>
                   switchOutCurve: seenAppearanceAnimationCurve.flipped,
                   transitionBuilder: (child, animation) => SizeTransition(
                     sizeFactor: animation,
-                    // TODO: Use `alignment: Alignment.topCenter` and remove
-                    // axisAlignment (and the ignore) once the minimum Flutter
-                    // version has `SizeTransition.alignment` (after 3.41).
+                    // TODO(YASH): Use `alignment: Alignment.topCenter` and
+                    // remove axisAlignment (and the ignore) once the minimum
+                    // Flutter version has `SizeTransition.alignment`
+                    // (after 3.41).
                     // ignore: deprecated_member_use
-                    axisAlignment: -1.0,
-                    // With the Align's widthFactor, keeps the row at content width.
-                    fixedCrossAxisSizeFactor: 1.0,
+                    axisAlignment: -1,
+                    // With the Align's widthFactor, keeps the row at
+                    // content width.
+                    fixedCrossAxisSizeFactor: 1,
                     child: FadeTransition(
                       opacity: animation,
                       child: SlideTransition(
@@ -326,14 +322,15 @@ class _MessageViewState extends State<MessageView>
                   child: showSeen
                       ? Align(
                           key: const ValueKey('seen'),
-                          widthFactor: 1.0,
+                          widthFactor: 1,
                           alignment: Alignment.centerRight,
                           child: widget.outgoingChatBubbleConfig
                                   ?.receiptsWidgetConfig?.lastSeenAgoBuilder
                                   ?.call(
-                                      widget.message,
-                                      widget.message.createdAt
-                                          .applicationDateFormatter) ??
+                                widget.message,
+                                widget
+                                    .message.createdAt.applicationDateFormatter,
+                              ) ??
                               MessageLastSeenAgo(
                                 createAt: widget.message.createdAt,
                               ),
@@ -341,13 +338,13 @@ class _MessageViewState extends State<MessageView>
                       : const SizedBox(key: ValueKey('seen-empty')),
                 );
               },
-            )
+            ),
         ],
       ),
     );
   }
 
-  void _onLongPressStart(LongPressStartDetails details) async {
+  Future<void> _onLongPressStart(LongPressStartDetails details) async {
     await _animationController?.forward();
     widget.onLongPress(
       details.globalPosition.dy,

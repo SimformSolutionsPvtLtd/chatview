@@ -27,8 +27,8 @@ import '../../utils/constants/constants.dart';
 
 class ChatGroupHeader extends StatelessWidget {
   const ChatGroupHeader({
-    super.key,
     required this.day,
+    super.key,
     this.groupSeparatorConfig,
   });
 

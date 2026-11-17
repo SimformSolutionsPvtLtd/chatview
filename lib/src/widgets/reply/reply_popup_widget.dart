@@ -25,12 +25,12 @@ import '../../utils/package_strings.dart';
 
 class ReplyPopupWidget extends StatelessWidget {
   const ReplyPopupWidget({
-    super.key,
     required this.sentByCurrentUser,
     required this.onUnsendTap,
     required this.onReplyTap,
     required this.onReportTap,
     required this.onMoreTap,
+    super.key,
     this.onEditTap,
     this.buttonTextStyle,
     this.topBorderColor,
@@ -69,8 +69,10 @@ class ReplyPopupWidget extends StatelessWidget {
       height: deviceWidth > 500 ? deviceWidth * 0.05 : deviceWidth * 0.13,
       decoration: BoxDecoration(
         border: Border(
-            top: BorderSide(
-                color: topBorderColor ?? Colors.grey.shade400, width: 1)),
+          top: BorderSide(
+            color: topBorderColor ?? Colors.grey.shade400,
+          ),
+        ),
       ),
       child: Row(
         children: [

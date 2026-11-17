@@ -24,14 +24,14 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
 import '../../utils/package_strings.dart';
 import '../../values/typedefs.dart';
 
 class ReplyMessageTypeView extends StatelessWidget {
   const ReplyMessageTypeView({
-    super.key,
     required this.message,
+    super.key,
     this.customMessageReplyViewBuilder,
     this.sendMessageConfig,
   });

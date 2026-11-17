@@ -118,11 +118,12 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
                 // Fade out and scale down while sliding up
                 opacity =
                     Tween<double>(begin: 1, end: 0).evaluate(moveAnimation);
-                scale =
-                    Tween<double>(begin: 1, end: 0.8).evaluate(CurvedAnimation(
-                  parent: itemState.moveController,
-                  curve: Curves.easeInBack,
-                ));
+                scale = Tween<double>(begin: 1, end: 0.8).evaluate(
+                  CurvedAnimation(
+                    parent: itemState.moveController,
+                    curve: Curves.easeInBack,
+                  ),
+                );
               }
               // Animate all items down if a new item is added at the top
               if (_controller.isAddedAtTop &&
@@ -165,7 +166,7 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
 
   @override
   void dispose() {
-    _updateSubscription?.cancel();
+    unawaited(_updateSubscription?.cancel());
     _updateSubscription = null;
     _controller.disposeAnimations();
     super.dispose();

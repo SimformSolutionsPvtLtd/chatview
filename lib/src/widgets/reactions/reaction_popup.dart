@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -30,9 +32,9 @@ import 'glassmorphism_reaction_popup.dart';
 
 class ReactionPopup extends StatefulWidget {
   const ReactionPopup({
-    super.key,
     required this.onTap,
     required this.showPopUp,
+    super.key,
   });
 
   /// Provides call back when user taps on reaction pop-up.
@@ -63,8 +65,8 @@ class ReactionPopupState extends State<ReactionPopup>
       chatListConfig.reactionPopupConfig;
 
   bool get showPopUp => widget.showPopUp;
-  double _yCoordinate = 0.0;
-  double _xCoordinate = 0.0;
+  double _yCoordinate = 0;
+  double _xCoordinate = 0;
   Message? _message;
 
   ChatController? chatController;
@@ -89,9 +91,9 @@ class ReactionPopupState extends State<ReactionPopup>
     final deviceWidth = MediaQuery.of(context).size.width;
     final toolTipWidth = deviceWidth > 450 ? 450 : deviceWidth;
     if (showPopUp) {
-      _animationController.forward();
+      unawaited(_animationController.forward());
     } else {
-      _animationController.reverse();
+      unawaited(_animationController.reverse());
     }
     return showPopUp
         ? Positioned(
@@ -114,7 +116,8 @@ class ReactionPopupState extends State<ReactionPopup>
                         )
                       : Container(
                           constraints: BoxConstraints(
-                              maxWidth: reactionPopupConfig?.maxWidth ?? 350),
+                            maxWidth: reactionPopupConfig?.maxWidth ?? 350,
+                          ),
                           margin: reactionPopupConfig?.margin ??
                               const EdgeInsets.symmetric(horizontal: 25),
                           padding: reactionPopupConfig?.padding ??
@@ -133,7 +136,7 @@ class ReactionPopupState extends State<ReactionPopup>
                                     blurRadius: 8,
                                     spreadRadius: -2,
                                     offset: const Offset(0, 8),
-                                  )
+                                  ),
                             ],
                           ),
                           child: _reactionPopupRow,

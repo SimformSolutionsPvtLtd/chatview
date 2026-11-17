@@ -61,7 +61,6 @@ class ChatViewStateWidget extends StatelessWidget {
       child: config.widget ??
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 title ??
@@ -96,8 +95,8 @@ class ChatViewStateWidget extends StatelessWidget {
                     backgroundColor: config.reloadButtonColor,
                   ),
                   child: Text(PackageStrings.currentLocale.reload),
-                )
-              ]
+                ),
+              ],
             ],
           ),
     );

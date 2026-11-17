@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chatview/src/extensions/extensions.dart';
-import 'package:chatview/src/models/config_models/chat_view/message/image_message_configuration.dart';
-import 'package:chatview/src/utils/constants/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../extensions/extensions.dart';
+import '../../../models/config_models/chat_view/message/image_message_configuration.dart';
+import '../../../utils/constants/constants.dart';
+
 class AdaptiveImage extends StatelessWidget {
   const AdaptiveImage({
-    super.key,
     required this.imageUrl,
+    super.key,
     this.fit = BoxFit.cover,
     this.errorBuilder,
   });
@@ -22,7 +23,7 @@ class AdaptiveImage extends StatelessWidget {
   final BoxFit fit;
 
   /// Builds a custom error widget with access to the failing [imageUrl] and
-  /// [error]. Falls back to a built-in placeholder when null.
+  /// `error`. Falls back to a built-in placeholder when null.
   final ImageMessageErrorWidgetBuilder? errorBuilder;
 
   @override

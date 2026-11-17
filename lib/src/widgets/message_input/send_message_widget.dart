@@ -35,6 +35,7 @@ import '../reply/reply_message_view.dart';
 import 'chatui_textfield.dart';
 import 'edit_message_view.dart';
 import 'selected_image_view_widget.dart';
+import 'text_field_size_observer.dart';
 
 class SendMessageWidget extends StatefulWidget {
   const SendMessageWidget({
@@ -113,17 +114,15 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: isCustomTextField
-          ? Builder(
-              // Assign the key only when using a custom text field to measure its height,
-              // to preventing overlap with the message list.
-              key: chatViewIW?.chatTextFieldViewKey,
-              builder: (context) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => context.calculateAndUpdateTextFieldHeight(),
-                );
-                return widget.sendMessageBuilder?.call(_replyMessage) ??
-                    const SizedBox.shrink();
-              },
+          ? TextFieldSizeObserver(
+              child: Builder(
+                // Assign the key only when using a custom text field to measure its height,
+                // to preventing overlap with the message list.
+                key: chatViewIW?.chatTextFieldViewKey,
+                builder: (context) =>
+                    widget.sendMessageBuilder?.call(_replyMessage) ??
+                    const SizedBox.shrink(),
+              ),
             )
           : SizedBox(
               width: context.screenSize.width,
@@ -164,69 +163,73 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                               child: const ScrollToBottomButton(),
                             ),
                           ),
-                        Padding(
-                          key: chatViewIW?.chatTextFieldViewKey,
-                          padding: EdgeInsets.fromLTRB(
-                            bottomPadding4,
-                            bottomPadding4,
-                            bottomPadding4,
-                            _bottomPadding,
-                          ),
-                          child: Stack(
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              ReplyMessageView(
-                                key: _replyMessageTextFieldViewKey,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                messageConfig: widget.messageConfig,
-                                builder: widget.replyMessageBuilder,
-                                onChange: (value) => _replyMessage = value,
-                              ),
-                              EditMessageView(
-                                key: _editMessageViewKey,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                onChange: (value) {
-                                  // When the user cancels via the X button
-                                  // on EditMessageView, clear the text field.
-                                  if (value == null &&
-                                      _currentlyEditingMessage != null) {
-                                    _textEditingController.clear();
-                                  }
-                                  _currentlyEditingMessage = value;
-                                },
-                              ),
-                              if (widget
-                                  .sendMessageConfig.shouldSendImageWithText)
-                                SelectedImageViewWidget(
-                                  key: _selectedImageViewWidgetKey,
+                        TextFieldSizeObserver(
+                          child: Padding(
+                            key: chatViewIW?.chatTextFieldViewKey,
+                            padding: EdgeInsets.fromLTRB(
+                              bottomPadding4,
+                              bottomPadding4,
+                              bottomPadding4,
+                              _bottomPadding,
+                            ),
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                ReplyMessageView(
+                                  key: _replyMessageTextFieldViewKey,
                                   sendMessageConfig: widget.sendMessageConfig,
+                                  messageConfig: widget.messageConfig,
+                                  builder: widget.replyMessageBuilder,
+                                  onChange: (value) => _replyMessage = value,
                                 ),
-                              ChatUITextField(
-                                focusNode: _focusNode,
-                                textEditingController: _textEditingController,
-                                onPressed: _onPressed,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                onRecordingComplete: _onRecordingComplete,
-                                onImageSelected: (images, messageId) {
-                                  if (widget.sendMessageConfig
-                                      .shouldSendImageWithText) {
-                                    if (images.isNotEmpty) {
-                                      _selectedImageViewWidgetKey.currentState
-                                          ?.selectedImages.value = [
-                                        ...?_selectedImageViewWidgetKey
-                                            .currentState?.selectedImages.value,
-                                        images,
-                                      ];
-
-                                      FocusScope.of(context)
-                                          .requestFocus(_focusNode);
+                                EditMessageView(
+                                  key: _editMessageViewKey,
+                                  sendMessageConfig: widget.sendMessageConfig,
+                                  onChange: (value) {
+                                    // When the user cancels via the X button
+                                    // on EditMessageView, clear the text field.
+                                    if (value == null &&
+                                        _currentlyEditingMessage != null) {
+                                      _textEditingController.clear();
                                     }
-                                  } else {
-                                    _onImageSelected(images, '');
-                                  }
-                                },
-                              ),
-                            ],
+                                    _currentlyEditingMessage = value;
+                                  },
+                                ),
+                                if (widget
+                                    .sendMessageConfig.shouldSendImageWithText)
+                                  SelectedImageViewWidget(
+                                    key: _selectedImageViewWidgetKey,
+                                    sendMessageConfig: widget.sendMessageConfig,
+                                  ),
+                                ChatUITextField(
+                                  focusNode: _focusNode,
+                                  textEditingController: _textEditingController,
+                                  onPressed: _onPressed,
+                                  sendMessageConfig: widget.sendMessageConfig,
+                                  onRecordingComplete: _onRecordingComplete,
+                                  onImageSelected: (images, messageId) {
+                                    if (widget.sendMessageConfig
+                                        .shouldSendImageWithText) {
+                                      if (images.isNotEmpty) {
+                                        _selectedImageViewWidgetKey.currentState
+                                            ?.selectedImages.value = [
+                                          ...?_selectedImageViewWidgetKey
+                                              .currentState
+                                              ?.selectedImages
+                                              .value,
+                                          images,
+                                        ];
+
+                                        FocusScope.of(context)
+                                            .requestFocus(_focusNode);
+                                      }
+                                    } else {
+                                      _onImageSelected(images, '');
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],

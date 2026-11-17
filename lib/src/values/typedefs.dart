@@ -104,11 +104,6 @@ typedef EditMessageCallback = void Function(
   Message message,
   Message updatedMessage,
 );
-typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
-  BuildContext context,
-  T value,
-  Widget? child,
-);
 typedef TextFieldActionWidgetBuilder = List<Widget> Function(
   BuildContext context,
   TextEditingController controller,

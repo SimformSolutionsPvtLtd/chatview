@@ -23,7 +23,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../extensions/extensions.dart';
-import '../models/config_models/send_message_configuration.dart';
+import '../models/config_models/chat_view/message_input/image_picker_configuration.dart';
 
 Future<String?> onMediaActionButtonPressed(
   ImageSource source, {
@@ -63,7 +63,8 @@ String formatLastMessageTime(
   final now = DateTime.now();
   final isLast7Days = now
           .difference(
-              DateTime(messageDate.year, messageDate.month, messageDate.day))
+            DateTime(messageDate.year, messageDate.month, messageDate.day),
+          )
           .inDays <
       7;
 

@@ -21,26 +21,27 @@
  */
 import 'dart:io';
 
-import 'package:chatview/chatview.dart';
-import 'package:chatview/src/widgets/chat_list_widget.dart';
-import 'package:chatview/src/widgets/chatview_state_widget.dart';
-import 'package:chatview/src/widgets/reaction_popup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../chatview.dart';
 import '../extensions/extensions.dart';
+import '../inherited_widgets/chat_view_inherited_widget.dart';
 import '../inherited_widgets/configurations_inherited_widgets.dart';
+import '../inherited_widgets/suggestions_config_inherited_widget.dart';
 import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
 import '../values/enumeration.dart';
-import 'chat_view_inherited_widget.dart';
-import 'send_message_widget.dart';
-import 'suggestions/suggestions_config_inherited_widget.dart';
+import 'common/chatview_state_widget.dart';
+import 'message_input/send_message_widget.dart';
+import 'message_list/chat_list_widget.dart';
+import 'reactions/reaction_popup.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({
-    super.key,
     required this.chatController,
+    required this.chatViewState,
+    super.key,
     this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.onSendTap,
     this.onEditTap,
@@ -58,7 +59,6 @@ class ChatView extends StatefulWidget {
     ChatBackgroundConfiguration? chatBackgroundConfig,
     this.sendMessageBuilder,
     this.onChatListTap,
-    required this.chatViewState,
     ChatViewStateConfiguration? chatViewStateConfig,
     this.featureActiveConfig = const FeatureActiveConfig(),
     this.sendMessageConfig = const SendMessageConfiguration(),
@@ -331,7 +331,10 @@ class _ChatViewState extends State<ChatView>
                                     chatController.removeReplySuggestions();
                                   }
                                   _onSendTap(
-                                      message, replyMessage, messageType);
+                                    message,
+                                    replyMessage,
+                                    messageType,
+                                  );
                                 },
                                 onEditTap: widget.onEditTap,
                                 messageConfig: widget.messageConfig,
@@ -377,9 +380,7 @@ class _ChatViewState extends State<ChatView>
     MessageType messageType,
   ) {
     if (widget.sendMessageBuilder == null) {
-      if (widget.onSendTap != null) {
-        widget.onSendTap!(message, replyMessage, messageType);
-      }
+      widget.onSendTap?.call(message, replyMessage, messageType);
     }
     chatController.scrollToLastMessage();
   }

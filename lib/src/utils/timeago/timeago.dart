@@ -1,8 +1,9 @@
 // This code is sourced from the timeago package available on pub.dev. link: https://pub.dev/packages/timeago
 
-import 'package:chatview/src/utils/timeago/en_messages.dart';
-import 'package:chatview/src/utils/timeago/lookupmessages.dart';
 import 'package:flutter/foundation.dart';
+
+import 'en_messages.dart';
+import 'lookupmessages.dart';
 
 String _default = 'en';
 
@@ -14,13 +15,15 @@ Map<String, LookupMessages> _lookupMessagesMap = {
 /// Sets the default [locale]. By default it is `en`.
 ///
 /// Example
-/// ```
+/// ```dart
 /// setLocaleMessages('fr', FrMessages());
 /// setDefaultLocale('fr');
 /// ```
 void setDefaultLocale(String locale) {
-  assert(_lookupMessagesMap.containsKey(locale),
-      '[locale] must be a registered locale');
+  assert(
+    _lookupMessagesMap.containsKey(locale),
+    '[locale] must be a registered locale',
+  );
   _default = locale;
 }
 
@@ -47,19 +50,25 @@ void setLocaleMessages(String locale, LookupMessages lookupMessages) {
 ///   the elapsed time. Defaults to DateTime.now()
 /// - If [allowFromNow] is passed, format will use the From prefix, ie. a date
 ///   5 minutes from now in 'en' locale will display as "5 minutes from now"
-String format(DateTime date,
-    {String? locale, DateTime? clock, bool allowFromNow = false}) {
+String format(
+  DateTime date, {
+  String? locale,
+  DateTime? clock,
+  bool allowFromNow = false,
+}) {
   final locale0 = locale ?? _default;
   if (_lookupMessagesMap[locale0] == null) {
     debugPrint(
-        "Locale [$locale0] has not been added, using [$_default] as fallback. To add a locale use [setLocaleMessages]");
+      'Locale [$locale0] has not been added, using [$_default] as fallback. To add a locale use [setLocaleMessages]',
+    );
   }
   final allowFromNow0 = allowFromNow;
   final messages = _lookupMessagesMap[locale0] ?? EnMessages();
   final clock0 = clock ?? DateTime.now();
   var elapsed = clock0.millisecondsSinceEpoch - date.millisecondsSinceEpoch;
 
-  String prefix, suffix;
+  String prefix;
+  String suffix;
 
   if (allowFromNow0 && elapsed < 0) {
     elapsed = date.isBefore(clock0) ? elapsed : elapsed.abs();

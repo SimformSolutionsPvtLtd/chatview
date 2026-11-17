@@ -1,0 +1,337 @@
+/*
+ * Copyright (c) 2022 Simform Solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+import 'package:chatview/chatview.dart';
+import 'package:chatview/src/widgets/message_types/text/custom_selection_area.dart';
+import 'package:flutter/material.dart';
+
+import '../../../extensions/extensions.dart';
+import '../../../utils/constants/constants.dart';
+import '../../message_status/in_bubble_time_and_receipt.dart';
+import 'link_preview.dart';
+import '../../reactions/reaction_widget.dart';
+
+class TextMessageView extends StatelessWidget {
+  const TextMessageView({
+    super.key,
+    required this.isMessageBySender,
+    required this.message,
+    this.chatBubbleMaxWidth,
+    this.inComingChatBubbleConfig,
+    this.outgoingChatBubbleConfig,
+    this.messageReactionConfig,
+    this.highlightMessage = false,
+    this.highlightColor,
+    this.featureActiveConfig,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
+  });
+
+  /// Represents current message is sent by current user.
+  final bool isMessageBySender;
+
+  /// Provides message instance of chat.
+  final Message message;
+
+  /// Allow users to give max width of chat bubble.
+  final double? chatBubbleMaxWidth;
+
+  /// Provides configuration of chat bubble appearance from other user of chat.
+  final ChatBubble? inComingChatBubbleConfig;
+
+  /// Provides configuration of chat bubble appearance from current user of chat.
+  final ChatBubble? outgoingChatBubbleConfig;
+
+  /// Provides configuration of reaction appearance in chat bubble.
+  final MessageReactionConfiguration? messageReactionConfig;
+
+  /// Represents message should highlight.
+  final bool highlightMessage;
+
+  /// Allow user to set color of highlighted message.
+  final Color? highlightColor;
+
+  /// Provides configuration of active features in chat.
+  final FeatureActiveConfig? featureActiveConfig;
+
+  /// True when this is the oldest message in a consecutive same-sender group.
+  final bool isFirstInGroup;
+
+  /// True when this is the newest message in a consecutive same-sender group.
+  final bool isLastInGroup;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final textMessage = message.message;
+    final showTimeInChatBubble =
+        featureActiveConfig?.showTimeInChatBubble ?? false;
+    final timeText = message.createdAt.getTimeFromDateTime;
+    final border = isMessageBySender
+        ? outgoingChatBubbleConfig?.border
+        : inComingChatBubbleConfig?.border;
+    final isSelectable = featureActiveConfig?.enableTextSelection ?? false;
+    final textSelectionConfig = isMessageBySender
+        ? outgoingChatBubbleConfig?.textSelectionConfig
+        : inComingChatBubbleConfig?.textSelectionConfig;
+    final extractedUrls = textMessage.extractedUrls;
+    final timestampStyle = (textTheme.bodySmall ?? const TextStyle())
+        .copyWith(
+          fontSize: 12,
+          color: isMessageBySender ? Colors.white70 : Colors.black54,
+        )
+        .merge(_messageTimeTextStyle);
+    final effectiveTextStyle = _textStyle ??
+        textTheme.bodyMedium?.copyWith(
+          color: Colors.white,
+          fontSize: 16,
+        ) ??
+        const TextStyle(color: Colors.white, fontSize: 16);
+    final baseWidget = extractedUrls.isNotEmpty
+        ? LinkPreview(
+            linkPreviewConfig: _linkPreviewConfig,
+            textMessage: textMessage,
+            extractedUrls: extractedUrls,
+            normalTextStyle: effectiveTextStyle,
+          )
+        : Text(
+            textMessage,
+            style: effectiveTextStyle,
+          );
+    final messageWidget = isSelectable
+        ? CustomSelectionArea(
+            config: textSelectionConfig,
+            child: baseWidget,
+          )
+        : baseWidget;
+
+    // Inline clock/tick next to the time; a custom receiptsBuilder replaces it
+    // (see MessageStatusIndicator).
+    final showInBubbleReceipt = InBubbleTimeAndReceipt.shouldShowReceipt(
+      isMessageBySender: isMessageBySender,
+      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+      featureActiveConfig: featureActiveConfig,
+    );
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          constraints: BoxConstraints(
+              maxWidth: chatBubbleMaxWidth ??
+                  MediaQuery.of(context).size.width * 0.75),
+          padding: _padding ??
+              const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+          margin: _margin ??
+              EdgeInsets.fromLTRB(
+                  5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
+          decoration: BoxDecoration(
+            color: highlightMessage ? highlightColor : _color,
+            border: border,
+            borderRadius: _borderRadius(textMessage, showTimeInChatBubble),
+            boxShadow: isMessageBySender
+                ? outgoingChatBubbleConfig?.boxShadow
+                : inComingChatBubbleConfig?.boxShadow,
+          ),
+          child: showTimeInChatBubble || showInBubbleReceipt
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    final canShowInSingleLine = extractedUrls.isEmpty &&
+                        !textMessage.contains('\n') &&
+                        _canRenderTimeInSingleLine(
+                          context: context,
+                          messageText: textMessage,
+                          messageStyle: effectiveTextStyle,
+                          // Measure the time only when it is actually drawn.
+                          timeText: showTimeInChatBubble ? timeText : '',
+                          timeStyle: timestampStyle,
+                          maxContentWidth: constraints.maxWidth,
+                          // Room for the clock/tick next to the time: icon
+                          // width + its horizontal padding on both sides, plus
+                          // the 4px gap between the time and the icon.
+                          extraTrailingWidth: showInBubbleReceipt
+                              ? clockToTickIconSize +
+                                  2 * clockToTickIconPadding +
+                                  (showTimeInChatBubble ? 4 : 0)
+                              : 0,
+                        );
+
+                    if (canShowInSingleLine) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Flexible(child: messageWidget),
+                          const SizedBox(width: 8),
+                          InBubbleTimeAndReceipt(
+                            message: message,
+                            timeStyle: timestampStyle,
+                            showTime: showTimeInChatBubble,
+                            // Not isMessageBySender: the tick must also honor
+                            // receiptsBuilderVisibility, the animation type
+                            // and a custom receiptsBuilder.
+                            showReceipt: showInBubbleReceipt,
+                            outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+                          ),
+                        ],
+                      );
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        messageWidget,
+                        const SizedBox(height: 4),
+                        InBubbleTimeAndReceipt(
+                          message: message,
+                          timeStyle: timestampStyle,
+                          showTime: showTimeInChatBubble,
+                          showReceipt: showInBubbleReceipt,
+                          outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+                        ),
+                      ],
+                    );
+                  },
+                )
+              : messageWidget,
+        ),
+        if (message.reaction.reactions.isNotEmpty)
+          ReactionWidget(
+            key: key,
+            isMessageBySender: isMessageBySender,
+            reaction: message.reaction,
+            messageReactionConfig: messageReactionConfig,
+          ),
+      ],
+    );
+  }
+
+  EdgeInsetsGeometry? get _padding => isMessageBySender
+      ? outgoingChatBubbleConfig?.padding
+      : inComingChatBubbleConfig?.padding;
+
+  EdgeInsetsGeometry? get _margin => isMessageBySender
+      ? outgoingChatBubbleConfig?.margin
+      : inComingChatBubbleConfig?.margin;
+
+  LinkPreviewConfiguration? get _linkPreviewConfig => isMessageBySender
+      ? outgoingChatBubbleConfig?.linkPreviewConfig
+      : inComingChatBubbleConfig?.linkPreviewConfig;
+
+  TextStyle? get _textStyle => isMessageBySender
+      ? outgoingChatBubbleConfig?.textStyle
+      : inComingChatBubbleConfig?.textStyle;
+
+  TextStyle? get _messageTimeTextStyle => isMessageBySender
+      ? outgoingChatBubbleConfig?.messageTimeTextStyle
+      : inComingChatBubbleConfig?.messageTimeTextStyle;
+
+  BorderRadiusGeometry _borderRadius(
+      String message, bool showTimeInChatBubble) {
+    final config =
+        isMessageBySender ? outgoingChatBubbleConfig : inComingChatBubbleConfig;
+    if (config?.borderRadius != null) return config!.borderRadius!;
+
+    final r =
+        (showTimeInChatBubble && message.length < (isMessageBySender ? 37 : 29))
+            ? replyBorderRadius1
+            : replyBorderRadius2;
+
+    final groupingEnabled = featureActiveConfig?.enableMessageGrouping ?? true;
+    final standalone = isFirstInGroup && isLastInGroup;
+    if (!groupingEnabled || standalone) return BorderRadius.circular(r);
+
+    final small = (featureActiveConfig?.chainedCornerRadius ??
+            (r * messageGroupCornerRadiusFactor))
+        .clamp(0.0, r);
+
+    // Sender → reduce only right-side corners (avatar is on the right).
+    // Receiver → reduce only left-side corners (avatar is on the left).
+    // First (top): bottom corner = small (connects down to next msg).
+    // Last (bottom): top corner = small (connects up to prev msg).
+    if (isMessageBySender) {
+      return BorderRadius.only(
+        topLeft: Radius.circular(r),
+        topRight: Radius.circular(isFirstInGroup ? r : small),
+        bottomLeft: Radius.circular(r),
+        bottomRight: Radius.circular(isLastInGroup ? r : small),
+      );
+    } else {
+      return BorderRadius.only(
+        topLeft: Radius.circular(isFirstInGroup ? r : small),
+        topRight: Radius.circular(r),
+        bottomLeft: Radius.circular(isLastInGroup ? r : small),
+        bottomRight: Radius.circular(r),
+      );
+    }
+  }
+
+  Color get _color => isMessageBySender
+      ? outgoingChatBubbleConfig?.color ?? Colors.purple
+      : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
+
+  /// Whether [messageText] fits on one line next to the time (and the
+  /// clock/tick) inside [maxContentWidth].
+  ///
+  /// [extraTrailingWidth] reserves space for anything drawn after the time,
+  /// such as the clock/tick icon, so the text is not squeezed and wrapped
+  /// inside the `Row` when the check says it fits.
+  bool _canRenderTimeInSingleLine({
+    required BuildContext context,
+    required String messageText,
+    required TextStyle messageStyle,
+    required String timeText,
+    required TextStyle? timeStyle,
+    required double maxContentWidth,
+    double extraTrailingWidth = 0,
+  }) {
+    if (messageText.length > 60) return false;
+
+    final textScaler = MediaQuery.textScalerOf(context);
+    final textDirection = Directionality.of(context);
+
+    final timePainter = TextPainter(
+      text: TextSpan(text: timeText, style: timeStyle),
+      textDirection: textDirection,
+      maxLines: 1,
+      textScaler: textScaler,
+    )..layout(maxWidth: maxContentWidth);
+
+    final availableForMessage =
+        maxContentWidth - 8 - timePainter.width - extraTrailingWidth;
+
+    // A narrow bubble can leave no room, and layout rejects a negative width.
+    if (availableForMessage <= 0) return false;
+
+    final messagePainter = TextPainter(
+      text: TextSpan(text: messageText, style: messageStyle),
+      textDirection: textDirection,
+      maxLines: 1,
+      textScaler: textScaler,
+    )..layout(maxWidth: availableForMessage);
+
+    return !messagePainter.didExceedMaxLines &&
+        messagePainter.width <= availableForMessage;
+  }
+}

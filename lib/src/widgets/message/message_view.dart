@@ -1,0 +1,363 @@
+/*
+ * Copyright (c) 2022 Simform Solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+import 'package:chatview/src/widgets/message_status/message_last_seen_ago.dart';
+import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/material.dart';
+
+import '../../extensions/extensions.dart';
+import '../../models/config_models/chat_view/chat_bubble.dart';
+import '../../models/config_models/chat_view/message/message_configuration.dart';
+import '../../utils/constants/constants.dart';
+import '../../values/typedefs.dart';
+import '../../inherited_widgets/chat_view_inherited_widget.dart';
+import '../message_types/image/image_message_view.dart';
+import '../reactions/reaction_widget.dart';
+import '../message_types/text/text_message_view.dart';
+import '../message_types/voice/voice_message_view.dart';
+
+class MessageView extends StatefulWidget {
+  const MessageView({
+    super.key,
+    required this.message,
+    required this.isMessageBySender,
+    required this.onLongPress,
+    required this.isLongPressEnable,
+    this.chatBubbleMaxWidth,
+    this.inComingChatBubbleConfig,
+    this.outgoingChatBubbleConfig,
+    this.longPressAnimationDuration,
+    this.onDoubleTap,
+    this.highlightColor = Colors.grey,
+    this.shouldHighlight = false,
+    this.highlightScale = 1.2,
+    this.messageConfig,
+    this.onMaxDuration,
+    this.controller,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
+    this.statusBelowBubble,
+  });
+
+  /// Status indicator shown right below the bubble, above the "Seen" label.
+  final Widget? statusBelowBubble;
+
+  /// Provides message instance of chat.
+  final Message message;
+
+  /// Represents current message is sent by current user.
+  final bool isMessageBySender;
+
+  /// Give callback once user long press on chat bubble.
+  final DoubleCallBack onLongPress;
+
+  /// Allow users to give max width of chat bubble.
+  final double? chatBubbleMaxWidth;
+
+  /// Provides configuration of chat bubble appearance from other user of chat.
+  final ChatBubble? inComingChatBubbleConfig;
+
+  /// Provides configuration of chat bubble appearance from current user of chat.
+  final ChatBubble? outgoingChatBubbleConfig;
+
+  /// Allow users to give duration of animation when user long press on chat bubble.
+  final Duration? longPressAnimationDuration;
+
+  /// Allow user to set some action when user double tap on chat bubble.
+  final ValueSetter<Message>? onDoubleTap;
+
+  /// Allow users to pass colour of chat bubble when user taps on replied message.
+  final Color highlightColor;
+
+  /// Allow users to turn on/off highlighting chat bubble when user tap on replied message.
+  final bool shouldHighlight;
+
+  /// Provides scale of highlighted image when user taps on replied image.
+  final double highlightScale;
+
+  /// Allow user to giving customisation different types
+  /// messages.
+  final MessageConfiguration? messageConfig;
+
+  /// Allow user to turn on/off long press tap on chat bubble.
+  final bool isLongPressEnable;
+
+  final ChatController? controller;
+
+  final ValueSetter<int>? onMaxDuration;
+
+  /// True when this is the oldest message in a consecutive same-sender group.
+  final bool isFirstInGroup;
+
+  /// True when this is the newest message in a consecutive same-sender group.
+  final bool isLastInGroup;
+
+  @override
+  State<MessageView> createState() => _MessageViewState();
+}
+
+class _MessageViewState extends State<MessageView>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _animationController;
+
+  MessageConfiguration? get messageConfig => widget.messageConfig;
+
+  bool get isLongPressEnable => widget.isLongPressEnable;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isLongPressEnable) {
+      _animationController = AnimationController(
+        vsync: this,
+        duration: widget.longPressAnimationDuration ??
+            const Duration(milliseconds: 250),
+        upperBound: 0.1,
+        lowerBound: 0.0,
+      );
+
+      _animationController?.addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _animationController?.reverse();
+        }
+      });
+    }
+    if (widget.message.status != MessageStatus.read &&
+        !widget.isMessageBySender) {
+      widget.inComingChatBubbleConfig?.onMessageRead?.call(widget.message);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPressStart: isLongPressEnable ? _onLongPressStart : null,
+      onDoubleTap: () {
+        if (widget.onDoubleTap != null) widget.onDoubleTap!(widget.message);
+      },
+      child: (() {
+        if (isLongPressEnable) {
+          return AnimatedBuilder(
+            builder: (_, __) {
+              return Transform.scale(
+                scale: 1 - _animationController!.value,
+                child: _messageView,
+              );
+            },
+            animation: _animationController!,
+          );
+        } else {
+          return _messageView;
+        }
+      }()),
+    );
+  }
+
+  Widget get _messageView {
+    final message = widget.message.message;
+    final emojiMessageConfiguration = messageConfig?.emojiMessageConfig;
+    final maxOutSideBubbleEmojis =
+        emojiMessageConfiguration?.maxOutSideBubbleEmojis;
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: widget.message.reaction.reactions.isNotEmpty ? 6 : 0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          (() {
+                if (message.isOutsideBubbleEmoji(maxOutSideBubbleEmojis)) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        padding: emojiMessageConfiguration?.padding ??
+                            EdgeInsets.fromLTRB(
+                              leftPadding2,
+                              4,
+                              leftPadding2,
+                              widget.message.reaction.reactions.isNotEmpty
+                                  ? 14
+                                  : 0,
+                            ),
+                        constraints: BoxConstraints(
+                            maxWidth: widget.chatBubbleMaxWidth ??
+                                MediaQuery.sizeOf(context).width * 0.75),
+                        child: Transform.scale(
+                          scale: widget.shouldHighlight
+                              ? widget.highlightScale
+                              : 1.0,
+                          child: Text(
+                            message,
+                            style: emojiMessageConfiguration?.textStyle ??
+                                const TextStyle(fontSize: 30),
+                          ),
+                        ),
+                      ),
+                      if (widget.message.reaction.reactions.isNotEmpty)
+                        ReactionWidget(
+                          reaction: widget.message.reaction,
+                          messageReactionConfig:
+                              messageConfig?.messageReactionConfig,
+                          isMessageBySender: widget.isMessageBySender,
+                        ),
+                    ],
+                  );
+                } else if (widget.message.messageType.isImage) {
+                  return ImageMessageView(
+                    message: widget.message,
+                    isMessageBySender: widget.isMessageBySender,
+                    imageMessageConfig: messageConfig?.imageMessageConfig,
+                    messageReactionConfig: messageConfig?.messageReactionConfig,
+                    inComingChatBubbleConfig: widget.inComingChatBubbleConfig,
+                    outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+                    highlightImage: widget.shouldHighlight,
+                    highlightScale: widget.highlightScale,
+                    featureActiveConfig: chatViewIW?.featureActiveConfig,
+                    isFirstInGroup: widget.isFirstInGroup,
+                    isLastInGroup: widget.isLastInGroup,
+                  );
+                } else if (widget.message.messageType.isText) {
+                  return TextMessageView(
+                    inComingChatBubbleConfig: widget.inComingChatBubbleConfig,
+                    outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+                    isMessageBySender: widget.isMessageBySender,
+                    message: widget.message,
+                    chatBubbleMaxWidth: widget.chatBubbleMaxWidth,
+                    messageReactionConfig: messageConfig?.messageReactionConfig,
+                    highlightColor: widget.highlightColor,
+                    highlightMessage: widget.shouldHighlight,
+                    featureActiveConfig: chatViewIW?.featureActiveConfig,
+                    isFirstInGroup: widget.isFirstInGroup,
+                    isLastInGroup: widget.isLastInGroup,
+                  );
+                } else if (widget.message.messageType.isVoice) {
+                  return VoiceMessageView(
+                    screenWidth: MediaQuery.of(context).size.width,
+                    message: widget.message,
+                    config: messageConfig?.voiceMessageConfig,
+                    onMaxDuration: widget.onMaxDuration,
+                    isMessageBySender: widget.isMessageBySender,
+                    messageReactionConfig: messageConfig?.messageReactionConfig,
+                    inComingChatBubbleConfig: widget.inComingChatBubbleConfig,
+                    outgoingChatBubbleConfig: widget.outgoingChatBubbleConfig,
+                    featureActiveConfig: chatViewIW?.featureActiveConfig,
+                  );
+                } else if (widget.message.messageType.isCustom &&
+                    messageConfig?.customMessageBuilder != null) {
+                  final customWidget =
+                      messageConfig!.customMessageBuilder!.call(widget.message);
+                  final showReactions =
+                      messageConfig?.showReactionsOnCustomMessages ?? true;
+                  return showReactions
+                      ? Stack(
+                          children: [
+                            customWidget,
+                            if (widget.message.reaction.reactions.isNotEmpty)
+                              ReactionWidget(
+                                reaction: widget.message.reaction,
+                                messageReactionConfig:
+                                    messageConfig?.messageReactionConfig,
+                                isMessageBySender: widget.isMessageBySender,
+                              ),
+                          ],
+                        )
+                      : customWidget;
+                }
+              }()) ??
+              const SizedBox(),
+          if (widget.statusBelowBubble case final status?)
+            Padding(padding: const EdgeInsets.only(right: 6), child: status),
+          if (widget.isMessageBySender)
+            ValueListenableBuilder(
+              valueListenable: widget.message.statusNotifier,
+              builder: (context, status, child) {
+                final showSeen =
+                    widget.controller?.initialMessageList.lastOrNull?.id ==
+                            widget.message.id &&
+                        status.isRead &&
+                        (ChatViewInheritedWidget.of(context)
+                                ?.featureActiveConfig
+                                .lastSeenAgoBuilderVisibility ??
+                            true);
+                return AnimatedSwitcher(
+                  duration: seenAppearanceAnimationDuration,
+                  switchInCurve: seenAppearanceAnimationCurve,
+                  // Flipped so the label leaves quickly instead of slowing down.
+                  switchOutCurve: seenAppearanceAnimationCurve.flipped,
+                  transitionBuilder: (child, animation) => SizeTransition(
+                    sizeFactor: animation,
+                    // TODO: Use `alignment: Alignment.topCenter` and remove
+                    // axisAlignment (and the ignore) once the minimum Flutter
+                    // version has `SizeTransition.alignment` (after 3.41).
+                    // ignore: deprecated_member_use
+                    axisAlignment: -1.0,
+                    // With the Align's widthFactor, keeps the row at content width.
+                    fixedCrossAxisSizeFactor: 1.0,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.35),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                  child: showSeen
+                      ? Align(
+                          key: const ValueKey('seen'),
+                          widthFactor: 1.0,
+                          alignment: Alignment.centerRight,
+                          child: widget.outgoingChatBubbleConfig
+                                  ?.receiptsWidgetConfig?.lastSeenAgoBuilder
+                                  ?.call(
+                                      widget.message,
+                                      widget.message.createdAt
+                                          .applicationDateFormatter) ??
+                              MessageLastSeenAgo(
+                                createAt: widget.message.createdAt,
+                              ),
+                        )
+                      : const SizedBox(key: ValueKey('seen-empty')),
+                );
+              },
+            )
+        ],
+      ),
+    );
+  }
+
+  void _onLongPressStart(LongPressStartDetails details) async {
+    await _animationController?.forward();
+    widget.onLongPress(
+      details.globalPosition.dy,
+      details.globalPosition.dx,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
+  }
+}

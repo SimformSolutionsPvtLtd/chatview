@@ -32,7 +32,7 @@ import '../../models/config_models/chat_list/search_config.dart';
 import '../../utils/package_strings.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
-import '../chatview_state_widget.dart';
+import '../common/chatview_state_widget.dart';
 import 'adaptive_progress_indicator.dart';
 import 'auto_animate_sliver_list.dart';
 import 'chat_list_item_tile.dart';

@@ -31,9 +31,8 @@ class ReplyMessageTile extends StatelessWidget {
     final replyBy =
         replyBySender ? PackageStrings.currentLocale.you : messagedUser.name;
     return Container(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.75,
-      ),
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.75),
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: replyBySender ? AppColors.uiTwoSenderBgColor : Colors.white,

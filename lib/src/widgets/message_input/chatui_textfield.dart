@@ -146,6 +146,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     widget.textEditingController.removeListener(_listenTextEditingController);
+    controller?.dispose();
     playerController.dispose();
     super.dispose();
   }
@@ -527,21 +528,23 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     }
   }
 
-  void _listenTextEditingController() {
-    widget.textEditingController.addListener(() {
+  void _listenTextEditingController() =>
       _onChanged(widget.textEditingController.text);
-    });
-  }
 
+  /// Sets `typing` on every edit and reverts to `typed` after the debounce;
+  /// an empty field (cleared or sent) is `typed` immediately.
+  ///
+  /// `onInterrupt` was removed: it missed edits spaced beyond the threshold.
   void _onChanged(String inputText) {
-    debouncer.run(
-      onComplete: () {
-        composingStatus.value = TypeWriterStatus.typed;
-      },
-      onInterrupt: () {
-        composingStatus.value = TypeWriterStatus.typing;
-      },
-    );
+    if (inputText.isEmpty) {
+      debouncer.cancel();
+      composingStatus.value = TypeWriterStatus.typed;
+    } else {
+      composingStatus.value = TypeWriterStatus.typing;
+      debouncer.run(
+        onComplete: () => composingStatus.value = TypeWriterStatus.typed,
+      );
+    }
     _isTextNotEmptyNotifier.value = inputText.trim().isNotEmpty;
   }
 }

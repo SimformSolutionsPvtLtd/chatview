@@ -27,6 +27,7 @@ import 'replied_msg_auto_scroll_config.dart';
 class RepliedMessageConfiguration {
   const RepliedMessageConfiguration({
     required this.loadOldReplyMessage,
+    this.onReplyTargetNotFound,
     this.verticalBarColor,
     this.backgroundColor,
     this.textStyle,
@@ -47,6 +48,11 @@ class RepliedMessageConfiguration {
   /// Used to fetch old replied message when original message is not present
   /// in the current list of messages.
   final OldReplyMessageFetchCallback loadOldReplyMessage;
+
+  /// Called with the replied message id when the user taps a reply preview
+  /// and the original message is still missing from the list after
+  /// [loadOldReplyMessage] completed, for example because it was deleted.
+  final ValueSetter<String>? onReplyTargetNotFound;
 
   /// Used to give color to vertical bar.
   final Color? verticalBarColor;

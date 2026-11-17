@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +34,7 @@ import '../../models/config_models/chat_list/search_config.dart';
 import '../../utils/package_strings.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
-import '../chatview_state_widget.dart';
+import '../common/chatview_state_widget.dart';
 import 'adaptive_progress_indicator.dart';
 import 'auto_animate_sliver_list.dart';
 import 'chat_list_item_tile.dart';
@@ -166,7 +168,11 @@ class _ChatListState extends State<ChatList> {
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: _scrollController,
-      keyboardDismissBehavior: widget.scrollViewKeyboardDismissBehavior,
+      // Pass `keyboardDismissBehavior` only when `scrollViewKeyboardDismissBehavior`
+      // is non-null. Older Flutter versions don't accept null for this parameter
+      // and fall back to `ScrollViewKeyboardDismissBehavior.manual` when it is omitted.
+      keyboardDismissBehavior: widget.scrollViewKeyboardDismissBehavior ??
+          ScrollViewKeyboardDismissBehavior.manual,
       slivers: [
         if (widget.appbar case final appbar?) appbar,
         if (widget.searchConfig case final config?)
@@ -294,8 +300,10 @@ class _ChatListState extends State<ChatList> {
         !_isNextPageLoading.value) {
       _isNextPageLoading.value = true;
 
-      widget.loadMoreChats!()
-          .whenComplete(() => _isNextPageLoading.value = false);
+      unawaited(
+        widget.loadMoreChats!()
+            .whenComplete(() => _isNextPageLoading.value = false),
+      );
     }
   }
 }

@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -56,17 +58,17 @@ class _SlideOutIndicatorState extends State<SlideOutIndicator>
   /// Stays at 1 during the wait (first half), then eases to 0 (second half).
   late final _curved = CurvedAnimation(
     parent: _animationController,
-    curve: Interval(0, 0.5, curve: sendingAnimationCurve),
+    curve: const Interval(0, 0.5, curve: sendingAnimationCurve),
   );
 
   /// Horizontal offset of the dot: 0 while pending, slid out by half its size
   /// once sent.
   late final Animation<double> _dx =
-      Tween<double>(begin: slideOutDotSize * 0.5, end: 0.0).animate(_curved);
+      Tween<double>(begin: slideOutDotSize * 0.5, end: 0).animate(_curved);
 
   /// Visible clip width: half the dot while pending, 0 once sent.
   late final Animation<double> _width =
-      Tween<double>(begin: 0.0, end: slideOutDotSize * 0.5).animate(_curved);
+      Tween<double>(begin: 0, end: slideOutDotSize * 0.5).animate(_curved);
 
   /// Keeps the dot in step with the status: it slides out once the message is
   /// no longer pending and shows again if the message becomes pending again
@@ -74,7 +76,7 @@ class _SlideOutIndicatorState extends State<SlideOutIndicator>
   @override
   void didUpdateWidget(SlideOutIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _animationController.animateTo(widget.status.isPending ? 1 : 0);
+    unawaited(_animationController.animateTo(widget.status.isPending ? 1 : 0));
   }
 
   @override

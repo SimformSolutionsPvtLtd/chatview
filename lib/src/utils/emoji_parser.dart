@@ -48,12 +48,14 @@ class EmojiUtil {
   /// Strip colons for emoji name.
   /// So, ':heart:' will become 'heart'.
   ///
-  static String? stripColons(String? name,
-      [void Function(String message)? onError]) {
+  static String? stripColons(
+    String? name, [
+    void Function(String message)? onError,
+  ]) {
     if (name == null) {
       return null;
     }
-    Iterable<Match> matches = EmojiParser.regexName.allMatches(name);
+    final Iterable<Match> matches = EmojiParser.regexName.allMatches(name);
     if (matches.isEmpty) {
       if (onError != null) {
         onError(EmojiMessage.errorMalformedEmojiName);
@@ -103,21 +105,22 @@ class EmojiUtil {
 ///
 /// Emoji.None is being used to represent a NULL emoji.
 ///
+@immutable
 class Emoji {
+  const Emoji(this.name, this.code);
+
   ///
   /// If emoji not found, the parser always returns this.
   ///
-  static final Emoji none = Emoji(EmojiConst.charEmpty, EmojiConst.charEmpty);
+  static const Emoji none = Emoji(EmojiConst.charEmpty, EmojiConst.charEmpty);
 
   final String name;
   final String code;
 
-  Emoji(this.name, this.code);
-
   String get full => EmojiUtil.ensureColons(name);
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     return other is Emoji && name == other.name && code == other.code;
   }
 
@@ -139,6 +142,12 @@ class Emoji {
 /// You will need to instantiate one of this instance to start using.
 ///
 class EmojiParser {
+  EmojiParser({bool init = true}) {
+    if (init) {
+      initLocalData();
+    }
+  }
+
   static final RegExp regexName = RegExp(r':([\w-+]+):');
 
   ///
@@ -154,22 +163,20 @@ class EmojiParser {
   final Map<String, Emoji> _emojisByName = <String, Emoji>{};
   final Map<String?, Emoji> _emojisByCode = <String, Emoji>{};
 
-  EmojiParser({bool init = true}) {
-    if (init == true) {
-      initLocalData();
-    }
-  }
-
   void initLocalData() {
     _init(jsonEmoji);
   }
 
   void _init(String dataset) {
-    Map<String, dynamic> mapEmojis = jsonDecode(dataset);
-    mapEmojis.forEach((k, v) {
-      _emojisByName[k] = Emoji(k, v);
-      _emojisByCode[EmojiUtil.stripNSM(v)] = Emoji(k, v);
-    });
+    (jsonDecode(dataset) as Map<String, dynamic>? ?? <String, dynamic>{})
+        .forEach(
+      (name, value) {
+        final code = value?.toString() ?? '';
+        final emoji = Emoji(name, code);
+        _emojisByName[name] = emoji;
+        _emojisByCode[EmojiUtil.stripNSM(code)] = emoji;
+      },
+    );
   }
 
   bool hasEmoji(String? emoji) {
@@ -226,7 +233,7 @@ class EmojiParser {
   List<String> parseEmojis(String text) {
     if (text.isEmpty) return List.empty();
 
-    List<String> result = <String>[];
+    final result = <String>[];
     for (final character in text.characters) {
       if (hasEmoji(character)) {
         result.add(character);

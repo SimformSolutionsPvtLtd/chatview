@@ -2,6 +2,8 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
+    prefer_relative_imports: true
+    always_use_package_imports: false
     public_member_api_docs: false
     avoid_print: true
     avoid_empty_else: true

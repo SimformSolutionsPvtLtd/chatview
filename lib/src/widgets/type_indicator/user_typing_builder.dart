@@ -1,8 +1,8 @@
 import 'package:chatview_utils/chatview_utils.dart' show Constants;
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/profile_circle_configuration.dart';
-import '../profile_circle.dart';
+import '../../models/config_models/chat_view/profile_circle_configuration.dart';
+import '../common/profile_circle.dart';
 
 class UserTypingBuilder extends StatelessWidget {
   const UserTypingBuilder({

@@ -20,13 +20,14 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/suggestion_list_config.dart';
+import '../../models/config_models/chat_view/message_input/suggestion_list_config.dart';
 import '../../utils/constants/constants.dart';
 import 'suggestion_item.dart';
 
@@ -78,7 +79,9 @@ class _SuggestionListState extends State<SuggestionList>
     final newSuggestions = chatViewIW?.chatController.newSuggestions;
     if (newSuggestions != null) {
       isSuggestionListEmpty = newSuggestions.value.isEmpty;
-      isSuggestionListEmpty ? _controller.reverse() : _controller.forward();
+      unawaited(
+        isSuggestionListEmpty ? _controller.reverse() : _controller.forward(),
+      );
     }
   }
 
@@ -90,8 +93,7 @@ class _SuggestionListState extends State<SuggestionList>
     return Container(
       alignment: suggestionsListConfig.axisAlignment.alignment,
       decoration: suggestionsListConfig.decoration,
-      padding:
-          suggestionsListConfig.padding ?? const EdgeInsets.only(left: 8.0),
+      padding: suggestionsListConfig.padding ?? const EdgeInsets.only(left: 8),
       margin: suggestionsListConfig.margin,
       // TODO: Switch to SizeTransition once support for
       // `fixedCrossAxisSizeFactor` is provided.
@@ -100,8 +102,8 @@ class _SuggestionListState extends State<SuggestionList>
           animation: _controller,
           builder: (context, child) {
             return Align(
-              alignment: const AlignmentDirectional(-1.0, -1.0),
-              heightFactor: math.max(_controller.value, 0.0),
+              alignment: AlignmentDirectional.topStart,
+              heightFactor: math.max(_controller.value, 0),
               widthFactor: 1,
               child: suggestionsConfig?.suggestionItemType.isScrollType ?? false
                   ? SingleChildScrollView(
@@ -127,7 +129,8 @@ class _SuggestionListState extends State<SuggestionList>
   }
 
   List<Widget> _suggestionListWidget(
-      SuggestionItemConfig? suggestionsItemConfig) {
+    SuggestionItemConfig? suggestionsItemConfig,
+  ) {
     final suggestionsListConfig =
         suggestionsConfig?.listConfig ?? const SuggestionListConfig();
     return List.generate(

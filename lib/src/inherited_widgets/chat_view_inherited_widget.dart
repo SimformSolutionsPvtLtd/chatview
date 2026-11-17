@@ -30,26 +30,36 @@ import '../widgets/reactions/reaction_popup.dart';
 /// This widget for alternative of excessive amount of passing arguments
 /// over widgets.
 class ChatViewInheritedWidget extends InheritedWidget {
-  ChatViewInheritedWidget({
+  const ChatViewInheritedWidget({
     required super.child,
     required this.featureActiveConfig,
     required this.chatController,
     required this.chatTextFieldViewKey,
+    required this.showPopUp,
+    required this.chatTextFieldHeight,
+    required this.reactionPopupKey,
     super.key,
     this.profileCircleConfiguration,
   });
+
   final FeatureActiveConfig featureActiveConfig;
   final ProfileCircleConfiguration? profileCircleConfiguration;
   final ChatController chatController;
   final GlobalKey chatTextFieldViewKey;
-  final ValueNotifier<bool> showPopUp = ValueNotifier(false);
-  final ValueNotifier<double> chatTextFieldHeight = ValueNotifier(0);
-  final GlobalKey<ReactionPopupState> reactionPopupKey = GlobalKey();
+
+  /// Owned by `ChatView`'s state, so they outlive rebuilds of this widget.
+  final ValueNotifier<bool> showPopUp;
+  final ValueNotifier<double> chatTextFieldHeight;
+  final GlobalKey<ReactionPopupState> reactionPopupKey;
 
   static ChatViewInheritedWidget? of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<ChatViewInheritedWidget>();
 
   @override
   bool updateShouldNotify(covariant ChatViewInheritedWidget oldWidget) =>
-      oldWidget.featureActiveConfig != featureActiveConfig;
+      oldWidget.featureActiveConfig != featureActiveConfig ||
+      // Widgets cache the controller in `didChangeDependencies`, so a
+      // controller swapped in place must wake them.
+      !identical(oldWidget.chatController, chatController) ||
+      oldWidget.profileCircleConfiguration != profileCircleConfiguration;
 }

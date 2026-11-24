@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* **Feat**: [470](https://github.com/SimformSolutionsPvtLtd/chatview/pull/470) :sparkles: Add AI coding-agent skills `chatview-chat-screen`, `chatview-chat-list` and `chatview-migration` in `skills/`. Install them in your app with [`dart run skills@ get`](https://dart.dev/tools/pub/package-skills).
 * **Feat**: [454](https://github.com/SimformSolutionsPvtLtd/chatview/pull/454) :sparkles: Add configurable image fit option for AdaptiveImage widget
 * **Feat**: [457](https://github.com/SimformSolutionsPvtLtd/chatview/pull/457) :sparkles: Add errorWidget support to ImageMessageConfiguration
 * **Fix**: [458](https://github.com/SimformSolutionsPvtLtd/chatview/pull/458) Enhance text field action animations for improved UX

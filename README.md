@@ -58,6 +58,29 @@ dependencies:
   chatview: <latest-version>
 ```
 
+## AI agent skills
+
+This package ships [agent skills](https://dart.dev/tools/pub/package-skills) for coding agents
+(Claude Code, Cursor, Copilot, Codex, …):
+
+| Skill                  | Use it to                                                          |
+|------------------------|--------------------------------------------------------------------|
+| `chatview-chat-screen` | Build and customize a chat screen with `ChatView`                  |
+| `chatview-chat-list`   | Build and customize the conversation list with `ChatList`          |
+| `chatview-migration`   | Upgrade your app from its current `chatview` version to the latest |
+
+Install them from your app's root (needs Dart 3.10 or later):
+
+```bash
+dart run skills@ get
+```
+
+Only packages that are direct dependencies of your app are scanned. Run the command again after
+upgrading `chatview` to update the skills.
+
+Upgrading from an older version? Upgrade first (`flutter pub upgrade --major-versions chatview`),
+run the command above, then ask your agent to migrate the project.
+
 ## Compatibility with [`chatview_connect`][chatViewConnect]
 
 | `chatview` version | [`chatview_connect`][chatViewConnect] version |

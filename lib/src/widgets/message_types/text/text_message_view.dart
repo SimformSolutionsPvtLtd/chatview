@@ -19,21 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'package:chatview/chatview.dart';
-import 'package:chatview/src/widgets/message_types/text/custom_selection_area.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../chatview.dart';
 import '../../../extensions/extensions.dart';
 import '../../../utils/constants/constants.dart';
 import '../../message_status/in_bubble_time_and_receipt.dart';
-import 'link_preview.dart';
 import '../../reactions/reaction_widget.dart';
+import 'custom_selection_area.dart';
+import 'link_preview.dart';
 
 class TextMessageView extends StatelessWidget {
   const TextMessageView({
-    super.key,
     required this.isMessageBySender,
     required this.message,
+    super.key,
     this.chatBubbleMaxWidth,
     this.inComingChatBubbleConfig,
     this.outgoingChatBubbleConfig,
@@ -135,8 +135,9 @@ class TextMessageView extends StatelessWidget {
       children: [
         Container(
           constraints: BoxConstraints(
-              maxWidth: chatBubbleMaxWidth ??
-                  MediaQuery.of(context).size.width * 0.75),
+            maxWidth:
+                chatBubbleMaxWidth ?? MediaQuery.of(context).size.width * 0.75,
+          ),
           padding: _padding ??
               const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -144,7 +145,11 @@ class TextMessageView extends StatelessWidget {
               ),
           margin: _margin ??
               EdgeInsets.fromLTRB(
-                  5, 0, 6, message.reaction.reactions.isNotEmpty ? 15 : 2),
+                5,
+                0,
+                6,
+                message.reaction.reactions.isNotEmpty ? 15 : 2,
+              ),
           decoration: BoxDecoration(
             color: highlightMessage ? highlightColor : _color,
             border: border,
@@ -248,7 +253,9 @@ class TextMessageView extends StatelessWidget {
       : inComingChatBubbleConfig?.messageTimeTextStyle;
 
   BorderRadiusGeometry _borderRadius(
-      String message, bool showTimeInChatBubble) {
+    String message,
+    bool showTimeInChatBubble,
+  ) {
     final config =
         isMessageBySender ? outgoingChatBubbleConfig : inComingChatBubbleConfig;
     if (config?.borderRadius != null) return config!.borderRadius!;

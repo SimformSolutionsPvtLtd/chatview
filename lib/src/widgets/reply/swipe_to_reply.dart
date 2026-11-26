@@ -26,9 +26,9 @@ import 'reply_icon.dart';
 
 class SwipeToReply extends StatefulWidget {
   const SwipeToReply({
-    super.key,
     required this.onSwipe,
     required this.child,
+    super.key,
     this.isMessageByCurrentUser = true,
   });
 
@@ -82,7 +82,7 @@ class _SwipeToReplyState extends State<SwipeToReply> {
                 ReplyIcon(
                   replyIconSize: replyIconSize,
                   animationValue: paddingValue > replyIconSize
-                      ? (paddingValue) / (paddingLimit)
+                      ? paddingValue / paddingLimit
                       : 0.0,
                 ),
                 Padding(

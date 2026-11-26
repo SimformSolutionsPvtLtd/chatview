@@ -11,11 +11,11 @@ import 'reply_message_type_view.dart';
 
 class ReplyMessageView extends StatefulWidget {
   const ReplyMessageView({
-    super.key,
     required this.sendMessageConfig,
     required this.messageConfig,
     required this.builder,
     required this.onChange,
+    super.key,
   });
 
   /// Provides configuration for sending message.
@@ -65,7 +65,7 @@ class ReplyMessageViewState extends State<ReplyMessageView> {
 
   @override
   Widget build(BuildContext context) {
-    final replyTitle = "${PackageStrings.currentLocale.replyTo} $_replyTo";
+    final replyTitle = '${PackageStrings.currentLocale.replyTo} $_replyTo';
 
     return ChatTextFieldViewBuilder<ReplyMessage>(
       valueListenable: replyMessage,

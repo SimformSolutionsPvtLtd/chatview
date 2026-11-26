@@ -32,9 +32,9 @@ import '../../values/typedefs.dart';
 class ChatTextFieldViewBuilder<T> extends StatelessWidget {
   /// A widget that rebuilds when the value of a [ValueNotifier] changes.
   const ChatTextFieldViewBuilder({
-    super.key,
     required this.valueListenable,
     required this.builder,
+    super.key,
   });
 
   /// The [ValueListenable] that provides the value to be listened to.

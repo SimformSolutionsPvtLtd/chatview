@@ -23,6 +23,18 @@
 import 'package:flutter/material.dart';
 
 class RepliedMsgAutoScrollConfig {
+  /// Configuration for auto scrolling and highlighting a message when
+  /// tapping on the original message above the replied message.
+  const RepliedMsgAutoScrollConfig({
+    this.enableHighlightRepliedMsg = true,
+    this.enableScrollToRepliedMsg = true,
+    this.highlightColor = Colors.grey,
+    this.highlightDuration = const Duration(milliseconds: 500),
+    this.highlightScale = 1.1,
+    this.highlightScrollCurve = Curves.easeIn,
+    this.alignment = 0.5,
+  });
+
   /// Auto scrolls to original message when tapped on replied message.
   /// Defaults to true.
   final bool enableScrollToRepliedMsg;
@@ -46,16 +58,4 @@ class RepliedMsgAutoScrollConfig {
 
   /// Alignment of the replied message when scrolled to.
   final double alignment;
-
-  /// Configuration for auto scrolling and highlighting a message when
-  /// tapping on the original message above the replied message.
-  const RepliedMsgAutoScrollConfig({
-    this.enableHighlightRepliedMsg = true,
-    this.enableScrollToRepliedMsg = true,
-    this.highlightColor = Colors.grey,
-    this.highlightDuration = const Duration(milliseconds: 500),
-    this.highlightScale = 1.1,
-    this.highlightScrollCurve = Curves.easeIn,
-    this.alignment = 0.5,
-  });
 }

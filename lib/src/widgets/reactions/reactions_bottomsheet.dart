@@ -41,7 +41,7 @@ class ReactionsBottomSheet {
   }) {
     return showModalBottomSheet<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.5,
           color: reactionsBottomSheetConfig?.backgroundColor,
@@ -77,7 +77,7 @@ class ReactionsBottomSheet {
                                 color: Colors.grey.shade200,
                                 offset: const Offset(0, 20),
                                 blurRadius: 40,
-                              )
+                              ),
                             ],
                             borderRadius: const BorderRadius.all(
                               Radius.circular(
@@ -117,7 +117,7 @@ class ReactionsBottomSheet {
                           fontSize:
                               reactionsBottomSheetConfig?.reactionSize ?? 14,
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),

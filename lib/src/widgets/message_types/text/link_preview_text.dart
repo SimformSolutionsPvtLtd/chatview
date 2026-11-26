@@ -5,10 +5,10 @@ import '../../../../chatview.dart';
 
 class LinkPreviewText extends StatefulWidget {
   const LinkPreviewText({
-    super.key,
     required this.textMessage,
     required this.extractedUrls,
     required this.onLinkTap,
+    super.key,
     this.linkPreviewConfig,
     this.normalTextStyle,
   });
@@ -39,7 +39,7 @@ class _LinkPreviewTextState extends State<LinkPreviewText> {
   Widget build(BuildContext context) {
     final linkStyle = widget.linkPreviewConfig?.linkStyle;
     final spans = <TextSpan>[];
-    int lastIndex = 0;
+    var lastIndex = 0;
 
     for (final url in widget.extractedUrls) {
       final start = widget.textMessage.indexOf(url, lastIndex);

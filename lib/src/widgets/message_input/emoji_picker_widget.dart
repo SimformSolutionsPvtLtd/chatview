@@ -67,8 +67,7 @@ class EmojiPickerWidget extends StatelessWidget {
           ),
           Expanded(
             child: EmojiPicker(
-              onEmojiSelected: (Category? category, Emoji emoji) =>
-                  onSelected(emoji.emoji),
+              onEmojiSelected: (category, emoji) => onSelected(emoji.emoji),
               config: emojiPickerSheetConfig ??
                   Config(
                     emojiViewConfig: EmojiViewConfig(

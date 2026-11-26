@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 
 class ProfileImageWidget extends StatelessWidget {
   const ProfileImageWidget({
+    required this.networkImageProgressIndicatorBuilder,
     super.key,
     this.imageUrl,
     this.defaultAvatarImage = Constants.profileImage,
@@ -35,7 +36,6 @@ class ProfileImageWidget extends StatelessWidget {
     this.assetImageErrorBuilder,
     this.networkImageErrorBuilder,
     this.imageType = ImageType.network,
-    required this.networkImageProgressIndicatorBuilder,
   });
 
   /// Allow user to set radius of circle avatar.

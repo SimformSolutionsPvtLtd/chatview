@@ -31,11 +31,11 @@ import '../widgets/reactions/reaction_popup.dart';
 /// over widgets.
 class ChatViewInheritedWidget extends InheritedWidget {
   ChatViewInheritedWidget({
-    super.key,
     required super.child,
     required this.featureActiveConfig,
     required this.chatController,
     required this.chatTextFieldViewKey,
+    super.key,
     this.profileCircleConfiguration,
   });
   final FeatureActiveConfig featureActiveConfig;
@@ -43,7 +43,7 @@ class ChatViewInheritedWidget extends InheritedWidget {
   final ChatController chatController;
   final GlobalKey chatTextFieldViewKey;
   final ValueNotifier<bool> showPopUp = ValueNotifier(false);
-  final ValueNotifier<double> chatTextFieldHeight = ValueNotifier(0.0);
+  final ValueNotifier<double> chatTextFieldHeight = ValueNotifier(0);
   final GlobalKey<ReactionPopupState> reactionPopupKey = GlobalKey();
 
   static ChatViewInheritedWidget? of(BuildContext context) =>

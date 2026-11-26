@@ -23,7 +23,7 @@
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
 import '../../utils/constants/constants.dart';
 import '../../utils/package_strings.dart';
 import 'chat_textfield_view_builder.dart';
@@ -33,9 +33,9 @@ import 'chat_textfield_view_builder.dart';
 /// Displays an "Editing" header and a close button to cancel the edit.
 class EditMessageView extends StatefulWidget {
   const EditMessageView({
-    super.key,
     required this.sendMessageConfig,
     required this.onChange,
+    super.key,
   });
 
   /// Configuration for the send-message text field area.
@@ -81,7 +81,10 @@ class EditMessageViewState extends State<EditMessageView> {
             ),
           ),
           padding: const EdgeInsets.only(
-              left: leftPadding, right: leftPadding, bottom: 48),
+            left: leftPadding,
+            right: leftPadding,
+            bottom: 48,
+          ),
           child: Row(
             children: [
               Expanded(

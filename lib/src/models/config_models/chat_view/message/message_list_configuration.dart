@@ -75,7 +75,7 @@ class ChatBackgroundConfiguration {
   /// Provides configurations of chat separator widget.
   final StringWithReturnWidget? groupSeparatorBuilder;
 
-  /// Used to define the order of a [GroupedListView] or [SliverGroupedListView].
+  /// Used to define the order of a `GroupedListView` or `SliverGroupedListView`.
   final GroupedListOrder groupedListOrder;
 
   /// Used to enable sort in list view.
@@ -85,7 +85,7 @@ class ChatBackgroundConfiguration {
   /// message.
   ///
   /// Acts as a global fallback for the swipe-to-reveal timestamp.
-  /// If [ChatBubble.messageTimeTextStyle] is set on the outgoing or incoming
+  /// If `ChatBubble.messageTimeTextStyle` is set on the outgoing or incoming
   /// bubble config, it takes priority over this value for that specific bubble.
   final TextStyle? messageTimeTextStyle;
 

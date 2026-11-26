@@ -29,8 +29,8 @@ import 'profile_image_widget.dart';
 
 class ChatViewAppBar extends StatelessWidget {
   const ChatViewAppBar({
-    super.key,
     required this.chatTitle,
+    super.key,
     this.backGroundColor,
     this.userStatus,
     this.profilePicture,
@@ -134,7 +134,7 @@ class ChatViewAppBar extends StatelessWidget {
                 children: [
                   if (profilePicture != null)
                     Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
+                      padding: const EdgeInsets.only(right: 8),
                       child: ProfileImageWidget(
                         imageUrl: profilePicture,
                         defaultAvatarImage: defaultAvatarImage,

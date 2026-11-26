@@ -28,8 +28,8 @@ import '../../models/config_models/chat_view/message_input/reply_suggestions_con
 
 class SuggestionItem extends StatelessWidget {
   const SuggestionItem({
-    super.key,
     required this.suggestionItemData,
+    super.key,
   });
 
   final SuggestionItemData suggestionItemData;

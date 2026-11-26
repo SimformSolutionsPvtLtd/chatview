@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'dart:async';
+
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,9 +32,9 @@ import 'link_preview_text.dart';
 
 class LinkPreview extends StatelessWidget {
   const LinkPreview({
-    super.key,
     required this.textMessage,
     required this.extractedUrls,
+    super.key,
     this.linkPreviewConfig,
     this.normalTextStyle,
   });
@@ -119,14 +121,14 @@ class LinkPreview extends StatelessWidget {
     if (linkPreviewConfig?.onUrlDetect case final onUrlDetect?) {
       onUrlDetect(url);
     } else {
-      _launchURL(url);
+      unawaited(_launchURL(url));
     }
   }
 
-  void _launchURL(String url) async {
+  Future<void> _launchURL(String url) async {
     final parsedUrl = Uri.parse(url);
     await canLaunchUrl(parsedUrl)
         ? await launchUrl(parsedUrl)
-        : throw couldNotLaunch;
+        : throw Exception(couldNotLaunch);
   }
 }

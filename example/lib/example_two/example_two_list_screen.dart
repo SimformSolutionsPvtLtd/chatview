@@ -301,7 +301,8 @@ class _ExampleTwoListScreenState extends State<ExampleTwoListScreen> {
             child: Container(
               width: 46,
               height: 46,
-              padding: const EdgeInsetsGeometry.all(8),
+              // To support minimum flutter version 3.22.0
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: _theme.floatingButton,

@@ -89,7 +89,7 @@ class FeatureActiveConfig {
   /// Controls the visibility of message seen ago receipts default is true
   final bool lastSeenAgoBuilderVisibility;
 
-  /// Controls the visibility of the message [receiptsBuilder]
+  /// Controls the visibility of the message `receiptsBuilder`
   final bool receiptsBuilderVisibility;
 
   /// Used for enable/disable other users name.

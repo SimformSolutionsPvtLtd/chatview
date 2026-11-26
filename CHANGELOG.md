@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Fix**: :bug: An image message without `onTap` now lets the tap reach the message list like a text message, and the reaction chip on a custom message hangs below it without being clipped.
+* **Perf**: :zap: A message bubble now rebuilds only the part that changed. Text, link, image, voice, emoji and custom messages cache their parsed URLs, link spans and config instead of rebuilding them on every frame.
 * **Perf**: :zap: The reaction pop-up, reaction chips, swipe-to-reply and the reply preview rebuild far less per frame. The pop-up background is built once, the reply bar is drawn with a border, and received reaction chips skip size measuring.
 * **Fix**: :bug: The reply title no longer reads "Replied by null" for an unknown user, and the reply preview above the text field shows the name of the user you are replying to instead of the previous one.
 * **Fix**: :bug: The reaction chip is re-measured on rotation. Add `moreReactions` to `ChatViewLocale` as the accessibility label of the pop-up's "+" button.

@@ -19,9 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:io' if (kIsWeb) 'dart:html';
-
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 
 import '../../../chatview.dart';
@@ -220,8 +218,10 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   void _onChatListTap() {
     widget.onChatListTap?.call();
-    if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-      FocusScope.of(context).unfocus();
+    if (defaultTargetPlatform.isNativeMobile) {
+      // Not FocusScope.of(context): that subscribes this widget to focus
+      // changes, so every text field focus would rebuild the whole list.
+      FocusManager.instance.primaryFocus?.unfocus();
     }
     chatViewIW?.showPopUp.value = false;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

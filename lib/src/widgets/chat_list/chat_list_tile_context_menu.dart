@@ -40,7 +40,7 @@ class ChatListTileContextMenu extends StatelessWidget {
         ? child
         // Display Cupertino context menu only on mobile platforms.
         // On web/desktop, the extra space causes the menu to appear horizontally.
-        : defaultTargetPlatform.isMobile
+        : defaultTargetPlatform.isNativeMobile
             ? CupertinoContextMenu.builder(
                 builder: (_, __) => Material(
                   color: chatTileColor,
@@ -130,7 +130,7 @@ class ChatListTileContextMenu extends StatelessWidget {
     // On web/desktop, Cupertino context menu isn’t used.
     // The callback is called directly (no animation delay),
     // and Navigator.pop is unnecessary since nothing is pushed.
-    if (!defaultTargetPlatform.isMobile) {
+    if (!defaultTargetPlatform.isNativeMobile) {
       callback.call();
       return;
     }

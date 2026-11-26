@@ -25,7 +25,9 @@ class TextFieldActionButtonState<T extends TextFieldActionButton>
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => widget.onPressed?.call(context),
+      onPressed: widget.onPressed == null
+          ? null
+          : () => widget.onPressed!.call(context),
       icon: widget.icon,
       color: widget.color,
       style: widget.style,

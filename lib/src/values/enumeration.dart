@@ -242,3 +242,9 @@ extension MessageStatusExtension on MessageStatus {
         MessageStatus.undelivered => Icons.error_outline,
       };
 }
+
+/// Keys of the message list items that are not a message or a date separator.
+/// A type of their own, so a key can never equal a message id.
+///
+/// Internal use only: hidden from the package exports.
+enum MessageListItem { loader, footer }

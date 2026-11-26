@@ -62,32 +62,39 @@ class ScrollToBottomButtonState extends State<ScrollToBottomButton> {
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
       builder: (context, scale, child) {
-        return Transform.scale(
-          scale: scale,
-          child: InkWell(
-            onTap: () => _onScrollTap(
-              config: scrollToBottomButtonConfig,
-              chatController: chatViewIW?.chatController,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: scrollToBottomButtonConfig?.borderRadius ??
-                    BorderRadius.circular(50),
-                border: scrollToBottomButtonConfig?.border ??
-                    Border.all(color: Colors.grey),
-                color:
-                    scrollToBottomButtonConfig?.backgroundColor ?? Colors.white,
-                boxShadow: scrollToBottomButtonConfig?.boxShadow,
+        // Scaled to 0 is invisible and untappable, but it would still be in
+        // the semantics tree and a screen reader could focus it.
+        return ExcludeSemantics(
+          excluding: !isButtonVisible,
+          child: Transform.scale(
+            scale: scale,
+            child: InkWell(
+              onTap: () => _onScrollTap(
+                config: scrollToBottomButtonConfig,
+                chatController: chatViewIW?.chatController,
               ),
-              padding: scrollToBottomButtonConfig?.insidePadding ??
-                  const EdgeInsets.all(4),
-              child: scrollToBottomButtonConfig?.icon ??
-                  const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.grey,
-                    weight: 10,
-                    size: 30,
-                  ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: scrollToBottomButtonConfig?.borderRadius ??
+                      const BorderRadius.all(Radius.circular(50)),
+                  border: scrollToBottomButtonConfig?.border ??
+                      const Border.fromBorderSide(
+                        BorderSide(color: Colors.grey),
+                      ),
+                  color: scrollToBottomButtonConfig?.backgroundColor ??
+                      Colors.white,
+                  boxShadow: scrollToBottomButtonConfig?.boxShadow,
+                ),
+                padding: scrollToBottomButtonConfig?.insidePadding ??
+                    const EdgeInsets.all(4),
+                child: scrollToBottomButtonConfig?.icon ??
+                    const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Colors.grey,
+                      weight: 10,
+                      size: 30,
+                    ),
+              ),
             ),
           ),
         );

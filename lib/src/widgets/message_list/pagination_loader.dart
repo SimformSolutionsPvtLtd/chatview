@@ -18,7 +18,7 @@ class PaginationLoader extends StatelessWidget {
         if (!isLoading) return const SizedBox.shrink();
 
         return SizedBox(
-          height: Scaffold.of(context).appBarMaxHeight,
+          height: Scaffold.maybeOf(context)?.appBarMaxHeight,
           child: child,
         );
       },

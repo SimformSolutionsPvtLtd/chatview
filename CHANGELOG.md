@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Fix**: :bug: Edit and Unsend are hidden in the message actions when `onEditTap` or `onUnsendTap` is not set, a blocked edit keeps the typed text, a recording in progress is discarded when the text field is disposed, and on web Enter no longer sends while IME text is being composed.
+* **Fix**: :bug: The "+" menu stays in place when the keyboard or orientation changes, shows every option, opens and closes smoothly and no longer leaves an overlay behind when the screen closes.
 * **Refactor**: :recycle: Use `defaultTargetPlatform` instead of `dart:io`'s `Platform` for platform checks, and `MediaQuery.paddingOf` in the app bar, so these widgets work on web and rebuild less.
 * **Perf**: :zap: The typing indicator repaints only its dots and starts no tickers for a custom indicator, and the suggestion list builds its items once instead of on every animation frame.
 * **Fix**: :bug: Fix animation listener leaks in the chat list and the sending indicator, and make the reply suggestion list react when `replySuggestionsConfig` changes.

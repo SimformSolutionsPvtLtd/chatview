@@ -264,14 +264,17 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   void _onPressed() {
     final messageText = _textEditingController.text.trim();
-    _textEditingController.clear();
-    if (messageText.isEmpty) return;
+    if (messageText.isEmpty) {
+      _textEditingController.clear();
+      return;
+    }
 
     // If in edit mode, delegate to onEditTap instead of onSendTap.
     if (isEditMode) {
       // Only confirm the edit if a handler is registered; otherwise keep edit
       // mode active so the user's text is not silently discarded.
       if (widget.onEditTap == null) return;
+      _textEditingController.clear();
       if (messageText == _currentlyEditingMessage!.message) {
         _closeEditMode();
         return;
@@ -286,6 +289,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       _closeEditMode();
       return;
     }
+    _textEditingController.clear();
 
     if (_selectedImageViewWidgetKey.currentState?.selectedImages.value
         case final selectedImages?) {

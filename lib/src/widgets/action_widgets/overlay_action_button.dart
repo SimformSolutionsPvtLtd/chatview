@@ -33,30 +33,40 @@ class OverlayActionButton extends TextFieldActionButton {
 
 class _OverlayActionButtonState
     extends TextFieldActionButtonState<OverlayActionButton>
-    with SingleTickerProviderStateMixin {
-  late OverlayEntry _plusOverlayEntry;
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  static const Duration _overlayDuration = Duration(milliseconds: 250);
+
+  /// The entry while the overlay is shown, null otherwise.
+  OverlayEntry? _plusOverlayEntry;
+
+  /// True while the overlay slides out, so a second dismiss is ignored.
+  bool _isHiding = false;
+
   late AnimationController _overlayAnimationController;
+  late CurvedAnimation _overlayCurve;
   late Animation<Offset> _overlayOffsetAnimation;
   final GlobalKey _plusIconKey = GlobalKey();
 
   @override
   void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _overlayAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: _overlayDuration,
     );
-    // Create the slide animation for the overlay
+    _overlayCurve = CurvedAnimation(
+      parent: _overlayAnimationController,
+      curve: Curves.easeOut,
+      // Reversed easeOut starts slow and ends fast, which looks like a snap.
+      reverseCurve: Curves.easeIn,
+    );
+    // A short slide plus a fade: a full-height slide of an opaque menu would
+    // sweep over the input bar and pop out of view at the end.
     _overlayOffsetAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(
-      // Use a curved animation for smooth transition
-      CurvedAnimation(
-        parent: _overlayAnimationController,
-        curve: Curves.easeOut,
-      ),
-    );
-    super.initState();
+    ).animate(_overlayCurve);
   }
 
   @override
@@ -79,8 +89,17 @@ class _OverlayActionButtonState
     );
   }
 
+  // The overlay is placed once from the button's position, so a keyboard or
+  // rotation change would leave it where the button used to be.
+  @override
+  void didChangeMetrics() => unawaited(hideOverlay());
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    // The screen can close while the overlay is open or sliding out.
+    _removeOverlay();
+    _overlayCurve.dispose();
     _overlayAnimationController.dispose();
     super.dispose();
   }
@@ -97,6 +116,9 @@ class _OverlayActionButtonState
     bool isLeading = false,
     ReplyMessage? replyMessage,
   }) {
+    // Already open: a second one would leave the first entry on screen.
+    if (_plusOverlayEntry != null) return;
+
     _overlayAnimationController.reset();
 
     var overlayBottom = 0.0;
@@ -136,7 +158,7 @@ class _OverlayActionButtonState
       isLeading: isLeading,
     );
 
-    _plusOverlayEntry = OverlayEntry(
+    final entry = _plusOverlayEntry = OverlayEntry(
       builder: (context) {
         return GestureDetector(
           onTap: hideOverlay, // Dismiss overlay on outside tap
@@ -148,41 +170,48 @@ class _OverlayActionButtonState
                   left: overlayLeft,
                   bottom: overlayBottom,
                   width: overlayWidth,
-                  child: SlideTransition(
-                    position: _overlayOffsetAnimation,
-                    child: Container(
-                      // Overlay container with animation, shadow,
-                      // and rounded corners
-                      margin: const EdgeInsets.only(bottom: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(20),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha((0.08 * 255).round()),
-                            blurRadius: 12,
+                  child: FadeTransition(
+                    opacity: _overlayCurve,
+                    child: SlideTransition(
+                      position: _overlayOffsetAnimation,
+                      child: Container(
+                        // Overlay container with animation, shadow,
+                        // and rounded corners
+                        margin: const EdgeInsets.only(bottom: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
                           ),
-                        ],
-                      ),
-                      child: SizedBox(
-                        height: 48,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          reverse: !isLeading, // Reverse for trailing
-                          itemCount: plusOptions.length,
-                          itemBuilder: (context, index) {
-                            final option = plusOptions[index];
-                            return IconButton(
-                              icon: option.icon,
-                              tooltip: option.label,
-                              onPressed: () {
-                                unawaited(hideOverlay());
-                                option.onTap.call(replyMessage);
-                              },
-                            );
-                          },
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.black.withAlpha((0.08 * 255).round()),
+                              blurRadius: 12,
+                            ),
+                          ],
+                        ),
+                        child: SizedBox(
+                          height: 48,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            // The root overlay has no Scaffold to remove the screen's
+                            // safe-area insets, which a horizontal list adds itself.
+                            padding: EdgeInsets.zero,
+                            reverse: !isLeading, // Reverse for trailing
+                            itemCount: plusOptions.length,
+                            itemBuilder: (context, index) {
+                              final option = plusOptions[index];
+                              return IconButton(
+                                icon: option.icon,
+                                tooltip: option.label,
+                                onPressed: () {
+                                  unawaited(hideOverlay());
+                                  option.onTap.call(replyMessage);
+                                },
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -194,7 +223,7 @@ class _OverlayActionButtonState
         );
       },
     );
-    Overlay.of(context, rootOverlay: true).insert(_plusOverlayEntry);
+    Overlay.of(context, rootOverlay: true).insert(entry);
     unawaited(_overlayAnimationController.forward());
   }
 
@@ -250,8 +279,23 @@ class _OverlayActionButtonState
   }
 
   // Dismisses the plus/attach overlay with animation and cleans up the entry.
+  ///
+  /// Safe to call more than once: taps while it slides out are ignored.
   Future<void> hideOverlay() async {
+    if (_plusOverlayEntry == null || _isHiding) return;
+    _isHiding = true;
     await _overlayAnimationController.reverse();
-    _plusOverlayEntry.remove();
+    // If the widget was disposed meanwhile, dispose() already removed it.
+    _removeOverlay();
+  }
+
+  void _removeOverlay() {
+    final entry = _plusOverlayEntry;
+    if (entry == null) return;
+    _plusOverlayEntry = null;
+    _isHiding = false;
+    entry
+      ..remove()
+      ..dispose();
   }
 }

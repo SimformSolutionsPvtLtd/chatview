@@ -323,7 +323,8 @@ class _ChatViewState extends State<ChatView> {
                                   // responsible for handling edit via
                                   // ReplyPopupConfiguration.onEditTap instead.
                                   assignEditMessage:
-                                      widget.sendMessageBuilder == null
+                                      widget.sendMessageBuilder == null &&
+                                              widget.onEditTap != null
                                           ? (message) => _sendMessageKey
                                               .currentState
                                               ?.assignEditMessage(message)

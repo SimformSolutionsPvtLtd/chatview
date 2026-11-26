@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Perf**: [474](https://github.com/SimformSolutionsPvtLtd/chatview/pull/474) :zap: Emoji detection now checks a constant set instead of decoding a JSON dataset, and stops at the first non-emoji character. A message's URLs are found once, and the last message time reuses cached date formats.
+* **Fix**: [474](https://github.com/SimformSolutionsPvtLtd/chatview/pull/474) :bug: A message that is only an emoji with a variation selector (such as `❤️`), a flag or a keycap is now shown as a bare emoji outside the bubble, like other emojis. Empty text is no longer treated as an emoji.
 * **Fix**: [469](https://github.com/SimformSolutionsPvtLtd/chatview/pull/469) :bug: The reaction pop-up and the list padding now survive host rebuilds, and the padding follows the text field while typing. The config inherited widgets only notify dependents when a config instance changes, and `ChatView` still notifies them when its controller is swapped.
 * **Fix**: [469](https://github.com/SimformSolutionsPvtLtd/chatview/pull/469) :bug: The text field's default text colour is now chosen from its background, so typed text is no longer white on a white field.
 * **Feat**: [473](https://github.com/SimformSolutionsPvtLtd/chatview/pull/473) :sparkles: Add `leadingActionsAlignment` and `trailingActionsAlignment` to `TextFieldConfiguration` to choose where text field actions sit when the field grows to several lines.

@@ -92,7 +92,7 @@ class TextMessageView extends StatelessWidget {
     final textSelectionConfig = isMessageBySender
         ? outgoingChatBubbleConfig?.textSelectionConfig
         : inComingChatBubbleConfig?.textSelectionConfig;
-    final extractedUrls = textMessage.extractedUrls;
+    final extractedUrls = message.urls;
     final timestampStyle = (textTheme.bodySmall ?? const TextStyle())
         .copyWith(
           fontSize: 12,

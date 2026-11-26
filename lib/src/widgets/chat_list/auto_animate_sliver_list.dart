@@ -100,10 +100,11 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
           final isMoving = itemState.isMoving;
           final movingOffset = itemState.moveOffset;
 
-          final moveAnimation = CurvedAnimation(
-            parent: itemState.moveController,
-            curve: widget.animationCurve,
-          );
+          // CurveTween, not CurvedAnimation: a CurvedAnimation adds a listener
+          // to its parent when created and must be disposed, and this runs
+          // on every rebuild of every visible item.
+          final moveAnimation = CurveTween(curve: widget.animationCurve)
+              .animate(itemState.moveController);
 
           return AnimatedBuilder(
             key: _controller.getItemGlobalKey(key),
@@ -118,11 +119,8 @@ class AutoAnimateSliverListState<T> extends State<AutoAnimateSliverList<T>>
                 // Fade out and scale down while sliding up
                 opacity =
                     Tween<double>(begin: 1, end: 0).evaluate(moveAnimation);
-                scale = Tween<double>(begin: 1, end: 0.8).evaluate(
-                  CurvedAnimation(
-                    parent: itemState.moveController,
-                    curve: Curves.easeInBack,
-                  ),
+                scale = Tween<double>(begin: 1, end: 0.8).transform(
+                  Curves.easeInBack.transform(itemState.moveController.value),
                 );
               }
               // Animate all items down if a new item is added at the top

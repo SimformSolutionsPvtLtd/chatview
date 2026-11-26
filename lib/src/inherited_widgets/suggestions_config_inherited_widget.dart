@@ -41,5 +41,6 @@ class SuggestionsConfigIW extends InheritedWidget {
       context.dependOnInheritedWidgetOfExactType<SuggestionsConfigIW>();
 
   @override
-  bool updateShouldNotify(covariant SuggestionsConfigIW oldWidget) => false;
+  bool updateShouldNotify(covariant SuggestionsConfigIW oldWidget) =>
+      !identical(oldWidget.suggestionsConfig, suggestionsConfig);
 }

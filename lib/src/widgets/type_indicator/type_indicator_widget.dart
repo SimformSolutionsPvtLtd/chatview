@@ -55,21 +55,56 @@ class TypingIndicator extends StatefulWidget {
 
 class _TypingIndicatorState extends State<TypingIndicator>
     with TickerProviderStateMixin {
-  late AnimationController _appearanceController;
+  late final AnimationController _appearanceController =
+      AnimationController(vsync: this);
 
-  late Animation<double> _indicatorSpaceAnimation;
+  late final CurvedAnimation _indicatorSpaceCurve = CurvedAnimation(
+    parent: _appearanceController,
+    curve: const Interval(0, 0.4, curve: Curves.easeOut),
+    reverseCurve: const Interval(0, 1, curve: Curves.easeOut),
+  );
 
-  late Animation<double> _largeBubbleAnimation;
+  late final Animation<double> _indicatorSpaceAnimation =
+      _indicatorSpaceCurve.drive(Tween<double>(begin: 0, end: 60));
 
-  late AnimationController _repeatingController;
-  final List<Interval> _dotIntervals = const [
+  late final CurvedAnimation _largeBubbleAnimation = CurvedAnimation(
+    parent: _appearanceController,
+    curve: const Interval(0.3, 1, curve: Curves.elasticOut),
+    reverseCurve: const Interval(0.5, 1, curve: Curves.easeOut),
+  );
+
+  late final AnimationController _repeatingController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1500),
+  );
+
+  static const List<Interval> _dotIntervals = [
     Interval(0.25, 0.8),
     Interval(0.35, 0.9),
     Interval(0.45, 1),
   ];
 
-  final List<AnimationController> _jumpControllers = [];
-  final List<Animation<double>> _jumpAnimations = [];
+  /// One controller drives all three dots, each one picks its own part of it
+  /// with an [Interval], so they stay in step with a single ticker.
+  late final AnimationController _jumpController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+    reverseDuration: const Duration(milliseconds: 500),
+  );
+
+  late final List<CurvedAnimation> _jumpCurves = List.generate(
+    3,
+    (i) => CurvedAnimation(
+      parent: _jumpController,
+      curve: Interval(0.2 * i, 0.7, curve: Curves.easeOutSine),
+      reverseCurve: Interval(0.2 * i, 0.7, curve: Curves.easeOut),
+    ),
+  );
+
+  late final List<Animation<double>> _jumpAnimations = [
+    for (final curve in _jumpCurves)
+      curve.drive(Tween<double>(begin: 0, end: 10)),
+  ];
 
   ProfileCircleConfiguration? profileCircleConfiguration;
 
@@ -78,63 +113,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
   @override
   void initState() {
     super.initState();
-    if (mounted) _initializeAnimationController();
-  }
-
-  void _initializeAnimationController() {
-    _appearanceController = AnimationController(
-      vsync: this,
-    )..addListener(() {
-        setState(() {});
-      });
-
-    _indicatorSpaceAnimation = CurvedAnimation(
-      parent: _appearanceController,
-      curve: const Interval(0, 0.4, curve: Curves.easeOut),
-      reverseCurve: const Interval(0, 1, curve: Curves.easeOut),
-    ).drive(
-      Tween<double>(
-        begin: 0,
-        end: 60,
-      ),
-    );
-
-    _largeBubbleAnimation = CurvedAnimation(
-      parent: _appearanceController,
-      curve: const Interval(0.3, 1, curve: Curves.elasticOut),
-      reverseCurve: const Interval(0.5, 1, curve: Curves.easeOut),
-    );
-
-    _repeatingController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-
-    for (var i = 0; i < 3; i++) {
-      _jumpControllers.add(
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 500),
-          reverseDuration: const Duration(milliseconds: 500),
-        ),
-      );
-      _jumpAnimations.add(
-        CurvedAnimation(
-          parent: _jumpControllers[i],
-          curve: Interval(0.2 * i, 0.7, curve: Curves.easeOutSine),
-          reverseCurve: Interval(0.2 * i, 0.7, curve: Curves.easeOut),
-        ).drive(
-          Tween<double>(
-            begin: 0,
-            end: 10,
-          ),
-        ),
-      );
-    }
-
-    if (widget.showIndicator) {
-      _showIndicator();
-    }
+    if (widget.showIndicator) _showIndicator();
   }
 
   @override
@@ -160,47 +139,67 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   void dispose() {
+    _indicatorSpaceCurve.dispose();
+    _largeBubbleAnimation.dispose();
+    for (final curve in _jumpCurves) {
+      curve.dispose();
+    }
     _appearanceController.dispose();
     _repeatingController.dispose();
-    for (final element in _jumpControllers) {
-      element.dispose();
-    }
+    _jumpController.dispose();
     super.dispose();
   }
 
   void _showIndicator() {
     _appearanceController.duration = const Duration(milliseconds: 750);
     unawaited(_appearanceController.forward());
+    // A custom indicator replaces the dots, so don't tick them for nothing.
+    if (widget.typeIndicatorConfig.customIndicator != null) return;
     unawaited(_repeatingController.repeat());
-    for (var i = 0; i < 3; i++) {
-      unawaited(_jumpControllers[i].repeat(reverse: true));
-    }
+    unawaited(_jumpController.repeat(reverse: true));
   }
 
   void _hideIndicator() {
     _appearanceController.duration = const Duration(milliseconds: 150);
-    unawaited(_appearanceController.reverse());
-    _repeatingController.stop();
-    for (var i = 0; i < 3; i++) {
-      _jumpControllers[i].stop();
-    }
+    // Keep the dots moving until the bubble has gone, so they do not freeze
+    // while it shrinks.
+    unawaited(
+      _appearanceController.reverse().then((_) {
+        if (mounted && !widget.showIndicator) _stopDots();
+      }),
+    );
+  }
+
+  void _stopDots() {
+    _repeatingController
+      ..stop()
+      ..value = 0;
+    _jumpController
+      ..stop()
+      ..value = 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isCustomIndicator =
-        widget.typeIndicatorConfig.customIndicator != null;
-
-    if (isCustomIndicator && widget.showIndicator) {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: typeIndicatorPadding,
-          child: UserTypingBuilder(
-            showProfileCircle: false,
-            animation: _largeBubbleAnimation,
-            profileConfig: profileCircleConfiguration,
-            bubble: widget.typeIndicatorConfig.customIndicator!,
+    // Without the dots the custom indicator is also scaled in and out, instead
+    // of the default dots taking its place while it leaves.
+    if (widget.typeIndicatorConfig.customIndicator case final custom?) {
+      return AnimatedBuilder(
+        animation: _appearanceController,
+        builder: (context, child) =>
+            !widget.showIndicator && _appearanceController.isDismissed
+                ? const SizedBox.shrink()
+                : child!,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: typeIndicatorPadding,
+            child: UserTypingBuilder(
+              showProfileCircle: false,
+              animation: _largeBubbleAnimation,
+              profileConfig: profileCircleConfiguration,
+              bubble: custom,
+            ),
           ),
         ),
       );
@@ -222,12 +221,14 @@ class _TypingIndicatorState extends State<TypingIndicator>
             child: UserTypingBuilder(
               animation: _largeBubbleAnimation,
               profileConfig: profileCircleConfiguration,
-              bubble: TypingDotsBubble(
-                dotIntervals: _dotIntervals,
-                jumpAnimations: _jumpAnimations,
-                chatBubbleConfig: widget.chatBubbleConfig,
-                repeatAnimationController: _repeatingController,
-                typeIndicatorConfig: widget.typeIndicatorConfig,
+              bubble: RepaintBoundary(
+                child: TypingDotsBubble(
+                  dotIntervals: _dotIntervals,
+                  jumpAnimations: _jumpAnimations,
+                  chatBubbleConfig: widget.chatBubbleConfig,
+                  repeatAnimationController: _repeatingController,
+                  typeIndicatorConfig: widget.typeIndicatorConfig,
+                ),
               ),
             ),
           ),

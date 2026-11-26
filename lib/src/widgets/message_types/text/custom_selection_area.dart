@@ -1,5 +1,6 @@
-import 'package:chatview/src/models/config_models/chat_view/message/text_selection_config.dart';
 import 'package:flutter/material.dart';
+
+import '../../../models/config_models/chat_view/message/text_selection_config.dart';
 
 /// A convenience wrapper around [SelectionArea] that lets you locally
 /// customize selection highlight, handle, and colors

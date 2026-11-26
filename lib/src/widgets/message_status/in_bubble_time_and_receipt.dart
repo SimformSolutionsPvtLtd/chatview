@@ -26,7 +26,6 @@ import 'package:flutter/material.dart';
 import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/chat_bubble.dart';
 import '../../models/config_models/chat_view/feature_active_config.dart';
-import '../../models/config_models/chat_view/message/receipts_widget_config.dart';
 import '../../values/enumeration.dart';
 import '../sending_animation/sending_message_animating_widget.dart';
 
@@ -35,12 +34,12 @@ import '../sending_animation/sending_message_animating_widget.dart';
 /// [SendingMessageAnimationType.clockToTick] is used.
 class InBubbleTimeAndReceipt extends StatelessWidget {
   const InBubbleTimeAndReceipt({
-    super.key,
     required this.message,
     required this.timeStyle,
     required this.showTime,
     required this.showReceipt,
     required this.outgoingChatBubbleConfig,
+    super.key,
   });
 
   /// Message whose time and status are shown.
@@ -61,7 +60,7 @@ class InBubbleTimeAndReceipt extends StatelessWidget {
   /// Whether the clock/tick is drawn inside the bubble for these settings.
   ///
   /// Honors the receiptsBuilderVisibility feature flag. A custom
-  /// [ReceiptsWidgetConfig.receiptsBuilder] replaces it, in which case it is
+  /// `ReceiptsWidgetConfig.receiptsBuilder` replaces it, in which case it is
   /// rendered next to the bubble by `MessageStatusIndicator` instead.
   static bool shouldShowReceipt({
     required bool isMessageBySender,
@@ -79,7 +78,6 @@ class InBubbleTimeAndReceipt extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Flexible lets a very wide time wrap instead of overflowing the bubble.
         if (showTime)

@@ -32,10 +32,10 @@ import '../../reactions/reaction_widget.dart';
 
 class VoiceMessageView extends StatefulWidget {
   const VoiceMessageView({
-    super.key,
     required this.screenWidth,
     required this.message,
     required this.isMessageBySender,
+    super.key,
     this.inComingChatBubbleConfig,
     this.outgoingChatBubbleConfig,
     this.onMaxDuration,
@@ -114,7 +114,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
 
   @override
   void dispose() {
-    playerStateSubscription.cancel();
+    unawaited(playerStateSubscription.cancel());
     controller.dispose();
     _playerState.dispose();
     _detectedDuration.dispose();
@@ -284,18 +284,18 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
     assert(
       defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.android,
-      "Voice messages are only supported with android and ios platform",
+      'Voice messages are only supported with android and ios platform',
     );
     if (playerState.isInitialised ||
         playerState.isPaused ||
         playerState.isStopped) {
       if (widget.config?.playerMode.isSingle ?? false) {
-        controller.pauseAllPlayers();
+        unawaited(controller.pauseAllPlayers());
       }
-      controller.startPlayer();
-      controller.setFinishMode(finishMode: FinishMode.pause);
+      unawaited(controller.startPlayer());
+      unawaited(controller.setFinishMode(finishMode: FinishMode.pause));
     } else {
-      controller.pausePlayer();
+      unawaited(controller.pausePlayer());
     }
   }
 }

@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
 import '../../utils/constants/constants.dart';
 import 'chat_textfield_view_builder.dart';
 
 class SelectedImageViewWidget extends StatefulWidget {
   const SelectedImageViewWidget({
-    super.key,
     required this.sendMessageConfig,
+    super.key,
   });
 
   /// Provides configuration for selected image view appearance.

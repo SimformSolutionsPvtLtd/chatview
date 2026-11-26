@@ -28,8 +28,8 @@ import '../models/config_models/chat_view/message_input/reply_suggestions_config
 /// over widgets.
 class SuggestionsConfigIW extends InheritedWidget {
   const SuggestionsConfigIW({
-    super.key,
     required super.child,
+    super.key,
     this.suggestionsConfig,
   });
 

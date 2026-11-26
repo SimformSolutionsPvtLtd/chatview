@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import 'dart:async';
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +29,7 @@ import 'package:flutter/material.dart';
 import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/feature_active_config.dart';
 import '../../models/config_models/chat_view/message/message_list_configuration.dart';
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/text_field_configuration.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../chat_bubble/chat_bubble_widget.dart';
@@ -37,13 +39,13 @@ import 'pagination_loader.dart';
 
 class ChatGroupedListWidget extends StatefulWidget {
   const ChatGroupedListWidget({
-    super.key,
     required this.showPopUp,
     required this.scrollController,
     required this.assignReplyMessage,
     required this.onChatListTap,
     required this.onChatBubbleLongPress,
     required this.isEnableSwipeToSeeTime,
+    super.key,
     this.textFieldConfig,
     this.loadMoreData,
     this.isLastPage,
@@ -95,7 +97,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
   bool highlightMessage = false;
   final ValueNotifier<String?> _replyId = ValueNotifier(null);
-  final _listKey = ValueNotifier(UniqueKey());
+  final ValueNotifier<UniqueKey> _listKey = ValueNotifier(UniqueKey());
 
   AnimationController? _animationController;
   Animation<Offset>? _slideAnimation;
@@ -196,9 +198,11 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       }
 
       await repliedMsgConfig.loadOldReplyMessage(id);
+      // The chat may have been closed while the message was being fetched.
+      if (!mounted) return;
 
       // Search for the message again in the updated message list.
-      _onReplyTap(
+      await _onReplyTap(
         id,
         // Use the latest user updated message list.
         chatViewIW!.chatController.initialMessageList,
@@ -226,13 +230,13 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       final visibleHeight = controllerPosition.viewportDimension;
       final scrollPosition = targetPosition - (visibleHeight * 0.85);
 
-      widget.scrollController
-          .animateTo(
-            scrollPosition,
-            curve: Curves.ease,
-            duration: const Duration(milliseconds: 50),
-          )
-          .then((_) => _onReplyTap(id, messages, messageIndex: index));
+      await widget.scrollController.animateTo(
+        scrollPosition,
+        curve: Curves.ease,
+        duration: const Duration(milliseconds: 50),
+      );
+      if (!mounted) return;
+      await _onReplyTap(id, messages, messageIndex: index);
       return;
     }
 
@@ -249,10 +253,14 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       // This value will make widget to be in center when auto scrolled.
       alignment: repliedMsgAutoScrollConfig?.alignment ?? 0.5,
     );
+    if (!mounted) return;
 
     if (repliedMsgAutoScrollConfig?.enableHighlightRepliedMsg ?? false) {
       _replyId.value = id;
-      Future.delayed(highlightDuration, () => _replyId.value = null);
+      // The chat may be closed before the highlight is due to be cleared.
+      Future.delayed(highlightDuration, () {
+        if (mounted) _replyId.value = null;
+      });
     }
   }
 
@@ -260,7 +268,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
   void _onHorizontalDrag(DragUpdateDetails details) {
     _slideAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(-0.2, 0.0),
+      end: const Offset(-0.2, 0),
     ).animate(
       CurvedAnimation(
         curve: chatBackgroundConfig.messageTimeAnimationCurve,
@@ -268,9 +276,11 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       ),
     );
 
-    details.delta.dx > 1
-        ? _animationController?.reverse()
-        : _animationController?.forward();
+    unawaited(
+      details.delta.dx > 1
+          ? _animationController?.reverse()
+          : _animationController?.forward(),
+    );
   }
 
   @override
@@ -314,7 +324,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
           final messageLength = messages.length;
 
-          var itemCount = enableSeparator
+          final itemCount = enableSeparator
               ? messageLength + messageSeparator.length
               : messageLength;
 
@@ -383,7 +393,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
 
                     /// By removing separators encountered till now from the [index]
                     /// so that we'll get actual index to display message in chat
-                    var newIndex = index - (separatorCounts[index] ?? 0);
+                    final newIndex = index - (separatorCounts[index] ?? 0);
 
                     final messageChild = ValueListenableBuilder<String?>(
                       valueListenable: _replyId,
@@ -461,11 +471,11 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
   }
 
   List<Message> sortMessage(List<Message> messages) {
-    final elements = messages.toList();
-    elements.sort(
-      chatBackgroundConfig.messageSorter ??
-          (a, b) => b.createdAt.compareTo(a.createdAt),
-    );
+    final elements = messages.toList()
+      ..sort(
+        chatBackgroundConfig.messageSorter ??
+            (a, b) => b.createdAt.compareTo(a.createdAt),
+      );
     // [elements] is already a fresh copy, so it can be returned directly for
     // the ascending case instead of allocating another list.
     return chatBackgroundConfig.groupedListOrder.isAsc
@@ -502,12 +512,12 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       0: 0, // Initial count since the loop starts from index 1
     };
 
-    _messageKeys.putIfAbsent(messages.first.id, () => GlobalKey());
+    _messageKeys.putIfAbsent(messages.first.id, GlobalKey.new);
 
     // Build separator map and update counts in the same loop
     for (var i = 1; i < messages.length; i++) {
       final message = messages[i];
-      _messageKeys.putIfAbsent(message.id, () => GlobalKey());
+      _messageKeys.putIfAbsent(message.id, GlobalKey.new);
       lastMatchedDate = _groupBy(
         message,
         lastMatchedDate,
@@ -545,7 +555,7 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     final messagesLength = messages.length;
     for (var i = 0; i < messagesLength; i++) {
       final message = messages[i];
-      _messageKeys.putIfAbsent(message.id, () => GlobalKey());
+      _messageKeys.putIfAbsent(message.id, GlobalKey.new);
     }
   }
 
@@ -592,15 +602,19 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       case ChatPaginationDirection.previous:
         if (_isPrevPageLoading.value) return;
         _isPrevPageLoading.value = true;
-        widget.loadMoreData
-            ?.call(direction, message)
-            .whenComplete(() => _isPrevPageLoading.value = false);
+        unawaited(
+          widget.loadMoreData
+              ?.call(direction, message)
+              .whenComplete(() => _isPrevPageLoading.value = false),
+        );
       case ChatPaginationDirection.next:
         if (_isNextPageLoading.value) return;
         _isNextPageLoading.value = true;
-        widget.loadMoreData
-            ?.call(direction, message)
-            .whenComplete(() => _isNextPageLoading.value = false);
+        unawaited(
+          widget.loadMoreData
+              ?.call(direction, message)
+              .whenComplete(() => _isNextPageLoading.value = false),
+        );
     }
   }
 }

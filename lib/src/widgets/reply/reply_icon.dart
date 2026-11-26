@@ -25,8 +25,8 @@ import '../../extensions/extensions.dart';
 
 class ReplyIcon extends StatelessWidget {
   const ReplyIcon({
-    super.key,
     required this.animationValue,
+    super.key,
     this.replyIconSize = 25,
   });
 

@@ -23,16 +23,16 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../../inherited_widgets/chat_view_inherited_widget.dart';
 import '../../models/config_models/chat_view/reply/replied_message_configuration.dart';
 import '../../utils/constants/constants.dart';
 import '../../utils/package_strings.dart';
-import '../../inherited_widgets/chat_view_inherited_widget.dart';
 import 'vertical_line.dart';
 
 class ReplyMessageWidget extends StatelessWidget {
   const ReplyMessageWidget({
-    super.key,
     required this.message,
+    super.key,
     this.repliedMessageConfig,
     this.onTap,
   });
@@ -74,7 +74,7 @@ class ReplyMessageWidget extends StatelessWidget {
               replyBySender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Text(
-              "${PackageStrings.currentLocale.repliedBy} $replyBy",
+              '${PackageStrings.currentLocale.repliedBy} $replyBy',
               style: repliedMessageConfig?.replyTitleTextStyle ??
                   textTheme.bodyMedium!
                       .copyWith(fontSize: 14, letterSpacing: 0.3),

@@ -30,7 +30,8 @@ import '../../../../values/typedefs.dart';
 class VoiceMessageConfiguration {
   const VoiceMessageConfiguration({
     @Deprecated(
-        'Use `outgoingPlayerWaveStyle`/`inComingPlayerWaveStyle` instead.')
+      'Use `outgoingPlayerWaveStyle`/`inComingPlayerWaveStyle` instead.',
+    )
     this.playerWaveStyle,
     this.outgoingPlayerWaveStyle,
     this.inComingPlayerWaveStyle,
@@ -122,7 +123,7 @@ class VoiceMessageConfiguration {
 
   /// Whether to display the voice message duration.
   ///
-  /// If [Message.voiceMessageDuration] is not set, the duration is
+  /// If `Message.voiceMessageDuration` is not set, the duration is
   /// automatically read from the audio file.
   ///
   /// Defaults to `true`.

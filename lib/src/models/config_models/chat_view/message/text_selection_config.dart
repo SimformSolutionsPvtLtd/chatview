@@ -21,7 +21,7 @@ class TextSelectionConfig {
 
   /// The configuration for the magnifier in the selection region.
   ///
-  /// By default, builds a [CupertinoTextMagnifier] on iOS and [TextMagnifier]
+  /// By default, builds a `CupertinoTextMagnifier` on iOS and [TextMagnifier]
   /// on Android, and builds nothing on all other platforms. To suppress the
   /// magnifier, consider passing [TextMagnifierConfiguration.disabled].
   ///

@@ -27,12 +27,12 @@ import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/message/message_configuration.dart';
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
 import '../../utils/constants/constants.dart';
 import '../../values/typedefs.dart';
-import 'chatui_textfield.dart';
-import '../reply/reply_message_view.dart';
 import '../message_list/scroll_to_bottom_button.dart';
+import '../reply/reply_message_view.dart';
+import 'chatui_textfield.dart';
 import 'edit_message_view.dart';
 import 'selected_image_view_widget.dart';
 
@@ -215,7 +215,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                                           ?.selectedImages.value = [
                                         ...?_selectedImageViewWidgetKey
                                             .currentState?.selectedImages.value,
-                                        images
+                                        images,
                                       ];
 
                                       FocusScope.of(context)

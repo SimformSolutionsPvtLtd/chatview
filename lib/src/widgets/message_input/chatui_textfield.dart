@@ -29,7 +29,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/cancel_record_configuration.dart';
+import '../../models/config_models/chat_view/message_input/image_picker_icons_configuration.dart';
+import '../../models/config_models/chat_view/message_input/send_message_configuration.dart';
+import '../../models/config_models/chat_view/message_input/text_field_configuration.dart';
+import '../../models/config_models/chat_view/message_input/voice_recording_configuration.dart';
 import '../../utils/constants/constants.dart';
 import '../../utils/debounce.dart';
 import '../../utils/package_strings.dart';
@@ -116,8 +120,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     // onChanged is not called when text is set programmatically.
     widget.textEditingController.addListener(_listenTextEditingController);
     debouncer = Debouncer(
-        sendMessageConfig.textFieldConfig?.compositionThresholdTime ??
-            const Duration(seconds: 1));
+      sendMessageConfig.textFieldConfig?.compositionThresholdTime ??
+          const Duration(seconds: 1),
+    );
     super.initState();
 
     if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
@@ -164,9 +169,11 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       }
 
       final pressedKeys = HardwareKeyboard.instance.logicalKeysPressed;
-      final isShiftPressed = pressedKeys.any((key) =>
-          key == LogicalKeyboardKey.shiftLeft ||
-          key == LogicalKeyboardKey.shiftRight);
+      final isShiftPressed = pressedKeys.any(
+        (key) =>
+            key == LogicalKeyboardKey.shiftLeft ||
+            key == LogicalKeyboardKey.shiftRight,
+      );
       if (!isShiftPressed) {
         // Send message on Enter
         final text = widget.textEditingController.text;
@@ -459,7 +466,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
             IconButton(
               onPressed: () {
                 cancelRecordConfiguration?.onCancel?.call();
-                _cancelRecording();
+                unawaited(_cancelRecording());
               },
               icon: cancelRecordConfiguration?.icon ??
                   const Icon(Icons.cancel_outlined),
@@ -476,7 +483,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     widget.onPressed();
   }
 
-  FutureOr<void> _cancelRecording() async {
+  Future<void> _cancelRecording() async {
     assert(
       defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.android,
@@ -507,7 +514,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       if (chatListConfig
               .messageConfig?.voiceMessageConfig?.playerMode.isSingle ??
           false) {
-        playerController.pauseAllPlayers();
+        await playerController.pauseAllPlayers();
       }
       await controller?.record(
         recorderSettings: voiceRecordingConfig.recorderSettings,
@@ -527,11 +534,14 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   }
 
   void _onChanged(String inputText) {
-    debouncer.run(onComplete: () {
-      composingStatus.value = TypeWriterStatus.typed;
-    }, onInterrupt: () {
-      composingStatus.value = TypeWriterStatus.typing;
-    });
+    debouncer.run(
+      onComplete: () {
+        composingStatus.value = TypeWriterStatus.typed;
+      },
+      onInterrupt: () {
+        composingStatus.value = TypeWriterStatus.typing;
+      },
+    );
     _isTextNotEmptyNotifier.value = inputText.trim().isNotEmpty;
   }
 }

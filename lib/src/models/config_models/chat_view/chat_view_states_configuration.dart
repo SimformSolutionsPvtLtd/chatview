@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-import '../base/state_config_base.dart';
 import '../base/chat_view_state_widget_config.dart';
+import '../base/state_config_base.dart';
 
 final class ChatViewStateConfiguration extends StateConfigBase {
   const ChatViewStateConfiguration({

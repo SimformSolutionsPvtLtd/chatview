@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-import 'package:chatview/src/widgets/message_types/image/adaptive_image.dart';
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -31,13 +30,14 @@ import '../../../models/config_models/chat_view/reactions/message_reaction_confi
 import '../../../utils/constants/constants.dart';
 import '../../message_status/in_bubble_time_and_receipt.dart';
 import '../../reactions/reaction_widget.dart';
+import 'adaptive_image.dart';
 import '../../chat_bubble/share_icon.dart';
 
 class ImageMessageView extends StatelessWidget {
   const ImageMessageView({
-    super.key,
     required this.message,
     required this.isMessageBySender,
+    super.key,
     this.imageMessageConfig,
     this.messageReactionConfig,
     this.inComingChatBubbleConfig,
@@ -146,9 +146,7 @@ class ImageMessageView extends StatelessWidget {
         Stack(
           children: [
             GestureDetector(
-              onTap: () => imageMessageConfig?.onTap != null
-                  ? imageMessageConfig?.onTap!(message)
-                  : null,
+              onTap: () => imageMessageConfig?.onTap?.call(message),
               child: Transform.scale(
                 scale: highlightImage ? highlightScale : 1.0,
                 alignment: isMessageBySender

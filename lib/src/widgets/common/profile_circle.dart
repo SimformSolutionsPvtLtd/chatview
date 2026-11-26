@@ -27,8 +27,8 @@ import 'profile_image_widget.dart';
 
 class ProfileCircle extends StatelessWidget {
   const ProfileCircle({
-    super.key,
     required this.bottomPadding,
+    super.key,
     this.imageUrl,
     this.profileCirclePadding,
     this.circleRadius,
@@ -81,7 +81,7 @@ class ProfileCircle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: profileCirclePadding ??
-          EdgeInsets.only(left: 6.0, right: 4, bottom: bottomPadding),
+          EdgeInsets.only(left: 6, right: 4, bottom: bottomPadding),
       child: InkWell(
         onLongPress: onLongPress,
         onTap: onTap,

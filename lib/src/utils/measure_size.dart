@@ -26,9 +26,9 @@ import 'package:flutter/material.dart';
 /// It also gives update when size changes.
 class MeasureSize extends StatefulWidget {
   const MeasureSize({
-    super.key,
     required this.onSizeChange,
     required this.child,
+    super.key,
   });
   final Widget? child;
   final ValueSetter<bool> onSizeChange;
@@ -51,18 +51,19 @@ class _MeasureSizeState extends State<MeasureSize> {
   Size? oldSize;
 
   void postFrameCallback(Duration timestamp) {
-    var currentContext = widgetKey.currentContext;
+    final currentContext = widgetKey.currentContext;
     if (currentContext == null) return;
 
-    var newSize = currentContext.size;
+    final newSize = currentContext.size;
     if (oldSize == newSize) return;
     oldSize = newSize;
-    RenderBox? box = widgetKey.currentContext?.findRenderObject() as RenderBox?;
-    Offset position = box!.localToGlobal(Offset.zero);
+    final box = widgetKey.currentContext?.findRenderObject() as RenderBox?;
+    final position = box!.localToGlobal(Offset.zero);
 
     /// Below logic checks that end position of widget greater than or less than
     /// to device width
     widget.onSizeChange(
-        (position.dx + newSize!.width) >= MediaQuery.of(context).size.width);
+      (position.dx + newSize!.width) >= MediaQuery.of(context).size.width,
+    );
   }
 }

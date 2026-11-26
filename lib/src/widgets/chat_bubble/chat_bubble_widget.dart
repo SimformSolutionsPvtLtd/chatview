@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -29,13 +30,13 @@ import '../../utils/constants/constants.dart';
 import '../../utils/package_strings.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
-import 'chat_bubble_with_status.dart';
+import '../common/profile_circle.dart';
 import '../message_status/message_status_indicator.dart';
 import '../message_status/message_time_widget.dart';
-import '../message/message_view.dart';
-import '../common/profile_circle.dart';
 import '../reply/reply_message_widget.dart';
 import '../reply/swipe_to_reply.dart';
+import 'chat_bubble_with_status.dart';
+import '../message/message_view.dart';
 
 class ChatBubbleWidget extends StatefulWidget {
   const ChatBubbleWidget({
@@ -110,11 +111,11 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
 
     // showTimeInChatBubble and enableSwipeToSeeTime are mutually exclusive
     // (enforced by FeatureActiveConfig's assert). Only one can ever be true.
-    final bool showTimeInChatBubble =
+    final showTimeInChatBubble =
         featureActiveConfig?.showTimeInChatBubble ?? false;
 
     // Use swipe-to-see-time only when in-bubble timestamps are not active.
-    final bool useSwipeToSeeTime = !showTimeInChatBubble &&
+    final useSwipeToSeeTime = !showTimeInChatBubble &&
         (featureActiveConfig?.enableSwipeToSeeTime ?? true);
 
     if (useSwipeToSeeTime && widget.slideAnimation != null) {
@@ -154,15 +155,16 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
     final avatarRadius = profileCircleConfig?.circleRadius ?? 16;
     final resolvedAvatarPadding = (profileCircleConfig?.padding ??
             const EdgeInsets.only(
-                left: avatarDefaultPaddingLeft,
-                right: avatarDefaultPaddingRight))
+              left: avatarDefaultPaddingLeft,
+              right: avatarDefaultPaddingRight,
+            ))
         .resolve(Directionality.of(context));
     final avatarSpacerWidth = avatarRadius * 2 +
         resolvedAvatarPadding.left +
         resolvedAvatarPadding.right;
 
     return Container(
-      padding: chatBubbleConfig?.padding ?? const EdgeInsets.only(left: 5.0),
+      padding: chatBubbleConfig?.padding ?? const EdgeInsets.only(left: 5),
       margin: chatBubbleConfig?.margin ??
           EdgeInsets.only(
             bottom: (featureActiveConfig?.enableMessageGrouping ?? true) &&
@@ -221,10 +223,10 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
       widget.message.voiceMessageDuration =
           Duration(milliseconds: maxDuration!);
     }
-    if (chatListConfig.swipeToReplyConfig?.onRightSwipe != null) {
-      chatListConfig.swipeToReplyConfig?.onRightSwipe!(
-          widget.message.message, widget.message.sentBy);
-    }
+    chatListConfig.swipeToReplyConfig?.onRightSwipe?.call(
+      widget.message.message,
+      widget.message.sentBy,
+    );
     widget.onSwipe(widget.message);
   }
 
@@ -233,10 +235,10 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
       widget.message.voiceMessageDuration =
           Duration(milliseconds: maxDuration!);
     }
-    if (chatListConfig.swipeToReplyConfig?.onLeftSwipe != null) {
-      chatListConfig.swipeToReplyConfig?.onLeftSwipe!(
-          widget.message.message, widget.message.sentBy);
-    }
+    chatListConfig.swipeToReplyConfig?.onLeftSwipe?.call(
+      widget.message.message,
+      widget.message.sentBy,
+    );
     widget.onSwipe(widget.message);
   }
 

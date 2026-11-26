@@ -25,9 +25,9 @@ import '../../extensions/extensions.dart';
 
 class MessageTimeWidget extends StatelessWidget {
   const MessageTimeWidget({
-    super.key,
     required this.messageTime,
     required this.isCurrentUser,
+    super.key,
   });
 
   /// Provides message crated date time.

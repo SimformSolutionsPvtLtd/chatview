@@ -25,9 +25,9 @@ import '../../models/config_models/chat_view/message/image_message_configuration
 
 class ShareIcon extends StatelessWidget {
   const ShareIcon({
+    required this.imageUrl,
     super.key,
     this.shareIconConfig,
-    required this.imageUrl,
   });
 
   /// Provides configuration of share icon which is showed in image preview.
@@ -39,10 +39,8 @@ class ShareIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => shareIconConfig?.onPressed != null
-          ? shareIconConfig?.onPressed!(imageUrl)
-          : null,
-      padding: shareIconConfig?.margin ?? const EdgeInsets.all(8.0),
+      onPressed: () => shareIconConfig?.onPressed?.call(imageUrl),
+      padding: shareIconConfig?.margin ?? const EdgeInsets.all(8),
       icon: shareIconConfig?.icon ??
           Container(
             alignment: Alignment.center,

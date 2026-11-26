@@ -81,7 +81,7 @@ class ImageMessageConfiguration {
   final BoxFit fit;
 
   /// Builds a custom widget shown when an image fails to load, with access to
-  /// the failing [imageUrl] and the [error]. Replaces the default broken-image
+  /// the failing `imageUrl` and the `error`. Replaces the default broken-image
   /// placeholder when set.
   final ImageMessageErrorWidgetBuilder? errorBuilder;
 }

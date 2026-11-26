@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Fix**: :bug: Fix the message list: scroll notifications bubble up to the host, the pagination loader no longer needs a `Scaffold`, the footer stays mounted when the newest message is deleted, and an Android back swipe no longer reveals the message time.
+* **Perf**: :zap: The message list sorts messages and finds date separators once per stream event, keys items by message id, shows messages on the first frame, and opening the reaction pop-up or typing no longer rebuilds the list. Swipe-to-see-time moves into its own `SwipeToSeeTime` widget.
 * **Fix**: :bug: An image message without `onTap` now lets the tap reach the message list like a text message, and the reaction chip on a custom message hangs below it without being clipped.
 * **Perf**: :zap: A message bubble now rebuilds only the part that changed. Text, link, image, voice, emoji and custom messages cache their parsed URLs, link spans and config instead of rebuilding them on every frame.
 * **Perf**: :zap: The reaction pop-up, reaction chips, swipe-to-reply and the reply preview rebuild far less per frame. The pop-up background is built once, the reply bar is drawn with a border, and received reaction chips skip size measuring.

@@ -29,14 +29,15 @@ import 'package:flutter/material.dart';
 import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/feature_active_config.dart';
 import '../../models/config_models/chat_view/message/message_list_configuration.dart';
-import '../../models/config_models/chat_view/message_input/text_field_configuration.dart';
-import '../../utils/constants/constants.dart';
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../chat_bubble/chat_bubble_widget.dart';
 import 'chat_group_header.dart';
 import 'end_message_footer.dart';
+import 'message_rebuild_gate.dart';
+import 'message_timeline_adapter.dart';
 import 'pagination_loader.dart';
+import 'swipe_to_see_time.dart';
 
 class ChatGroupedListWidget extends StatefulWidget {
   const ChatGroupedListWidget({
@@ -47,14 +48,17 @@ class ChatGroupedListWidget extends StatefulWidget {
     required this.onChatBubbleLongPress,
     required this.isEnableSwipeToSeeTime,
     super.key,
-    this.textFieldConfig,
     this.loadMoreData,
     this.isLastPage,
     this.loadingWidget,
   });
 
-  /// Allow user to swipe to see time while reaction pop is not open.
-  final bool showPopUp;
+  /// True while the reaction popup is open. The list then stops scrolling
+  /// and swipe-to-see-time is ignored.
+  ///
+  /// A listenable, not a bool, so opening the popup rebuilds only the scroll
+  /// physics, not the list and its bubbles.
+  final ValueListenable<bool> showPopUp;
 
   /// Pass scroll controller
   final ScrollController scrollController;
@@ -72,9 +76,6 @@ class ChatGroupedListWidget extends StatefulWidget {
   /// swipe whole chat.
   final bool isEnableSwipeToSeeTime;
 
-  /// Provides configuration for text field.
-  final TextFieldConfiguration? textFieldConfig;
-
   /// Provides callback when user actions reaches to top and needs to load more
   /// chat
   final PaginationCallback? loadMoreData;
@@ -89,60 +90,43 @@ class ChatGroupedListWidget extends StatefulWidget {
   State<ChatGroupedListWidget> createState() => _ChatGroupedListWidgetState();
 }
 
-class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
-    with TickerProviderStateMixin {
+class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget> {
   final ValueNotifier<bool> _isNextPageLoading = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isPrevPageLoading = ValueNotifier<bool>(false);
-
-  bool get showPopUp => widget.showPopUp;
 
   bool highlightMessage = false;
   final ValueNotifier<String?> _replyId = ValueNotifier(null);
   final ValueNotifier<UniqueKey> _listKey = ValueNotifier(UniqueKey());
 
-  AnimationController? _animationController;
-  Animation<Offset>? _slideAnimation;
-
   FeatureActiveConfig? featureActiveConfig;
 
   ChatController? chatController;
-
-  bool get isEnableSwipeToSeeTime => widget.isEnableSwipeToSeeTime;
 
   ChatBackgroundConfiguration get chatBackgroundConfig =>
       chatListConfig.chatBackgroundConfig;
 
   final Map<String, GlobalKey> _messageKeys = {};
 
+  /// The messages currently shown. Read by callbacks of bubbles that are not
+  /// rebuilt on every event, so they never see an older list.
+  List<Message> _messages = const [];
+
+  /// Where the list gets its [MessageTimeline]s from. Created again only when
+  /// the controller or a setting that affects sorting or separators changes.
+  MessageTimelineAdapter? _timelineAdapter;
+
+  static int _newestFirst(Message a, Message b) =>
+      b.createdAt.compareTo(a.createdAt);
+
+  /// The timeline to show right after [_timelineAdapter] changed, because a new
+  /// subscription would otherwise show the loader until the next event.
+  MessageTimeline? _initialTimeline;
+
   bool get isPaginationEnabled =>
       featureActiveConfig?.enablePagination ?? false;
 
   ValueListenable<bool>? get typingIndicatorNotifier =>
       chatController?.typingIndicatorNotifier;
-
-  /// Creates the swipe-to-see-time animation, once, and only if the feature
-  /// is enabled.
-  ///
-  /// The controller (0 to 1) tracks the drag. [_slideAnimation] maps it to an
-  /// offset from 0 to `-timeRevealDistance` (left). Bubbles listen to
-  /// [_slideAnimation] directly, so dragging never rebuilds the list.
-  ///
-  /// Example: with a [timeRevealDistance] of 120, a 30px drag sets the
-  /// controller to 0.25 and the offset to `Offset(-30, 0)`.
-  void _initializeAnimation() {
-    if (!isEnableSwipeToSeeTime || _animationController != null) return;
-    _animationController = AnimationController(
-      vsync: this,
-      duration: timeRevealSnapBackDuration,
-    );
-    // No curve, so messages follow the finger 1:1. A curve such as
-    // Curves.decelerate would move them 90px after a 60px drag.
-    // The curve is applied only on release, in onHorizontalDragEnd.
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(-timeRevealDistance, 0),
-    ).animate(_animationController!);
-  }
 
   @override
   void didChangeDependencies() {
@@ -152,25 +136,269 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       chatController = chatViewIW!.chatController
         ..registerListViewReset(() => _listKey.value = UniqueKey());
     }
-    _initializeAnimation();
+    _syncTimelineAdapter();
+  }
+
+  /// Creates [_timelineAdapter], again when the controller or a setting that
+  /// affects sorting or separators changes.
+  ///
+  /// The settings are read here, once, so handling a stream event never reads
+  /// the context.
+  void _syncTimelineAdapter() {
+    final controller = chatController;
+    if (controller == null) return;
+
+    final config = chatBackgroundConfig;
+    final adapter = MessageTimelineAdapter(
+      controller: controller,
+      sortEnable: config.sortEnable,
+      sorter: config.messageSorter ?? _newestFirst,
+      order: config.groupedListOrder,
+      enableSeparator: featureActiveConfig?.enableChatSeparator ?? false,
+    );
+    if (adapter == _timelineAdapter) return;
+
+    // Show the current messages right away, so the first frame already has
+    // the bubbles. Only the first call with no messages keeps the loader until
+    // the first stream event, like a host that shows `hasMessages` while it is
+    // still fetching.
+    final current = adapter.current;
+    final isFirstCall = _timelineAdapter == null;
+    _initialTimeline = isFirstCall && current.messages.isEmpty ? null : current;
+    _timelineAdapter = adapter;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate:
-          isEnableSwipeToSeeTime && !showPopUp ? _onHorizontalDrag : null,
-      onHorizontalDragEnd: isEnableSwipeToSeeTime && !showPopUp
-          ? (_) => unawaited(
-                _animationController?.animateBack(
-                  0,
-                  duration: timeRevealSnapBackDuration,
-                  curve: chatBackgroundConfig.messageTimeAnimationCurve,
-                ),
-              )
-          : null,
+    return SwipeToSeeTime(
+      enable: widget.isEnableSwipeToSeeTime,
+      isPaused: widget.showPopUp,
       onTap: widget.onChatListTap,
-      child: _chatStreamBuilder,
+      snapBackCurve: chatBackgroundConfig.messageTimeAnimationCurve,
+      builder: (context, slideAnimation) => StreamBuilder<MessageTimeline>(
+        // A new adapter gets a fresh builder, so no stale snapshot is shown.
+        key: ObjectKey(_timelineAdapter),
+        stream: _timelineAdapter?.stream,
+        initialData: _initialTimeline,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: chatBackgroundConfig.loadingWidget ??
+                  const CircularProgressIndicator.adaptive(),
+            );
+          } else {
+            final enableSeparator =
+                featureActiveConfig?.enableChatSeparator ?? false;
+            final timeline = snapshot.data!;
+            final messages = _messages = timeline.messages;
+            final messageSeparator = timeline.separators;
+            final separatorCounts = timeline.separatorCounts;
+
+            final messageLength = messages.length;
+
+            final itemCount = enableSeparator
+                ? messageLength + messageSeparator.length
+                : messageLength;
+
+            return NotificationListener<ScrollUpdateNotification>(
+              onNotification: (notification) => _onScrollUpdateNotification(
+                notification,
+                messages,
+              ),
+              child: ListenableBuilder(
+                // Not chatTextFieldHeight: a height change only moves the
+                // bottom spacer below, it must not rebuild every bubble.
+                listenable: Listenable.merge([_listKey, _isPrevPageLoading]),
+                builder: (context, child) {
+                  // Whether to reserve an extra slot at the top (the list is
+                  // reversed) for the previous-page loader.
+                  final showPrevPageLoader = _isPrevPageLoading.value;
+
+                  // Derive the effective count without mutating [itemCount].
+                  // Using `++itemCount` here would permanently inflate the
+                  // captured [itemCount] every time this builder re-runs while
+                  // [_isPrevPageLoading] is true (e.g. when the text field
+                  // height changes during a load), eventually producing
+                  // out-of-range indices.
+                  final effectiveItemCount =
+                      showPrevPageLoader ? itemCount + 1 : itemCount;
+
+                  final listView = CustomScrollView(
+                    key: _listKey.value,
+                    controller: widget.scrollController,
+                    reverse: true,
+                    slivers: [
+                      // Bottom space so the list sits above the message text
+                      // field. The list is reversed, so the first sliver is the
+                      // bottom one. Own listener: a height change (reply bar,
+                      // multi-line input) resizes only this box.
+                      if (chatViewIW case final iw?)
+                        ValueListenableBuilder<double>(
+                          valueListenable: iw.chatTextFieldHeight,
+                          builder: (_, height, __) => SliverPadding(
+                            padding: EdgeInsets.only(bottom: height),
+                          ),
+                        ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: effectiveItemCount,
+                          findChildIndexCallback: (key) {
+                            if (key is! ValueKey) return null;
+                            final index = timeline.itemIndexes[key.value];
+                            // Slot 0 is the keep-alive footer. Moving a bubble
+                            // there would push the footer's element out and
+                            // remount it, so that bubble is rebuilt instead.
+                            return index == 0 ? null : index;
+                          },
+                          (context, index) {
+                            // Since the list is reversed, check if it's the last item
+                            // to display the loading widget at top.
+                            if (showPrevPageLoader &&
+                                index == effectiveItemCount - 1) {
+                              return PaginationLoader(
+                                key: const ValueKey(MessageListItem.loader),
+                                listenable: _isPrevPageLoading,
+                                loader: widget.loadingWidget,
+                              );
+                            }
+
+                            /// Check [messageSeparator] contains group separator for [index]
+                            if (enableSeparator &&
+                                messageSeparator.containsKey(index)) {
+                              final separator = messageSeparator[index]!;
+                              return KeyedSubtree(
+                                key: ValueKey<DateTime>(separator),
+                                child: chatBackgroundConfig
+                                        .groupSeparatorBuilder
+                                        ?.call(separator.toString()) ??
+                                    ChatGroupHeader(
+                                      day: separator,
+                                      groupSeparatorConfig: chatBackgroundConfig
+                                          .defaultGroupSeparatorConfig,
+                                    ),
+                              );
+                            }
+
+                            /// By removing separators encountered till now from the [index]
+                            /// so that we'll get actual index to display message in chat
+                            final newIndex =
+                                index - (separatorCounts[index] ?? 0);
+                            final message = messages[newIndex];
+
+                            final enableScrollToRepliedMsg = chatListConfig
+                                    .repliedMessageConfig
+                                    ?.repliedMsgAutoScrollConfig
+                                    .enableScrollToRepliedMsg ??
+                                false;
+                            // ListView is reversed: index 0 = newest (bottom).
+                            // isLastInGroup  → avatar shown (newest in group, visually bottom).
+                            // isFirstInGroup → name shown  (oldest in group, visually top).
+                            //
+                            // Edited messages show an "Edited" label ABOVE the bubble,
+                            // creating a visual break only on the top side. So:
+                            //  • isFirstInGroup=true when THIS message is edited
+                            //    (Edited label above → detach from older message above).
+                            //  • isLastInGroup=true when the NEWER/below neighbor is
+                            //    edited (that neighbor's Edited label visually separates
+                            //    it from the current message below).
+                            // The connection below the edited message is preserved so
+                            // messages sent after it stay grouped with it.
+                            final prevMessage =
+                                newIndex > 0 ? messages[newIndex - 1] : null;
+                            final isLastInGroup = newIndex == 0 ||
+                                !_isSameGroup(
+                                  message,
+                                  messages[newIndex - 1],
+                                ) ||
+                                (prevMessage?.updatedAt != null);
+                            final isFirstInGroup =
+                                newIndex == messages.length - 1 ||
+                                    !_isSameGroup(
+                                      message,
+                                      messages[newIndex + 1],
+                                    ) ||
+                                    message.updatedAt != null;
+
+                            // Key on the id (not on the position) so the list
+                            // can find the bubble again after items move.
+                            final messageChild = MessageRebuildGate(
+                              key: ValueKey<String>(message.id),
+                              signature: MessageSignature(
+                                message: message,
+                                slideAnimation: slideAnimation,
+                                isFirstInGroup: isFirstInGroup,
+                                isLastInGroup: isLastInGroup,
+                                enableScrollToRepliedMsg:
+                                    enableScrollToRepliedMsg,
+                              ),
+                              builder: () => ValueListenableBuilder<String?>(
+                                valueListenable: _replyId,
+                                builder: (_, highlightedId, __) =>
+                                    ChatBubbleWidget(
+                                  key: _messageKeys[message.id] ??= GlobalKey(),
+                                  message: message,
+                                  slideAnimation: slideAnimation,
+                                  onLongPress: (yCoordinate, xCoordinate) =>
+                                      widget.onChatBubbleLongPress(
+                                    yCoordinate,
+                                    xCoordinate,
+                                    message,
+                                  ),
+                                  onSwipe: widget.assignReplyMessage,
+                                  shouldHighlight: highlightedId == message.id,
+                                  onReplyTap: enableScrollToRepliedMsg
+                                      ? (id) => _onReplyTap(id, _messages)
+                                      : null,
+                                  isFirstInGroup: isFirstInGroup,
+                                  isLastInGroup: isLastInGroup,
+                                ),
+                              ),
+                            );
+
+                            return index != 0
+                                ? messageChild
+                                // Since the list is reversed, we need to check if
+                                // we are at the first item to display the typing indicator
+                                // , suggestions and loading widget.
+                                : EndMessageFooter(
+                                    key: const ValueKey(MessageListItem.footer),
+                                    loadingWidget: widget.loadingWidget,
+                                    isNextPageLoading: _isNextPageLoading,
+                                    typingIndicatorNotifier:
+                                        typingIndicatorNotifier,
+                                    child: messageChild,
+                                  );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+
+                  // Stops scrolling while the reaction popup is open. The
+                  // physics come from a ScrollConfiguration so a toggle only
+                  // updates the Scrollable; `listView` (and every bubble) is
+                  // not rebuilt.
+                  return ValueListenableBuilder<bool>(
+                    valueListenable: widget.showPopUp,
+                    child: listView,
+                    // Always wrapped, so the tree keeps its shape and the
+                    // list is not remounted on a toggle.
+                    builder: (context, showPopUp, listView) =>
+                        ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        physics: showPopUp
+                            ? const NeverScrollableScrollPhysics()
+                            : null,
+                      ),
+                      child: listView!,
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -276,277 +504,12 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
     }
   }
 
-  /// Moves the messages with the finger.
-  ///
-  /// Each update adds the finger's movement since the last update (`delta`) to
-  /// the controller, so the messages follow the finger exactly.
-  ///
-  /// A leftward drag reveals the time, a rightward drag hides it.
-  void _onHorizontalDrag(DragUpdateDetails details) {
-    if (_animationController case final controller?) {
-      controller.value -= details.delta.dx / timeRevealDistance;
-    }
-  }
-
   @override
   void dispose() {
-    _animationController?.dispose();
     _replyId.dispose();
     _isNextPageLoading.dispose();
     _isPrevPageLoading.dispose();
     super.dispose();
-  }
-
-  Widget get _chatStreamBuilder {
-    var lastMatchedDate = DateTime.now();
-    return StreamBuilder<List<Message>>(
-      stream: chatController?.messageStreamController.stream,
-      builder: (context, snapshot) {
-        if (!snapshot.connectionState.isActive) {
-          return Center(
-            child: chatBackgroundConfig.loadingWidget ??
-                const CircularProgressIndicator.adaptive(),
-          );
-        } else {
-          final data = snapshot.data!;
-          final messages = chatBackgroundConfig.sortEnable
-              ? sortMessage(data)
-              : data.reversed.toList();
-
-          final enableSeparator =
-              featureActiveConfig?.enableChatSeparator ?? false;
-
-          var messageSeparator = <int, DateTime>{};
-          var separatorCounts = <int, int>{};
-
-          if (enableSeparator && messages.isNotEmpty) {
-            /// Get separator when date differ for two messages
-            (messageSeparator, lastMatchedDate, separatorCounts) =
-                _getMessageSeparator(messages, lastMatchedDate);
-          } else {
-            _initMessageKeys(messages);
-          }
-
-          final messageLength = messages.length;
-
-          final itemCount = enableSeparator
-              ? messageLength + messageSeparator.length
-              : messageLength;
-
-          return NotificationListener<ScrollUpdateNotification>(
-            onNotification: (notification) => _onScrollUpdateNotification(
-              notification,
-              messages,
-            ),
-            child: ListenableBuilder(
-              listenable: Listenable.merge([
-                _listKey,
-                chatViewIW?.chatTextFieldHeight,
-                _isNextPageLoading,
-                _isPrevPageLoading,
-              ]),
-              builder: (context, child) {
-                // Whether to reserve an extra slot at the top (the list is
-                // reversed) for the previous-page loader.
-                final showPrevPageLoader = _isPrevPageLoading.value;
-
-                // Derive the effective count without mutating [itemCount].
-                // Using `++itemCount` here would permanently inflate the
-                // captured [itemCount] every time this builder re-runs while
-                // [_isPrevPageLoading] is true (e.g. when the text field
-                // height changes during a load), eventually producing
-                // out-of-range indices.
-                final effectiveItemCount =
-                    showPrevPageLoader ? itemCount + 1 : itemCount;
-
-                return ListView.builder(
-                  key: _listKey.value,
-                  controller: widget.scrollController,
-                  // When reaction popup is being appeared at that user should
-                  // not scroll.
-                  physics:
-                      showPopUp ? const NeverScrollableScrollPhysics() : null,
-                  padding: EdgeInsets.only(
-                    // Adds bottom space to the message list, ensuring it is
-                    // displayed above the message text field.
-                    bottom: chatViewIW?.chatTextFieldHeight.value ?? 0,
-                  ),
-                  reverse: true,
-                  itemCount: effectiveItemCount,
-                  itemBuilder: (context, index) {
-                    // Since the list is reversed, check if it's the last item
-                    // to display the loading widget at top.
-                    if (showPrevPageLoader && index == effectiveItemCount - 1) {
-                      return PaginationLoader(
-                        listenable: _isPrevPageLoading,
-                        loader: widget.loadingWidget,
-                      );
-                    }
-
-                    /// Check [messageSeparator] contains group separator for [index]
-                    if (enableSeparator &&
-                        messageSeparator.containsKey(index)) {
-                      final separator = messageSeparator[index]!;
-                      return chatBackgroundConfig.groupSeparatorBuilder
-                              ?.call(separator.toString()) ??
-                          ChatGroupHeader(
-                            day: separator,
-                            groupSeparatorConfig: chatBackgroundConfig
-                                .defaultGroupSeparatorConfig,
-                          );
-                    }
-
-                    /// By removing separators encountered till now from the [index]
-                    /// so that we'll get actual index to display message in chat
-                    final newIndex = index - (separatorCounts[index] ?? 0);
-
-                    final messageChild = ValueListenableBuilder<String?>(
-                      valueListenable: _replyId,
-                      builder: (context, state, child) {
-                        final message = messages[newIndex];
-                        final messageKey =
-                            _messageKeys[message.id] ??= GlobalKey();
-                        final enableScrollToRepliedMsg = chatListConfig
-                                .repliedMessageConfig
-                                ?.repliedMsgAutoScrollConfig
-                                .enableScrollToRepliedMsg ??
-                            false;
-                        // ListView is reversed: index 0 = newest (bottom).
-                        // isLastInGroup  → avatar shown (newest in group, visually bottom).
-                        // isFirstInGroup → name shown  (oldest in group, visually top).
-                        //
-                        // Edited messages show an "Edited" label ABOVE the bubble,
-                        // creating a visual break only on the top side. So:
-                        //  • isFirstInGroup=true when THIS message is edited
-                        //    (Edited label above → detach from older message above).
-                        //  • isLastInGroup=true when the NEWER/below neighbor is
-                        //    edited (that neighbor's Edited label visually separates
-                        //    it from the current message below).
-                        // The connection below the edited message is preserved so
-                        // messages sent after it stay grouped with it.
-                        final prevMessage =
-                            newIndex > 0 ? messages[newIndex - 1] : null;
-                        final isLastInGroup = newIndex == 0 ||
-                            !_isSameGroup(message, messages[newIndex - 1]) ||
-                            (prevMessage?.updatedAt != null);
-                        final isFirstInGroup = newIndex ==
-                                messages.length - 1 ||
-                            !_isSameGroup(message, messages[newIndex + 1]) ||
-                            message.updatedAt != null;
-                        return ChatBubbleWidget(
-                          key: messageKey,
-                          message: message,
-                          slideAnimation: _slideAnimation,
-                          onLongPress: (yCoordinate, xCoordinate) =>
-                              widget.onChatBubbleLongPress(
-                            yCoordinate,
-                            xCoordinate,
-                            message,
-                          ),
-                          onSwipe: widget.assignReplyMessage,
-                          shouldHighlight: state == message.id,
-                          onReplyTap: enableScrollToRepliedMsg
-                              ? (id) => _onReplyTap(id, messages)
-                              : null,
-                          isFirstInGroup: isFirstInGroup,
-                          isLastInGroup: isLastInGroup,
-                        );
-                      },
-                    );
-
-                    return index != 0
-                        ? messageChild
-                        // Since the list is reversed, we need to check if
-                        // we are at the first item to display the typing indicator
-                        // , suggestions and loading widget.
-                        : EndMessageFooter(
-                            loadingWidget: widget.loadingWidget,
-                            isNextPageLoading: _isNextPageLoading,
-                            typingIndicatorNotifier: typingIndicatorNotifier,
-                            child: messageChild,
-                          );
-                  },
-                );
-              },
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  List<Message> sortMessage(List<Message> messages) {
-    final elements = messages.toList()
-      ..sort(
-        chatBackgroundConfig.messageSorter ??
-            (a, b) => b.createdAt.compareTo(a.createdAt),
-      );
-    // [elements] is already a fresh copy, so it can be returned directly for
-    // the ascending case instead of allocating another list.
-    return chatBackgroundConfig.groupedListOrder.isAsc
-        ? elements
-        : elements.reversed.toList();
-  }
-
-  /// return DateTime by checking lastMatchedDate and message created DateTime
-  DateTime _groupBy(
-    Message message,
-    DateTime lastMatchedDate,
-  ) {
-    // If the conversation is ongoing on the same date,
-    // return the same date [lastMatchedDate].
-
-    // When the conversation starts on a new date,
-    // we are returning new date [message.createdAt].
-    return lastMatchedDate.getDateFromDateTime ==
-            message.createdAt.getDateFromDateTime
-        ? lastMatchedDate
-        : message.createdAt;
-  }
-
-  GetMessageSeparatorWithCounts _getMessageSeparator(
-    List<Message> messages,
-    DateTime lastDate,
-  ) {
-    var counter = 0;
-    var lastMatchedDate = lastDate;
-    final messageSeparator = <int, DateTime>{};
-
-    // Build separator counts as we build the separator map
-    final separatorCounts = <int, int>{
-      0: 0, // Initial count since the loop starts from index 1
-    };
-
-    _messageKeys.putIfAbsent(messages.first.id, GlobalKey.new);
-
-    // Build separator map and update counts in the same loop
-    for (var i = 1; i < messages.length; i++) {
-      final message = messages[i];
-      _messageKeys.putIfAbsent(message.id, GlobalKey.new);
-      lastMatchedDate = _groupBy(
-        message,
-        lastMatchedDate,
-      );
-      final previousDate = _groupBy(
-        messages[i - 1],
-        lastMatchedDate,
-      );
-
-      if (previousDate == lastMatchedDate) {
-        separatorCounts[i + counter] = counter;
-      } else {
-        // Group separator when previous message and current message time differ
-        final separatorIndex = i + counter++;
-        separatorCounts[separatorIndex + 1] = counter;
-        messageSeparator[separatorIndex] = previousDate;
-      }
-    }
-
-    final separatorIndex = messages.length + counter;
-    separatorCounts[separatorIndex + 1] = counter;
-    messageSeparator[separatorIndex] = lastMatchedDate;
-
-    return (messageSeparator, lastMatchedDate, separatorCounts);
   }
 
   bool _isSameGroup(Message a, Message b) {
@@ -556,19 +519,13 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
         a.createdAt.difference(b.createdAt).inMinutes.abs() < threshold;
   }
 
-  void _initMessageKeys(List<Message> messages) {
-    final messagesLength = messages.length;
-    for (var i = 0; i < messagesLength; i++) {
-      final message = messages[i];
-      _messageKeys.putIfAbsent(message.id, GlobalKey.new);
-    }
-  }
-
   bool _onScrollUpdateNotification(
     ScrollUpdateNotification notification,
     List<Message> messages,
   ) {
-    if (!isPaginationEnabled) return true;
+    // Always false: true would stop the notification here and starve any
+    // NotificationListener the host app has above the ChatView.
+    if (!isPaginationEnabled) return false;
 
     final metrics = notification.metrics;
 
@@ -589,10 +546,10 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
       );
     }
 
-    if (result.direction == null || result.message == null) return true;
+    if (result.direction == null || result.message == null) return false;
 
     _pagination(direction: result.direction!, message: result.message!);
-    return true;
+    return false;
   }
 
   void _pagination({
@@ -608,17 +565,19 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget>
         if (_isPrevPageLoading.value) return;
         _isPrevPageLoading.value = true;
         unawaited(
-          widget.loadMoreData
-              ?.call(direction, message)
-              .whenComplete(() => _isPrevPageLoading.value = false),
+          widget.loadMoreData?.call(direction, message).whenComplete(() {
+            // The chat may be closed before the page finishes loading.
+            if (mounted) _isPrevPageLoading.value = false;
+          }),
         );
       case ChatPaginationDirection.next:
         if (_isNextPageLoading.value) return;
         _isNextPageLoading.value = true;
         unawaited(
-          widget.loadMoreData
-              ?.call(direction, message)
-              .whenComplete(() => _isNextPageLoading.value = false),
+          widget.loadMoreData?.call(direction, message).whenComplete(() {
+            // The chat may be closed before the page finishes loading.
+            if (mounted) _isNextPageLoading.value = false;
+          }),
         );
     }
   }

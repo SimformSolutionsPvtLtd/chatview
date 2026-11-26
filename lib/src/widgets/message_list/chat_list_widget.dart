@@ -39,7 +39,6 @@ class ChatListWidget extends StatefulWidget {
     this.loadMoreData,
     this.isLastPage,
     this.onChatListTap,
-    this.textFieldConfig,
   });
 
   /// Provides controller for accessing few function for running chat.
@@ -64,9 +63,6 @@ class ChatListWidget extends StatefulWidget {
 
   /// Provides callback when user tap anywhere on whole chat.
   final VoidCallback? onChatListTap;
-
-  /// Provides configuration for text field config.
-  final TextFieldConfiguration? textFieldConfig;
 
   @override
   State<ChatListWidget> createState() => _ChatListWidgetState();
@@ -114,36 +110,32 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: chatViewIW!.showPopUp,
-      builder: (_, showPopupValue, __) => ChatGroupedListWidget(
-        isLastPage: widget.isLastPage,
-        loadMoreData: widget.loadMoreData,
-        loadingWidget: widget.loadingWidget,
-        showPopUp: showPopupValue,
-        scrollController: scrollController,
-        isEnableSwipeToSeeTime: _resolveSwipeToSeeTime,
-        assignReplyMessage: widget.assignReplyMessage,
-        onChatListTap: _onChatListTap,
-        textFieldConfig: widget.textFieldConfig,
-        onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
-          if (featureActiveConfig?.enableReactionPopup ?? false) {
-            chatViewIW
-              ?..reactionPopupKey.currentState?.refreshWidget(
-                    message: message,
-                    xCoordinate: xCoordinate,
-                    yCoordinate: yCoordinate,
-                  )
-              ..showPopUp.value = true;
-          }
-          if (featureActiveConfig?.enableReplySnackBar ?? false) {
-            _showReplyPopup(
-              message: message,
-              sentByCurrentUser: message.sentBy == currentUser?.id,
-            );
-          }
-        },
-      ),
+    return ChatGroupedListWidget(
+      isLastPage: widget.isLastPage,
+      loadMoreData: widget.loadMoreData,
+      loadingWidget: widget.loadingWidget,
+      showPopUp: chatViewIW!.showPopUp,
+      scrollController: scrollController,
+      isEnableSwipeToSeeTime: _resolveSwipeToSeeTime,
+      assignReplyMessage: widget.assignReplyMessage,
+      onChatListTap: _onChatListTap,
+      onChatBubbleLongPress: (yCoordinate, xCoordinate, message) {
+        if (featureActiveConfig?.enableReactionPopup ?? false) {
+          chatViewIW
+            ?..reactionPopupKey.currentState?.refreshWidget(
+                  message: message,
+                  xCoordinate: xCoordinate,
+                  yCoordinate: yCoordinate,
+                )
+            ..showPopUp.value = true;
+        }
+        if (featureActiveConfig?.enableReplySnackBar ?? false) {
+          _showReplyPopup(
+            message: message,
+            sentByCurrentUser: message.sentBy == currentUser?.id,
+          );
+        }
+      },
     );
   }
 

@@ -46,7 +46,7 @@ export 'src/models/models.dart';
 export 'src/utils/chat_view_locale.dart';
 export 'src/utils/package_strings.dart';
 export 'src/values/enumeration.dart'
-    hide ChatViewStateType, MessageStatusExtension;
+    hide ChatViewStateType, MessageListItem, MessageStatusExtension;
 export 'src/values/typedefs.dart';
 export 'src/widgets/action_widgets/camera_action_button.dart';
 export 'src/widgets/action_widgets/emoji_picker_action_button.dart';

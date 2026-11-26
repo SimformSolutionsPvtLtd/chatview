@@ -331,8 +331,6 @@ class _ChatViewState extends State<ChatView>
                                               .currentState
                                               ?.assignEditMessage(message)
                                           : null,
-                                  textFieldConfig:
-                                      widget.sendMessageConfig.textFieldConfig,
                                 ),
                               ),
                             if (featureActiveConfig.enableTextField)

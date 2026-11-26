@@ -2,7 +2,7 @@ import 'package:chatview_utils/chatview_utils.dart' show ReplyMessage;
 import 'package:flutter/material.dart';
 
 import '../../../chatview.dart' show ChatView;
-import '../../models/overlay_action_widget.dart';
+import '../../models/config_models/chat_view/message_input/overlay_action_widget.dart';
 import 'text_field_action_button.dart';
 
 /// Custom action button that displays a plus icon and

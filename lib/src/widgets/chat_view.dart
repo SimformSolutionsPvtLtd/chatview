@@ -22,9 +22,9 @@
 import 'dart:io';
 
 import 'package:chatview/chatview.dart';
-import 'package:chatview/src/widgets/chat_list_widget.dart';
-import 'package:chatview/src/widgets/chatview_state_widget.dart';
-import 'package:chatview/src/widgets/reaction_popup.dart';
+import 'package:chatview/src/widgets/message_list/chat_list_widget.dart';
+import 'package:chatview/src/widgets/common/chatview_state_widget.dart';
+import 'package:chatview/src/widgets/reactions/reaction_popup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -33,9 +33,9 @@ import '../inherited_widgets/configurations_inherited_widgets.dart';
 import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
 import '../values/enumeration.dart';
-import 'chat_view_inherited_widget.dart';
-import 'send_message_widget.dart';
-import 'suggestions/suggestions_config_inherited_widget.dart';
+import '../inherited_widgets/chat_view_inherited_widget.dart';
+import 'message_input/send_message_widget.dart';
+import '../inherited_widgets/suggestions_config_inherited_widget.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({

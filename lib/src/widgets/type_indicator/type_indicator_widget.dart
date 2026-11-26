@@ -23,9 +23,9 @@
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/chat_bubble.dart';
-import '../../models/config_models/profile_circle_configuration.dart';
-import '../../models/config_models/type_indicator_configuration.dart';
+import '../../models/config_models/chat_view/chat_bubble.dart';
+import '../../models/config_models/chat_view/profile_circle_configuration.dart';
+import '../../models/config_models/chat_view/type_indicator/type_indicator_configuration.dart';
 import 'typing_dots_bubble.dart';
 import 'user_typing_builder.dart';
 

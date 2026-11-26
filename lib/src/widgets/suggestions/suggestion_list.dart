@@ -26,7 +26,7 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
-import '../../models/config_models/suggestion_list_config.dart';
+import '../../models/config_models/chat_view/message_input/suggestion_list_config.dart';
 import '../../utils/constants/constants.dart';
 import 'suggestion_item.dart';
 

@@ -32,6 +32,7 @@ import '../../models/config_models/chat_view/message/message_list_configuration.
 import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../chat_bubble/chat_bubble_widget.dart';
+import '../message/message_highlight_scope.dart';
 import 'chat_group_header.dart';
 import 'end_message_footer.dart';
 import 'message_rebuild_gate.dart';
@@ -338,10 +339,10 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget> {
                                 sender: chatController
                                     ?.getUserFromId(message.sentBy),
                               ),
-                              builder: () => ValueListenableBuilder<String?>(
-                                valueListenable: _replyId,
-                                builder: (_, highlightedId, __) =>
-                                    ChatBubbleWidget(
+                              builder: () => MessageHighlightScope(
+                                id: message.id,
+                                highlightedId: _replyId,
+                                child: ChatBubbleWidget(
                                   key: _messageKeys[message.id] ??= GlobalKey(),
                                   message: message,
                                   slideAnimation: slideAnimation,
@@ -352,7 +353,6 @@ class _ChatGroupedListWidgetState extends State<ChatGroupedListWidget> {
                                     message,
                                   ),
                                   onSwipe: widget.assignReplyMessage,
-                                  shouldHighlight: highlightedId == message.id,
                                   onReplyTap: enableScrollToRepliedMsg
                                       ? (id) => _onReplyTap(id, _messages)
                                       : null,

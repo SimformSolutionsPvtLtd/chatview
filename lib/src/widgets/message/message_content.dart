@@ -31,6 +31,7 @@ import '../message_types/emoji/emoji_message_view.dart';
 import '../message_types/image/image_message_view.dart';
 import '../message_types/text/text_message_view.dart';
 import '../message_types/voice/voice_message_view.dart';
+import 'highlight_aware.dart';
 
 /// Shows [message] with the view for its type: text, emoji, image, voice or
 /// custom.
@@ -98,28 +99,34 @@ class MessageContent extends StatelessWidget {
     final emojiMessageConfig = messageConfig?.emojiMessageConfig;
     final messageReactionConfig = messageConfig?.messageReactionConfig;
     return switch (message.messageType) {
-      MessageType.image => ImageMessageView(
-          message: message,
-          isLastInGroup: isLastInGroup,
-          isFirstInGroup: isFirstInGroup,
-          highlightScale: highlightScale,
-          highlightImage: shouldHighlight,
-          isMessageBySender: isMessageBySender,
-          featureActiveConfig: featureActiveConfig,
-          messageReactionConfig: messageReactionConfig,
-          inComingChatBubbleConfig: inComingChatBubbleConfig,
-          outgoingChatBubbleConfig: outgoingChatBubbleConfig,
-          imageMessageConfig: messageConfig?.imageMessageConfig,
+      MessageType.image => HighlightAware(
+          highlighted: shouldHighlight,
+          builder: (_, highlighted, __) => ImageMessageView(
+            message: message,
+            isLastInGroup: isLastInGroup,
+            isFirstInGroup: isFirstInGroup,
+            highlightScale: highlightScale,
+            highlightImage: highlighted,
+            isMessageBySender: isMessageBySender,
+            featureActiveConfig: featureActiveConfig,
+            messageReactionConfig: messageReactionConfig,
+            inComingChatBubbleConfig: inComingChatBubbleConfig,
+            outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+            imageMessageConfig: messageConfig?.imageMessageConfig,
+          ),
         ),
-      MessageType.text when isOutsideBubbleEmoji => EmojiMessageView(
-          reaction: reaction,
-          message: message.message,
-          padding: emojiMessageConfig?.padding,
-          textStyle: emojiMessageConfig?.textStyle,
-          isMessageBySender: isMessageBySender,
-          chatBubbleMaxWidth: chatBubbleMaxWidth,
-          messageReactionConfig: messageReactionConfig,
-          highlightScale: shouldHighlight ? highlightScale : 1.0,
+      MessageType.text when isOutsideBubbleEmoji => HighlightAware(
+          highlighted: shouldHighlight,
+          builder: (_, highlighted, __) => EmojiMessageView(
+            reaction: reaction,
+            message: message.message,
+            padding: emojiMessageConfig?.padding,
+            textStyle: emojiMessageConfig?.textStyle,
+            isMessageBySender: isMessageBySender,
+            chatBubbleMaxWidth: chatBubbleMaxWidth,
+            messageReactionConfig: messageReactionConfig,
+            highlightScale: highlighted ? highlightScale : 1.0,
+          ),
         ),
       MessageType.text => TextMessageView(
           message: message,

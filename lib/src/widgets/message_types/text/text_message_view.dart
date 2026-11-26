@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import '../../../../chatview.dart';
 import '../../../extensions/extensions.dart';
 import '../../../utils/constants/constants.dart';
+import '../../message/highlight_aware.dart';
 import '../../message_status/in_bubble_time_and_receipt.dart';
 import '../../reactions/reaction_widget.dart';
 import 'custom_selection_area.dart';
@@ -197,32 +198,36 @@ class TextMessageView extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          constraints: BoxConstraints(
-            maxWidth:
-                chatBubbleMaxWidth ?? context.widthFraction(sizeFraction: 0.75),
-          ),
-          padding: _padding ??
-              const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-          margin: _margin ??
-              EdgeInsets.fromLTRB(
-                5,
-                0,
-                6,
-                message.reaction.reactions.isNotEmpty ? 15 : 2,
-              ),
-          decoration: BoxDecoration(
-            color: highlightMessage ? highlightColor : _color,
-            border: border,
-            borderRadius: _borderRadius(textMessage, showTimeInChatBubble),
-            boxShadow: isMessageBySender
-                ? outgoingChatBubbleConfig?.boxShadow
-                : inComingChatBubbleConfig?.boxShadow,
-          ),
+        HighlightAware(
+          highlighted: highlightMessage,
           child: content,
+          builder: (context, highlighted, child) => Container(
+            constraints: BoxConstraints(
+              maxWidth: chatBubbleMaxWidth ??
+                  context.widthFraction(sizeFraction: 0.75),
+            ),
+            padding: _padding ??
+                const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+            margin: _margin ??
+                EdgeInsets.fromLTRB(
+                  5,
+                  0,
+                  6,
+                  message.reaction.reactions.isNotEmpty ? 15 : 2,
+                ),
+            decoration: BoxDecoration(
+              color: highlighted ? highlightColor : _color,
+              border: border,
+              borderRadius: _borderRadius(textMessage, showTimeInChatBubble),
+              boxShadow: isMessageBySender
+                  ? outgoingChatBubbleConfig?.boxShadow
+                  : inComingChatBubbleConfig?.boxShadow,
+            ),
+            child: child,
+          ),
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(

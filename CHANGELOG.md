@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* **Perf**: [478](https://github.com/SimformSolutionsPvtLtd/chatview/pull/478) :zap: Highlighting a replied message now rebuilds only that message instead of every visible bubble.
 * **Fix**: [477](https://github.com/SimformSolutionsPvtLtd/chatview/pull/477) :bug: Fix the message list: scroll notifications bubble up to the host, the pagination loader no longer needs a `Scaffold`, the footer stays mounted when the newest message is deleted, and an Android back swipe no longer reveals the message time.
 * **Perf**: [477](https://github.com/SimformSolutionsPvtLtd/chatview/pull/477) :zap: The message list sorts messages and finds date separators once per stream event, keys items by message id, shows messages on the first frame, and opening the reaction pop-up or typing no longer rebuilds the list. Swipe-to-see-time moves into its own `SwipeToSeeTime` widget. Messages with equal timestamps keep their order, a new `messageSorter` passed on a host rebuild no longer remounts the list, and a bubble updates when its sender is replaced with `updateOtherUser`.
 * **Fix**: [476](https://github.com/SimformSolutionsPvtLtd/chatview/pull/476) :bug: An image message without `onTap` now lets the tap reach the message list like a text message, and the reaction chip on a custom message hangs below it without being clipped.

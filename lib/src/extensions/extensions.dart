@@ -59,24 +59,30 @@ extension TimeDifference on DateTime {
   }
 
   String getDay(String chatSeparatorDatePattern) {
+    // A UTC timestamp must be judged on the user's local calendar day.
+    final local = toLocal();
     final now = DateTime.now();
 
     /// Compares only the year, month, and day of the dates, ignoring the time.
     /// For example, `2024-12-09 22:00` and `2024-12-10 00:05` are on different
     /// calendar days but less than 24 hours apart. This ensures the difference
     /// is based on the date, not the total hours between the timestamps.
-    final targetDate = DateTime(year, month, day);
-    final currentDate = DateTime(now.year, now.month, now.day);
+    ///
+    /// Both dates are rebuilt as UTC so every day is exactly 24 hours: local
+    /// midnights are 23 or 25 hours apart across a daylight-saving change,
+    /// which would make `inDays` come out one short.
+    final targetDate = DateTime.utc(local.year, local.month, local.day);
+    final currentDate = DateTime.utc(now.year, now.month, now.day);
 
     final differenceInDays = currentDate.difference(targetDate).inDays;
 
     if (differenceInDays == 0) {
       return PackageStrings.currentLocale.today;
-    } else if (differenceInDays <= 1 && differenceInDays >= -1) {
+    } else if (differenceInDays == 1) {
       return PackageStrings.currentLocale.yesterday;
     } else {
       return TimeDifference._cachedDateFormat(chatSeparatorDatePattern)
-          .format(this);
+          .format(local);
     }
   }
 
@@ -110,8 +116,15 @@ extension TimeDifference on DateTime {
   ///
   /// This comparison checks only the year, month, and day components,
   /// and **ignores the time** (hour, minute, second, etc.).
-  bool isSameCalendarDay(DateTime other) =>
-      year == other.year && month == other.month && day == other.day;
+  ///
+  /// Both dates are compared on the local calendar, so a UTC timestamp and a
+  /// local one agree with what [getDay] shows. `toLocal` on a local date is a
+  /// no-op.
+  bool isSameCalendarDay(DateTime other) {
+    final a = toLocal();
+    final b = other.toLocal();
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 }
 
 /// Extension on String which implements different types string validations.

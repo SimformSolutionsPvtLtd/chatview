@@ -316,8 +316,8 @@ class _ChatBubbleWidgetState extends State<ChatBubbleWidget> {
               ? chatListConfig.repliedMessageConfig!
                   .repliedMessageWidgetBuilder!(widget.message.replyMessage)
               : ReplyMessageWidget(
-                  message: widget.message,
-                  repliedMessageConfig: chatListConfig.repliedMessageConfig,
+                  replyMessage: widget.message.replyMessage,
+                  config: chatListConfig.repliedMessageConfig,
                   onTap: () => widget.onReplyTap
                       ?.call(widget.message.replyMessage.messageId),
                 ),

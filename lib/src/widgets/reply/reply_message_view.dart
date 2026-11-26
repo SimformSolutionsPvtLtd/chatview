@@ -64,14 +64,15 @@ class ReplyMessageViewState extends State<ReplyMessageView> {
 
   @override
   Widget build(BuildContext context) {
-    final replyTitle = '${PackageStrings.currentLocale.replyTo} $_replyTo';
-
     return ValueListenableBuilder<ReplyMessage>(
       valueListenable: replyMessage,
       builder: (_, state, child) {
         if (state.message.isEmpty) {
           return const SizedBox.shrink();
         }
+
+        // Computed here so it follows each new reply, not just parent rebuilds.
+        final replyTitle = '${PackageStrings.currentLocale.replyTo} $_replyTo';
 
         return widget.builder?.call(context, state) ??
             Container(

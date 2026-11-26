@@ -28,7 +28,7 @@ import 'package:flutter/material.dart';
 import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/reactions/reaction_popup_configuration.dart';
 import 'emoji_row.dart';
-import 'glassmorphism_reaction_popup.dart';
+import 'reaction_popup_background.dart';
 
 class ReactionPopup extends StatefulWidget {
   const ReactionPopup({
@@ -49,13 +49,16 @@ class ReactionPopup extends StatefulWidget {
 
 class ReactionPopupState extends State<ReactionPopup>
     with SingleTickerProviderStateMixin {
+  static const Duration _defaultDuration = Duration(milliseconds: 180);
+
+  /// The duration comes from the config, which can only be read once the
+  /// widget is in the tree, so it is set in [didChangeDependencies].
   late final AnimationController _animationController = AnimationController(
     vsync: this,
-    duration: reactionPopupConfig?.animationDuration ??
-        const Duration(milliseconds: 180),
+    duration: _defaultDuration,
   );
 
-  late final Animation<double> _scaleAnimation = CurvedAnimation(
+  late final CurvedAnimation _scaleAnimation = CurvedAnimation(
     parent: _animationController,
     curve: Curves.easeIn,
     reverseCurve: Curves.easeInOutSine,
@@ -75,6 +78,23 @@ class ReactionPopupState extends State<ReactionPopup>
   @override
   void initState() {
     super.initState();
+    if (showPopUp) unawaited(_animationController.forward());
+  }
+
+  @override
+  void didUpdateWidget(ReactionPopup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Start the animation only when the popup is really shown or hidden, not
+    // on every build.
+    if (showPopUp == oldWidget.showPopUp) return;
+    if (showPopUp) {
+      unawaited(_animationController.forward(from: 0));
+    } else {
+      // The popup is removed from the tree right away, so there is nothing to
+      // animate out. Rewind so the next show starts from 0.
+      _animationController.reset();
+      _message = null;
+    }
   }
 
   @override
@@ -84,63 +104,30 @@ class ReactionPopupState extends State<ReactionPopup>
       chatController = chatViewIW!.chatController;
       currentUser = chatController?.currentUser;
     }
+    _animationController.duration =
+        reactionPopupConfig?.animationDuration ?? _defaultDuration;
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceWidth = context.widthFraction();
-    final toolTipWidth = deviceWidth > 450 ? 450 : deviceWidth;
-    if (showPopUp) {
-      unawaited(_animationController.forward());
-    } else {
-      unawaited(_animationController.reverse());
-    }
+    final toolTipWidth = deviceWidth > 450.0 ? 450.0 : deviceWidth;
+    final centeredLeft = _xCoordinate - toolTipWidth * 0.5;
     return showPopUp
         ? Positioned(
             top: _yCoordinate,
             left: _xCoordinate + toolTipWidth > deviceWidth
                 ? deviceWidth - toolTipWidth
-                : _xCoordinate - (toolTipWidth / 2) < 0
+                : centeredLeft < 0
                     ? 0
-                    : _xCoordinate - (toolTipWidth / 2),
+                    : centeredLeft,
             child: SizedBox(
-              width: deviceWidth > 450 ? 450 : deviceWidth,
-              child: AnimatedBuilder(
-                animation: _scaleAnimation,
-                builder: (context, child) => Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: reactionPopupConfig?.showGlassMorphismEffect ?? false
-                      ? GlassMorphismReactionPopup(
-                          reactionPopupConfig: reactionPopupConfig,
-                          child: _reactionPopupRow,
-                        )
-                      : Container(
-                          constraints: BoxConstraints(
-                            maxWidth: reactionPopupConfig?.maxWidth ?? 350,
-                          ),
-                          margin: reactionPopupConfig?.margin ??
-                              const EdgeInsets.symmetric(horizontal: 25),
-                          padding: reactionPopupConfig?.padding ??
-                              const EdgeInsets.symmetric(
-                                vertical: 6,
-                                horizontal: 14,
-                              ),
-                          decoration: BoxDecoration(
-                            color: reactionPopupConfig?.backgroundColor ??
-                                Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              reactionPopupConfig?.shadow ??
-                                  BoxShadow(
-                                    color: Colors.grey.shade400,
-                                    blurRadius: 8,
-                                    spreadRadius: -2,
-                                    offset: const Offset(0, 8),
-                                  ),
-                            ],
-                          ),
-                          child: _reactionPopupRow,
-                        ),
+              width: toolTipWidth,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: ReactionPopupBackground(
+                  config: reactionPopupConfig,
+                  child: EmojiRow(onEmojiTap: _onEmojiTap),
                 ),
               ),
             ),
@@ -148,24 +135,22 @@ class ReactionPopupState extends State<ReactionPopup>
         : const SizedBox.shrink();
   }
 
-  Widget get _reactionPopupRow => EmojiRow(
-        onEmojiTap: (emoji) {
-          widget.onTap();
-          if (currentUser != null && _message != null) {
-            if (!(reactionPopupConfig?.overrideUserReactionCallback ?? false)) {
-              chatController?.setReaction(
-                emoji: emoji,
-                messageId: _message!.id,
-                userId: currentUser!.id,
-              );
-            }
-            reactionPopupConfig?.userReactionCallback?.call(
-              _message!,
-              emoji,
-            );
-          }
-        },
+  void _onEmojiTap(String emoji) {
+    widget.onTap();
+    if (currentUser != null && _message != null) {
+      if (!(reactionPopupConfig?.overrideUserReactionCallback ?? false)) {
+        chatController?.setReaction(
+          emoji: emoji,
+          messageId: _message!.id,
+          userId: currentUser!.id,
+        );
+      }
+      reactionPopupConfig?.userReactionCallback?.call(
+        _message!,
+        emoji,
       );
+    }
+  }
 
   void refreshWidget({
     required Message message,
@@ -173,6 +158,7 @@ class ReactionPopupState extends State<ReactionPopup>
     required double yCoordinate,
   }) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       setState(() {
         final yPosition = yCoordinate -
             (chatViewIW!.reactionPopupKey.currentContext?.size?.height ?? 0);
@@ -185,6 +171,7 @@ class ReactionPopupState extends State<ReactionPopup>
 
   @override
   void dispose() {
+    _scaleAnimation.dispose();
     _animationController.dispose();
     super.dispose();
   }

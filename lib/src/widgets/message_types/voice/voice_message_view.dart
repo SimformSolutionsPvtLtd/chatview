@@ -257,7 +257,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
           ReactionWidget(
             isMessageBySender: widget.isMessageBySender,
             reaction: widget.message.reaction,
-            messageReactionConfig: widget.messageReactionConfig,
+            config: widget.messageReactionConfig,
           ),
       ],
     );

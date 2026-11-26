@@ -76,8 +76,8 @@ class ReactionsBottomSheet {
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.grey.shade200,
-                                offset: const Offset(0, 20),
-                                blurRadius: 40,
+                                offset: const Offset(0, 4),
+                                blurRadius: 8,
                               ),
                             ],
                             borderRadius: const BorderRadius.all(

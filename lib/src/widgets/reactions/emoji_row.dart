@@ -23,19 +23,17 @@ import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
 import '../../utils/constants/constants.dart';
+import '../../utils/package_strings.dart';
 import '../message_input/emoji_picker_widget.dart';
 
 class EmojiRow extends StatelessWidget {
-  EmojiRow({
-    required this.onEmojiTap,
-    super.key,
-  });
+  const EmojiRow({required this.onEmojiTap, super.key});
 
   /// Provides callback when user taps on emoji in reaction pop-up.
   final ValueSetter<String> onEmojiTap;
 
   /// These are default emojis.
-  final List<String> _emojiUnicodes = [
+  static const List<String> _emojiUnicodes = [
     heart,
     faceWithTears,
     astonishedFace,
@@ -48,31 +46,28 @@ class EmojiRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final emojiConfig = context.chatListConfig.reactionPopupConfig?.emojiConfig;
     final emojiList = emojiConfig?.emojiList ?? _emojiUnicodes;
-    final size = emojiConfig?.size;
+    final emojiTextSize = emojiConfig?.size ?? 28;
     return Row(
       children: [
         Expanded(
           child: Row(
-            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(
-              emojiList.length,
-              (index) => GestureDetector(
-                onTap: () => onEmojiTap(emojiList[index]),
-                child: Text(
-                  emojiList[index],
-                  style: TextStyle(fontSize: size ?? 28),
+            children: [
+              for (final emoji in emojiList)
+                GestureDetector(
+                  onTap: () => onEmojiTap(emoji),
+                  child: Text(emoji, style: TextStyle(fontSize: emojiTextSize)),
                 ),
-              ),
-            ),
+            ],
           ),
         ),
         IconButton(
           constraints: const BoxConstraints(),
           icon: Icon(
             Icons.add,
+            semanticLabel: PackageStrings.currentLocale.moreReactions,
             color: Colors.grey.shade600,
-            size: size ?? 28,
+            size: emojiTextSize,
           ),
           onPressed: () => _showBottomSheet(context),
         ),

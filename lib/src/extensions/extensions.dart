@@ -36,11 +36,17 @@ import '../models/config_models/chat_view/chat_bubble_configuration.dart';
 import '../models/config_models/chat_view/message/message_list_configuration.dart';
 import '../models/config_models/chat_view/message_input/reply_suggestions_config.dart';
 import '../utils/constants/constants.dart';
-import '../utils/emoji_parser.dart';
+import '../utils/emoji_data.dart';
 import '../utils/package_strings.dart';
 import '../utils/timeago/timeago.dart' as timeago;
 import '../values/enumeration.dart';
 import '../widgets/common/profile_image_widget.dart';
+
+/// The URLs found in each [Message], see [MessageUrls.urls].
+///
+/// An [Expando] holds its keys weakly, unlike a `Map`: when a message is no
+/// longer used, it and its URLs are freed. A `Map` would keep them forever.
+final Expando<List<String>> _urlsByMessage = Expando('urlsByMessage');
 
 /// Extension for DateTime to get specific formats of dates and time.
 extension TimeDifference on DateTime {
@@ -96,6 +102,9 @@ extension TimeDifference on DateTime {
 
   String get getTimeFromDateTime => _cachedDateFormat('hh:mm a').format(this);
 
+  /// Reuse the cached formats
+  String formatWith(String pattern) => _cachedDateFormat(pattern).format(this);
+
   /// Returns `true` if [other] occurs on the same calendar day as
   /// this [DateTime].
   ///
@@ -112,15 +121,6 @@ extension ValidateString on String {
   /// Building a [RegExp] compiles the pattern, so it is created once and
   /// reused instead of being recompiled on every call.
   static final RegExp _imageUrlRegExp = RegExp(imageUrlRegExpression);
-
-  /// Shared [EmojiParser] instance.
-  ///
-  /// The [EmojiParser] constructor decodes a large emoji JSON dataset and
-  /// builds lookup maps (thousands of entries). Previously a new instance was
-  /// created for every [isAllEmoji] call — which runs for every text bubble on
-  /// every rebuild — causing severe jank while scrolling. Reusing a single
-  /// instance removes that per-frame cost entirely.
-  static final EmojiParser _emojiParser = EmojiParser();
 
   bool get isImageUrl {
     return _imageUrlRegExp.hasMatch(this) || startsWith('data:image');
@@ -143,20 +143,23 @@ extension ValidateString on String {
     return bytes == null ? null : MemoryImage(bytes);
   }
 
-  bool get isAllEmoji {
-    final unEmojified = _emojiParser.parseEmojis(this);
-    return runes.length == unEmojified.length;
-  }
+  /// Whether every character of this text is an emoji. Empty text is not.
+  ///
+  /// It stops at the first non-emoji, so the cost does not depend on the
+  /// length of normal text.
+  bool get isAllEmoji => isNotEmpty && characters.every(EmojiData.isKnown);
 
   /// Whether this text is shown as bare emojis outside a chat bubble, i.e. it
   /// is all emoji and within [maxOutSideBubbleEmojis] (no limit when null).
   bool isOutsideBubbleEmoji(int? maxOutSideBubbleEmojis) =>
-      // Cheap length check first, so the emoji parse is skipped for long text.
+      // [isAllEmoji] first: it stops early, counting every character does not.
+      isAllEmoji &&
       (maxOutSideBubbleEmojis == null ||
-          characters.length <= maxOutSideBubbleEmojis) &&
-      isAllEmoji;
+          characters.length <= maxOutSideBubbleEmojis);
 
   bool get isUrl {
+    // A base64 image can be megabytes: skip parsing it.
+    if (startsWith('data:')) return false;
     final uri = Uri.tryParse(this);
     return uri != null &&
         uri.isAbsolute &&
@@ -286,12 +289,11 @@ extension StatefulWidgetExtension on State {
       : null;
 
   ConfigurationsInheritedWidget get chatListConfig =>
-      context.mounted && ConfigurationsInheritedWidget.of(context) != null
-          ? ConfigurationsInheritedWidget.of(context)!
-          : const ConfigurationsInheritedWidget(
-              chatBackgroundConfig: ChatBackgroundConfiguration(),
-              child: SizedBox.shrink(),
-            );
+      (context.mounted ? ConfigurationsInheritedWidget.of(context) : null) ??
+      const ConfigurationsInheritedWidget(
+        chatBackgroundConfig: ChatBackgroundConfiguration(),
+        child: SizedBox.shrink(),
+      );
 }
 
 /// Extension on State for accessing inherited widget.
@@ -330,12 +332,11 @@ extension BuildContextExtension on BuildContext {
       mounted ? SuggestionsConfigIW.of(this)?.suggestionsConfig : null;
 
   ConfigurationsInheritedWidget get chatListConfig =>
-      mounted && ConfigurationsInheritedWidget.of(this) != null
-          ? ConfigurationsInheritedWidget.of(this)!
-          : const ConfigurationsInheritedWidget(
-              chatBackgroundConfig: ChatBackgroundConfiguration(),
-              child: SizedBox.shrink(),
-            );
+      (mounted ? ConfigurationsInheritedWidget.of(this) : null) ??
+      const ConfigurationsInheritedWidget(
+        chatBackgroundConfig: ChatBackgroundConfiguration(),
+        child: SizedBox.shrink(),
+      );
 
   ChatBubbleConfiguration? get chatBubbleConfig =>
       chatListConfig.chatBubbleConfig;
@@ -520,4 +521,24 @@ extension MessageStatusExtension on MessageStatus {
         MessageStatus.undelivered => Colors.red,
         MessageStatus.delivered || MessageStatus.pending => Colors.grey,
       };
+}
+
+extension MessageUrls on Message {
+  /// The URLs in [message], found once per [Message] object.
+  ///
+  /// The result is kept in an [Expando] keyed by this message, because:
+  /// - A [Message] is immutable ([Message.copyWith] makes a new one), so an
+  ///   entry can't go stale and an edited message gets its own.
+  /// - It is reused when a bubble scrolls out and back in. A widget's State
+  ///   is lost then, an [Expando] is not.
+  /// - Its keys are weak, so an entry goes away with its message.
+  ///
+  /// ```dart
+  /// final message = Message(message: 'see https://a.com', ...);
+  /// message.urls; // runs the URL regex
+  /// message.urls; // the same list, no regex
+  /// message.copyWith(message: 'no link').urls; // a new message: [], runs again
+  /// ```
+  List<String> get urls =>
+      _urlsByMessage[this] ??= List.unmodifiable(message.extractedUrls);
 }

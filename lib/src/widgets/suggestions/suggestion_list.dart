@@ -24,6 +24,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:chatview_utils/chatview_utils.dart';
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
@@ -45,6 +46,10 @@ class _SuggestionListState extends State<SuggestionList>
   List<SuggestionItemData> suggestions = [];
   bool isSuggestionListEmpty = false;
 
+  /// Cached so the per-frame animation listener does not repeat the inherited
+  /// widget lookup on every tick.
+  ValueListenable<List<SuggestionItemData>>? _newSuggestions;
+
   @override
   void initState() {
     super.initState();
@@ -54,31 +59,43 @@ class _SuggestionListState extends State<SuggestionList>
       vsync: this,
     )..addListener(updateSuggestionsOnAnimation);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final newSuggestions = chatViewIW?.chatController.newSuggestions;
-      newSuggestions?.addListener(animateSuggestionList);
+      _newSuggestions = chatViewIW?.chatController.newSuggestions
+        ?..addListener(animateSuggestionList);
     });
   }
 
+  /// The items are the `AnimatedBuilder.child`, so after the collapse
+  /// `setState` is needed to unmount them.
+  ///
+  /// Example: `removeReplySuggestions()` collapses the list to zero height;
+  /// without the `setState`, the old `SuggestionItem`s stay mounted, hidden.
   void updateSuggestionsOnAnimation() {
     if (isSuggestionListEmpty && _controller.value == 0) {
-      suggestions = [];
-    } else if (chatViewIW?.chatController.newSuggestions.value.isNotEmpty ??
-        false) {
-      suggestions = chatViewIW?.chatController.newSuggestions.value ?? [];
+      if (suggestions.isNotEmpty && mounted) {
+        setState(() => suggestions = []);
+      }
+    } else if (_newSuggestions?.value.isNotEmpty ?? false) {
+      suggestions = _newSuggestions!.value;
     }
   }
 
   @override
   void activate() {
     super.activate();
-    final newSuggestions = chatViewIW?.chatController.newSuggestions;
-    newSuggestions?.addListener(animateSuggestionList);
+    _newSuggestions = chatViewIW?.chatController.newSuggestions
+      ?..addListener(animateSuggestionList);
   }
 
   void animateSuggestionList() {
     final newSuggestions = chatViewIW?.chatController.newSuggestions;
     if (newSuggestions != null) {
       isSuggestionListEmpty = newSuggestions.value.isEmpty;
+      // The animation listener only copies the new items while it ticks. When
+      // the list is already fully shown, forward() does not tick, so swap the
+      // items here.
+      if (!isSuggestionListEmpty && mounted) {
+        setState(() => suggestions = newSuggestions.value);
+      }
       unawaited(
         isSuggestionListEmpty ? _controller.reverse() : _controller.forward(),
       );
@@ -100,29 +117,28 @@ class _SuggestionListState extends State<SuggestionList>
       child: ClipRect(
         child: AnimatedBuilder(
           animation: _controller,
-          builder: (context, child) {
-            return Align(
-              alignment: AlignmentDirectional.topStart,
-              heightFactor: math.max(_controller.value, 0),
-              widthFactor: 1,
-              child: suggestionsConfig?.suggestionItemType.isScrollType ?? false
-                  ? SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: _suggestionListWidget(
-                          suggestionsItemConfig,
-                        ),
-                      ),
-                    )
-                  : Wrap(
-                      runSpacing:
-                          suggestionsConfig?.spaceBetweenSuggestionItemRow ??
-                              10,
-                      alignment: WrapAlignment.end,
-                      children: _suggestionListWidget(suggestionsItemConfig),
+          // Built once, not per frame; the builder only sets `heightFactor`.
+          child: suggestionsConfig?.suggestionItemType.isScrollType ?? false
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _suggestionListWidget(
+                      suggestionsItemConfig,
                     ),
-            );
-          },
+                  ),
+                )
+              : Wrap(
+                  runSpacing:
+                      suggestionsConfig?.spaceBetweenSuggestionItemRow ?? 10,
+                  alignment: WrapAlignment.end,
+                  children: _suggestionListWidget(suggestionsItemConfig),
+                ),
+          builder: (_, child) => Align(
+            alignment: AlignmentDirectional.topStart,
+            heightFactor: math.max(_controller.value, 0),
+            widthFactor: 1,
+            child: child,
+          ),
         ),
       ),
     );
@@ -157,8 +173,7 @@ class _SuggestionListState extends State<SuggestionList>
 
   @override
   void deactivate() {
-    final newSuggestions = chatViewIW?.chatController.newSuggestions;
-    newSuggestions?.removeListener(animateSuggestionList);
+    _newSuggestions?.removeListener(animateSuggestionList);
     super.deactivate();
   }
 

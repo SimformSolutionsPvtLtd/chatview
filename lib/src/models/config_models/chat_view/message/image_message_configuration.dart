@@ -87,7 +87,7 @@ class ImageMessageConfiguration {
 }
 
 class ShareIconConfiguration {
-  ShareIconConfiguration({
+  const ShareIconConfiguration({
     this.onPressed,
     this.icon,
     this.defaultIconBackgroundColor,

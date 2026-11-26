@@ -41,6 +41,7 @@ import '../../values/enumeration.dart';
 import '../../values/typedefs.dart';
 import '../action_widgets/camera_action_button.dart';
 import '../action_widgets/gallery_action_button.dart';
+import 'action_switcher.dart';
 
 class ChatUITextField extends StatefulWidget {
   const ChatUITextField({
@@ -85,8 +86,6 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   ValueNotifier<bool> isRecording = ValueNotifier(false);
 
-  bool Function(KeyEvent)? _keyboardHandler;
-
   SendMessageConfiguration get sendMessageConfig => widget.sendMessageConfig;
 
   VoiceRecordingConfiguration get voiceRecordingConfig =>
@@ -101,6 +100,9 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   Color get _backgroundColor =>
       sendMessageConfig.textFieldBackgroundColor ?? Colors.white;
 
+  /// Enabled unless explicitly disabled, including when no config is given.
+  bool get _isEnabled => textFieldConfig?.enabled ?? true;
+
   /// Text colour used when no `textStyle` is given: white on a dark fill, black
   /// on a light one, so typed text is never white on white.
   Color get _defaultTextColor =>
@@ -114,13 +116,17 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   OutlineInputBorder get _outLineBorder => OutlineInputBorder(
         borderSide: const BorderSide(color: Colors.transparent),
         borderRadius: widget.sendMessageConfig.textFieldConfig?.borderRadius ??
-            BorderRadius.circular(textFieldBorderRadius),
+            textFieldBorderRadius,
       );
 
   ValueNotifier<TypeWriterStatus> composingStatus =
       ValueNotifier(TypeWriterStatus.typed);
 
   late Debouncer debouncer;
+
+  /// True while `record()` is awaited, before [isRecording] turns true. A
+  /// dispose in that window must not dispose the recorder under it.
+  bool _isStartingRecording = false;
 
   /// The text at the last controller notification, to tell an edit from a
   /// cursor or selection move.
@@ -141,27 +147,42 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     if (defaultTargetPlatform.isNativeMobile) {
       controller = RecorderController();
     }
-    if (kIsWeb) {
-      if (_attachHardwareKeyboardHandler() case final handler) {
-        _keyboardHandler = handler;
-        HardwareKeyboard.instance.addHandler(handler);
-      }
-    }
   }
 
   @override
   void dispose() {
+    // Read before isRecording is disposed.
+    final recorder = controller;
+    final wasRecording = isRecording.value;
+    final isStarting = _isStartingRecording;
     debouncer.dispose();
     composingStatus.dispose();
     isRecording.dispose();
     _isTextNotEmptyNotifier.dispose();
-    if (_keyboardHandler case final handler?) {
-      HardwareKeyboard.instance.removeHandler(handler);
-    }
     widget.textEditingController.removeListener(_listenTextEditingController);
-    controller?.dispose();
+    if (recorder != null && wasRecording) {
+      unawaited(_discardRecording(recorder));
+    } else if (!isStarting) {
+      recorder?.dispose();
+    }
+    // Starting: `_recordOrStop` still awaits `record()` and discards the
+    // recording it started, then disposes the recorder.
     playerController.dispose();
     super.dispose();
+  }
+
+  /// Stops an in-progress recording whose screen was popped and deletes the
+  /// file, since nothing will ever send it.
+  Future<void> _discardRecording(RecorderController recorder) async {
+    try {
+      final path = await recorder.stop();
+      if (path != null) {
+        final file = File(path);
+        if (await file.exists()) await file.delete();
+      }
+    } finally {
+      recorder.dispose();
+    }
   }
 
   void attachListeners() {
@@ -171,47 +192,20 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     });
   }
 
-  // Attaches a hardware keyboard handler to handle Enter key events.
-  // This is only applicable for web platforms.
-  // It checks if the Enter key is pressed then sends the message
-  // or inserts a new line based on whether Enter + Shift is pressed.
-  bool Function(KeyEvent) _attachHardwareKeyboardHandler() {
-    return (KeyEvent event) {
-      if (event is! KeyDownEvent ||
-          event.logicalKey != LogicalKeyboardKey.enter) {
-        return false;
-      }
-
-      final pressedKeys = HardwareKeyboard.instance.logicalKeysPressed;
-      final isShiftPressed = pressedKeys.any(
-        (key) =>
-            key == LogicalKeyboardKey.shiftLeft ||
-            key == LogicalKeyboardKey.shiftRight,
-      );
-      if (!isShiftPressed) {
-        // Send message on Enter
-        final text = widget.textEditingController.text;
-        if (text.trim().isNotEmpty) {
-          _onPressed();
-        }
-      } else {
-        // Shift+Enter: insert new line
-        final text = widget.textEditingController.text;
-        final selection = widget.textEditingController.selection;
-
-        // Insert a newline ('\n') at the current cursor position or
-        // replace selected text with it.
-        final newText = text.replaceRange(
-          selection.start,
-          selection.end,
-          '\n',
-        );
-        widget.textEditingController
-          ..text = newText
-          ..selection = TextSelection.collapsed(offset: selection.start + 1);
-      }
-      return true;
-    };
+  // Web only: Enter sends, Shift+Enter falls through so the TextField inserts
+  // a newline itself. Runs only while the TextField below has focus.
+  KeyEventResult _onKeyEvent(FocusNode _, KeyEvent event) {
+    if (event is! KeyDownEvent ||
+        event.logicalKey != LogicalKeyboardKey.enter ||
+        HardwareKeyboard.instance.isShiftPressed) {
+      return KeyEventResult.ignored;
+    }
+    // Underlined IME text (CJK): Enter confirms it, it must not send.
+    if (widget.textEditingController.value.composing.isValid) {
+      return KeyEventResult.ignored;
+    }
+    if (widget.textEditingController.text.trim().isNotEmpty) _onPressed();
+    return KeyEventResult.handled; // swallow Enter so no newline is inserted
   }
 
   @override
@@ -222,8 +216,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
           textFieldConfig?.padding ?? const EdgeInsets.symmetric(horizontal: 6),
       margin: textFieldConfig?.margin,
       decoration: BoxDecoration(
-        borderRadius: textFieldConfig?.borderRadius ??
-            BorderRadius.circular(textFieldBorderRadius),
+        borderRadius: textFieldConfig?.borderRadius ?? textFieldBorderRadius,
         color: _backgroundColor,
       ),
       child: ValueListenableBuilder<bool>(
@@ -282,81 +275,56 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                           );
                           final showActions =
                               !hideLeadingActions && actions != null;
-                          return AnimatedSize(
-                            duration: textFieldActionAnimationDuration,
-                            curve: Curves.easeOutCubic,
-                            alignment: Alignment.centerLeft,
-                            child: AnimatedSwitcher(
-                              duration: textFieldActionAnimationDuration,
-                              switchInCurve: Curves.easeOutCubic,
-                              switchOutCurve: Curves.easeInCubic,
-                              layoutBuilder: (currentChild, previousChildren) {
-                                return Stack(
-                                  alignment: Alignment.centerLeft,
-                                  children: [
-                                    ...previousChildren,
-                                    if (currentChild != null) currentChild,
-                                  ],
-                                );
-                              },
-                              transitionBuilder: (child, animation) {
-                                return ClipRect(
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: SlideTransition(
-                                      position: Tween<Offset>(
-                                        begin: const Offset(-0.35, 0),
-                                        end: Offset.zero,
-                                      ).animate(animation),
-                                      child: child,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: showActions
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: actions,
-                                    )
-                                  : const SizedBox.shrink(),
-                            ),
+                          return ActionSwitcher(
+                            isLeading: true,
+                            child: showActions
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: actions,
+                                  )
+                                : const SizedBox.shrink(),
                           );
                         },
                       ),
                       Expanded(
-                        child: TextField(
-                          focusNode: widget.focusNode,
-                          controller: widget.textEditingController,
-                          style: textFieldConfig?.textStyle ??
-                              TextStyle(color: _defaultTextColor),
-                          maxLines: textFieldConfig?.maxLines ?? 5,
-                          minLines: textFieldConfig?.minLines ?? 1,
-                          keyboardType: textFieldConfig?.textInputType,
-                          inputFormatters: textFieldConfig?.inputFormatters,
-                          enabled: textFieldConfig?.enabled,
-                          textCapitalization:
-                              textFieldConfig?.textCapitalization ??
-                                  TextCapitalization.sentences,
-                          decoration: InputDecoration(
-                            hintText: textFieldConfig?.hintText ??
-                                PackageStrings.currentLocale.message,
-                            fillColor: _backgroundColor,
-                            filled: true,
-                            hintMaxLines: textFieldConfig?.hintMaxLines ?? 1,
-                            hintStyle: textFieldConfig?.hintStyle ??
-                                TextStyle(
-                                  overflow: TextOverflow.ellipsis,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey.shade600,
-                                  letterSpacing: 0.25,
-                                ),
-                            contentPadding: textFieldConfig?.contentPadding ??
-                                const EdgeInsets.symmetric(horizontal: 6),
-                            border: outlineBorder,
-                            focusedBorder: outlineBorder,
-                            enabledBorder: outlineBorder,
-                            disabledBorder: outlineBorder,
+                        child: Focus(
+                          canRequestFocus: false,
+                          skipTraversal: true,
+                          onKeyEvent: kIsWeb ? _onKeyEvent : null,
+                          child: TextField(
+                            focusNode: widget.focusNode,
+                            controller: widget.textEditingController,
+                            style: textFieldConfig?.textStyle ??
+                                TextStyle(color: _defaultTextColor),
+                            maxLines: textFieldConfig?.maxLines ?? 5,
+                            minLines: textFieldConfig?.minLines ?? 1,
+                            keyboardType: textFieldConfig?.textInputType,
+                            inputFormatters: textFieldConfig?.inputFormatters,
+                            enabled: textFieldConfig?.enabled,
+                            textCapitalization:
+                                textFieldConfig?.textCapitalization ??
+                                    TextCapitalization.sentences,
+                            decoration: InputDecoration(
+                              hintText: textFieldConfig?.hintText ??
+                                  PackageStrings.currentLocale.message,
+                              fillColor: _backgroundColor,
+                              filled: true,
+                              hintMaxLines: textFieldConfig?.hintMaxLines ?? 1,
+                              hintStyle: textFieldConfig?.hintStyle ??
+                                  TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey.shade600,
+                                    letterSpacing: 0.25,
+                                  ),
+                              contentPadding: textFieldConfig?.contentPadding ??
+                                  const EdgeInsets.symmetric(horizontal: 6),
+                              border: outlineBorder,
+                              focusedBorder: outlineBorder,
+                              enabledBorder: outlineBorder,
+                              disabledBorder: outlineBorder,
+                            ),
                           ),
                         ),
                       ),
@@ -366,44 +334,12 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
               ValueListenableBuilder<bool>(
                 valueListenable: _isTextNotEmptyNotifier,
                 builder: (_, isNotEmpty, child) {
-                  return AnimatedSize(
-                    duration: textFieldActionAnimationDuration,
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment.centerRight,
-                    child: AnimatedSwitcher(
-                      duration: textFieldActionAnimationDuration,
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      // Right-align and keep the incoming child on top so the
-                      // bar never expands to the union of both children.
-                      layoutBuilder: (currentChild, previousChildren) {
-                        return Stack(
-                          alignment: Alignment.centerRight,
-                          children: [
-                            ...previousChildren,
-                            if (currentChild != null) currentChild,
-                          ],
-                        );
-                      },
-                      transitionBuilder: (child, animation) {
-                        return ClipRect(
-                          child: FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0.35, 0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            ),
-                          ),
-                        );
-                      },
-                      child: _buildTrailing(
-                        context,
-                        isNotEmpty: isNotEmpty,
-                        isRecordingValue: isRecordingValue,
-                      ),
+                  return ActionSwitcher(
+                    isLeading: false,
+                    child: _buildTrailing(
+                      context,
+                      isNotEmpty: isNotEmpty,
+                      isRecordingValue: isRecordingValue,
                     ),
                   );
                 },
@@ -424,7 +360,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       return IconButton(
         color: sendMessageConfig.defaultSendButtonColor ?? Colors.green,
         style: sendMessageConfig.sendButtonStyle,
-        onPressed: (textFieldConfig?.enabled ?? true) ? _onPressed : null,
+        onPressed: _isEnabled ? _onPressed : null,
         icon: sendMessageConfig.sendButtonIcon ?? const Icon(Icons.send),
       );
     } else {
@@ -437,12 +373,14 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                 ) ??
                 [
                   CameraActionButton(
+                    imagePickerConfiguration:
+                        sendMessageConfig.imagePickerConfiguration,
                     icon: imagePickerIconsConfig?.cameraImagePickerIcon ??
                         Icon(
                           Icons.camera_alt_outlined,
                           color: imagePickerIconsConfig?.cameraIconColor,
                         ),
-                    onPressed: !(textFieldConfig?.enabled ?? false)
+                    onPressed: !_isEnabled
                         ? null
                         : (path, _) => widget.onImageSelected(
                               path ?? '',
@@ -450,12 +388,14 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
                             ),
                   ),
                   GalleryActionButton(
+                    imagePickerConfiguration:
+                        sendMessageConfig.imagePickerConfiguration,
                     icon: imagePickerIconsConfig?.galleryImagePickerIcon ??
                         Icon(
                           Icons.image,
                           color: imagePickerIconsConfig?.galleryIconColor,
                         ),
-                    onPressed: !(textFieldConfig?.enabled ?? false)
+                    onPressed: !_isEnabled
                         ? null
                         : (path, _) => widget.onImageSelected(
                               path ?? '',
@@ -468,8 +408,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
           if ((sendMessageConfig.allowRecordingVoice) &&
               defaultTargetPlatform.isNativeMobile)
             IconButton(
-              onPressed:
-                  (textFieldConfig?.enabled ?? true) ? _recordOrStop : null,
+              onPressed: _isEnabled ? _recordOrStop : null,
               icon: (isRecordingValue
                       ? voiceRecordingConfig.stopIcon
                       : voiceRecordingConfig.micIcon) ??
@@ -507,16 +446,12 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     );
     if (!isRecording.value) return;
     final path = await controller?.stop();
-    if (path == null) {
-      isRecording.value = false;
-      return;
-    }
-    final file = File(path);
-
-    if (await file.exists()) {
-      await file.delete();
+    if (path != null) {
+      final file = File(path);
+      if (await file.exists()) await file.delete();
     }
 
+    if (!mounted) return;
     isRecording.value = false;
   }
 
@@ -531,12 +466,29 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
           false) {
         await playerController.pauseAllPlayers();
       }
-      await controller?.record(
-        recorderSettings: voiceRecordingConfig.recorderSettings,
-      );
+      _isStartingRecording = true;
+      try {
+        await controller?.record(
+          recorderSettings: voiceRecordingConfig.recorderSettings,
+        );
+      } catch (_) {
+        // dispose left the recorder to us.
+        if (!mounted) controller?.dispose();
+        rethrow;
+      } finally {
+        _isStartingRecording = false;
+      }
+      if (!mounted) {
+        // Disposed while starting: stop what just started and delete the file,
+        // or the microphone stays on.
+        final recorder = controller;
+        if (recorder != null) await _discardRecording(recorder);
+        return;
+      }
       isRecording.value = true;
     } else {
       final path = await controller?.stop();
+      if (!mounted) return;
       isRecording.value = false;
       widget.onRecordingComplete(path);
     }

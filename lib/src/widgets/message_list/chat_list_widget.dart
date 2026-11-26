@@ -178,12 +178,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                     message,
                   );
                 },
-                onUnsendTap: () {
-                  _onChatListTap();
-                  replyPopup?.onUnsendTap?.call(
-                    message,
-                  );
-                },
+                onUnsendTap: replyPopup?.onUnsendTap == null
+                    ? null
+                    : () {
+                        _onChatListTap();
+                        replyPopup?.onUnsendTap?.call(message);
+                      },
                 onReplyTap: () {
                   widget.assignReplyMessage(message);
                   if (featureActiveConfig?.enableReactionPopup ?? false) {

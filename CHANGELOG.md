@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+* **Fix**: [481](https://github.com/SimformSolutionsPvtLtd/chatview/pull/481) :bug: Edit and Unsend are hidden in the message actions when `onEditTap` or `onUnsendTap` is not set, a blocked edit keeps the typed text, a recording in progress, or one that is still starting, is discarded when the text field is disposed, and on web Enter no longer sends while IME text is being composed.
+* **Fix**: [481](https://github.com/SimformSolutionsPvtLtd/chatview/pull/481) :bug: The "+" menu stays in place when the keyboard or orientation changes, shows every option, opens and closes smoothly and no longer leaves an overlay behind when the screen closes.
+* **Fix**: [481](https://github.com/SimformSolutionsPvtLtd/chatview/pull/481) :bug: The default camera and gallery buttons are enabled when `TextFieldConfiguration.enabled` is not set, like the send and microphone buttons. Before, they were disabled unless `enabled` was `true`.
 * **Refactor**: [480](https://github.com/SimformSolutionsPvtLtd/chatview/pull/480) :recycle: Use `defaultTargetPlatform` instead of `dart:io`'s `Platform` for platform checks, and `MediaQuery.paddingOf` in the app bar, so these widgets work on web and rebuild less.
 * **Fix**: [480](https://github.com/SimformSolutionsPvtLtd/chatview/pull/480) :bug: `TextFieldActionButton` is now disabled when it has no `onPressed`, instead of being an enabled button that does nothing.
 * **Perf**: [479](https://github.com/SimformSolutionsPvtLtd/chatview/pull/479) :zap: The typing indicator repaints only its dots and starts no tickers for a custom indicator, and the suggestion list builds its items once instead of on every animation frame.

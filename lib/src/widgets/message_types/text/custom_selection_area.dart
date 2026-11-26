@@ -21,18 +21,22 @@ class CustomSelectionArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(textSelectionTheme: config?.themeData),
-      child: SelectionArea(
-        focusNode: config?.focusNode,
-        selectionControls: config?.selectionControls,
-        contextMenuBuilder:
-            config?.contextMenuBuilder ?? _defaultContextMenuBuilder,
-        onSelectionChanged: config?.onSelectionChanged,
-        magnifierConfiguration: config?.magnifierConfiguration,
-        child: child,
-      ),
+    final area = SelectionArea(
+      focusNode: config?.focusNode,
+      selectionControls: config?.selectionControls,
+      contextMenuBuilder:
+          config?.contextMenuBuilder ?? _defaultContextMenuBuilder,
+      onSelectionChanged: config?.onSelectionChanged,
+      magnifierConfiguration: config?.magnifierConfiguration,
+      child: child,
     );
+    final themeData = config?.themeData;
+    return themeData == null
+        ? area
+        : Theme(
+            data: Theme.of(context).copyWith(textSelectionTheme: themeData),
+            child: area,
+          );
   }
 
   static Widget _defaultContextMenuBuilder(

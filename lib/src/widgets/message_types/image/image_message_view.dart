@@ -28,10 +28,10 @@ import '../../../models/config_models/chat_view/feature_active_config.dart';
 import '../../../models/config_models/chat_view/message/image_message_configuration.dart';
 import '../../../models/config_models/chat_view/reactions/message_reaction_configuration.dart';
 import '../../../utils/constants/constants.dart';
+import '../../chat_bubble/share_icon.dart';
 import '../../message_status/in_bubble_time_and_receipt.dart';
 import '../../reactions/reaction_widget.dart';
 import 'adaptive_image.dart';
-import '../../chat_bubble/share_icon.dart';
 
 class ImageMessageView extends StatelessWidget {
   const ImageMessageView({
@@ -146,7 +146,10 @@ class ImageMessageView extends StatelessWidget {
         Stack(
           children: [
             GestureDetector(
-              onTap: () => imageMessageConfig?.onTap?.call(message),
+              // Null when unset, so the tap falls through to the bubble.
+              onTap: imageMessageConfig?.onTap == null
+                  ? null
+                  : () => imageMessageConfig!.onTap!(message),
               child: Transform.scale(
                 scale: highlightImage ? highlightScale : 1.0,
                 alignment: isMessageBySender
@@ -189,9 +192,11 @@ class ImageMessageView extends StatelessWidget {
                               horizontal: 6,
                               vertical: 2,
                             ),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.black45,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
                             ),
                             child: InBubbleTimeAndReceipt(
                               message: message,

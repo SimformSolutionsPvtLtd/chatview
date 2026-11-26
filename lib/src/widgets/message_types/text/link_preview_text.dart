@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -35,8 +36,30 @@ class LinkPreviewText extends StatefulWidget {
 class _LinkPreviewTextState extends State<LinkPreviewText> {
   final List<TapGestureRecognizer> _recognizers = [];
 
+  /// Built when the text or its styles change, not on every build, so the
+  /// recognizers are created once and not once per rebuild.
+  late List<TextSpan> _spans;
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    _spans = _buildSpans();
+  }
+
+  @override
+  void didUpdateWidget(LinkPreviewText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.textMessage != widget.textMessage ||
+        !listEquals(oldWidget.extractedUrls, widget.extractedUrls) ||
+        oldWidget.normalTextStyle != widget.normalTextStyle ||
+        oldWidget.linkPreviewConfig?.linkStyle !=
+            widget.linkPreviewConfig?.linkStyle) {
+      _disposeRecognizers();
+      _spans = _buildSpans();
+    }
+  }
+
+  List<TextSpan> _buildSpans() {
     final linkStyle = widget.linkPreviewConfig?.linkStyle;
     final spans = <TextSpan>[];
     var lastIndex = 0;
@@ -54,6 +77,7 @@ class _LinkPreviewTextState extends State<LinkPreviewText> {
         );
       }
 
+      // Reads [widget] when tapped, so a new `onLinkTap` needs no new span.
       final recognizer = TapGestureRecognizer()
         ..onTap = () => widget.onLinkTap(url);
       _recognizers.add(recognizer);
@@ -77,17 +101,24 @@ class _LinkPreviewTextState extends State<LinkPreviewText> {
         ),
       );
     }
+    return spans;
+  }
 
-    return RichText(
-      text: TextSpan(children: spans),
-    );
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(TextSpan(children: _spans));
+  }
+
+  void _disposeRecognizers() {
+    for (final recognizer in _recognizers) {
+      recognizer.dispose();
+    }
+    _recognizers.clear();
   }
 
   @override
   void dispose() {
-    for (final recognizer in _recognizers) {
-      recognizer.dispose();
-    }
+    _disposeRecognizers();
     super.dispose();
   }
 }

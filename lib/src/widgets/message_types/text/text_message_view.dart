@@ -130,6 +130,70 @@ class TextMessageView extends StatelessWidget {
       outgoingChatBubbleConfig: outgoingChatBubbleConfig,
       featureActiveConfig: featureActiveConfig,
     );
+    // Built here, not inside the highlight builder, so a highlight change does
+    // not rebuild it (or re-measure the text).
+    final content = showTimeInChatBubble || showInBubbleReceipt
+        ? LayoutBuilder(
+            builder: (context, constraints) {
+              final canShowInSingleLine = extractedUrls.isEmpty &&
+                  !textMessage.contains('\n') &&
+                  _canRenderTimeInSingleLine(
+                    context: context,
+                    messageText: textMessage,
+                    messageStyle: effectiveTextStyle,
+                    // Measure the time only when it is actually drawn.
+                    timeText: showTimeInChatBubble ? timeText : '',
+                    timeStyle: timestampStyle,
+                    maxContentWidth: constraints.maxWidth,
+                    // Room for the clock/tick next to the time: icon
+                    // width + its horizontal padding on both sides, plus
+                    // the 4px gap between the time and the icon.
+                    extraTrailingWidth: showInBubbleReceipt
+                        ? clockToTickIconSize +
+                            2 * clockToTickIconPadding +
+                            (showTimeInChatBubble ? 4 : 0)
+                        : 0,
+                  );
+
+              if (canShowInSingleLine) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Flexible(child: messageWidget),
+                    const SizedBox(width: 8),
+                    InBubbleTimeAndReceipt(
+                      message: message,
+                      timeStyle: timestampStyle,
+                      showTime: showTimeInChatBubble,
+                      // Not isMessageBySender: the tick must also honor
+                      // receiptsBuilderVisibility, the animation type
+                      // and a custom receiptsBuilder.
+                      showReceipt: showInBubbleReceipt,
+                      outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+                    ),
+                  ],
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  messageWidget,
+                  const SizedBox(height: 4),
+                  InBubbleTimeAndReceipt(
+                    message: message,
+                    timeStyle: timestampStyle,
+                    showTime: showTimeInChatBubble,
+                    showReceipt: showInBubbleReceipt,
+                    outgoingChatBubbleConfig: outgoingChatBubbleConfig,
+                  ),
+                ],
+              );
+            },
+          )
+        : messageWidget;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -158,68 +222,7 @@ class TextMessageView extends StatelessWidget {
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
           ),
-          child: showTimeInChatBubble || showInBubbleReceipt
-              ? LayoutBuilder(
-                  builder: (context, constraints) {
-                    final canShowInSingleLine = extractedUrls.isEmpty &&
-                        !textMessage.contains('\n') &&
-                        _canRenderTimeInSingleLine(
-                          context: context,
-                          messageText: textMessage,
-                          messageStyle: effectiveTextStyle,
-                          // Measure the time only when it is actually drawn.
-                          timeText: showTimeInChatBubble ? timeText : '',
-                          timeStyle: timestampStyle,
-                          maxContentWidth: constraints.maxWidth,
-                          // Room for the clock/tick next to the time: icon
-                          // width + its horizontal padding on both sides, plus
-                          // the 4px gap between the time and the icon.
-                          extraTrailingWidth: showInBubbleReceipt
-                              ? clockToTickIconSize +
-                                  2 * clockToTickIconPadding +
-                                  (showTimeInChatBubble ? 4 : 0)
-                              : 0,
-                        );
-
-                    if (canShowInSingleLine) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Flexible(child: messageWidget),
-                          const SizedBox(width: 8),
-                          InBubbleTimeAndReceipt(
-                            message: message,
-                            timeStyle: timestampStyle,
-                            showTime: showTimeInChatBubble,
-                            // Not isMessageBySender: the tick must also honor
-                            // receiptsBuilderVisibility, the animation type
-                            // and a custom receiptsBuilder.
-                            showReceipt: showInBubbleReceipt,
-                            outgoingChatBubbleConfig: outgoingChatBubbleConfig,
-                          ),
-                        ],
-                      );
-                    }
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        messageWidget,
-                        const SizedBox(height: 4),
-                        InBubbleTimeAndReceipt(
-                          message: message,
-                          timeStyle: timestampStyle,
-                          showTime: showTimeInChatBubble,
-                          showReceipt: showInBubbleReceipt,
-                          outgoingChatBubbleConfig: outgoingChatBubbleConfig,
-                        ),
-                      ],
-                    );
-                  },
-                )
-              : messageWidget,
+          child: content,
         ),
         if (message.reaction.reactions.isNotEmpty)
           ReactionWidget(
@@ -324,9 +327,11 @@ class TextMessageView extends StatelessWidget {
       maxLines: 1,
       textScaler: textScaler,
     )..layout(maxWidth: maxContentWidth);
+    final timeWidth = timePainter.width;
+    timePainter.dispose();
 
     final availableForMessage =
-        maxContentWidth - 8 - timePainter.width - extraTrailingWidth;
+        maxContentWidth - 8 - timeWidth - extraTrailingWidth;
 
     // A narrow bubble can leave no room, and layout rejects a negative width.
     if (availableForMessage <= 0) return false;
@@ -338,7 +343,11 @@ class TextMessageView extends StatelessWidget {
       textScaler: textScaler,
     )..layout(maxWidth: availableForMessage);
 
-    return !messagePainter.didExceedMaxLines &&
+    final fits = !messagePainter.didExceedMaxLines &&
         messagePainter.width <= availableForMessage;
+
+    messagePainter.dispose();
+
+    return fits;
   }
 }

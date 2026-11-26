@@ -37,7 +37,9 @@ class AdaptiveImage extends StatelessWidget {
         imageUrl: imageUrl,
         fit: fit,
         progressIndicatorBuilder: (context, url, progress) => Center(
-          child: CircularProgressIndicator(value: progress.progress),
+          child: RepaintBoundary(
+            child: CircularProgressIndicator(value: progress.progress),
+          ),
         ),
         errorWidget: (context, _, error) => _buildError(context, error),
       );

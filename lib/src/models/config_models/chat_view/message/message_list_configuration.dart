@@ -99,8 +99,8 @@ class ChatBackgroundConfiguration {
   /// Used for giving widget while data is loading.
   final Widget? loadingWidget;
 
-  /// Used to give curve of animation which runes while user swipe to see time of
-  /// message.
+  /// Used to give curve of the animation which slides the message time back
+  /// after the user lifts the finger from swiping to see the time of message.
   final Curve messageTimeAnimationCurve;
 
   /// Provides callback to sort message

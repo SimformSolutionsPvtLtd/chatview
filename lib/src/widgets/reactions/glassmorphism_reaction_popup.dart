@@ -55,71 +55,37 @@ class GlassMorphismReactionPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          constraints:
-              BoxConstraints(maxWidth: reactionPopupConfig?.maxWidth ?? 350),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                backgroundColor.withAlpha(opacity),
-                backgroundColor.withAlpha(opacity),
-              ],
-              stops: const <double>[
-                0.3,
-                0,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(borderRadius),
+    return Padding(
+      // Margin applied once, to the glass and its border together.
+      padding: reactionPopupConfig?.margin ??
+          const EdgeInsets.symmetric(horizontal: 25),
+      child: ConstrainedBox(
+        constraints:
+            BoxConstraints(maxWidth: reactionPopupConfig?.maxWidth ?? 350),
+        child: CustomPaint(
+          // Painted on the glass box itself, so the ring always matches it.
+          foregroundPainter: _GradientPainter(
+            strokeWidth: strokeWidth,
+            radius: borderRadius,
+            borderColor: borderColor,
           ),
           child: ClipRRect(
             clipBehavior: Clip.hardEdge,
             borderRadius: BorderRadius.circular(borderRadius),
             child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 8,
-                sigmaY: 16,
-              ),
-              child: Padding(
-                padding: reactionPopupConfig?.padding ??
-                    const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
-                child: child,
-              ),
-            ),
-          ),
-        ),
-        IgnorePointer(
-          child: Padding(
-            padding: reactionPopupConfig?.margin ??
-                const EdgeInsets.symmetric(horizontal: 25),
-            child: CustomPaint(
-              painter: _GradientPainter(
-                strokeWidth: strokeWidth,
-                radius: borderRadius,
-                borderColor: borderColor,
-              ),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: reactionPopupConfig?.maxWidth ?? maxWidth,
-                ),
-                padding: EdgeInsets.symmetric(
-                  vertical: reactionPopupConfig?.emojiConfig?.size ?? 28,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(borderRadius),
-                  ),
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 16),
+              child: ColoredBox(
+                color: backgroundColor.withAlpha(opacity),
+                child: Padding(
+                  padding: reactionPopupConfig?.padding ??
+                      const EdgeInsets.symmetric(vertical: 6, horizontal: 14),
+                  child: child,
                 ),
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -166,22 +132,21 @@ class _GradientPainter extends CustomPainter {
     );
     _paintObject.shader = _gradient.createShader(Offset.zero & size);
 
-    final outerRectPath = Path()..addRRect(outerRect);
-    final innerRectPath2 = Path()..addRRect(innerRect2);
-    canvas.drawPath(
-      Path.combine(
-        PathOperation.difference,
-        outerRectPath,
-        Path.combine(
-          PathOperation.intersect,
-          outerRectPath,
-          innerRectPath2,
-        ),
-      ),
-      _paintObject,
-    );
+    // Draw the border as one path holding two shapes: outer and inner rect.
+    // `evenOdd` fills only the part covered by one shape (the ring) and leaves
+    // the inside of the inner rect empty. This is cheaper than cutting that
+    // hole with `Path.combine` on every paint.
+    final path = Path()
+      ..fillType = PathFillType.evenOdd
+      ..addRRect(outerRect)
+      ..addRRect(innerRect2);
+    canvas.drawPath(path, _paintObject);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
+  bool shouldRepaint(CustomPainter oldDelegate) =>
+      oldDelegate is _GradientPainter &&
+      (oldDelegate.radius != radius ||
+          oldDelegate.strokeWidth != strokeWidth ||
+          oldDelegate.borderColor != borderColor);
 }

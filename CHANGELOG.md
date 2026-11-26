@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+* **Perf**: :zap: The reaction pop-up, reaction chips, swipe-to-reply and the reply preview rebuild far less per frame. The pop-up background is built once, the reply bar is drawn with a border, and received reaction chips skip size measuring.
+* **Fix**: :bug: The reply title no longer reads "Replied by null" for an unknown user, and the reply preview above the text field shows the name of the user you are replying to instead of the previous one.
+* **Fix**: :bug: The reaction chip is re-measured on rotation. Add `moreReactions` to `ChatViewLocale` as the accessibility label of the pop-up's "+" button.
 * **Perf**: :zap: Emoji detection now checks a constant set instead of decoding a JSON dataset, and stops at the first non-emoji character. A message's URLs are found once, and the last message time reuses cached date formats.
 * **Fix**: :bug: The reaction pop-up and the list padding now survive host rebuilds, and the padding follows the text field while typing. The config inherited widgets only notify dependents when a config instance changes.
 * **Fix**: :bug: The text field's default text colour is now chosen from its background, so typed text is no longer white on a white field.

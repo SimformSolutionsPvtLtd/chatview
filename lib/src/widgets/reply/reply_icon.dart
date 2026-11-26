@@ -52,12 +52,14 @@ class ReplyIcon extends StatelessWidget {
           ),
           height: replyIconSize,
           width: replyIconSize,
-          child: CircularProgressIndicator(
-            value: animationValue,
-            backgroundColor: Colors.transparent,
-            strokeWidth: 1.5,
-            color: swipeToReplyConfig?.replyIconProgressRingColor ??
-                Colors.grey.shade300,
+          child: RepaintBoundary(
+            child: CircularProgressIndicator(
+              value: animationValue,
+              backgroundColor: Colors.transparent,
+              strokeWidth: 1.5,
+              color: swipeToReplyConfig?.replyIconProgressRingColor ??
+                  Colors.grey.shade300,
+            ),
           ),
         ),
         Transform.scale(

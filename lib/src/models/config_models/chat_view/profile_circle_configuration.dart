@@ -61,6 +61,8 @@ class ProfileCircleConfiguration {
   final ImageType imageType;
 
   /// Field to set default avatar image if profile image link not provided
+  ///
+  /// It is loaded as a network image, so give it a URL.
   final String defaultAvatarImage;
 
   /// Error builder to build error widget for asset image

@@ -63,19 +63,23 @@ class ProfileImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = (circleRadius ?? 20) * 2;
+    // No photo: show the default avatar, which is always a network image.
+    final hasPhoto = imageUrl?.isNotEmpty ?? false;
+    final url = hasPhoto ? imageUrl! : defaultAvatarImage;
+    final type = hasPhoto ? imageType : ImageType.network;
     return ClipRRect(
       borderRadius: BorderRadius.circular(circleRadius ?? 20),
-      child: switch (imageType) {
-        ImageType.asset when (imageUrl?.isNotEmpty ?? false) => Image.asset(
-            imageUrl!,
+      child: switch (type) {
+        _ when url.isEmpty => const SizedBox.shrink(),
+        ImageType.asset => Image.asset(
+            url,
             height: radius,
             width: radius,
             fit: BoxFit.cover,
             errorBuilder: assetImageErrorBuilder ?? _errorWidget,
           ),
-        ImageType.network when (imageUrl?.isNotEmpty ?? false) =>
-          CachedNetworkImage(
-            imageUrl: imageUrl ?? defaultAvatarImage,
+        ImageType.network => CachedNetworkImage(
+            imageUrl: url,
             height: radius,
             width: radius,
             fit: BoxFit.cover,
@@ -94,8 +98,8 @@ class ProfileImageWidget extends StatelessWidget {
                         ),
             errorWidget: networkImageErrorBuilder ?? _networkImageErrorWidget,
           ),
-        ImageType.base64 when (imageUrl?.isNotEmpty ?? false) => Image.memory(
-            base64Decode(imageUrl!),
+        ImageType.base64 => Image.memory(
+            base64Decode(url),
             height: radius,
             width: radius,
             fit: BoxFit.cover,

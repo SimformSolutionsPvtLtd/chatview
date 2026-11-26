@@ -209,8 +209,7 @@ class _MessageViewState extends State<MessageView>
                       if (widget.message.reaction.reactions.isNotEmpty)
                         ReactionWidget(
                           reaction: widget.message.reaction,
-                          messageReactionConfig:
-                              messageConfig?.messageReactionConfig,
+                          config: messageConfig?.messageReactionConfig,
                           isMessageBySender: widget.isMessageBySender,
                         ),
                     ],
@@ -268,8 +267,7 @@ class _MessageViewState extends State<MessageView>
                             if (widget.message.reaction.reactions.isNotEmpty)
                               ReactionWidget(
                                 reaction: widget.message.reaction,
-                                messageReactionConfig:
-                                    messageConfig?.messageReactionConfig,
+                                config: messageConfig?.messageReactionConfig,
                                 isMessageBySender: widget.isMessageBySender,
                               ),
                           ],

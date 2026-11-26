@@ -63,6 +63,7 @@ final class ChatViewLocale {
     this.sent = 'Sent',
     this.read = 'Read',
     this.notDelivered = 'Not delivered',
+    this.moreReactions = 'More reactions',
   });
 
   /// Create from `Map<String, String>`
@@ -108,6 +109,7 @@ final class ChatViewLocale {
       sent: map['sent']?.toString() ?? 'Sent',
       read: map['read']?.toString() ?? 'Read',
       notDelivered: map['notDelivered']?.toString() ?? 'Not delivered',
+      moreReactions: map['moreReactions']?.toString() ?? 'More reactions',
     );
   }
 
@@ -165,6 +167,9 @@ final class ChatViewLocale {
 
   /// Announced for an outgoing message that could not be delivered.
   final String notDelivered;
+
+  /// Accessibility label for the "+" button in the reaction pop-up.
+  final String moreReactions;
 
   /// English defaults
   static const en = ChatViewLocale(

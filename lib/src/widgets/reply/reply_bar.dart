@@ -21,36 +21,43 @@
  */
 import 'package:flutter/material.dart';
 
-class VerticalLine extends StatelessWidget {
-  const VerticalLine({
+/// Draws the vertical bar of a replied message as a border on the side
+/// facing the screen edge, with [child] inside it.
+class ReplyBar extends StatelessWidget {
+  const ReplyBar({
+    required this.child,
+    required this.replyBySender,
     super.key,
-    this.leftPadding = 0,
-    this.rightPadding = 0,
     this.verticalBarColor,
     this.verticalBarWidth,
   });
 
-  /// Allow user to set color of bar
+  final Widget child;
+
+  /// Bar is on the right when the current user replied, else on the left.
+  final bool replyBySender;
+
   final Color? verticalBarColor;
-
-  /// Allow user to set left padding.
-  final double leftPadding;
-
-  /// Allow user to set left padding.
-  final double rightPadding;
-
-  /// Allow user to set width of bar.
   final double? verticalBarWidth;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final bar = BorderSide(
       width: verticalBarWidth ?? 2.5,
       color: verticalBarColor ?? Colors.grey.shade300,
-      margin: EdgeInsets.only(
-        left: leftPadding,
-        right: rightPadding,
+    );
+    return Container(
+      padding: EdgeInsets.only(
+        left: replyBySender ? 0 : 4,
+        right: replyBySender ? 4 : 0,
       ),
+      decoration: BoxDecoration(
+        border: Border(
+          left: replyBySender ? BorderSide.none : bar,
+          right: replyBySender ? bar : BorderSide.none,
+        ),
+      ),
+      child: child,
     );
   }
 }

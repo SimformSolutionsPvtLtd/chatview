@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
@@ -48,10 +50,19 @@ class SwipeToReply extends StatefulWidget {
   State<SwipeToReply> createState() => _SwipeToReplyState();
 }
 
-class _SwipeToReplyState extends State<SwipeToReply> {
-  double paddingValue = 0;
-  double trackPaddingValue = 0;
+class _SwipeToReplyState extends State<SwipeToReply>
+    with SingleTickerProviderStateMixin {
+  // How far the bubble is dragged (0..paddingLimit); only the builder listens.
+  final _offset = ValueNotifier<double>(0);
+
+  /// Eases the bubble back on release. Created on the first release only, so
+  /// bubbles that are never swiped carry no controller.
+  AnimationController? _settle;
+
+  // Finger x at drag start, the swipe distance is measured from it.
   double initialTouchPoint = 0;
+
+  // Makes onSwipe fire once per drag.
   bool isCallBackTriggered = false;
 
   late bool isMessageByCurrentUser = widget.isMessageByCurrentUser;
@@ -64,57 +75,96 @@ class _SwipeToReplyState extends State<SwipeToReply> {
     return !(chatViewIW?.featureActiveConfig.enableSwipeToReply ?? true)
         ? widget.child
         : GestureDetector(
-            onHorizontalDragStart: (details) =>
-                initialTouchPoint = details.globalPosition.dx,
-            onHorizontalDragEnd: (details) => setState(
-              () {
-                paddingValue = 0;
-                isCallBackTriggered = false;
-              },
-            ),
+            onHorizontalDragStart: (details) {
+              // A new drag cancels a running snap back.
+              _settle?.stop();
+              initialTouchPoint = details.globalPosition.dx;
+            },
+            onHorizontalDragEnd: (_) => _reset(),
+            onHorizontalDragCancel: _reset,
             onHorizontalDragUpdate: _onHorizontalDragUpdate,
-            child: Stack(
-              alignment: isMessageByCurrentUser
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              fit: StackFit.passthrough,
-              children: [
-                ReplyIcon(
-                  replyIconSize: replyIconSize,
-                  animationValue: paddingValue > replyIconSize
-                      ? paddingValue / paddingLimit
-                      : 0.0,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    right: isMessageByCurrentUser ? paddingValue : 0,
-                    left: isMessageByCurrentUser ? 0 : paddingValue,
+            child: ValueListenableBuilder(
+              valueListenable: _offset,
+              child: widget.child,
+              builder: (context, paddingValue, child) => Stack(
+                alignment: isMessageByCurrentUser
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                fit: StackFit.passthrough,
+                children: [
+                  // Show the icon only once the bubble has moved past
+                  // the icon's size. Before that it is invisible anyway.
+                  //
+                  // The empty SizedBox keeps the bubble as the 2nd child.
+                  // Without it the bubble would shift position, and Flutter
+                  // would rebuild it and lose its state.
+                  if (paddingValue > replyIconSize)
+                    ReplyIcon(
+                      replyIconSize: replyIconSize,
+                      animationValue: paddingValue / paddingLimit,
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  // Translate instead of Padding: padding re-lays out the bubble
+                  // on every drag frame, translate only repaints it.
+                  Transform.translate(
+                    offset: Offset(
+                      isMessageByCurrentUser ? -paddingValue : paddingValue,
+                      0,
+                    ),
+                    child: child,
                   ),
-                  child: widget.child,
-                ),
-              ],
+                ],
+              ),
             ),
           );
   }
 
+  @override
+  void dispose() {
+    // Disposing a controller also drops its listener.
+    _settle?.dispose();
+    _offset.dispose();
+    super.dispose();
+  }
+
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
+    // Distance dragged towards the reply side (own messages go left).
     final swipeDistance = isMessageByCurrentUser
         ? (initialTouchPoint - details.globalPosition.dx)
         : (details.globalPosition.dx - initialTouchPoint);
-    if (swipeDistance >= 0 && trackPaddingValue < paddingLimit) {
-      setState(() {
-        paddingValue = swipeDistance;
-      });
-    } else if (paddingValue >= paddingLimit) {
-      if (!isCallBackTriggered) {
-        widget.onSwipe();
-        isCallBackTriggered = true;
-      }
-    } else {
-      setState(() {
-        paddingValue = 0;
-      });
+
+    // Never negative, never past the limit.
+    final swipeOffset = swipeDistance.clamp(0.0, paddingLimit).toDouble();
+    // Skip the write (and the rebuild) when nothing changed.
+    if (swipeOffset != _offset.value) _offset.value = swipeOffset;
+
+    // Reached the limit: trigger the reply once.
+    if (swipeOffset >= paddingLimit && !isCallBackTriggered) {
+      isCallBackTriggered = true;
+      widget.onSwipe();
     }
-    trackPaddingValue = swipeDistance;
+  }
+
+  void _reset() {
+    isCallBackTriggered = false;
+    // Nothing to snap back.
+    if (_offset.value == 0) return;
+    // Start where the bubble is, on every release.
+    final snapBack = (_settle ??= _createSnapBackController())
+      ..value = _offset.value;
+    // Ease the bubble back to 0.
+    unawaited(snapBack.animateBack(0, curve: Curves.easeOut));
+  }
+
+  AnimationController _createSnapBackController() {
+    // Its value is the offset itself (0..paddingLimit).
+    final controller = AnimationController(
+      vsync: this,
+      upperBound: paddingLimit.toDouble(),
+      duration: const Duration(milliseconds: 150),
+    );
+    // Copy each animation frame into the offset the builder listens to.
+    return controller..addListener(() => _offset.value = controller.value);
   }
 }

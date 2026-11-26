@@ -104,11 +104,8 @@ typedef EditMessageCallback = void Function(
   Message message,
   Message updatedMessage,
 );
-typedef ChatTextFieldViewBuilderCallback<T> = Widget Function(
-  BuildContext context,
-  T value,
-  Widget? child,
-);
+@Deprecated('Use `ValueWidgetBuilder` instead.')
+typedef ChatTextFieldViewBuilderCallback<T> = ValueWidgetBuilder<T>;
 typedef TextFieldActionWidgetBuilder = List<Widget> Function(
   BuildContext context,
   TextEditingController controller,

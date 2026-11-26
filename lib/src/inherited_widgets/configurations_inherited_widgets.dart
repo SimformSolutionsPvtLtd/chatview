@@ -58,7 +58,23 @@ class ConfigurationsInheritedWidget extends InheritedWidget {
   static ConfigurationsInheritedWidget? of(BuildContext context) => context
       .dependOnInheritedWidgetOfExactType<ConfigurationsInheritedWidget>();
 
+  // Identity, not `==`: the config models have no `==`, and a host that
+  // rebuilds with the same instances must not wake every dependent.
   @override
-  bool updateShouldNotify(covariant ConfigurationsInheritedWidget oldWidget) =>
-      oldWidget != this;
+  bool updateShouldNotify(covariant ConfigurationsInheritedWidget oldWidget) {
+    return !identical(oldWidget.chatBackgroundConfig, chatBackgroundConfig) ||
+        !identical(oldWidget.reactionPopupConfig, reactionPopupConfig) ||
+        !identical(oldWidget.messageConfig, messageConfig) ||
+        !identical(oldWidget.chatBubbleConfig, chatBubbleConfig) ||
+        !identical(oldWidget.profileCircleConfig, profileCircleConfig) ||
+        !identical(oldWidget.swipeToReplyConfig, swipeToReplyConfig) ||
+        !identical(oldWidget.repliedMessageConfig, repliedMessageConfig) ||
+        !identical(oldWidget.typeIndicatorConfig, typeIndicatorConfig) ||
+        !identical(oldWidget.replyPopupConfig, replyPopupConfig) ||
+        !identical(oldWidget.emojiPickerSheetConfig, emojiPickerSheetConfig) ||
+        !identical(
+          oldWidget.scrollToBottomButtonConfig,
+          scrollToBottomButtonConfig,
+        );
+  }
 }

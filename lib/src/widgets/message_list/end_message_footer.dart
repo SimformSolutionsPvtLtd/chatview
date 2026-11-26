@@ -44,11 +44,10 @@ class _EndMessageFooterState extends State<EndMessageFooter>
             ),
           ),
         const SuggestionList(),
-        if (widget.isNextPageLoading.value)
-          PaginationLoader(
-            listenable: widget.isNextPageLoading,
-            loader: widget.loadingWidget,
-          ),
+        PaginationLoader(
+          listenable: widget.isNextPageLoading,
+          loader: widget.loadingWidget,
+        ),
       ],
     );
   }

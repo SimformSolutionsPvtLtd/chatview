@@ -72,6 +72,26 @@ typedef GetMessageSeparatorWithCounts = (
   DateTime lastMatchedDate,
   Map<int, int> separatorCounts
 );
+
+/// The sorted messages and their date separators, computed once per stream
+/// event so that rebuilds only read it.
+typedef MessageTimeline = ({
+  List<Message> messages,
+  Map<int, DateTime> separators,
+  Map<int, int> separatorCounts,
+
+  /// List index of each item, by message id (`String`) and by separator day
+  /// (`DateTime`). Lets the list find an item again by key after an insert
+  /// shifts the indices.
+  Map<Object, int> itemIndexes,
+});
+
+/// Builds the message list under `SwipeToSeeTime`. [slideAnimation] is null
+/// when swipe-to-see-time is turned off.
+typedef SwipeToSeeTimeBuilder = Widget Function(
+  BuildContext context,
+  Animation<Offset>? slideAnimation,
+);
 typedef SelectedImageViewBuilder = Widget Function(
   List<String> images,
   ValueSetter<String> onImageRemove,

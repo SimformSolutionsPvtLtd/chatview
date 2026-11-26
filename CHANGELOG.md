@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Refactor**: [480](https://github.com/SimformSolutionsPvtLtd/chatview/pull/480) :recycle: Use `defaultTargetPlatform` instead of `dart:io`'s `Platform` for platform checks, and `MediaQuery.paddingOf` in the app bar, so these widgets work on web and rebuild less.
+* **Fix**: [480](https://github.com/SimformSolutionsPvtLtd/chatview/pull/480) :bug: `TextFieldActionButton` is now disabled when it has no `onPressed`, instead of being an enabled button that does nothing.
 * **Perf**: [479](https://github.com/SimformSolutionsPvtLtd/chatview/pull/479) :zap: The typing indicator repaints only its dots and starts no tickers for a custom indicator, and the suggestion list builds its items once instead of on every animation frame.
 * **Fix**: [479](https://github.com/SimformSolutionsPvtLtd/chatview/pull/479) :bug: Fix animation listener leaks in the chat list and the sending indicator, and make the reply suggestion list react when `replySuggestionsConfig` changes.
 * **Perf**: [478](https://github.com/SimformSolutionsPvtLtd/chatview/pull/478) :zap: Highlighting a replied message now rebuilds only that message instead of every visible bubble.

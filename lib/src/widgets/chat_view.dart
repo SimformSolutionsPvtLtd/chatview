@@ -19,8 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -381,8 +379,8 @@ class _ChatViewState extends State<ChatView> {
 
   void _onChatListTap(BuildContext context) {
     widget.onChatListTap?.call();
-    if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-      FocusScope.of(context).unfocus();
+    if (defaultTargetPlatform.isNativeMobile) {
+      FocusManager.instance.primaryFocus?.unfocus();
     }
     context.chatViewIW?.showPopUp.value = false;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

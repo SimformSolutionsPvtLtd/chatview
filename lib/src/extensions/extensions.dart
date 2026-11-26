@@ -464,8 +464,16 @@ extension AsyncSnapshotExtension<T> on AsyncSnapshot<List<T>> {
 }
 
 extension PlatformExtension on TargetPlatform {
-  bool get isMobile =>
-      !kIsWeb && (this == TargetPlatform.iOS || this == TargetPlatform.android);
+  /// A native Android or iOS app. False on web, even in a phone's browser.
+  bool get isNativeMobile => !kIsWeb && isAndroidOrIOS;
+
+  bool get isIOS => this == TargetPlatform.iOS;
+
+  bool get isAndroid => this == TargetPlatform.android;
+
+  /// The platform is Android or iOS. True in a phone's web browser too, use
+  /// [isNativeMobile] when web must be excluded.
+  bool get isAndroidOrIOS => isAndroid || isIOS;
 }
 
 extension CupertinoContextMenuActionExtension on CupertinoContextMenuAction {

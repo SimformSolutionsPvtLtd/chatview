@@ -27,6 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../chatview.dart';
+import '../../../extensions/extensions.dart';
 import '../../message_status/in_bubble_time_and_receipt.dart';
 import '../../reactions/reaction_widget.dart';
 
@@ -287,8 +288,7 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
 
   void _playOrPause() {
     assert(
-      defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.android,
+      defaultTargetPlatform.isAndroidOrIOS,
       'Voice messages are only supported with android and ios platform',
     );
     if (playerState.isInitialised ||

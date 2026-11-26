@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* **Perf**: :zap: Emoji detection now checks a constant set instead of decoding a JSON dataset, and stops at the first non-emoji character. A message's URLs are found once, and the last message time reuses cached date formats.
 * **Fix**: :bug: The reaction pop-up and the list padding now survive host rebuilds, and the padding follows the text field while typing. The config inherited widgets only notify dependents when a config instance changes.
 * **Fix**: :bug: The text field's default text colour is now chosen from its background, so typed text is no longer white on a white field.
 * **Feat**: :sparkles: Add `leadingActionsAlignment` and `trailingActionsAlignment` to `TextFieldConfiguration` to choose where text field actions sit when the field grows to several lines.

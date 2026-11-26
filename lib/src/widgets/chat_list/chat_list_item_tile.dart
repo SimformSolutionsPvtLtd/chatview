@@ -173,7 +173,7 @@ class ChatListItemTile extends StatelessWidget {
                       lastMessageTimeConfig.timeBuilder?.call(createAt) ??
                           Text(
                             formatLastMessageTime(
-                              createAt.toString(),
+                              createAt,
                               lastMessageTimeConfig.dateFormatPattern,
                             ),
                             maxLines: lastMessageTimeConfig.maxLines,

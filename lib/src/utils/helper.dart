@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 
 import '../extensions/extensions.dart';
 import '../models/config_models/chat_view/message_input/image_picker_configuration.dart';
@@ -44,22 +43,20 @@ Future<String?> onMediaActionButtonPressed(
   }
 }
 
-/// Returns a formatted string representing the time of the last message.
-/// - If the message was sent less than a minute ago, returns 'Now'.
-/// - If the message was sent less than an hour ago, returns 'X min ago'.
-/// - If the message was sent today, returns the time in 'hh:mm a' format.
-/// - If the message was sent yesterday, returns 'Yesterday'.
-/// - Otherwise, formats the date using the provided pattern.
+/// Formats the time of the last message: the time today, the weekday for the
+/// previous 6 days (yesterday included), otherwise [dateFormatPattern].
 ///
-/// [messageDateStr] is the date string of the message in UTC.
-/// [dateFormatPattern] is the pattern to format dates older than yesterday.
+/// [createAtDate] can be UTC or local, the day is compared in local time.
+///
+/// Example, on Thursday 19 Nov 2026 with the pattern 'dd/MM/yyyy':
+/// - today at 9:15 gives '09:15 AM'
+/// - Monday 16 Nov gives 'Monday'
+/// - 5 Nov gives '05/11/2026'
 String formatLastMessageTime(
-  String messageDateStr,
+  DateTime createAtDate,
   String dateFormatPattern,
 ) {
-  final messageDate =
-      DateTime.tryParse(messageDateStr)?.toLocal(); // Convert from UTC to local
-  if (messageDate == null) return '';
+  final messageDate = createAtDate.toLocal(); // Convert from UTC to local
   final now = DateTime.now();
   final isLast7Days = now
           .difference(
@@ -69,10 +66,10 @@ String formatLastMessageTime(
       7;
 
   if (now.isSameCalendarDay(messageDate)) {
-    return DateFormat('hh:mm a').format(messageDate); // Today
+    return messageDate.formatWith('hh:mm a'); // Today
   } else if (isLast7Days) {
-    return DateFormat('EEEE').format(messageDate);
+    return messageDate.formatWith('EEEE');
   } else {
-    return DateFormat(dateFormatPattern).format(messageDate);
+    return messageDate.formatWith(dateFormatPattern);
   }
 }

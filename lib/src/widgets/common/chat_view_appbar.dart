@@ -59,6 +59,8 @@ class ChatViewAppBar extends StatelessWidget {
   final String? userStatus;
 
   /// Allow user to change profile picture in appbar.
+  ///
+  /// When null no avatar is shown. When empty, [defaultAvatarImage] is shown.
   final String? profilePicture;
 
   /// Allow user to change text style of chat title.

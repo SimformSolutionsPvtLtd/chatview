@@ -19,10 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:io' if (kIsWeb) 'dart:html';
-
 import 'package:chatview_utils/chatview_utils.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../../extensions/extensions.dart';
@@ -137,7 +135,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                     bottom: 0,
                     child: Container(
                       height: context.screenSize.height /
-                          ((!kIsWeb && Platform.isIOS) ? 24 : 28),
+                          ((!kIsWeb && defaultTargetPlatform.isIOS) ? 24 : 28),
                       color:
                           chatListConfig.chatBackgroundConfig.backgroundColor ??
                               Colors.white,
@@ -380,7 +378,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     _closeEditMode();
   }
 
-  double get _bottomPadding => (!kIsWeb && Platform.isIOS)
+  double get _bottomPadding => (!kIsWeb && defaultTargetPlatform.isIOS)
       ? (_focusNode.hasFocus
           ? bottomPadding1
           : View.of(context).viewPadding.bottom > 0

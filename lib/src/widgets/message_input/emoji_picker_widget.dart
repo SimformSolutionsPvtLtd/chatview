@@ -19,11 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:io';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
+
+import '../../extensions/extensions.dart';
 
 class EmojiPickerWidget extends StatelessWidget {
   const EmojiPickerWidget({
@@ -72,8 +72,10 @@ class EmojiPickerWidget extends StatelessWidget {
                   Config(
                     emojiViewConfig: EmojiViewConfig(
                       columns: 7,
-                      emojiSizeMax:
-                          32 * ((!kIsWeb && Platform.isIOS) ? 1.30 : 1.0),
+                      emojiSizeMax: 32 *
+                          ((!kIsWeb && defaultTargetPlatform.isIOS)
+                              ? 1.30
+                              : 1.0),
                       backgroundColor: Colors.white,
                     ),
                     searchViewConfig: const SearchViewConfig(

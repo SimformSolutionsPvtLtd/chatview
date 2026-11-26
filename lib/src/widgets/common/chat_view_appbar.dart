@@ -19,12 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:io' if (kIsWeb) 'dart:html';
-
 import 'package:chatview_utils/chatview_utils.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 
+import '../../extensions/extensions.dart';
 import 'profile_image_widget.dart';
 
 class ChatViewAppBar extends StatelessWidget {
@@ -112,7 +111,7 @@ class ChatViewAppBar extends StatelessWidget {
       child: Container(
         padding: padding ??
             EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top,
+              top: MediaQuery.paddingOf(context).top,
               bottom: 4,
             ),
         color: backGroundColor ?? Colors.white,
@@ -123,7 +122,7 @@ class ChatViewAppBar extends StatelessWidget {
                   IconButton(
                     onPressed: onBackPress ?? () => Navigator.pop(context),
                     icon: Icon(
-                      (!kIsWeb && Platform.isIOS)
+                      (!kIsWeb && defaultTargetPlatform.isIOS)
                           ? Icons.arrow_back_ios
                           : Icons.arrow_back,
                       color: backArrowColor,

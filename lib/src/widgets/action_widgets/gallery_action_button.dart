@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../chatview.dart' show ChatView;
+import '../../extensions/extensions.dart';
 import '../../models/config_models/chat_view/message_input/image_picker_configuration.dart';
 import '../../utils/helper.dart';
 import '../../values/typedefs.dart';
@@ -39,7 +38,7 @@ class GalleryActionButton extends TextFieldActionButton {
                   // remain open and overlaps the text field.
 
                   // https://github.com/SimformSolutionsPvtLtd/chatview/issues/266
-                  if (!kIsWeb && Platform.isIOS && hasFocus) {
+                  if (!kIsWeb && defaultTargetPlatform.isIOS && hasFocus) {
                     primaryFocus?.requestFocus();
                   }
                   final replyMessage = context.mounted

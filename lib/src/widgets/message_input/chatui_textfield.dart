@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 import 'dart:async';
-import 'dart:io' show File, Platform;
+import 'dart:io' show File;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:chatview_utils/chatview_utils.dart';
@@ -134,7 +134,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
     );
     super.initState();
 
-    if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
+    if (!kIsWeb && defaultTargetPlatform.isAndroidOrIOS) {
       controller = RecorderController();
     }
     if (kIsWeb) {
@@ -463,7 +463,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
           // Always add the voice button at the end if allowed
           if ((sendMessageConfig.allowRecordingVoice) &&
               !kIsWeb &&
-              (Platform.isIOS || Platform.isAndroid))
+              defaultTargetPlatform.isAndroidOrIOS)
             IconButton(
               onPressed:
                   (textFieldConfig?.enabled ?? true) ? _recordOrStop : null,
@@ -499,8 +499,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   Future<void> _cancelRecording() async {
     assert(
-      defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.android,
+      defaultTargetPlatform.isAndroidOrIOS,
       'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) return;
@@ -520,8 +519,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   Future<void> _recordOrStop() async {
     assert(
-      defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.android,
+      defaultTargetPlatform.isAndroidOrIOS,
       'Voice messages are only supported with android and ios platform',
     );
     if (!isRecording.value) {

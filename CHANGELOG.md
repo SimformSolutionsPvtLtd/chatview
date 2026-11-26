@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+* **Refactor**: :recycle: Use `defaultTargetPlatform` instead of `dart:io`'s `Platform` for platform checks, and `MediaQuery.paddingOf` in the app bar, so these widgets work on web and rebuild less.
 * **Perf**: :zap: The typing indicator repaints only its dots and starts no tickers for a custom indicator, and the suggestion list builds its items once instead of on every animation frame.
 * **Fix**: :bug: Fix animation listener leaks in the chat list and the sending indicator, and make the reply suggestion list react when `replySuggestionsConfig` changes.
 * **Perf**: :zap: Highlighting a replied message now rebuilds only that message instead of every visible bubble.

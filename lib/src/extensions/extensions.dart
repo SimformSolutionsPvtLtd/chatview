@@ -542,3 +542,11 @@ extension MessageUrls on Message {
   List<String> get urls =>
       _urlsByMessage[this] ??= List.unmodifiable(message.extractedUrls);
 }
+
+extension DefaultTargetPlatformExtension on TargetPlatform {
+  bool get isIOS => this == TargetPlatform.iOS;
+
+  bool get isAndroid => this == TargetPlatform.android;
+
+  bool get isAndroidOrIOS => isAndroid || isIOS;
+}

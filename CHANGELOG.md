@@ -2,6 +2,7 @@
 
 * **Fix**: [469](https://github.com/SimformSolutionsPvtLtd/chatview/pull/469) :bug: The reaction pop-up and the list padding now survive host rebuilds, and the padding follows the text field while typing. The config inherited widgets only notify dependents when a config instance changes, and `ChatView` still notifies them when its controller is swapped.
 * **Fix**: [469](https://github.com/SimformSolutionsPvtLtd/chatview/pull/469) :bug: The text field's default text colour is now chosen from its background, so typed text is no longer white on a white field.
+* **Feat**: [473](https://github.com/SimformSolutionsPvtLtd/chatview/pull/473) :sparkles: Add `leadingActionsAlignment` and `trailingActionsAlignment` to `TextFieldConfiguration` to choose where text field actions sit when the field grows to several lines.
 * **Feat**: [454](https://github.com/SimformSolutionsPvtLtd/chatview/pull/454) :sparkles: Add configurable image fit option for AdaptiveImage widget
 * **Feat**: [457](https://github.com/SimformSolutionsPvtLtd/chatview/pull/457) :sparkles: Add errorWidget support to ImageMessageConfiguration
 * **Fix**: [458](https://github.com/SimformSolutionsPvtLtd/chatview/pull/458) Enhance text field action animations for improved UX

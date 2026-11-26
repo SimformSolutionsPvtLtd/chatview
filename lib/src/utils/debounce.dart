@@ -30,15 +30,17 @@ class Debouncer {
   final Duration duration;
   Timer? _debounce;
 
-  void run({required VoidCallback onComplete, VoidCallback? onInterrupt}) {
-    if (_debounce?.isActive ?? false) {
-      onInterrupt?.call();
-      _debounce?.cancel();
-    }
+  /// Restarts the timer and calls [onComplete] once calls stop for [duration].
+  ///
+  /// `onInterrupt` was removed: it only fired on a quick repeat call, so the
+  /// first call after an idle gap was missed.
+  void run({required VoidCallback onComplete}) {
+    _debounce?.cancel();
     _debounce = Timer(duration, onComplete);
   }
 
-  void dispose() {
-    _debounce?.cancel();
-  }
+  /// Cancels a pending [run] so its callback never fires.
+  void cancel() => _debounce?.cancel();
+
+  void dispose() => cancel();
 }

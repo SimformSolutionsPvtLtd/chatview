@@ -22,6 +22,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../extensions/extensions.dart';
+
 /// This widget has been created for size of widget which is covered in view port
 /// It also gives update when size changes.
 class MeasureSize extends StatefulWidget {
@@ -30,6 +32,7 @@ class MeasureSize extends StatefulWidget {
     required this.child,
     super.key,
   });
+
   final Widget? child;
   final ValueSetter<bool> onSizeChange;
 
@@ -63,7 +66,7 @@ class _MeasureSizeState extends State<MeasureSize> {
     /// Below logic checks that end position of widget greater than or less than
     /// to device width
     widget.onSizeChange(
-      (position.dx + newSize!.width) >= MediaQuery.of(context).size.width,
+      (position.dx + newSize!.width) >= context.widthFraction(),
     );
   }
 }

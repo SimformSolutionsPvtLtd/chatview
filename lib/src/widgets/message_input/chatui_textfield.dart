@@ -113,6 +113,10 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   late Debouncer debouncer;
 
+  /// The text at the last controller notification, to tell an edit from a
+  /// cursor or selection move.
+  late String _lastText = widget.textEditingController.text;
+
   @override
   void initState() {
     attachListeners();
@@ -146,6 +150,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     widget.textEditingController.removeListener(_listenTextEditingController);
+    controller?.dispose();
     playerController.dispose();
     super.dispose();
   }
@@ -528,20 +533,28 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
   }
 
   void _listenTextEditingController() {
-    widget.textEditingController.addListener(() {
-      _onChanged(widget.textEditingController.text);
-    });
+    final text = widget.textEditingController.text;
+    // The controller also notifies when only the cursor or selection moves,
+    // which is not typing.
+    if (text == _lastText) return;
+    _lastText = text;
+    _onChanged(text);
   }
 
+  /// Sets `typing` on every edit and reverts to `typed` after the debounce;
+  /// an empty field (cleared or sent) is `typed` immediately.
+  ///
+  /// `onInterrupt` was removed: it missed edits spaced beyond the threshold.
   void _onChanged(String inputText) {
-    debouncer.run(
-      onComplete: () {
-        composingStatus.value = TypeWriterStatus.typed;
-      },
-      onInterrupt: () {
-        composingStatus.value = TypeWriterStatus.typing;
-      },
-    );
+    if (inputText.isEmpty) {
+      debouncer.cancel();
+      composingStatus.value = TypeWriterStatus.typed;
+    } else {
+      composingStatus.value = TypeWriterStatus.typing;
+      debouncer.run(
+        onComplete: () => composingStatus.value = TypeWriterStatus.typed,
+      );
+    }
     _isTextNotEmptyNotifier.value = inputText.trim().isNotEmpty;
   }
 }

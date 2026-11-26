@@ -99,17 +99,22 @@ class _VoiceMessageViewState extends State<VoiceMessageView> {
   @override
   void initState() {
     super.initState();
-    controller = PlayerController()
-      ..preparePlayer(
-        path: widget.message.message,
-        noOfSamples: _waveStyle.getSamplesForWidth(widget.screenWidth * 0.5),
-      ).whenComplete(() {
-        widget.onMaxDuration?.call(controller.maxDuration);
-        _detectedDuration.value =
-            Duration(milliseconds: controller.maxDuration);
-      });
+    controller = PlayerController();
+    unawaited(_preparePlayer());
     playerStateSubscription = controller.onPlayerStateChanged
         .listen((state) => _playerState.value = state);
+  }
+
+  Future<void> _preparePlayer() async {
+    await controller.preparePlayer(
+      path: widget.message.message,
+      noOfSamples: _waveStyle.getSamplesForWidth(widget.screenWidth * 0.5),
+    );
+    // The bubble can scroll out of the list, and be disposed, before the
+    // player is prepared.
+    if (!mounted) return;
+    widget.onMaxDuration?.call(controller.maxDuration);
+    _detectedDuration.value = Duration(milliseconds: controller.maxDuration);
   }
 
   @override

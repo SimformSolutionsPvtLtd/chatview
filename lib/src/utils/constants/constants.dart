@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 import 'package:flutter/material.dart' show Color, Curve, Curves;
+import 'package:flutter/painting.dart';
 
 const String imageUrlRegExpression =
     r'(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)';
@@ -50,7 +51,8 @@ const double messageGroupDefaultSpacing = 2;
 const double avatarDefaultPaddingLeft = 6;
 const double avatarDefaultPaddingRight = 4;
 const double leftPadding3 = 12;
-const double textFieldBorderRadius = 27;
+const BorderRadius textFieldBorderRadius =
+    BorderRadius.all(Radius.circular(27));
 const String defaultChatSeparatorDatePattern = 'MMM dd, yyyy';
 const double defaultChatTextFieldHeight = 10;
 const Color primaryColor = Color(0xffEE5366);

@@ -41,7 +41,7 @@ class ReplyPopupWidget extends StatelessWidget {
   final bool sentByCurrentUser;
 
   /// Provides call back when user tap on unsend button.
-  final VoidCallback onUnsendTap;
+  final VoidCallback? onUnsendTap;
 
   /// Provides call back when user tap on reply button.
   final VoidCallback onReplyTap;
@@ -87,7 +87,7 @@ class ReplyPopupWidget extends StatelessWidget {
               ),
             ),
           ),
-          if (sentByCurrentUser)
+          if (sentByCurrentUser && onUnsendTap != null)
             Expanded(
               child: InkWell(
                 onTap: onUnsendTap,

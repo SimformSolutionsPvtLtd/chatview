@@ -55,6 +55,10 @@ class TextFieldConfiguration {
   });
 
   /// Used to give max lines in text field.
+  ///
+  /// **NOTE:** On web, Enter sends the message and Shift+Enter inserts a new
+  /// line through the text field itself. With `maxLines: 1` the field cannot
+  /// hold a new line, so Shift+Enter does nothing.
   final int? maxLines;
 
   /// Used to give min lines in text field.

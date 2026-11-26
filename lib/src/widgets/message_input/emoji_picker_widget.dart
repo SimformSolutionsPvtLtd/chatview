@@ -60,9 +60,9 @@ class EmojiPickerWidget extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 15),
             width: 35,
             height: 4,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.grey,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.all(Radius.circular(30)),
             ),
           ),
           Expanded(

@@ -43,11 +43,9 @@ class SelectedImageViewWidgetState extends State<SelectedImageViewWidget> {
             vertical: 4,
             horizontal: 6,
           ),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(
-              textFieldBorderRadius,
-            ),
+            borderRadius: textFieldBorderRadius,
           ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,

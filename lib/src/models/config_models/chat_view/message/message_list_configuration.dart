@@ -103,7 +103,8 @@ class ChatBackgroundConfiguration {
   /// after the user lifts the finger from swiping to see the time of message.
   final Curve messageTimeAnimationCurve;
 
-  /// Provides callback to sort message
+  /// Compares two messages to sort the list. Used only when [sortEnable] is
+  /// true. Newest first when null.
   final MessageSorter? messageSorter;
 }
 

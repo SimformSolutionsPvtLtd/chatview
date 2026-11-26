@@ -37,9 +37,7 @@ class SearchConfig {
     this.textInputAction = TextInputAction.search,
     this.textCapitalization = TextCapitalization.none,
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 6),
-    this.borderRadius = const BorderRadius.all(
-      Radius.circular(textFieldBorderRadius),
-    ),
+    this.borderRadius = textFieldBorderRadius,
     this.clearIcon = const Icon(Icons.clear),
     this.onTapOutside,
     this.textStyle,

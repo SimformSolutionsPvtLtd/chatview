@@ -74,11 +74,13 @@ class LinkPreview extends StatelessWidget {
                 onTap: () => _onLinkTap(firstUrl),
                 placeholderWidget: SizedBox(
                   height: context.heightFraction(sizeFraction: 0.25),
-                  width: double.infinity,
+                  width: double.maxFinite,
                   child: Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1,
-                      color: linkPreviewConfig?.loadingColor,
+                    child: RepaintBoundary(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1,
+                        color: linkPreviewConfig?.loadingColor,
+                      ),
                     ),
                   ),
                 ),
@@ -98,7 +100,7 @@ class LinkPreview extends StatelessWidget {
                 child: Image.network(
                   firstUrl,
                   height: 120,
-                  width: double.infinity,
+                  width: double.maxFinite,
                   fit: BoxFit.fitWidth,
                 ),
               ),

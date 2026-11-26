@@ -182,8 +182,7 @@ class ChatView extends StatefulWidget {
   State<ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends State<ChatView>
-    with SingleTickerProviderStateMixin {
+class _ChatViewState extends State<ChatView> {
   final GlobalKey<SendMessageWidgetState> _sendMessageKey = GlobalKey();
 
   ChatController get chatController => widget.chatController;

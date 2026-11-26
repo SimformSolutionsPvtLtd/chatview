@@ -52,7 +52,13 @@ class LastMessageView extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           reverseDuration: const Duration(milliseconds: 200),
           child: Align(
-            key: ValueKey('${lastMessage.id}_${lastMessage.message}'),
+            // Only text previews render `message`; for image/voice it may be
+            // a multi-MB base64 payload, so keep it out of the key.
+            key: ValueKey(
+              lastMessageType?.isText ?? false
+                  ? (lastMessage.id, lastMessage.message)
+                  : lastMessage.id,
+            ),
             alignment: Alignment.centerLeft,
             child: Row(
               children: [

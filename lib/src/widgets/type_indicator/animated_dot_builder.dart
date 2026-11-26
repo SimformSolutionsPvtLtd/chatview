@@ -21,7 +21,9 @@ class AnimatedDotBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: jumpAnimation,
+      // The color follows the repeating controller, the jump follows its own.
+      animation: Listenable.merge([jumpAnimation, repeatAnimationController]),
+      child: SizedBox.square(dimension: typeIndicatorConfig.indicatorSize),
       builder: (context, child) {
         final circleFlashPercent =
             dotInterval.transform(repeatAnimationController.value);
@@ -29,8 +31,6 @@ class AnimatedDotBuilder extends StatelessWidget {
         return Transform.translate(
           offset: Offset(0, jumpAnimation.value),
           child: Container(
-            width: typeIndicatorConfig.indicatorSize,
-            height: typeIndicatorConfig.indicatorSize,
             margin: EdgeInsets.symmetric(
               horizontal: typeIndicatorConfig.indicatorSpacing,
             ),
@@ -42,6 +42,7 @@ class AnimatedDotBuilder extends StatelessWidget {
                 circleColorPercent,
               ),
             ),
+            child: child,
           ),
         );
       },

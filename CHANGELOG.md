@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+* **Perf**: :zap: The typing indicator repaints only its dots and starts no tickers for a custom indicator, and the suggestion list builds its items once instead of on every animation frame.
+* **Fix**: :bug: Fix animation listener leaks in the chat list and the sending indicator, and make the reply suggestion list react when `replySuggestionsConfig` changes.
 * **Perf**: :zap: Highlighting a replied message now rebuilds only that message instead of every visible bubble.
 * **Fix**: :bug: Fix the message list: scroll notifications bubble up to the host, the pagination loader no longer needs a `Scaffold`, the footer stays mounted when the newest message is deleted, and an Android back swipe no longer reveals the message time.
 * **Perf**: :zap: The message list sorts messages and finds date separators once per stream event, keys items by message id, shows messages on the first frame, and opening the reaction pop-up or typing no longer rebuilds the list. Swipe-to-see-time moves into its own `SwipeToSeeTime` widget.

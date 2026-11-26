@@ -43,32 +43,28 @@ class SlideOutIndicator extends StatefulWidget {
 
 class _SlideOutIndicatorState extends State<SlideOutIndicator>
     with SingleTickerProviderStateMixin {
-  /// Runs for twice the animation time: the first half is the wait before the
-  /// dot slides out, the second half is the slide. This replaces a timer, so a
-  /// retry just runs it back toward 1 and there is nothing to cancel.
-  late final AnimationController _animationController = AnimationController(
-    vsync: this,
-    duration: sendingAnimationDuration * 2,
-    // Start half-visible while pending, already collapsed when the message
-    // was sent before this widget was ever built (e.g. history scroll-in or
-    // ShowReceiptsIn.all) so no stuck dot remains.
-    value: widget.status.isPending ? 1.0 : 0.0,
-  );
-
   /// Stays at 1 during the wait (first half), then eases to 0 (second half).
-  late final _curved = CurvedAnimation(
-    parent: _animationController,
+  static final CurveTween _slideCurve = CurveTween(
     curve: const Interval(0, 0.5, curve: sendingAnimationCurve),
   );
 
   /// Horizontal offset of the dot: 0 while pending, slid out by half its size
   /// once sent.
-  late final Animation<double> _dx =
-      Tween<double>(begin: slideOutDotSize * 0.5, end: 0).animate(_curved);
+  static final Tween<double> _dxTween =
+      Tween<double>(begin: slideOutDotSize * 0.5, end: 0);
 
   /// Visible clip width: half the dot while pending, 0 once sent.
-  late final Animation<double> _width =
-      Tween<double>(begin: 0, end: slideOutDotSize * 0.5).animate(_curved);
+  static final Tween<double> _widthTween =
+      Tween<double>(begin: 0, end: slideOutDotSize * 0.5);
+
+  /// Created only when the status actually flips (send / retry), so messages
+  /// that are built already settled (e.g. history scroll-in or
+  /// ShowReceiptsIn.all) never allocate a controller and show no stuck dot.
+  ///
+  /// Runs for twice the animation time: the first half is the wait before the
+  /// dot slides out, the second half is the slide. This replaces a timer, so a
+  /// retry just runs it back toward 1 and there is nothing to cancel.
+  AnimationController? _animationController;
 
   /// Keeps the dot in step with the status: it slides out once the message is
   /// no longer pending and shows again if the message becomes pending again
@@ -76,24 +72,42 @@ class _SlideOutIndicatorState extends State<SlideOutIndicator>
   @override
   void didUpdateWidget(SlideOutIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    unawaited(_animationController.animateTo(widget.status.isPending ? 1 : 0));
+    final wasPending = oldWidget.status.isPending;
+    final isPending = widget.status.isPending;
+    if (isPending == wasPending) return;
+
+    final controller = _animationController ??= AnimationController(
+      vsync: this,
+      duration: sendingAnimationDuration * 2,
+      // Continue from the state the dot was in before this change.
+      value: wasPending ? 1.0 : 0.0,
+    );
+    unawaited(controller.animateTo(isPending ? 1 : 0));
   }
 
   @override
   Widget build(BuildContext context) {
+    // Before any transition there is no controller: use a fixed progress
+    // (1 = pending, 0 = sent) through the same tree, so the layout is the same.
+    final progress = _animationController ??
+        AlwaysStoppedAnimation<double>(widget.status.isPending ? 1.0 : 0.0);
+    final curved = progress.drive(_slideCurve);
+    final dx = curved.drive(_dxTween);
+    final width = curved.drive(_widthTween);
+
     return Center(
       child: ClipRect(
         child: AnimatedBuilder(
-          animation: _animationController,
+          animation: progress,
           builder: (_, child) => SizedBox(
-            width: _width.value,
+            width: width.value,
             height: slideOutDotSize,
             child: OverflowBox(
               alignment: Alignment.centerLeft,
               minWidth: slideOutDotSize,
               maxWidth: slideOutDotSize,
               child: Transform.translate(
-                offset: Offset(_dx.value, 0),
+                offset: Offset(dx.value, 0),
                 child: child,
               ),
             ),
@@ -113,7 +127,7 @@ class _SlideOutIndicatorState extends State<SlideOutIndicator>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 }

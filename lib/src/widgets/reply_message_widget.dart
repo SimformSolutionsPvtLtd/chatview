@@ -25,8 +25,10 @@ import 'package:flutter/material.dart';
 
 import '../models/config_models/replied_message_configuration.dart';
 import '../utils/constants/constants.dart';
+import '../utils/mention_parser.dart';
 import '../utils/package_strings.dart';
 import 'chat_view_inherited_widget.dart';
+import 'mentions/mention_config_inherited_widget.dart';
 import 'vertical_line.dart';
 
 class ReplyMessageWidget extends StatelessWidget {
@@ -53,7 +55,8 @@ class ReplyMessageWidget extends StatelessWidget {
     final currentUser = chatController?.currentUser;
     final replyBySender = message.replyMessage.replyBy == currentUser?.id;
     final textTheme = Theme.of(context).textTheme;
-    final replyMessage = message.replyMessage.message;
+    final replyMessage =
+        _displayReplyText(context, message.replyMessage.message);
     final messagedUser =
         chatController?.getUserFromId(message.replyMessage.replyBy);
     final replyBy =
@@ -175,6 +178,20 @@ class ReplyMessageWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Decodes mention tokens in a replied message to their visible `@name`
+  /// form. Returns [raw] unchanged when the mention feature is off.
+  String _displayReplyText(BuildContext context, String raw) {
+    final enableMention = ChatViewInheritedWidget.of(context)
+            ?.featureActiveConfig
+            .enableMention ??
+        false;
+    if (!enableMention) return raw;
+    final mentionConfig = MentionConfigIW.of(context)?.mentionConfig;
+    if (mentionConfig == null) return raw;
+    return MentionParser(triggerCharacter: mentionConfig.triggerCharacter)
+        .toPlainText(raw);
   }
 
   BorderRadiusGeometry _borderRadius({

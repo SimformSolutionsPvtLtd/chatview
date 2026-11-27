@@ -21,6 +21,7 @@
  */
 export 'chat_bubble.dart';
 export 'config_models/chat_bubble_configuration.dart';
+export 'config_models/mention_configuration.dart';
 export 'config_models/chat_list/models.dart';
 export 'config_models/chat_view_state_widget_config.dart';
 export 'config_models/chat_view_states_configuration.dart';
@@ -45,4 +46,5 @@ export 'config_models/swipe_to_reply_configuration.dart';
 export 'config_models/text_selection_config.dart';
 export 'config_models/type_indicator_configuration.dart';
 export 'config_models/voice_message_configuration.dart';
+export 'mention.dart';
 export 'overlay_action_widget.dart';

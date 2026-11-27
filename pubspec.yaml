@@ -19,7 +19,7 @@ dependencies:
   any_link_preview: 3.0.3
   audio_waveforms: 2.0.2
   cached_network_image: 3.4.1
-  chatview_utils: 3.1.0
+  chatview_utils: ^3.2.0
 
   emoji_picker_flutter: 4.4.0
   flutter:
@@ -32,6 +32,12 @@ dev_dependencies:
   flutter_lints: 6.0.0
   flutter_test:
     sdk: flutter
+
+# Build against the local chatview_utils (3.2.0) until it is published.
+# Remove once chatview_utils 3.2.0 is available on pub.dev.
+dependency_overrides:
+  chatview_utils:
+    path: ../chatview_models
 
 flutter:
   config:

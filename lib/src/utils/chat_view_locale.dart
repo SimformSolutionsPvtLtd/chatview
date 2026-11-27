@@ -59,6 +59,7 @@ final class ChatViewLocale {
     this.edit = 'Edit',
     this.edited = 'Edited',
     this.editing = 'Editing',
+    this.everyone = 'everyone',
   });
 
   /// Create from `Map<String, String>`
@@ -100,6 +101,7 @@ final class ChatViewLocale {
       edit: map['edit']?.toString() ?? 'Edit',
       edited: map['edited']?.toString() ?? 'Edited',
       editing: map['editing']?.toString() ?? 'Editing',
+      everyone: map['everyone']?.toString() ?? 'everyone',
     );
   }
 
@@ -146,6 +148,9 @@ final class ChatViewLocale {
   /// Label shown in the text field header when editing a message.
   final String editing;
 
+  /// Default label for the "everyone" entry in the mention suggestion list.
+  final String everyone;
+
   /// English defaults
   static const en = ChatViewLocale(
     today: 'Today',
@@ -184,5 +189,6 @@ final class ChatViewLocale {
     edit: 'Edit',
     edited: 'Edited',
     editing: 'Editing',
+    everyone: 'everyone',
   );
 }

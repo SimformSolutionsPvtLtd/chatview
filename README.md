@@ -33,6 +33,7 @@ Flutter applications with [Flexible Backend Integration][chatViewConnect].
 - One-on-one and group chat support
 - Message reactions with emoji
 - Reply to messages functionality
+- `@`-mentions / tagging (with an `@everyone` entry and customizable highlight)
 - Link preview for URLs
 - Voice messages support
 - Image sharing capabilities
@@ -57,6 +58,64 @@ implementation details, usage instructions, code examples, and advanced features
 dependencies:
   chatview: <latest-version>
 ```
+
+## Mentions (tagging)
+
+Type `@` in the message field to tag group members. A suggestion list of
+`chatController.otherUsers` (plus an optional `@everyone` entry) appears; the
+selected mention is highlighted in the text field and in the sent bubble.
+
+Enable the feature with `FeatureActiveConfig(enableMention: true)` and customize
+it via `mentionConfig`:
+
+```dart
+ChatView(
+  chatController: chatController,
+  featureActiveConfig: const FeatureActiveConfig(enableMention: true),
+  mentionConfig: MentionConfiguration(
+    // The highlight is fully customizable; it defaults to blue + bold (used in
+    // the text field and both bubbles). Because a single color can't contrast
+    // with both bubble backgrounds, style each direction independently so the
+    // color contrasts with that bubble:
+    outgoingMentionTextStyle: const TextStyle(
+      color: Colors.white, // readable on a coloured/branded outgoing bubble
+      fontWeight: FontWeight.bold,
+    ),
+    incomingMentionTextStyle: const TextStyle(
+      color: Colors.blue, // readable on a light incoming bubble
+      fontWeight: FontWeight.bold,
+    ),
+    // Or set a single `mentionTextStyle` used for both directions + the field.
+    onMentionTap: (mention) {
+      // Open the tapped user's profile, etc. `mention.isEveryone` flags @everyone.
+    },
+  ),
+  // The sent message carries its resolved mentions, so you can react to them
+  // (e.g. send notifications) without a separate callback:
+  onSendMessage: (message) {
+    if (message.mentions.isNotEmpty) {
+      // message.mentions -> List<MentionedUser> (tagged users + @everyone).
+      // `message.message` is the encoded form (`@[Name](id)`); de-tokenize it
+      // to the visible `@Name` form before showing it in a notification:
+      final body = MentionParser().toPlainText(message.message);
+      // notify(to: message.mentions, body: body);
+    }
+    chatController.addMessage(message); // assign your own id if needed.
+  },
+  // ...
+)
+```
+
+Everything about the mention UI is customizable via `MentionConfiguration`:
+the highlight style (shared, per-direction, and in-field), the trigger
+character, the `@everyone` entry (label/id/visibility), and the suggestion
+dropdown through `MentionListConfig` (max height, decoration, padding, avatar,
+per-row `itemBuilder`, empty-state builder, animation).
+
+Mentions are persisted inside the message text as tokens
+(`@[Display Name](userId)`), so they survive reloads and remain correct even if
+a display name changes. Use `MentionParser().toPlainText(message.message)` to
+get the plain `@name` form (e.g. for notification previews).
 
 ## Compatibility with [`chatview_connect`][chatViewConnect]
 

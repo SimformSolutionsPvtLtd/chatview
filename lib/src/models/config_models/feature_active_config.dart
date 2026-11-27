@@ -43,6 +43,7 @@ class FeatureActiveConfig {
     this.messageGroupingThresholdMinutes = 1,
     this.chainedCornerRadius,
     this.messageGroupSpacing,
+    this.enableMention = false,
   });
 
   /// Used for enable/disable swipe to reply.
@@ -139,4 +140,16 @@ class FeatureActiveConfig {
   /// When `null`, defaults to `2.0`.
   /// Only used when [enableMessageGrouping] is `true`.
   final double? messageGroupSpacing;
+
+  /// Used for enable/disable the `@`-mention (tagging) feature.
+  ///
+  /// When enabled, typing the mention trigger (default `@`) in the text field
+  /// shows a list of group members (plus an optional `@everyone` entry), and
+  /// confirmed mentions are highlighted in the text field and in sent message
+  /// bubbles.
+  ///
+  /// Configure appearance and behaviour via `ChatView(mentionConfig: ...)`.
+  ///
+  /// Defaults to `false`.
+  final bool enableMention;
 }

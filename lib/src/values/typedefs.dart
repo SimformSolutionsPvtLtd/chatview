@@ -30,6 +30,13 @@ typedef StringMessageCallBack = void Function(
   ReplyMessage replyMessage,
   MessageType messageType,
 );
+
+/// Callback invoked when the user sends a message, exposing the fully built
+/// [Message] (including any [Message.mentions] and the reply/type metadata).
+///
+/// Preferred over [StringMessageCallBack]; the message's `id` is left empty so
+/// the host can assign its own before persisting.
+typedef MessageSendCallback = void Function(Message message);
 typedef ReplyMessageWithReturnWidget = Widget Function(
   ReplyMessage? replyMessage,
 );
@@ -188,6 +195,22 @@ typedef MessageStatusIconResolver = IconData Function(
 typedef MessageStatusBuilder = Widget Function(
   MessageStatus status,
 );
+
+/// Callback when a highlighted mention is tapped inside a message bubble.
+typedef MentionTapCallback = void Function(MentionedUser mention);
+
+/// Builder for a single row in the mention suggestion dropdown.
+typedef MentionListItemBuilder = Widget Function(
+  BuildContext context,
+  MentionedUser mention,
+);
+
+/// Callback exposing the set of mentions present in the composed message,
+/// reported while the user is typing.
+///
+/// For mentions of a *sent* message, read [Message.mentions] from the message
+/// delivered to [MessageSendCallback] instead.
+typedef MentionsCallback = void Function(List<MentionedUser> mentions);
 typedef CustomVoiceActionIconCallback = Icon Function(
   bool isMessageBySender,
 );

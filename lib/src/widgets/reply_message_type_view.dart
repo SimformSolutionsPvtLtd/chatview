@@ -25,8 +25,11 @@ import 'package:chatview_utils/chatview_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../models/config_models/send_message_configuration.dart';
+import '../utils/mention_parser.dart';
 import '../utils/package_strings.dart';
 import '../values/typedefs.dart';
+import 'chat_view_inherited_widget.dart';
+import 'mentions/mention_config_inherited_widget.dart';
 
 class ReplyMessageTypeView extends StatelessWidget {
   const ReplyMessageTypeView({
@@ -84,7 +87,7 @@ class ReplyMessageTypeView extends StatelessWidget {
       MessageType.custom when customMessageReplyViewBuilder != null =>
         customMessageReplyViewBuilder!(message),
       MessageType.custom || MessageType.text => Text(
-          message.message,
+          _displayText(context, message.message),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -93,5 +96,20 @@ class ReplyMessageTypeView extends StatelessWidget {
           ),
         ),
     };
+  }
+
+  /// Decodes mention tokens to their visible `@name` form for reply previews
+  /// (mentions are shown as plain text here, not highlighted). Returns [raw]
+  /// unchanged when the mention feature is off.
+  String _displayText(BuildContext context, String raw) {
+    final enableMention = ChatViewInheritedWidget.of(context)
+            ?.featureActiveConfig
+            .enableMention ??
+        false;
+    if (!enableMention) return raw;
+    final mentionConfig = MentionConfigIW.of(context)?.mentionConfig;
+    if (mentionConfig == null) return raw;
+    return MentionParser(triggerCharacter: mentionConfig.triggerCharacter)
+        .toPlainText(raw);
   }
 }

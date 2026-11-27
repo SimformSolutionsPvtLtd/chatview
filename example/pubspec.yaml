@@ -23,6 +23,12 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.1
 
+# Build against the local chatview_utils (3.2.0) until it is published.
+# Remove once chatview_utils 3.2.0 is available on pub.dev.
+dependency_overrides:
+  chatview_utils:
+    path: ../../chatview_models
+
 flutter:
   uses-material-design: true
   assets:

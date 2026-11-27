@@ -25,7 +25,9 @@ import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
 import '../utils/constants/constants.dart';
+import 'chat_view_inherited_widget.dart';
 import 'link_preview.dart';
+import 'mentions/mention_config_inherited_widget.dart';
 import 'reaction_widget.dart';
 
 class TextMessageView extends StatelessWidget {
@@ -104,17 +106,47 @@ class TextMessageView extends StatelessWidget {
           fontSize: 16,
         ) ??
         const TextStyle(color: Colors.white, fontSize: 16);
-    final baseWidget = extractedUrls.isNotEmpty
-        ? LinkPreview(
-            linkPreviewConfig: _linkPreviewConfig,
-            textMessage: textMessage,
-            extractedUrls: extractedUrls,
-            normalTextStyle: effectiveTextStyle,
-          )
-        : Text(
-            textMessage,
+
+    // Resolve mention highlighting. When the message carries encoded mention
+    // tokens, render them highlighted; [displayText] is the visible (token
+    // free) text used for layout measurements.
+    final mentionConfig = (featureActiveConfig?.enableMention ?? false)
+        ? MentionConfigIW.of(context)?.mentionConfig
+        : null;
+    final mentionParser = mentionConfig == null
+        ? null
+        : MentionParser(triggerCharacter: mentionConfig.triggerCharacter);
+    final hasMentions = mentionParser?.hasMentions(textMessage) ?? false;
+    final displayText =
+        hasMentions ? mentionParser!.toPlainText(textMessage) : textMessage;
+    // Resolve the chat controller at build time (not inside the tap callback)
+    // so the inherited-widget dependency is registered correctly.
+    final chatController = hasMentions
+        ? ChatViewInheritedWidget.of(context)?.chatController
+        : null;
+
+    final baseWidget = hasMentions
+        ? MentionText(
+            encodedText: textMessage,
+            parser: mentionParser!,
             style: effectiveTextStyle,
-          );
+            mentionStyle: mentionConfig!
+                .mentionTextStyleFor(isMessageBySender: isMessageBySender),
+            onMentionTap: mentionConfig.onMentionTap,
+            resolveMention: (id, name) =>
+                _resolveMention(id, name, mentionConfig, chatController),
+          )
+        : extractedUrls.isNotEmpty
+            ? LinkPreview(
+                linkPreviewConfig: _linkPreviewConfig,
+                textMessage: textMessage,
+                extractedUrls: extractedUrls,
+                normalTextStyle: effectiveTextStyle,
+              )
+            : Text(
+                textMessage,
+                style: effectiveTextStyle,
+              );
     final messageWidget = isSelectable
         ? CustomSelectionArea(
             config: textSelectionConfig,
@@ -139,7 +171,7 @@ class TextMessageView extends StatelessWidget {
           decoration: BoxDecoration(
             color: highlightMessage ? highlightColor : _color,
             border: border,
-            borderRadius: _borderRadius(textMessage, showTimeInChatBubble),
+            borderRadius: _borderRadius(displayText, showTimeInChatBubble),
             boxShadow: isMessageBySender
                 ? outgoingChatBubbleConfig?.boxShadow
                 : inComingChatBubbleConfig?.boxShadow,
@@ -162,10 +194,10 @@ class TextMessageView extends StatelessWidget {
                       );
                     }
 
-                    final canShowInSingleLine = !textMessage.contains('\n') &&
+                    final canShowInSingleLine = !displayText.contains('\n') &&
                         _canRenderTimeInSingleLine(
                           context: context,
-                          messageText: textMessage,
+                          messageText: displayText,
                           messageStyle: effectiveTextStyle,
                           timeText: timeText,
                           timeStyle: timestampStyle,
@@ -274,6 +306,27 @@ class TextMessageView extends StatelessWidget {
   Color get _color => isMessageBySender
       ? outgoingChatBubbleConfig?.color ?? Colors.purple
       : inComingChatBubbleConfig?.color ?? Colors.grey.shade500;
+
+  /// Maps a tapped mention token (id/name) back to a [MentionedUser], resolving
+  /// the everyone target and attaching the [ChatUser] when known.
+  MentionedUser _resolveMention(
+    String id,
+    String name,
+    MentionConfiguration config,
+    ChatController? chatController,
+  ) {
+    if (id == config.everyoneId) {
+      return MentionedUser.everyone(id: id, name: name);
+    }
+    final user = chatController == null
+        ? null
+        : id == chatController.currentUser.id
+            ? chatController.currentUser
+            : chatController.otherUsersMap[id];
+    return user == null
+        ? MentionedUser(id: id, name: name)
+        : MentionedUser.fromChatUser(user);
+  }
 
   bool _canRenderTimeInSingleLine({
     required BuildContext context,

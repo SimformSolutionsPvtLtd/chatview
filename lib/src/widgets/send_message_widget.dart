@@ -26,11 +26,15 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../extensions/extensions.dart';
+import '../models/config_models/mention_configuration.dart';
 import '../models/config_models/message_configuration.dart';
 import '../models/config_models/send_message_configuration.dart';
 import '../utils/constants/constants.dart';
 import '../values/typedefs.dart';
 import 'chatui_textfield.dart';
+import 'mentions/mention_config_inherited_widget.dart';
+import 'mentions/mention_list.dart';
+import 'mentions/mention_text_editing_controller.dart';
 import 'reply_message_view.dart';
 import 'scroll_to_bottom_button.dart';
 import 'edit_message_view.dart';
@@ -38,7 +42,7 @@ import 'selected_image_view_widget.dart';
 
 class SendMessageWidget extends StatefulWidget {
   const SendMessageWidget({
-    required this.onSendTap,
+    required this.onSendMessage,
     required this.sendMessageConfig,
     this.onEditTap,
     this.sendMessageBuilder,
@@ -47,8 +51,9 @@ class SendMessageWidget extends StatefulWidget {
     super.key,
   });
 
-  /// Provides call back when user tap on send button on text field.
-  final StringMessageCallBack onSendTap;
+  /// Called with the fully built [Message] (including [Message.mentions]) when
+  /// the user sends a message.
+  final MessageSendCallback onSendMessage;
 
   /// Provides configuration for text field appearance.
   final SendMessageConfiguration sendMessageConfig;
@@ -71,7 +76,12 @@ class SendMessageWidget extends StatefulWidget {
 }
 
 class SendMessageWidgetState extends State<SendMessageWidget> {
-  final _textEditingController = TextEditingController();
+  late MentionTextEditingController _textEditingController;
+
+  /// Guards one-time creation of the mention controller (it depends on the
+  /// inherited [MentionConfiguration], available only from
+  /// [didChangeDependencies] onward).
+  bool _isControllerInitialized = false;
 
   final _focusNode = FocusNode();
 
@@ -103,6 +113,27 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     if (chatViewIW != null) {
       currentUser = chatViewIW!.chatController.currentUser;
     }
+    if (!_isControllerInitialized) {
+      final mentionConfig = MentionConfigIW.of(context)?.mentionConfig;
+      _textEditingController = MentionTextEditingController(
+        triggerCharacter: mentionConfig?.triggerCharacter ?? '@',
+        everyoneId: mentionConfig?.everyoneId ?? 'everyone',
+        composeMentionStyle: mentionConfig?.effectiveComposeMentionTextStyle ??
+            MentionConfiguration.defaultMentionTextStyle,
+        onMentionsChanged: mentionConfig?.onMentionsChanged,
+        userResolver: _resolveMentionUser,
+      );
+      _isControllerInitialized = true;
+    }
+  }
+
+  /// Resolves a mention id to a [ChatUser] so reported mentions carry the full
+  /// user. Returns `null` for the everyone target or unknown ids.
+  ChatUser? _resolveMentionUser(String id) {
+    final controller = chatViewIW?.chatController;
+    if (controller == null) return null;
+    if (id == controller.currentUser.id) return controller.currentUser;
+    return controller.otherUsersMap[id];
   }
 
   @override
@@ -164,6 +195,9 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
                               child: const ScrollToBottomButton(),
                             ),
                           ),
+                        if (chatViewIW?.featureActiveConfig.enableMention ??
+                            false)
+                          MentionList(controller: _textEditingController),
                         Padding(
                           key: chatViewIW?.chatTextFieldViewKey,
                           padding: EdgeInsets.fromLTRB(
@@ -240,11 +274,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   void _onRecordingComplete(String? path) {
     if (path != null) {
-      widget.onSendTap.call(
-        path,
-        _replyMessage,
-        MessageType.voice,
-      );
+      _dispatchSend(path, _replyMessage, MessageType.voice);
       onCloseTap();
     }
   }
@@ -252,8 +282,41 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   void _onImageSelected(String imagePath, String error) {
     if (imagePath.isEmpty) return;
 
-    widget.onSendTap.call(imagePath, _replyMessage, MessageType.image);
+    _dispatchSend(imagePath, _replyMessage, MessageType.image);
     _assignRepliedMessage();
+  }
+
+  /// Builds a [Message] for the given content and hands it to
+  /// [SendMessageWidget.onSendMessage].
+  ///
+  /// The message `id` is intentionally left empty so the host can assign its
+  /// own before persisting. [mentions] are de-duplicated by id and only apply
+  /// to text messages.
+  void _dispatchSend(
+    String message,
+    ReplyMessage replyMessage,
+    MessageType messageType, {
+    List<MentionedUser> mentions = const [],
+  }) {
+    widget.onSendMessage(
+      Message(
+        message: message,
+        createdAt: DateTime.now(),
+        sentBy: currentUser?.id ?? '',
+        replyMessage: replyMessage,
+        messageType: messageType,
+        mentions: _dedupeMentions(mentions),
+      ),
+    );
+  }
+
+  /// De-duplicates [mentions] by id, preserving first-seen order.
+  List<MentionedUser> _dedupeMentions(List<MentionedUser> mentions) {
+    if (mentions.isEmpty) return const [];
+    final unique = <String, MentionedUser>{
+      for (final mention in mentions) mention.id: mention,
+    };
+    return unique.values.toList();
   }
 
   void _assignRepliedMessage() {
@@ -262,11 +325,15 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
   }
 
   void _onPressed() {
-    final messageText = _textEditingController.text.trim();
+    // Visible text drives the empty check; the encoded text (with mention
+    // tokens) is what gets sent/persisted.
+    final displayText = _textEditingController.text.trim();
+    final messageText = _textEditingController.encodedText.trim();
+    final mentions = _textEditingController.mentions;
     _textEditingController.clear();
-    if (messageText.isEmpty) return;
+    if (displayText.isEmpty) return;
 
-    // If in edit mode, delegate to onEditTap instead of onSendTap.
+    // If in edit mode, delegate to onEditTap instead of onSendMessage.
     if (isEditMode) {
       // Only confirm the edit if a handler is registered; otherwise keep edit
       // mode active so the user's text is not silently discarded.
@@ -280,6 +347,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
         _currentlyEditingMessage!.copyWith(
           message: messageText,
           updatedAt: DateTime.now(),
+          mentions: _dedupeMentions(mentions),
         ),
       );
       _closeEditMode();
@@ -294,10 +362,11 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
       _selectedImageViewWidgetKey.currentState?.selectedImages.value = [];
     }
 
-    widget.onSendTap.call(
-      messageText.trim(),
+    _dispatchSend(
+      messageText,
       _replyMessage,
       MessageType.text,
+      mentions: mentions,
     );
     onCloseTap();
   }
@@ -313,11 +382,9 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
     }
 
     _currentlyEditingMessage = message;
-    _textEditingController.text = message.message;
-    // Place cursor at end.
-    _textEditingController.selection = TextSelection.fromPosition(
-      TextPosition(offset: message.message.length),
-    );
+    // Decode any mention tokens back into highlighted display text and place
+    // the cursor at the end. Plain (token-free) text is set verbatim.
+    _textEditingController.setFromEncoded(message.message);
     FocusScope.of(context).requestFocus(_focusNode);
 
     if (_editMessageViewKey.currentState == null) {
@@ -387,7 +454,7 @@ class SendMessageWidgetState extends State<SendMessageWidget> {
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    if (_isControllerInitialized) _textEditingController.dispose();
     _focusNode.dispose();
     super.dispose();
   }

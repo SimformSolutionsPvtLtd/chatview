@@ -161,7 +161,7 @@ class Data {
   static const otherUsers = [
     ChatUser(
       id: '2',
-      name: 'Simform',
+      name: 'Simform solution',
       profilePhoto: Data.profileImage,
     ),
     ChatUser(

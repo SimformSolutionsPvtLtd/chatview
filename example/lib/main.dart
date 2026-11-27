@@ -58,130 +58,135 @@ class _ExampleOneListScreenState extends State<ExampleOneListScreen> {
     return Scaffold(
       backgroundColor: _theme.backgroundColor,
       body: SafeArea(
-        child: ChatList(
-          controller: _chatListController,
-          backgroundColor: _theme.backgroundColor,
-          header: _headerWidget(),
-          appbar: ChatListAppBar(
-            backgroundColor: _theme.backgroundColor,
-            centerTitle: false,
-            scrolledUnderElevation: 0,
-            titleText: 'ChatList',
-            titleTextStyle: TextStyle(
-              fontSize: 20,
-              color: _theme.textColor,
-              fontWeight: FontWeight.bold,
-            ),
-            actions: [
-              SvgPicture.asset(
-                AppIcons.chatDiscoveryAi,
-                colorFilter: ColorFilter.mode(
-                  _theme.iconColor,
-                  BlendMode.srcIn,
+        child: ListView(
+          shrin
+          children: [
+            ChatList(
+              controller: _chatListController,
+              backgroundColor: _theme.backgroundColor,
+              header: _headerWidget(),
+              appbar: ChatListAppBar(
+                backgroundColor: _theme.backgroundColor,
+                centerTitle: false,
+                scrolledUnderElevation: 0,
+                titleText: 'ChatList',
+                titleTextStyle: TextStyle(
+                  fontSize: 20,
+                  color: _theme.textColor,
+                  fontWeight: FontWeight.bold,
                 ),
+                actions: [
+                  SvgPicture.asset(
+                    AppIcons.chatDiscoveryAi,
+                    colorFilter: ColorFilter.mode(
+                      _theme.iconColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  SvgPicture.asset(
+                    AppIcons.createPen,
+                    colorFilter: ColorFilter.mode(
+                      _theme.iconColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _onThemeIconTap,
+                    icon: Icon(
+                      _isDarkTheme ? Icons.light_mode : Icons.dark_mode,
+                      color: _theme.iconColor,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 16),
-              SvgPicture.asset(
-                AppIcons.createPen,
-                colorFilter: ColorFilter.mode(
-                  _theme.iconColor,
-                  BlendMode.srcIn,
+              searchConfig: SearchConfig(
+                textEditingController: _searchController,
+                hintText: 'Ask Meta AI or search',
+                hintStyle: TextStyle(
+                  fontSize: 16.4,
+                  color: _theme.searchText,
+                  fontWeight: FontWeight.w400,
                 ),
-              ),
-              IconButton(
-                onPressed: _onThemeIconTap,
-                icon: Icon(
-                  _isDarkTheme ? Icons.light_mode : Icons.dark_mode,
-                  color: _theme.iconColor,
+                textStyle: TextStyle(
+                  fontSize: 16.4,
+                  color: _theme.textColor,
+                  fontWeight: FontWeight.w400,
                 ),
-              ),
-            ],
-          ),
-          searchConfig: SearchConfig(
-            textEditingController: _searchController,
-            hintText: 'Ask Meta AI or search',
-            hintStyle: TextStyle(
-              fontSize: 16.4,
-              color: _theme.searchText,
-              fontWeight: FontWeight.w400,
-            ),
-            textStyle: TextStyle(
-              fontSize: 16.4,
-              color: _theme.textColor,
-              fontWeight: FontWeight.w400,
-            ),
-            textFieldBackgroundColor: _theme.searchBg,
-            borderRadius: const BorderRadius.all(Radius.circular(30)),
-            prefixIcon: SizedBox.square(
-              dimension: 48,
-              child: Align(child: SvgPicture.asset(AppIcons.ai, width: 24)),
-            ),
-            clearIcon: Icon(Icons.clear, color: _theme.iconColor),
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 16,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            onSearch: (value) {
-              if (value.isEmpty) {
-                _chatListController.clearSearch();
-                return null;
-              }
+                textFieldBackgroundColor: _theme.searchBg,
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
+                prefixIcon: SizedBox.square(
+                  dimension: 48,
+                  child: Align(child: SvgPicture.asset(AppIcons.ai, width: 24)),
+                ),
+                clearIcon: Icon(Icons.clear, color: _theme.iconColor),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 16,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                onSearch: (value) {
+                  if (value.isEmpty) {
+                    _chatListController.clearSearch();
+                    return null;
+                  }
 
-              List<ChatListItem> chats =
-                  _chatListController.chatListMap.values.toList();
+                  List<ChatListItem> chats =
+                      _chatListController.chatListMap.values.toList();
 
-              final list = chats
-                  .where((chat) =>
-                      chat.name.toLowerCase().contains(value.toLowerCase()))
-                  .toList();
-              return list;
-            },
-          ),
-          menuConfig: ChatMenuConfig(
-            deleteCallback: (chat) => _chatListController.removeChat(chat.id),
-            muteStatusCallback: (result) => _chatListController.updateChat(
-              result.chat.id,
-              (previousChat) => previousChat.copyWith(
-                settings: previousChat.settings.copyWith(
-                  muteStatus: result.status,
+                  final list = chats
+                      .where((chat) =>
+                          chat.name.toLowerCase().contains(value.toLowerCase()))
+                      .toList();
+                  return list;
+                },
+              ),
+              menuConfig: ChatMenuConfig(
+                deleteCallback: (chat) => _chatListController.removeChat(chat.id),
+                muteStatusCallback: (result) => _chatListController.updateChat(
+                  result.chat.id,
+                  (previousChat) => previousChat.copyWith(
+                    settings: previousChat.settings.copyWith(
+                      muteStatus: result.status,
+                    ),
+                  ),
+                ),
+                pinStatusCallback: (result) => _chatListController.updateChat(
+                  result.chat.id,
+                  (previousChat) => previousChat.copyWith(
+                    settings: previousChat.settings.copyWith(
+                      pinStatus: result.status,
+                    ),
+                  ),
+                ),
+              ),
+              tileConfig: ListTileConfig(
+                showUserActiveStatusIndicator: false,
+                trailingBuilder: (chat) => _customTrailingWidget(chat),
+                userNameBuilder: (chat) => _customUserNameWidget(chat),
+                lastMessageTileBuilder: (chat) => _customLastMessageTile(chat),
+                onTap: (chat) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ExampleOneChatScreen(chat: chat),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                userAvatarConfig: UserAvatarConfig(
+                  radius: 26,
+                  backgroundColor: _theme.secondaryBg,
+                ),
+                typingStatusConfig: TypingStatusConfig(
+                  textBuilder: (chat) => 'Typing...',
+                  textStyle: TextStyle(
+                    fontSize: 13,
+                    color: _theme.lastMessageText,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ),
             ),
-            pinStatusCallback: (result) => _chatListController.updateChat(
-              result.chat.id,
-              (previousChat) => previousChat.copyWith(
-                settings: previousChat.settings.copyWith(
-                  pinStatus: result.status,
-                ),
-              ),
-            ),
-          ),
-          tileConfig: ListTileConfig(
-            showUserActiveStatusIndicator: false,
-            trailingBuilder: (chat) => _customTrailingWidget(chat),
-            userNameBuilder: (chat) => _customUserNameWidget(chat),
-            lastMessageTileBuilder: (chat) => _customLastMessageTile(chat),
-            onTap: (chat) => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ExampleOneChatScreen(chat: chat),
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            userAvatarConfig: UserAvatarConfig(
-              radius: 26,
-              backgroundColor: _theme.secondaryBg,
-            ),
-            typingStatusConfig: TypingStatusConfig(
-              textBuilder: (chat) => 'Typing...',
-              textStyle: TextStyle(
-                fontSize: 13,
-                color: _theme.lastMessageText,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
+          ],
         ),
       ),
     );
@@ -429,7 +434,7 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
           onEditTap: (message, updatedMessage) => _chatController.updateMessage(
               messageId: message.id, newMessage: updatedMessage),
           chatController: _chatController,
-          onSendTap: _onSendTap,
+          onSendMessage: _onSendMessage,
           isLastPage: () => _isTopPaginationCalled && _isBottomPaginationCalled,
           loadMoreData: (direction, message) async {
             if (direction.isNext) {
@@ -498,6 +503,32 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
             enableOtherUserProfileAvatar: true,
             enablePagination: true,
             enableMessageEditing: true,
+            enableMention: true,
+          ),
+          mentionConfig: MentionConfiguration(
+            // Per-direction styling keeps mentions readable on both bubbles:
+            // white on the coloured outgoing bubble and blue on the light
+            // incoming bubble. (Omit these to use the default blue + bold,
+            // which also styles the mention in the text field.)
+            outgoingMentionTextStyle: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            incomingMentionTextStyle: const TextStyle(
+              color: Color(0xFF1565C0),
+              fontWeight: FontWeight.bold,
+            ),
+            // Tapping a highlighted mention inside a bubble.
+            onMentionTap: (mention) =>
+                ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  mention.isEveryone
+                      ? 'Mentioned everyone'
+                      : 'Tapped @${mention.name}',
+                ),
+              ),
+            ),
           ),
           scrollToBottomButtonConfig: const ScrollToBottomButtonConfig(
             padding: EdgeInsets.only(bottom: 8, right: 12),
@@ -893,10 +924,12 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
               ),
               textStyle: TextStyle(color: _theme.textColor),
             ),
-            onTap: (item) => _onSendTap(
-              item.text,
-              const ReplyMessage(),
-              MessageType.text,
+            onTap: (item) => _onSendMessage(
+              Message(
+                message: item.text,
+                createdAt: DateTime.now(),
+                sentBy: _chatController.currentUser.id,
+              ),
             ),
           ),
         ),
@@ -932,30 +965,33 @@ class _ExampleOneChatScreenState extends State<ExampleOneChatScreen> {
     ]);
   }
 
-  void _onSendTap(
-    String message,
-    ReplyMessage replyMessage,
-    MessageType messageType,
-  ) {
-    final messageObj = Message(
-      id: DateTime.now().toString(),
-      createdAt: DateTime.now(),
-      message: message,
-      sentBy: _chatController.currentUser.id,
-      replyMessage: replyMessage,
-      messageType: messageType,
-    );
-    _chatController.addMessage(
-      messageObj,
-    );
+  void _onSendMessage(Message message) {
+    // Mentions are carried on the message itself, so notifications (etc.) can
+    // be triggered right here without a separate callback.
+    if (message.mentions.isNotEmpty) {
+      // `message.message` is the encoded form (`@[Name](id)`). For a human
+      // facing notification body, de-tokenize it to the visible `@Name` form.
+      final body = MentionParser().toPlainText(message.message);
+      debugPrint(
+        'Notify ${message.mentions.map((m) => m.name).join(', ')}: $body',
+      );
+    }
+
+    // ChatView leaves the id empty so the host can assign its own.
+    final messageObj = message.id.isEmpty
+        ? message.copyWith(id: DateTime.now().toString())
+        : message;
+    _chatController.addMessage(messageObj);
 
     Future.delayed(const Duration(milliseconds: 300), () {
       final index = _chatController.initialMessageList.indexOf(messageObj);
+      if (index == -1) return;
       _chatController.initialMessageList[index].setStatus =
           MessageStatus.undelivered;
     });
     Future.delayed(const Duration(seconds: 1), () {
       final index = _chatController.initialMessageList.indexOf(messageObj);
+      if (index == -1) return;
       _chatController.initialMessageList[index].setStatus = MessageStatus.read;
     });
   }

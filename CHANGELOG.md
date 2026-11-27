@@ -3,6 +3,21 @@
 * **Feat**: [454](https://github.com/SimformSolutionsPvtLtd/chatview/pull/454) :sparkles: Add configurable image fit option for AdaptiveImage widget
 * **Feat**: [457](https://github.com/SimformSolutionsPvtLtd/chatview/pull/457) :sparkles: Add errorWidget support to ImageMessageConfiguration
 
+## Unreleased
+
+* **Feat**: [128](https://github.com/SimformSolutionsPvtLtd/chatview/issues/128) Add `@`-mention
+  (tagging) support. Typing `@` in the text field shows a suggestion list of group members
+  (auto-sourced from `ChatController.otherUsers`) plus an optional `@everyone` entry. The selected
+  mention is highlighted in the text field and in the sent message bubble with a customizable,
+  tappable style. Enable via `FeatureActiveConfig(enableMention: true)` and configure with the new
+  `ChatView(mentionConfig: MentionConfiguration(...))`. Mentions are persisted as
+  `@[Display Name](id)` tokens; use `MentionParser.toPlainText` for the plain form. A sent
+  message carries its resolved mentions in `Message.mentions`, so you can react to tagged
+  users (e.g. notifications) from `ChatView.onSendMessage`.
+* **Feat**: Add `ChatView.onSendMessage`, which delivers the fully built `Message` (including
+  `Message.mentions`) when the user sends a message. Deprecates `ChatView.onSendTap` (still
+  supported as a fallback). Requires `chatview_utils` `^3.2.0`.
+
 ## 3.1.0
 
 * **Fix**: [423](https://github.com/SimformSolutionsPvtLtd/chatview/pull/423)

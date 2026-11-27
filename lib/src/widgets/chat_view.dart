@@ -34,6 +34,7 @@ import '../utils/timeago/timeago.dart';
 import '../values/custom_time_messages.dart';
 import '../values/enumeration.dart';
 import 'chat_view_inherited_widget.dart';
+import 'mentions/mention_config_inherited_widget.dart';
 import 'send_message_widget.dart';
 import 'suggestions/suggestions_config_inherited_widget.dart';
 
@@ -43,6 +44,7 @@ class ChatView extends StatefulWidget {
     required this.chatController,
     this.typeIndicatorConfig = const TypeIndicatorConfiguration(),
     this.onSendTap,
+    this.onSendMessage,
     this.onEditTap,
     this.profileCircleConfig,
     this.chatBubbleConfig,
@@ -66,6 +68,7 @@ class ChatView extends StatefulWidget {
     this.replyMessageBuilder,
     this.replySuggestionsConfig,
     this.scrollToBottomButtonConfig,
+    this.mentionConfig,
   })  : chatBackgroundConfig =
             chatBackgroundConfig ?? const ChatBackgroundConfiguration(),
         chatViewStateConfig =
@@ -111,7 +114,23 @@ class ChatView extends StatefulWidget {
 
   /// Provides call back when user tap on send button in text field. It returns
   /// message, reply message and message type.
+  ///
+  /// Prefer [onSendMessage], which delivers the fully built [Message]
+  /// (including [Message.mentions]). When [onSendMessage] is provided it takes
+  /// precedence and this callback is ignored.
+  @Deprecated(
+    'Use onSendMessage instead, which exposes the full Message object. '
+    'This will be removed in a future major release.',
+  )
   final StringMessageCallBack? onSendTap;
+
+  /// Called when the user sends a message, exposing the fully built [Message]
+  /// (including [Message.mentions] and the reply/type metadata).
+  ///
+  /// The message's `id` is left empty so the host can assign its own before
+  /// persisting (e.g. via `message.copyWith(id: ...)`). Takes precedence over
+  /// the deprecated [onSendTap].
+  final MessageSendCallback? onSendMessage;
 
   /// Callback invoked when the user confirms an edit on a message.
   /// Receives the original [Message] and the updated text.
@@ -156,6 +175,13 @@ class ChatView extends StatefulWidget {
   /// Provides a configuration for scroll to bottom button config
   final ScrollToBottomButtonConfig? scrollToBottomButtonConfig;
 
+  /// Configuration for the `@`-mention (tagging) feature.
+  ///
+  /// Must be combined with `FeatureActiveConfig(enableMention: true)` to take
+  /// effect. When the feature is enabled but this is `null`, a default
+  /// [MentionConfiguration] is used.
+  final MentionConfiguration? mentionConfig;
+
   static void closeReplyMessageView(BuildContext context) {
     final state = context.findAncestorStateOfType<_ChatViewState>();
 
@@ -198,6 +224,13 @@ class _ChatViewState extends State<ChatView>
 
   FeatureActiveConfig get featureActiveConfig => widget.featureActiveConfig;
 
+  /// Resolves the mention configuration to provide down the tree. Falls back to
+  /// a default configuration when the feature is enabled without an explicit
+  /// config, and to `null` when the feature is disabled.
+  MentionConfiguration? get _effectiveMentionConfig =>
+      widget.mentionConfig ??
+      (featureActiveConfig.enableMention ? const MentionConfiguration() : null);
+
   late GlobalKey chatTextFieldViewKey;
 
   @override
@@ -222,139 +255,144 @@ class _ChatViewState extends State<ChatView>
       chatTextFieldViewKey: chatTextFieldViewKey,
       child: SuggestionsConfigIW(
         suggestionsConfig: widget.replySuggestionsConfig,
-        child: ConfigurationsInheritedWidget(
-          chatBackgroundConfig: widget.chatBackgroundConfig,
-          reactionPopupConfig: widget.reactionPopupConfig,
-          typeIndicatorConfig: widget.typeIndicatorConfig,
-          chatBubbleConfig: widget.chatBubbleConfig,
-          replyPopupConfig: widget.replyPopupConfig,
-          messageConfig: widget.messageConfig,
-          profileCircleConfig: widget.profileCircleConfig,
-          repliedMessageConfig: widget.repliedMessageConfig,
-          swipeToReplyConfig: widget.swipeToReplyConfig,
-          emojiPickerSheetConfig: widget.emojiPickerSheetConfig,
-          scrollToBottomButtonConfig: widget.scrollToBottomButtonConfig,
-          child: Builder(
-            builder: (context) => Stack(
-              children: [
-                Container(
-                  height: chatBackgroundConfig.height ??
-                      MediaQuery.of(context).size.height,
-                  width: chatBackgroundConfig.width ??
-                      MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: chatBackgroundConfig.backgroundColor ?? Colors.white,
-                    image: imageUrl == null
-                        ? null
-                        : DecorationImage(
-                            fit: chatBackgroundConfig.backgroundImageFit ??
-                                BoxFit.fill,
-                            repeat:
-                                chatBackgroundConfig.backgroundImageRepeat ??
-                                    ImageRepeat.noRepeat,
-                            image: imageUrl.isUrl
-                                ? NetworkImage(imageUrl)
-                                : imageUrl.toMemoryImage() ??
-                                    AssetImage(imageUrl),
-                          ),
-                  ),
-                  padding: chatBackgroundConfig.padding,
-                  margin: chatBackgroundConfig.margin,
-                  child: Column(
-                    children: [
-                      if (widget.appBar != null) widget.appBar!,
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            if (chatViewState.isLoading)
-                              ChatViewStateWidget(
-                                type: ChatViewStateType.chatView,
-                                config: chatViewStateConfig.loadingWidgetConfig,
-                                chatViewState: chatViewState,
-                              )
-                            else if (chatViewState.noMessages)
-                              ChatViewStateWidget(
-                                type: ChatViewStateType.chatView,
-                                config:
-                                    chatViewStateConfig.noMessageWidgetConfig,
-                                chatViewState: chatViewState,
-                                onReloadButtonTap:
-                                    chatViewStateConfig.onReloadButtonTap,
-                              )
-                            else if (chatViewState.isError)
-                              ChatViewStateWidget(
-                                type: ChatViewStateType.chatView,
-                                config: chatViewStateConfig.errorWidgetConfig,
-                                chatViewState: chatViewState,
-                                onReloadButtonTap:
-                                    chatViewStateConfig.onReloadButtonTap,
-                              )
-                            else if (chatViewState.hasMessages)
-                              GestureDetector(
-                                onTap: () => FocusManager.instance.primaryFocus
-                                    ?.unfocus(),
-                                behavior: HitTestBehavior.opaque,
-                                child: ChatListWidget(
-                                  chatController: widget.chatController,
-                                  loadMoreData: widget.loadMoreData,
-                                  isLastPage: widget.isLastPage,
-                                  loadingWidget: widget.loadingWidget,
-                                  onChatListTap: widget.onChatListTap,
-                                  assignReplyMessage: (message) =>
-                                      _sendMessageKey.currentState
-                                          ?.assignReplyMessage(message),
-                                  // Only wire assignEditMessage when the built-in
-                                  // SendMessageWidget is active. When a custom
-                                  // sendMessageBuilder is provided, the caller is
-                                  // responsible for handling edit via
-                                  // ReplyPopupConfiguration.onEditTap instead.
-                                  assignEditMessage:
-                                      widget.sendMessageBuilder == null
-                                          ? (message) => _sendMessageKey
-                                              .currentState
-                                              ?.assignEditMessage(message)
-                                          : null,
-                                  textFieldConfig:
-                                      widget.sendMessageConfig.textFieldConfig,
+        child: MentionConfigIW(
+          mentionConfig: _effectiveMentionConfig,
+          child: ConfigurationsInheritedWidget(
+            chatBackgroundConfig: widget.chatBackgroundConfig,
+            reactionPopupConfig: widget.reactionPopupConfig,
+            typeIndicatorConfig: widget.typeIndicatorConfig,
+            chatBubbleConfig: widget.chatBubbleConfig,
+            replyPopupConfig: widget.replyPopupConfig,
+            messageConfig: widget.messageConfig,
+            profileCircleConfig: widget.profileCircleConfig,
+            repliedMessageConfig: widget.repliedMessageConfig,
+            swipeToReplyConfig: widget.swipeToReplyConfig,
+            emojiPickerSheetConfig: widget.emojiPickerSheetConfig,
+            scrollToBottomButtonConfig: widget.scrollToBottomButtonConfig,
+            child: Builder(
+              builder: (context) => Stack(
+                children: [
+                  Container(
+                    height: chatBackgroundConfig.height ??
+                        MediaQuery.of(context).size.height,
+                    width: chatBackgroundConfig.width ??
+                        MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      color:
+                          chatBackgroundConfig.backgroundColor ?? Colors.white,
+                      image: imageUrl == null
+                          ? null
+                          : DecorationImage(
+                              fit: chatBackgroundConfig.backgroundImageFit ??
+                                  BoxFit.fill,
+                              repeat:
+                                  chatBackgroundConfig.backgroundImageRepeat ??
+                                      ImageRepeat.noRepeat,
+                              image: imageUrl.isUrl
+                                  ? NetworkImage(imageUrl)
+                                  : imageUrl.toMemoryImage() ??
+                                      AssetImage(imageUrl),
+                            ),
+                    ),
+                    padding: chatBackgroundConfig.padding,
+                    margin: chatBackgroundConfig.margin,
+                    child: Column(
+                      children: [
+                        if (widget.appBar != null) widget.appBar!,
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              if (chatViewState.isLoading)
+                                ChatViewStateWidget(
+                                  type: ChatViewStateType.chatView,
+                                  config:
+                                      chatViewStateConfig.loadingWidgetConfig,
+                                  chatViewState: chatViewState,
+                                )
+                              else if (chatViewState.noMessages)
+                                ChatViewStateWidget(
+                                  type: ChatViewStateType.chatView,
+                                  config:
+                                      chatViewStateConfig.noMessageWidgetConfig,
+                                  chatViewState: chatViewState,
+                                  onReloadButtonTap:
+                                      chatViewStateConfig.onReloadButtonTap,
+                                )
+                              else if (chatViewState.isError)
+                                ChatViewStateWidget(
+                                  type: ChatViewStateType.chatView,
+                                  config: chatViewStateConfig.errorWidgetConfig,
+                                  chatViewState: chatViewState,
+                                  onReloadButtonTap:
+                                      chatViewStateConfig.onReloadButtonTap,
+                                )
+                              else if (chatViewState.hasMessages)
+                                GestureDetector(
+                                  onTap: () => FocusManager
+                                      .instance.primaryFocus
+                                      ?.unfocus(),
+                                  behavior: HitTestBehavior.opaque,
+                                  child: ChatListWidget(
+                                    chatController: widget.chatController,
+                                    loadMoreData: widget.loadMoreData,
+                                    isLastPage: widget.isLastPage,
+                                    loadingWidget: widget.loadingWidget,
+                                    onChatListTap: widget.onChatListTap,
+                                    assignReplyMessage: (message) =>
+                                        _sendMessageKey.currentState
+                                            ?.assignReplyMessage(message),
+                                    // Only wire assignEditMessage when the built-in
+                                    // SendMessageWidget is active. When a custom
+                                    // sendMessageBuilder is provided, the caller is
+                                    // responsible for handling edit via
+                                    // ReplyPopupConfiguration.onEditTap instead.
+                                    assignEditMessage:
+                                        widget.sendMessageBuilder == null
+                                            ? (message) => _sendMessageKey
+                                                .currentState
+                                                ?.assignEditMessage(message)
+                                            : null,
+                                    textFieldConfig: widget
+                                        .sendMessageConfig.textFieldConfig,
+                                  ),
                                 ),
-                              ),
-                            if (featureActiveConfig.enableTextField)
-                              SendMessageWidget(
-                                key: _sendMessageKey,
-                                sendMessageBuilder: widget.sendMessageBuilder,
-                                sendMessageConfig: widget.sendMessageConfig,
-                                onSendTap:
-                                    (message, replyMessage, messageType) {
-                                  if (context.suggestionsConfig
-                                          ?.autoDismissOnSelection ??
-                                      true) {
-                                    chatController.removeReplySuggestions();
-                                  }
-                                  _onSendTap(
-                                      message, replyMessage, messageType);
-                                },
-                                onEditTap: widget.onEditTap,
-                                messageConfig: widget.messageConfig,
-                                replyMessageBuilder: widget.replyMessageBuilder,
-                              ),
-                          ],
+                              if (featureActiveConfig.enableTextField)
+                                SendMessageWidget(
+                                  key: _sendMessageKey,
+                                  sendMessageBuilder: widget.sendMessageBuilder,
+                                  sendMessageConfig: widget.sendMessageConfig,
+                                  onSendMessage: (message) {
+                                    if (context.suggestionsConfig
+                                            ?.autoDismissOnSelection ??
+                                        true) {
+                                      chatController.removeReplySuggestions();
+                                    }
+                                    _onSend(message);
+                                  },
+                                  onEditTap: widget.onEditTap,
+                                  messageConfig: widget.messageConfig,
+                                  replyMessageBuilder:
+                                      widget.replyMessageBuilder,
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (featureActiveConfig.enableReactionPopup)
-                  ValueListenableBuilder<bool>(
-                    valueListenable: context.chatViewIW!.showPopUp,
-                    builder: (_, showPopupValue, child) {
-                      return ReactionPopup(
-                        key: context.chatViewIW!.reactionPopupKey,
-                        onTap: () => _onChatListTap(context),
-                        showPopUp: showPopupValue,
-                      );
-                    },
-                  ),
-              ],
+                  if (featureActiveConfig.enableReactionPopup)
+                    ValueListenableBuilder<bool>(
+                      valueListenable: context.chatViewIW!.showPopUp,
+                      builder: (_, showPopupValue, child) {
+                        return ReactionPopup(
+                          key: context.chatViewIW!.reactionPopupKey,
+                          onTap: () => _onChatListTap(context),
+                          showPopUp: showPopupValue,
+                        );
+                      },
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -371,14 +409,19 @@ class _ChatViewState extends State<ChatView>
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
   }
 
-  void _onSendTap(
-    String message,
-    ReplyMessage replyMessage,
-    MessageType messageType,
-  ) {
+  void _onSend(Message message) {
     if (widget.sendMessageBuilder == null) {
-      if (widget.onSendTap != null) {
-        widget.onSendTap!(message, replyMessage, messageType);
+      if (widget.onSendMessage != null) {
+        widget.onSendMessage!(message);
+      } else if (widget.onSendTap != null) {
+        // Backward-compatible fallback: decompose into the legacy 3-arg
+        // callback. Mentions on [message] are dropped on this path.
+        // ignore: deprecated_member_use_from_same_package
+        widget.onSendTap!(
+          message.message,
+          message.replyMessage,
+          message.messageType,
+        );
       }
     }
     chatController.scrollToLastMessage();

@@ -78,7 +78,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
   RecorderController? controller;
 
-  final playerController = PlayerController();
+  PlayerController? playerController;
 
   ValueNotifier<bool> isRecording = ValueNotifier(false);
 
@@ -122,6 +122,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
 
     if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
       controller = RecorderController();
+      playerController = PlayerController();
     }
     if (kIsWeb) {
       if (_attachHardwareKeyboardHandler() case final handler) {
@@ -141,7 +142,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       HardwareKeyboard.instance.removeHandler(handler);
     }
     widget.textEditingController.removeListener(_listenTextEditingController);
-    playerController.dispose();
+    playerController?.dispose();
     super.dispose();
   }
 
@@ -507,7 +508,7 @@ class _ChatUITextFieldState extends State<ChatUITextField> {
       if (chatListConfig
               .messageConfig?.voiceMessageConfig?.playerMode.isSingle ??
           false) {
-        playerController.pauseAllPlayers();
+        playerController?.pauseAllPlayers();
       }
       await controller?.record(
         recorderSettings: voiceRecordingConfig.recorderSettings,
